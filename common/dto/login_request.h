@@ -34,15 +34,13 @@ public:
 
     static LoginRequest deserialize(const uint8_t* buffer, size_t size) {
         if (size < 3) {
-            throw std::runtime_error(
-                    "");
+            throw std::runtime_error("");
         }
         uint16_t length;
         memcpy(&length, buffer + 1, sizeof(length));
         size_t expected_size = 3 + static_cast<size_t>(length);
         if (size < expected_size) {
-            throw std::runtime_error(
-                    "");
+            throw std::runtime_error("");
         }
         const std::string username_deserialized(
                 reinterpret_cast<const char*>(buffer + 3), length);

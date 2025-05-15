@@ -46,3 +46,9 @@ std::unique_ptr<Message> Protocol::recv_message() {
             throw std::runtime_error("Unknown message type");
     }
 }
+
+void Protocol::send_message(const Message& message) {
+    std::vector<uint8_t> buffer(message.serialized_size());
+    message.serialize(buffer.data());
+    peer.sendall(buffer.data(), buffer.size());
+}

@@ -25,7 +25,7 @@ public:
     }
 
     size_t serialized_size() const override {
-        return 4;
+        return 2;
     }
 
     uint8_t get_action() const {
@@ -33,9 +33,8 @@ public:
     }
 
     static PlayerAction deserialize(const uint8_t* buffer, size_t size) {
-        if (size < 4) {
-            throw std::runtime_error(
-                    "Buffer size is too small to deserialize PlayerAction");
+        if (size < 3) {
+            throw std::runtime_error("");
         }
         uint8_t action_deserialized = buffer[1];
         return PlayerAction(static_cast<Action>(action_deserialized));
