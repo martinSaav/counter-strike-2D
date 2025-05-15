@@ -3,9 +3,13 @@
 
 #include <string>
 #include <variant>
+#include <memory>
 
 #include "../common/common_socket.h"
+#include "../common/message_type.h"
+#include "../common/message.h"
 
+#define HEADER_SIZE 3
 
 
 class Protocol {
@@ -14,8 +18,8 @@ private:
 
 public:
     explicit Protocol(Socket& peer);
-    void recv_message();
-    void send_message(const int& response);
+    std::unique_ptr<Message> recv_message();
+    void send_message(const Message& response);
     void kill();
 };
 #endif
