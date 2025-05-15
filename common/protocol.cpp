@@ -52,3 +52,8 @@ void Protocol::send_message(const Message& message) {
     message.serialize(buffer.data());
     peer.sendall(buffer.data(), buffer.size());
 }
+
+void Protocol::kill() {
+    peer.shutdown(2);
+    peer.close();
+}
