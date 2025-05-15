@@ -5,7 +5,7 @@
 #include <variant>
 #include <memory>
 
-#include "../common/common_socket.h"
+#include "../common/catedra/socket.h"
 #include "../common/message_type.h"
 #include "../common/message.h"
 
