@@ -9,6 +9,7 @@
 #include "../common/dto/login_request.h"
 #include "../common/dto/player_action.h"
 #include <vector>
+#include "../common/dto/game_state_update.h"
 
 
 
@@ -41,6 +42,10 @@ std::unique_ptr<Message> Protocol::recv_message() {
         case MessageType::PlayerAction: {
             return std::make_unique<PlayerAction>(
                     PlayerAction::deserialize(buffer.data(), buffer.size()));
+        }
+        case MessageType::GameStateUpdate: {
+            return std::make_unique<GameStateUpdate>(
+                    GameStateUpdate::deserialize(buffer.data(), buffer.size()));
         }
         default:
             throw std::runtime_error("Unknown message type");
