@@ -11,6 +11,7 @@ repos:
     hooks:
       - id: cpplint
         files: ^(.*[.]cpp|.*[.]h)$
+        exclude: ^common/(queue\.h|thread\.h)$
         args: ["--filter=-whitespace/comments, -legal/copyright"]
   - repo: https://github.com/pocc/pre-commit-hooks
     rev: 9a9bbc00895bbdb7670231c2565d4f1309c42905  # SHA of v1.3.5
