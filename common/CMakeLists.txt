@@ -5,8 +5,6 @@ target_sources(taller_common
         catedra/resolvererror.cpp
         catedra/resolver.cpp
         catedra/socket.cpp
-        catedra/queue.cpp
-        catedra/thread.cpp
         protocol.cpp
     PUBLIC
     # .h files
