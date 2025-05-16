@@ -1,21 +1,23 @@
 #ifndef LOGIN_REQUEST_H
 #define LOGIN_REQUEST_H
 
-#include "../message_type.h"
-#include "../message.h"
 #include <cstring>
+#include <stdexcept>
 #include <string>
 #include <utility>
+
 #include <netinet/in.h>
-#include <stdexcept>
+
+#include "../message.h"
+#include "../message_type.h"
 
 class LoginRequest: public Message {
 private:
     MessageType message_type = MessageType::LoginRequest;
     std::string username;
+
 public:
-    explicit LoginRequest(std::string username)
-        : username(std::move(username)) {}
+    explicit LoginRequest(std::string username): username(std::move(username)) {}
 
     void serialize(uint8_t* buffer) const override {
         buffer[0] = static_cast<uint8_t>(message_type);
@@ -24,13 +26,9 @@ public:
         memcpy(buffer + 3, username.data(), username.size());
     }
 
-    size_t serialized_size() const override {
-        return 3 + username.size() + username.size();
-    }
+    size_t serialized_size() const override { return 3 + username.size() + username.size(); }
 
-    const std::string& get_username() const {
-        return username;
-    }
+    const std::string& get_username() const { return username; }
 
     static LoginRequest deserialize(const uint8_t* buffer, size_t size) {
         if (size < 3) {
@@ -42,10 +40,8 @@ public:
         if (size < expected_size) {
             throw std::runtime_error("");
         }
-        const std::string username_deserialized(
-                reinterpret_cast<const char*>(buffer + 3), length);
+        const std::string username_deserialized(reinterpret_cast<const char*>(buffer + 3), length);
         return LoginRequest(username_deserialized);
     }
-
 };
 #endif

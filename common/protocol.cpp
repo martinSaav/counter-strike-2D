@@ -1,19 +1,16 @@
 #include "protocol.h"
 
-
 #include <cstring>
 #include <stdexcept>
 #include <utility>
+#include <vector>
 
-
+#include "../common/dto/game_state_update.h"
 #include "../common/dto/login_request.h"
 #include "../common/dto/player_action.h"
-#include <vector>
-#include "../common/dto/game_state_update.h"
 
 
-
-Protocol::Protocol(Socket& peer) : peer(peer) {}
+Protocol::Protocol(Socket& peer): peer(peer) {}
 
 
 std::unique_ptr<Message> Protocol::recv_message() {

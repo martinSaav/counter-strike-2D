@@ -18,3 +18,8 @@ void Sender::run() {
         }
     }
 }
+
+void Sender::stop() {
+    Thread::stop();
+    protocol.kill();
+}
