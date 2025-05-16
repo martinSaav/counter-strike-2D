@@ -8,17 +8,19 @@
 
 #include "common/catedra/queue.h"
 #include "common/catedra/thread.h"
+#include "common/protocol.h"
 #include "server/events.h"
 #include "server/lobby.h"
-#include "server/match_status_dto.h"
+
 class ClientHandler: public Thread {
-    CommunicationProtocol protocol;
+    Protocol protocol;
     Lobby& lobby;
     Queue<CommandTypes> receiver_queue;
-    Queue<MatchStatusDTO> sender_queue;
+
+    //   GameIdentification pick_match();
 
 public:
-    explicit ClientHandler(CommunicationProtocol&& protocol, Lobby& lobby):
+    explicit ClientHandler(Protocol&& protocol, Lobby& lobby):
             protocol(std::move(protocol)), lobby(lobby) {}
     void run() override;
     void stop() override;
