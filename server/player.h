@@ -19,7 +19,7 @@ public:
             position_x(position_x), position_y(position_y), username(username) {}
     std::pair<int, int> get_location();
     void set_location(int x, int y);
-    [[nodiscard]] PlayerDTO get_player_info() const;
+    PlayerDTO get_player_info() const;
 };
 
 #endif  // PLAYER_H

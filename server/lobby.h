@@ -4,13 +4,11 @@
 #include <memory>
 #include <mutex>
 #include <string>
-#include <vector>
 
 #include "common/catedra/queue.h"
 
 #include "game_identification.h"
 #include "match.h"
-#include "match_dto.h"
 
 struct MatchNotFound: public std::runtime_error {
     MatchNotFound(): std::runtime_error("Match not found") {}
@@ -28,7 +26,6 @@ public:
     Lobby() = default;
     GameIdentification create_match(const std::string& match_name, const std::string& player_name);
     GameIdentification join_match(const std::string& match_name, const std::string& player_name);
-    std::vector<MatchDTO> list_matches();
 };
 
 #endif  // LOBBY_H
