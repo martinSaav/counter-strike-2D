@@ -25,7 +25,7 @@ public:
     }
 
     size_t serialized_size() const override {
-        return 3 + username.size() + username.size();
+        return 3 + username.size();
     }
 
     const std::string& get_username() const {
