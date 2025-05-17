@@ -8,6 +8,7 @@
 
 #include "common/catedra/queue.h"
 
+#include "PlayerCommand.h"
 #include "events.h"
 #include "match_status_dto.h"
 #include "player_credentials.h"
@@ -15,12 +16,12 @@
 
 class GameIdentification {
 public:
-    Queue<CommandTypes>& event_queue;
+    Queue<PlayerCommand>& command_queue;
     Queue<MatchStatusDTO>& sender_queue;
     PlayerCredentials& credentials;
-    GameIdentification(Queue<CommandTypes>& event_queue, Queue<MatchStatusDTO>& sender_queue,
+    GameIdentification(Queue<PlayerCommand>& event_queue, Queue<MatchStatusDTO>& sender_queue,
                        PlayerCredentials& credentials):
-            event_queue(event_queue), sender_queue(sender_queue), credentials(credentials) {}
+            command_queue(event_queue), sender_queue(sender_queue), credentials(credentials) {}
 };
 
 
