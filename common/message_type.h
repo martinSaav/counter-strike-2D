@@ -6,14 +6,16 @@
 enum class MessageType : uint8_t {
     // Client -> Server
     LoginRequest        = 0x01,
-    JoinGameRequest     = 0x02,
-    CreateGameRequest   = 0x03,
-    JoinTeamRequest     = 0x04,
-    Ready               = 0x05,
-    BuyWeaponRequest    = 0x06,
-    BuyAmmoRequest      = 0x07,
-    PlayerAction        = 0x08,
-    DisconnectRequest   = 0x09,
+    MapNamesRequest     = 0x02,
+    GameListRequest     = 0x03,
+    JoinGameRequest     = 0x04,
+    CreateGameRequest   = 0x05,
+    JoinTeamRequest     = 0x06,
+    Ready               = 0x07,
+    BuyWeaponRequest    = 0x08,
+    BuyAmmoRequest      = 0x09,
+    PlayerAction        = 0x0A,
+    DisconnectRequest   = 0x0B,
 
 
     // Server -> Client

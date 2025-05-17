@@ -4,12 +4,14 @@
 #include <cstring>
 #include <stdexcept>
 #include <utility>
+#include <vector>
 
 
 #include "../common/dto/login_request.h"
 #include "../common/dto/player_action.h"
-#include <vector>
 #include "../common/dto/game_state_update.h"
+#include "../common/dto/map_names_request.h"
+#include "../common/dto/game_list_request.h"
 
 
 
@@ -46,6 +48,14 @@ std::unique_ptr<Message> Protocol::recv_message() {
         case MessageType::GameStateUpdate: {
             return std::make_unique<GameStateUpdate>(
                     GameStateUpdate::deserialize(buffer.data(), buffer.size()));
+        }
+        case MessageType::MapNamesRequest: {
+            return std::make_unique<MapNamesRequest>(
+                    MapNamesRequest::deserialize(buffer.data(), buffer.size()));
+        }
+        case MessageType::GameListRequest: {
+            return std::make_unique<GameListRequest>(
+                    GameListRequest::deserialize(buffer.data(), buffer.size()));
         }
         default:
             throw std::runtime_error("Unknown message type");
