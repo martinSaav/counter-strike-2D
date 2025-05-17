@@ -23,8 +23,8 @@ public:
         
     void serialize(uint8_t* buffer) const override {
         buffer[0] = static_cast<uint8_t>(message_type);
-        uint16_t length = 2;
-        memccpy(buffer + 1, &length, 0, sizeof(length));
+        uint16_t payload_length = htons(2);
+        memccpy(buffer + 1, &payload_length, 0, sizeof(payload_length));
         buffer[3] = x;
         buffer[4] = y;
     }
