@@ -30,7 +30,7 @@ public:
     }
 
     size_t serialized_size() const override {
-        return 3;
+        return 5;
     }
 
     uint8_t get_x() const {
@@ -42,7 +42,7 @@ public:
     }
 
     static GameStateUpdate deserialize(const uint8_t* buffer, size_t size) {
-        if (size < 3) {
+        if (size < 5) {
             throw std::runtime_error("");
         }
         uint8_t x_deserialized = buffer[3];
