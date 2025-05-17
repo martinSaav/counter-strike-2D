@@ -32,6 +32,7 @@ public:
         return username;
     }
 
+
     static LoginRequest deserialize(const uint8_t* buffer, size_t size) {
         if (size < 3) {
             throw std::runtime_error("");
@@ -45,6 +46,10 @@ public:
         const std::string username_deserialized(
                 reinterpret_cast<const char*>(buffer + 3), length);
         return LoginRequest(username_deserialized);
+    }
+
+    MessageType type() const override {
+        return this->message_type;
     }
 
 };

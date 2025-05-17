@@ -47,5 +47,9 @@ public:
         uint8_t y_deserialized = buffer[2];
         return GameStateUpdate(x_deserialized, y_deserialized);
     }
+
+    MessageType type() const {
+        return this->message_type;
+    }
 };
 #endif 

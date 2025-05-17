@@ -40,5 +40,8 @@ public:
         return PlayerAction(static_cast<Action>(action_deserialized));
     }
 
+    MessageType type() const override {
+        return this->message_type;
+    }
 };
 #endif 
