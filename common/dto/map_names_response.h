@@ -3,6 +3,7 @@
 
 #include <cstring>
 #include <iostream>
+#include <list>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -11,20 +12,19 @@
 
 #include "../message.h"
 #include "../message_type.h"
-#include <list>
 
 class MapNamesResponse: public Message {
 private:
-    MessageType message_type = MessageType::MapNamesRequest;    
+    MessageType message_type = MessageType::MapNamesRequest;
     std::list<std::string> map_names;
 
 public:
     explicit MapNamesResponse(std::list<std::string> map_names): map_names(std::move(map_names)) {}
-    
-    void serialize(uint8_t* buffer) const {
+
+    void serialize(uint8_t* buffer) const override {
         buffer[0] = static_cast<uint8_t>(message_type);
         size_t offset = 3;
-        for (const auto& map_name : map_names) {
+        for (const auto& map_name: map_names) {
             uint16_t map_name_length = htons(static_cast<uint16_t>(map_name.size()));
             std::memcpy(buffer + offset, &map_name_length, sizeof(map_name_length));
             offset += sizeof(map_name_length);
@@ -35,9 +35,9 @@ public:
         std::memcpy(buffer + 1, &payload_length, sizeof(payload_length));
     }
 
-    size_t serialized_size() const { 
-        size_t size = 3; 
-        for (const auto& map_name : map_names) {
+    size_t serialized_size() const override {
+        size_t size = 3;
+        for (const auto& map_name: map_names) {
             size += sizeof(uint16_t);
             size += sizeof(uint16_t) + map_name.size();
         }
@@ -61,8 +61,8 @@ public:
             map_name_length = ntohs(map_name_length);
             offset += sizeof(map_name_length);
 
-            const std::string map_name(
-                    reinterpret_cast<const char*>(buffer + offset), map_name_length);
+            const std::string map_name(reinterpret_cast<const char*>(buffer + offset),
+                                       map_name_length);
             map_names_deserialized.push_back(map_name);
             offset += map_name_length;
         }

@@ -1,8 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <string>
 #include <cstdint>
+#include <string>
 
 struct Game {
     std::string name;

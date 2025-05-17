@@ -3,40 +3,41 @@
 
 #include <cstring>
 #include <iostream>
+#include <list>
 #include <stdexcept>
 #include <string>
 #include <utility>
 
 #include <arpa/inet.h>
 
+#include "../game.h"
 #include "../message.h"
 #include "../message_type.h"
-#include "../game.h"
-#include <list>
 
 class GameListResponse: public Message {
 private:
-    MessageType message_type = MessageType::GameListResponse;    
+    MessageType message_type = MessageType::GameListResponse;
     std::list<Game> games;
+
 public:
     explicit GameListResponse(std::list<Game> games): games(std::move(games)) {}
-    
-    void serialize(uint8_t* buffer) const {
+
+    void serialize(uint8_t* buffer) const override {
         buffer[0] = static_cast<uint8_t>(message_type);
         size_t offset = 3;
-        for (const auto& game : games) {
+        for (const auto& game: games) {
             uint16_t name_length = htons(static_cast<uint16_t>(game.name.size()));
             std::memcpy(buffer + offset, &name_length, sizeof(name_length));
             offset += sizeof(name_length);
             std::memcpy(buffer + offset, game.name.data(), game.name.size());
             offset += game.name.size();
-            
+
             uint16_t map_name_length = htons(static_cast<uint16_t>(game.map_name.size()));
             std::memcpy(buffer + offset, &map_name_length, sizeof(map_name_length));
             offset += sizeof(map_name_length);
             std::memcpy(buffer + offset, game.map_name.data(), game.map_name.size());
             offset += game.map_name.size();
-            
+
             buffer[offset++] = game.current_players;
             buffer[offset++] = game.max_players;
         }
@@ -44,10 +45,10 @@ public:
         std::memcpy(buffer + 1, &payload_length, sizeof(payload_length));
     }
 
-    size_t serialized_size() const { 
-        size_t size = 3; 
-        for (const auto& game : games) {
-            size += sizeof(uint16_t) + game.name.size(); 
+    size_t serialized_size() const override {
+        size_t size = 3;
+        for (const auto& game: games) {
+            size += sizeof(uint16_t) + game.name.size();
             size += sizeof(uint16_t) + game.map_name.size();
             size += sizeof(uint8_t) * 2;
         }
@@ -70,15 +71,14 @@ public:
             std::memcpy(&name_length, buffer + offset, sizeof(name_length));
             name_length = ntohs(name_length);
             offset += sizeof(name_length);
-            const std::string name(
-                    reinterpret_cast<const char*>(buffer + offset), name_length);
+            const std::string name(reinterpret_cast<const char*>(buffer + offset), name_length);
             offset += name_length;
             uint16_t map_name_length;
             std::memcpy(&map_name_length, buffer + offset, sizeof(map_name_length));
             map_name_length = ntohs(map_name_length);
             offset += sizeof(map_name_length);
-            const std::string map_name(
-                    reinterpret_cast<const char*>(buffer + offset), map_name_length);
+            const std::string map_name(reinterpret_cast<const char*>(buffer + offset),
+                                       map_name_length);
             offset += map_name_length;
             uint8_t current_players = buffer[offset++];
             uint8_t max_players = buffer[offset++];
@@ -86,11 +86,8 @@ public:
         }
         return GameListResponse(games_deserialized);
     }
-    
-    const std::list<Game>& get_games() const {
-        return games;
-    }
 
+    const std::list<Game>& get_games() const { return games; }
 };
 
 #endif

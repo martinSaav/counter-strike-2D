@@ -1,15 +1,17 @@
 #ifndef GAME_STATE_UPDATE_H
 #define GAME_STATE_UPDATE_H
 
-#include "../message_type.h"
-#include "../message.h"
-#include "../action.h"
+#include <cstdint>
 #include <cstring>
+#include <stdexcept>
 #include <string>
 #include <utility>
+
 #include <netinet/in.h>
-#include <stdexcept>
-#include <cstdint>
+
+#include "../action.h"
+#include "../message.h"
+#include "../message_type.h"
 
 
 class GameStateUpdate: public Message {
@@ -17,10 +19,10 @@ private:
     MessageType message_type = MessageType::GameStateUpdate;
     uint8_t x;
     uint8_t y;
+
 public:
-    GameStateUpdate(uint8_t x, uint8_t y)
-        : x(x), y(y) {}
-        
+    GameStateUpdate(uint8_t x, uint8_t y): x(x), y(y) {}
+
     void serialize(uint8_t* buffer) const override {
         buffer[0] = static_cast<uint8_t>(message_type);
         uint16_t payload_length = htons(2);
@@ -29,17 +31,11 @@ public:
         buffer[4] = y;
     }
 
-    size_t serialized_size() const override {
-        return 5;
-    }
+    size_t serialized_size() const override { return 5; }
 
-    uint8_t get_x() const {
-        return x;
-    }
+    uint8_t get_x() const { return x; }
 
-    uint8_t get_y() const {
-        return y;
-    }
+    uint8_t get_y() const { return y; }
 
     static GameStateUpdate deserialize(const uint8_t* buffer, size_t size) {
         if (size < 5) {
@@ -50,8 +46,6 @@ public:
         return GameStateUpdate(x_deserialized, y_deserialized);
     }
 
-    MessageType type() const {
-        return this->message_type;
-    }
+    MessageType type() const override { return this->message_type; }
 };
-#endif 
+#endif

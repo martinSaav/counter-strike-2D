@@ -1,8 +1,9 @@
 #ifndef MESSAGE
 #define MESSAGE
 
-#include "message_type.h"
 #include <cstddef>
+
+#include "message_type.h"
 
 class Message {
 public:
