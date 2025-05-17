@@ -11,5 +11,12 @@
 //    }
 //}
 
+void ClientHandler::receive_notification_about_sender_error() {
+    if (sender.has_value()) {
+        sender.value()->join();
+        sender = std::nullopt;
+    }
+}
+
 
 void ClientHandler::run() {}
