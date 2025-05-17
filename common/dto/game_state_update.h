@@ -23,8 +23,10 @@ public:
         
     void serialize(uint8_t* buffer) const override {
         buffer[0] = static_cast<uint8_t>(message_type);
-        buffer[1] = x;
-        buffer[2] = y;
+        uint16_t length = 2;
+        memccpy(buffer + 1, &length, 0, sizeof(length));
+        buffer[3] = x;
+        buffer[4] = y;
     }
 
     size_t serialized_size() const override {
@@ -43,8 +45,8 @@ public:
         if (size < 3) {
             throw std::runtime_error("");
         }
-        uint8_t x_deserialized = buffer[1];
-        uint8_t y_deserialized = buffer[2];
+        uint8_t x_deserialized = buffer[3];
+        uint8_t y_deserialized = buffer[4];
         return GameStateUpdate(x_deserialized, y_deserialized);
     }
 
