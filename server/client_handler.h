@@ -4,6 +4,8 @@
 
 #ifndef SERVER_CLIENT_HANDLER_H_
 #define SERVER_CLIENT_HANDLER_H_
+#include <memory>
+#include <optional>
 #include <utility>
 
 #include "common/catedra/queue.h"
@@ -12,16 +14,20 @@
 #include "server/events.h"
 #include "server/lobby.h"
 
+#include "sender.h"
+
 class ClientHandler: public Thread {
     Protocol protocol;
     Lobby& lobby;
     Queue<CommandTypes> receiver_queue;
+    std::optional<std::unique_ptr<Sender>> sender;
 
     //   GameIdentification pick_match();
 
 public:
     explicit ClientHandler(Protocol&& protocol, Lobby& lobby):
             protocol(std::move(protocol)), lobby(lobby) {}
+    void receive_notification_about_sender_error();
     void run() override;
     void stop() override;
 };

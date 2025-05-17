@@ -1,7 +1,26 @@
 target_sources(taller_server
     PRIVATE
-    # .cpp files
-    main.cpp
+        acceptor.cpp
+        client_handler.cpp
+        lobby.cpp
+        match.cpp
+        player.cpp
+        PlayerCommand.cpp
+        sender.cpp
+        main.cpp
     PUBLIC
-    # .h files
+        client_handler.h
+        events.h
+        game_identification.h
+        lobby.h
+        lobby_dto.h
+        match.h
+        match_dto.h
+        match_status_dto.h
+        player.h
+        player_credentials.h
+        player_dto.h
+        PlayerCommand.h
+        sender.h
+        acceptor.h
     )
