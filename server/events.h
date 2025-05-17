@@ -13,7 +13,8 @@ enum class CommandTypes : uint8_t {
     moveUp,
     moveDown,
     moveLeft,
-    moveRight
+    moveRight,
+    invalid
 };
 
 #endif  // EVENTS_H
