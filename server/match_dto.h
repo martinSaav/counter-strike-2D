@@ -9,9 +9,9 @@
 class MatchDTO {
 public:
     const std::string match_name;
-    const int amount_of_players;
-    MatchDTO(const std::string& match_name, const int amount_of_players):
-            match_name(match_name), amount_of_players(amount_of_players) {}
+    const int number_of_players;
+    MatchDTO(const std::string& match_name, const int number_of_players):
+            match_name(match_name), number_of_players(number_of_players) {}
 };
 
 #endif  // MATCH_DTO_H
