@@ -99,5 +99,7 @@ void Match::run() {
     commands_queue.close();
 }
 
+int Match::get_player_count() const { return player_count; }
+
 
 void Match::stop() { Thread::stop(); }
