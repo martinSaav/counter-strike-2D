@@ -20,3 +20,13 @@ void ClientHandler::receive_notification_about_sender_error() {
 
 
 void ClientHandler::run() {}
+
+void ClientHandler::stop() {
+    Thread::stop();
+    if (sender.has_value()) {
+        sender.value()->stop();
+        sender.value()->join();
+        sender = std::nullopt;
+    }
+    protocol.kill();
+}
