@@ -24,7 +24,7 @@ public:
     const PlayerCredentials credentials;
     const CommandTypes command_type;
 
-    PlayerCommand(const PlayerCredentials& credentials, const CommandTypes type);
+    PlayerCommand(const PlayerCredentials& credentials, CommandTypes type);
 };
 
 
