@@ -7,6 +7,7 @@
 #include "common/catedra/queue.h"
 #include "common/catedra/thread.h"
 
+#include "PlayerCommand.h"
 #include "events.h"
 #include "game_identification.h"
 #include "match_status_dto.h"
@@ -15,15 +16,20 @@
 
 class Match: public Thread {
     std::map<PlayerCredentials, Player> players;
-    Queue<CommandTypes> commands_queue;
+    Queue<PlayerCommand> commands_queue;
     std::vector<Queue<MatchStatusDTO>> senders_queues;
     std::mutex mtx;
     int player_count;
+    std::atomic<bool> has_finished;
 
-    void process_command(CommandTypes command);
+    void process_command(PlayerCommand command);
+
+    MatchStatusDTO get_match_status();
+
+    void broadcast_match_status();
 
 public:
-    Match(): commands_queue(Queue<CommandTypes>()), player_count(0) {}
+    Match(): commands_queue(Queue<PlayerCommand>()), player_count(0) {}
     GameIdentification join_match(const std::string& username);
     void run() override;
     void stop() override;
