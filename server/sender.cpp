@@ -28,5 +28,5 @@ void Sender::run() {
 
 void Sender::stop() {
     Thread::stop();
-    protocol.kill();
+    sender_queue.close();
 }
