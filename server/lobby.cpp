@@ -20,3 +20,13 @@ GameIdentification Lobby::join_match(const std::string& match_name,
 
     return match->second->join_match(player_name);
 }
+
+std::vector<MatchDTO> Lobby::list_matches() {
+    std::lock_guard<std::mutex> guard(mutex);
+    std::vector<MatchDTO> match_dtos;
+    for (auto& [name, match]: matches) {
+        MatchDTO match_dto(name, match->get_player_count());
+        match_dtos.push_back(match_dto);
+    }
+    return match_dtos;
+}

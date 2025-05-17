@@ -8,7 +8,6 @@
 #include "common/catedra/thread.h"
 
 #include "PlayerCommand.h"
-#include "events.h"
 #include "game_identification.h"
 #include "match_status_dto.h"
 #include "player.h"
@@ -33,6 +32,7 @@ public:
     GameIdentification join_match(const std::string& username);
     void run() override;
     void stop() override;
+    [[nodiscard]] int get_player_count() const;
 };
 
 #endif  // GAME_LOOP_H
