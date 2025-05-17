@@ -12,6 +12,7 @@
 #include "../common/dto/game_state_update.h"
 #include "../common/dto/map_names_request.h"
 #include "../common/dto/game_list_request.h"
+#include "../common/dto/map_names_response.h"
 
 
 
@@ -56,6 +57,10 @@ std::unique_ptr<Message> Protocol::recv_message() {
         case MessageType::GameListRequest: {
             return std::make_unique<GameListRequest>(
                     GameListRequest::deserialize(buffer.data(), buffer.size()));
+        }
+        case MessageType::MapNamesResponse: {
+            return std::make_unique<MapNamesResponse>(
+                    MapNamesResponse::deserialize(buffer.data(), buffer.size()));
         }
         default:
             throw std::runtime_error("Unknown message type");
