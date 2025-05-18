@@ -5,7 +5,7 @@ target_sources(taller_server
         lobby.cpp
         match.cpp
         player.cpp
-        PlayerCommand.cpp
+        player_command.cpp
         sender.cpp
         main.cpp
     PUBLIC
@@ -20,7 +20,7 @@ target_sources(taller_server
         player.h
         player_credentials.h
         player_dto.h
-        PlayerCommand.h
+        player_command.h
         sender.h
         acceptor.h
     )
