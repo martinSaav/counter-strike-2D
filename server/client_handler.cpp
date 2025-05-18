@@ -12,6 +12,8 @@
 #include "common/message.h"
 #define generic_match_name "match"
 #include "common/dto/game_list_response.h"
+#include "common/dto/map_names_response.h"
+#include "common/dto/player_action.h"
 
 std::string ClientHandler::handle_login() {
     while (true) {
@@ -44,6 +46,24 @@ void ClientHandler::handle_list_matches_request() {
     protocol.send_message(message);
 }
 
+void ClientHandler::handle_map_names_request() {
+    while (true) {
+        const auto message = protocol.recv_message();
+        switch (message->type()) {
+            case MessageType::MapNamesRequest: {
+                std::list<std::string> map_names;
+                map_names.emplace_back(generic_map_name);
+                protocol.send_message(MapNamesResponse(std::move(map_names)));
+            }
+            default:  // Mientras no reciba el mensaje de pedido de mapas continuo recibiendo
+                      // mensajes hasta
+                // recibirlo.
+                break;
+        }
+    }
+}
+
+
 GameIdentification ClientHandler::handle_create_game_request() {
     return lobby.create_match(generic_match_name, username);
 }
@@ -73,6 +93,31 @@ GameIdentification ClientHandler::pick_match() {
     }
 }
 
+void ClientHandler::handle_player_action(Queue<PlayerCommand>& command_queue,
+                                         const PlayerCredentials& credentials,
+                                         const std::unique_ptr<Message>& message) {
+    const auto player_action_message = static_cast<PlayerAction*>(message.get());
+    const PlayerCommand player_command(credentials,
+                                       static_cast<Action>(player_action_message->get_action()));
+    command_queue.push(player_command);
+}
+
+
+void ClientHandler::handle_game(Queue<PlayerCommand>& command_queue,
+                                const PlayerCredentials& credentials) {
+    while (true) {
+        auto message = protocol.recv_message();
+        switch (message->type()) {
+            case MessageType::PlayerAction: {
+                handle_player_action(command_queue, credentials, message);
+            }
+            default:
+                break;
+        }
+    }
+}
+
+
 void ClientHandler::receive_notification_about_sender_error() {
     if (sender.has_value()) {
         sender.value()->join();
@@ -82,9 +127,11 @@ void ClientHandler::receive_notification_about_sender_error() {
 
 void ClientHandler::run() {
     username = handle_login();
-    auto match_id = pick_match();
+    handle_map_names_request();
+    const auto match_id = pick_match();
     sender = std::make_unique<Sender>(protocol, match_id.sender_queue, this);
     sender.value()->start();
+    handle_game(match_id.command_queue, match_id.credentials);
 }
 
 void ClientHandler::stop() {

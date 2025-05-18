@@ -27,22 +27,22 @@ void Match::process_command(const PlayerCommand command) {
     }
     Player& player = player_p->second;
     switch (command.command_type) {
-        case CommandTypes::moveLeft: {
+        case Action::MoveLeft: {
             auto [x, y] = player.get_location();
             player.set_location(x - 1, y);
             break;
         }
 
-        case CommandTypes::moveRight: {
+        case Action::MoveRight: {
             auto [x, y] = player.get_location();
             player.set_location(x + 1, y);
             break;
         }
-        case CommandTypes::moveUp: {
+        case Action::MoveUp: {
             auto [x, y] = player.get_location();
             player.set_location(x, y - 1);
         }
-        case CommandTypes::moveDown: {
+        case Action::MoveDown: {
             auto [x, y] = player.get_location();
             player.set_location(x, y + 1);
         }

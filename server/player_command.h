@@ -8,6 +8,8 @@
 #include <set>
 #include <stdexcept>
 
+#include "common/action.h"
+
 #include "events.h"
 #include "player_credentials.h"
 
@@ -17,14 +19,13 @@ struct InvalidCommandType: public std::runtime_error {
 
 class PlayerCommand {
     friend class Match;
-    static std::set<CommandTypes> get_player_commands_set();
     PlayerCommand();
 
 public:
     const PlayerCredentials credentials;
-    const CommandTypes command_type;
+    const Action command_type;
 
-    PlayerCommand(const PlayerCredentials& credentials, CommandTypes type);
+    PlayerCommand(const PlayerCredentials& credentials, Action type);
 };
 
 

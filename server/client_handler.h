@@ -26,6 +26,8 @@ class ClientHandler: public Thread {
 
     std::string handle_login();
 
+    void handle_map_names_request();
+
     void handle_list_matches_request();
 
     GameIdentification handle_create_game_request();
@@ -33,6 +35,12 @@ class ClientHandler: public Thread {
     GameIdentification handle_join_game_request();
 
     GameIdentification pick_match();
+
+    void handle_player_action(Queue<PlayerCommand>& command_queue,
+                              const PlayerCredentials& credentials,
+                              const std::unique_ptr<Message>& message);
+
+    void handle_game(Queue<PlayerCommand>& command_queue, const PlayerCredentials& credentials);
 
 public:
     explicit ClientHandler(Protocol&& protocol, Lobby& lobby):
