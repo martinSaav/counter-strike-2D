@@ -20,7 +20,7 @@ std::string ClientHandler::handle_login() {
         const auto message = protocol.recv_message();
         switch (message->type()) {
             case MessageType::LoginRequest: {
-                const auto login_message = static_cast<LoginRequest*>(message.get());
+                const auto login_message = dynamic_cast<LoginRequest*>(message.get());
                 std::string username = login_message->get_username();
                 return username;
             }
@@ -96,7 +96,7 @@ GameIdentification ClientHandler::pick_match() {
 void ClientHandler::handle_player_action(Queue<PlayerCommand>& command_queue,
                                          const PlayerCredentials& credentials,
                                          const std::unique_ptr<Message>& message) {
-    const auto player_action_message = static_cast<PlayerAction*>(message.get());
+    const auto player_action_message = dynamic_cast<PlayerAction*>(message.get());
     const PlayerCommand player_command(credentials,
                                        static_cast<Action>(player_action_message->get_action()));
     command_queue.push(player_command);
@@ -132,6 +132,9 @@ void ClientHandler::run() {
     sender = std::make_unique<Sender>(protocol, match_id.sender_queue, this);
     sender.value()->start();
     handle_game(match_id.command_queue, match_id.credentials);
+    if (sender.has_value()) {
+        sender.value()->join();
+    }
 }
 
 void ClientHandler::stop() {

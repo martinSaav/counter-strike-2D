@@ -13,7 +13,6 @@ target_sources(taller_server
         events.h
         game_identification.h
         lobby.h
-        lobby_dto.h
         match.h
         match_dto.h
         match_status_dto.h
