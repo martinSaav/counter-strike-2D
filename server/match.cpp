@@ -53,8 +53,8 @@ void Match::process_command(const PlayerCommand command) {
 MatchStatusDTO Match::get_match_status() {
     std::vector<PlayerDTO> player_dtos;
     auto players_view = players | std::views::values;
-    std::transform(players_view.begin(), players_view.end(), std::back_inserter(player_dtos),
-                   [](const Player& player) { return player.get_player_info(); });
+    std::ranges::transform(players_view, std::back_inserter(player_dtos),
+                           [](const Player& player) { return player.get_player_info(); });
     return MatchStatusDTO{std::move(player_dtos)};
 }
 
