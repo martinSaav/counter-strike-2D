@@ -6,6 +6,7 @@
 #define SERVER_CLIENT_HANDLER_H_
 #include <memory>
 #include <optional>
+#include <string>
 #include <utility>
 
 #include "common/catedra/queue.h"
@@ -21,8 +22,11 @@ class ClientHandler: public Thread {
     Lobby& lobby;
     Queue<CommandTypes> receiver_queue;
     std::optional<std::unique_ptr<Sender>> sender;
+    std::string username;
 
-    //   GameIdentification pick_match();
+    std::string handle_login();
+
+    GameIdentification pick_match();
 
 public:
     explicit ClientHandler(Protocol&& protocol, Lobby& lobby):
