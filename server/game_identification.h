@@ -8,9 +8,9 @@
 
 #include "common/catedra/queue.h"
 
-#include "PlayerCommand.h"
 #include "events.h"
 #include "match_status_dto.h"
+#include "player_command.h"
 #include "player_credentials.h"
 
 

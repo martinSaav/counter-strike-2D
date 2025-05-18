@@ -1,4 +1,4 @@
-#include "PlayerCommand.h"
+#include "player_command.h"
 
 PlayerCommand::PlayerCommand():
         credentials(invalid_credential), command_type(CommandTypes::invalid) {}
