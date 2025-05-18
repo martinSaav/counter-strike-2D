@@ -82,6 +82,7 @@ void Match::run() {
             if (PlayerCommand command; commands_queue.try_pop(command)) {
                 process_command(command);
             }
+            broadcast_match_status();
             auto end = std::chrono::system_clock::now();
             const auto elapsed =
                     std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
