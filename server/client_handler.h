@@ -26,6 +26,12 @@ class ClientHandler: public Thread {
 
     std::string handle_login();
 
+    void handle_list_matches_request();
+
+    GameIdentification handle_create_game_request();
+
+    GameIdentification handle_join_game_request();
+
     GameIdentification pick_match();
 
 public:
