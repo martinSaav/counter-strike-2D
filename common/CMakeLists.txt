@@ -17,8 +17,13 @@ target_sources(taller_common
         dto/game_state_update.h
         dto/login_request.h
         dto/player_action.h
+        dto/game_list_request.h
+        dto/game_list_response.h
+        dto/map_names_request.h
+        dto/map_names_response.h
         action.h
         message_type.h
         message.h
         protocol.h
+        game.h
     )

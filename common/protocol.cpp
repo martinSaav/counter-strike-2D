@@ -13,7 +13,7 @@
 #include "../common/dto/player_action.h"
 
 
-Protocol::Protocol(Socket& peer): peer(peer) {}
+Protocol::Protocol(Socket&& peer): peer(std::move(peer)) {}
 
 
 std::unique_ptr<Message> Protocol::recv_message() {

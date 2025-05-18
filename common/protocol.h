@@ -14,10 +14,10 @@
 
 class Protocol {
 private:
-    Socket& peer;
+    Socket peer;
 
 public:
-    explicit Protocol(Socket& peer);
+    explicit Protocol(Socket&& peer);
     std::unique_ptr<Message> recv_message();
     void send_message(const Message& response);
     void kill();
