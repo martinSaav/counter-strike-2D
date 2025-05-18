@@ -7,10 +7,10 @@
 #include "common/catedra/queue.h"
 #include "common/catedra/thread.h"
 
-#include "PlayerCommand.h"
 #include "game_identification.h"
 #include "match_status_dto.h"
 #include "player.h"
+#include "player_command.h"
 #include "player_credentials.h"
 
 class Match: public Thread {
