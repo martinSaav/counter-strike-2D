@@ -7,14 +7,14 @@
 
 #include "../common/dto/create_game_request.h"
 #include "../common/dto/create_game_response.h"
+#include "../common/dto/game_list_request.h"
+#include "../common/dto/game_list_response.h"
+#include "../common/dto/game_state_update.h"
 #include "../common/dto/join_game_request.h"
 #include "../common/dto/join_game_response.h"
-#include "../common/dto/game_state_update.h"
 #include "../common/dto/login_request.h"
 #include "../common/dto/map_names_request.h"
 #include "../common/dto/map_names_response.h"
-#include "../common/dto/game_list_request.h"
-#include "../common/dto/game_list_response.h"
 #include "../common/dto/player_action.h"
 
 
