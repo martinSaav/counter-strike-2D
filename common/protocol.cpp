@@ -5,11 +5,16 @@
 #include <utility>
 #include <vector>
 
-#include "../common/dto/game_list_request.h"
+#include "../common/dto/create_game_request.h"
+#include "../common/dto/create_game_response.h"
+#include "../common/dto/join_game_request.h"
+#include "../common/dto/join_game_response.h"
 #include "../common/dto/game_state_update.h"
 #include "../common/dto/login_request.h"
 #include "../common/dto/map_names_request.h"
 #include "../common/dto/map_names_response.h"
+#include "../common/dto/game_list_request.h"
+#include "../common/dto/game_list_response.h"
 #include "../common/dto/player_action.h"
 
 
@@ -39,13 +44,17 @@ std::unique_ptr<Message> Protocol::recv_message() {
             return std::make_unique<LoginRequest>(
                     LoginRequest::deserialize(buffer.data(), buffer.size()));
         }
+        case MessageType::CreateGameRequest: {
+            return std::make_unique<CreateGameRequest>(
+                    CreateGameRequest::deserialize(buffer.data(), buffer.size()));
+        }
+        case MessageType::JoinGameRequest: {
+            return std::make_unique<JoinGameRequest>(
+                    JoinGameRequest::deserialize(buffer.data(), buffer.size()));
+        }
         case MessageType::PlayerAction: {
             return std::make_unique<PlayerAction>(
                     PlayerAction::deserialize(buffer.data(), buffer.size()));
-        }
-        case MessageType::GameStateUpdate: {
-            return std::make_unique<GameStateUpdate>(
-                    GameStateUpdate::deserialize(buffer.data(), buffer.size()));
         }
         case MessageType::MapNamesRequest: {
             return std::make_unique<MapNamesRequest>(
@@ -55,10 +64,27 @@ std::unique_ptr<Message> Protocol::recv_message() {
             return std::make_unique<GameListRequest>(
                     GameListRequest::deserialize(buffer.data(), buffer.size()));
         }
+        case MessageType::CreateGameResponse: {
+            return std::make_unique<CreateGameResponse>(
+                    CreateGameResponse::deserialize(buffer.data(), buffer.size()));
+        }
+        case MessageType::JoinGameResponse: {
+            return std::make_unique<JoinGameResponse>(
+                    JoinGameResponse::deserialize(buffer.data(), buffer.size()));
+        }
+        case MessageType::GameStateUpdate: {
+            return std::make_unique<GameStateUpdate>(
+                    GameStateUpdate::deserialize(buffer.data(), buffer.size()));
+        }
         case MessageType::MapNamesResponse: {
             return std::make_unique<MapNamesResponse>(
                     MapNamesResponse::deserialize(buffer.data(), buffer.size()));
         }
+        case MessageType::GameListResponse: {
+            return std::make_unique<GameListResponse>(
+                    GameListResponse::deserialize(buffer.data(), buffer.size()));
+        }
+
         default:
             throw std::runtime_error("Unknown message type");
     }
