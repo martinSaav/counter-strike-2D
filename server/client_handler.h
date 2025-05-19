@@ -19,7 +19,6 @@
 class ClientHandler: public Thread {
     Protocol protocol;
     Lobby& lobby;
-    Queue<CommandTypes> receiver_queue;
     std::optional<std::unique_ptr<Sender>> sender;
     std::string username;
 

@@ -10,7 +10,6 @@ target_sources(taller_server
         main.cpp
     PUBLIC
         client_handler.h
-        events.h
         game_identification.h
         lobby.h
         match.h
