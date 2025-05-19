@@ -22,8 +22,8 @@ class PlayerCommand {
     PlayerCommand();
 
 public:
-    const PlayerCredentials credentials;
-    const Action command_type;
+    PlayerCredentials credentials;
+    Action command_type;
 
     PlayerCommand(const PlayerCredentials& credentials, Action type);
 };

@@ -26,7 +26,7 @@ public:
 
     size_t serialized_size() const override { return 3; }
 
-    static GameListRequest deserialize(const uint8_t* buffer, size_t size) {
+    static GameListRequest deserialize([[maybe_unused]] const uint8_t* buffer, size_t size) {
         if (size < 1) {
             throw std::runtime_error("");
         }

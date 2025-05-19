@@ -14,8 +14,7 @@
 #include "common/protocol.h"
 #include "server/events.h"
 #include "server/lobby.h"
-
-#include "sender.h"
+#include "server/sender.h"
 
 class ClientHandler: public Thread {
     Protocol protocol;
@@ -45,7 +44,6 @@ class ClientHandler: public Thread {
 public:
     explicit ClientHandler(Protocol&& protocol, Lobby& lobby):
             protocol(std::move(protocol)), lobby(lobby) {}
-    void receive_notification_about_sender_error();
     void run() override;
     void stop() override;
 };

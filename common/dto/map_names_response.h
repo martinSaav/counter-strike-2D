@@ -55,7 +55,7 @@ public:
 
         std::list<std::string> map_names_deserialized;
         size_t offset = 3;
-        while (offset < length + 3) {
+        while (offset < static_cast<size_t>(length + 3)) {
             uint16_t map_name_length;
             std::memcpy(&map_name_length, buffer + offset, sizeof(map_name_length));
             map_name_length = ntohs(map_name_length);

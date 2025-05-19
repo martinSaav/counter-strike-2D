@@ -4,6 +4,7 @@
 
 #include "server/client_handler.h"
 
+#include "sender.h"
 void Acceptor::run() {
     while (true) {
         try {

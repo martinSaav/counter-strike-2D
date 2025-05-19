@@ -118,18 +118,11 @@ void ClientHandler::handle_game(Queue<PlayerCommand>& command_queue,
 }
 
 
-void ClientHandler::receive_notification_about_sender_error() {
-    if (sender.has_value()) {
-        sender.value()->join();
-        sender = std::nullopt;
-    }
-}
-
 void ClientHandler::run() {
     username = handle_login();
     handle_map_names_request();
     const auto match_id = pick_match();
-    sender = std::make_unique<Sender>(protocol, match_id.sender_queue, this);
+    sender = std::make_unique<Sender>(protocol, match_id.sender_queue);
     sender.value()->start();
     handle_game(match_id.command_queue, match_id.credentials);
     if (sender.has_value()) {

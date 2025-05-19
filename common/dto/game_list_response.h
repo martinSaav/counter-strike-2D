@@ -66,7 +66,7 @@ public:
 
         std::list<Game> games_deserialized;
         size_t offset = 3;
-        while (offset < length + 3) {
+        while (offset < static_cast<size_t>(length + 3)) {
             uint16_t name_length;
             std::memcpy(&name_length, buffer + offset, sizeof(name_length));
             name_length = ntohs(name_length);

@@ -12,9 +12,9 @@ GameIdentification Match::join_match(const std::string& username) {
     Player player(username, 0, 0);
     PlayerCredentials credentials(player_count);
     players.insert(std::pair{credentials, player});
-    auto sender_queue = Queue<MatchStatusDTO>();
-    const GameIdentification game_identification(commands_queue, sender_queue, credentials);
-    senders_queues.push_back(std::move(sender_queue));
+    auto sender_queue = std::make_unique<Queue<MatchStatusDTO>>();
+    const GameIdentification game_identification(commands_queue, *sender_queue, credentials);
+    senders_queues.emplace_back(std::move(sender_queue));
     return game_identification;
 }
 
@@ -41,12 +41,15 @@ void Match::process_command(const PlayerCommand command) {
         case Action::MoveUp: {
             auto [x, y] = player.get_location();
             player.set_location(x, y - 1);
+            break;
         }
         case Action::MoveDown: {
             auto [x, y] = player.get_location();
             player.set_location(x, y + 1);
+            break;
         }
         default:
+            break;
     }
 }
 
@@ -65,7 +68,7 @@ void Match::broadcast_match_status() {
     auto it = senders_queues.begin();
     while (it != senders_queues.end()) {
         try {
-            it->push(match_status);
+            (*it)->push(match_status);
         } catch (const ClosedQueue&) {
             it = senders_queues.erase(it);
             continue;

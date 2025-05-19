@@ -1,6 +1,7 @@
 #ifndef GAME_LOOP_H
 #define GAME_LOOP_H
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -16,7 +17,7 @@
 class Match: public Thread {
     std::map<PlayerCredentials, Player> players;
     Queue<PlayerCommand> commands_queue;
-    std::vector<Queue<MatchStatusDTO>> senders_queues;
+    std::vector<std::unique_ptr<Queue<MatchStatusDTO>>> senders_queues;
     std::mutex mtx;
     int player_count;
     std::atomic<bool> has_finished;
