@@ -4,6 +4,7 @@
 
 #include "server/client_handler.h"
 
+#include "sender.h"
 void Acceptor::run() {
     while (true) {
         try {
@@ -20,9 +21,8 @@ void Acceptor::run() {
 
 void Acceptor::accept_clients() {
     Socket peer = skt.accept();
-    CommunicationProtocol protocol(std::move(peer));
+    Protocol protocol(std::move(peer));
     Thread* c = new ClientHandler(std::move(protocol), lobby);
     clients.push_back(c);
     c->start();
-    reap_dead();
 }

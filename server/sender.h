@@ -6,13 +6,17 @@
 #define SENDER_H
 #include "common/catedra/queue.h"
 #include "common/catedra/thread.h"
+#include "common/protocol.h"
 
 #include "match_status_dto.h"
 
 class Sender: public Thread {
-    CommunicationProtocol protocol;
-    Queue<MatchStatusDTO> sender_queue;
+    Protocol& protocol;
+    Queue<MatchStatusDTO>& sender_queue;
 
+public:
+    Sender(Protocol& protocol, Queue<MatchStatusDTO>& sender_queue):
+            protocol(protocol), sender_queue(sender_queue) {}
     void run() override;
     void stop() override;
 };

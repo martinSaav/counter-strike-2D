@@ -4,21 +4,44 @@
 
 #ifndef SERVER_CLIENT_HANDLER_H_
 #define SERVER_CLIENT_HANDLER_H_
+#include <memory>
+#include <optional>
+#include <string>
 #include <utility>
 
 #include "common/catedra/queue.h"
 #include "common/catedra/thread.h"
+#include "common/protocol.h"
 #include "server/events.h"
 #include "server/lobby.h"
-#include "server/match_status_dto.h"
+#include "server/sender.h"
+
 class ClientHandler: public Thread {
-    CommunicationProtocol protocol;
+    Protocol protocol;
     Lobby& lobby;
-    Queue<CommandTypes> receiver_queue;
-    Queue<MatchStatusDTO> sender_queue;
+    std::optional<std::unique_ptr<Sender>> sender;
+    std::string username;
+
+    std::string handle_login();
+
+    void handle_map_names_request();
+
+    void handle_list_matches_request();
+
+    GameIdentification handle_create_game_request();
+
+    GameIdentification handle_join_game_request();
+
+    GameIdentification pick_match();
+
+    void handle_player_action(Queue<PlayerCommand>& command_queue,
+                              const PlayerCredentials& credentials,
+                              const std::unique_ptr<Message>& message);
+
+    void handle_game(Queue<PlayerCommand>& command_queue, const PlayerCredentials& credentials);
 
 public:
-    explicit ClientHandler(CommunicationProtocol&& protocol, Lobby& lobby):
+    explicit ClientHandler(Protocol&& protocol, Lobby& lobby):
             protocol(std::move(protocol)), lobby(lobby) {}
     void run() override;
     void stop() override;
