@@ -17,7 +17,7 @@ class createMatchWindow : public QWidget
     Q_OBJECT
 
 public:
-    explicit createMatchWindow(QWidget *parent = nullptr);
+    explicit createMatchWindow(std::list<std::string> maps, QWidget *parent = nullptr);
     ~createMatchWindow();
 
 private slots:

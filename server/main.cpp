@@ -5,7 +5,7 @@
 #include "acceptor.h"
 
 int main(const int argc, const char* argv[]) {
-    if (argc != 3) {
+    if (argc != 2) {
         std::cerr << "Bad program call. Expected: " << argv[0] << " <port> <game parameters file>"
                   << std::endl;
         return EXIT_FAILURE;

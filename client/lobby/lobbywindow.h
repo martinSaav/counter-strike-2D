@@ -35,5 +35,7 @@ private:
     Ui::LobbyWindow *ui;
 
     Protocol& protocolo;
+
+    std::list<std::string> maps;
 };
 #endif // LOBBYWINDOW_H

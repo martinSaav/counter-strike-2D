@@ -1,7 +1,7 @@
 #include "creatematchwindow.h"
 #include "ui_creatematchwindow.h"
 
-createMatchWindow::createMatchWindow(QWidget *parent)
+createMatchWindow::createMatchWindow(std::list<std::string> maps, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::createMatchWindow)
 {
@@ -9,8 +9,9 @@ createMatchWindow::createMatchWindow(QWidget *parent)
     ui->startButton->hide();
 
     //Recibimos por protocolo la lista de mapas
-    ui->listMaps->addItem("Dust 1");
-    ui->listMaps->addItem("Dust 2");
+    for (const auto& map : maps) {
+        ui->listMaps->addItem(QString::fromStdString(map));
+    }
 }
 
 createMatchWindow::~createMatchWindow()

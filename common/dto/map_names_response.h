@@ -68,6 +68,8 @@ public:
         }
         return MapNamesResponse(map_names_deserialized);
     }
+
+    const std::list<std::string>& get_mapGames() const { return map_names; }
 };
 
 #endif

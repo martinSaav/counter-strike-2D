@@ -2,6 +2,8 @@
 #include "./ui_lobbywindow.h"
 #include "common/dto/game_list_request.h"
 #include "common/dto/game_list_response.h"
+#include "common/dto/map_names_request.h"
+#include "common/dto/map_names_response.h"
 
 MainWindow::MainWindow(Protocol& protocolo, QWidget *parent)
     : QMainWindow(parent)
@@ -11,10 +13,14 @@ MainWindow::MainWindow(Protocol& protocolo, QWidget *parent)
     //Instanciamos los widgets
     ui->setupUi(this);
 
-    //Colocamos fondo de pantalla
-    //this->setStyleSheet("background-image: url(:/imagenes/fondoLobby.jpg);"
-    //                "background-repeat: no-repeat;"
-    //                "background-position: center;");
+    MapNamesRequest requestNamesMaps;
+    protocolo.send_message(requestNamesMaps);
+
+    const std::unique_ptr<Message> responseNameMaps = protocolo.recv_message();
+
+    const auto nameMaps = dynamic_cast<MapNamesResponse*>(responseNameMaps.get());
+    
+    maps = nameMaps->get_mapGames();
 
     //Ocultamos widgets para buscar partidas
     ui->listaPartidas->hide();
@@ -29,7 +35,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_crearButton_clicked()
 {
-    createMatchWindow *windowCreate = new createMatchWindow(this);
+    createMatchWindow *windowCreate = new createMatchWindow(this->maps,this);
 
     windowCreate->setWindowFlags(Qt::Window);  // esto la hace ventana real
     windowCreate->show();
@@ -69,7 +75,7 @@ void MainWindow::on_actualizarButton_clicked()
     GameListRequest requestGameList;
     protocolo.send_message(requestGameList);
 
-    const auto responseGameList = protocolo.recv_message();
+    const std::unique_ptr<Message> responseGameList = protocolo.recv_message();
 
     const auto gameList = dynamic_cast<GameListResponse*>(responseGameList.get());
     
