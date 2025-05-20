@@ -1,12 +1,13 @@
 #ifndef SOCKET_H
 #define SOCKET_H
+#include "socket_interface.h"
 
 /*
  * TDA Socket.
  * Por simplificación este TDA se enfocará solamente
  * en sockets IPv4 para TCP.
  * */
-class Socket {
+class Socket: public SocketInterface {
 private:
     int skt;
     bool closed;
@@ -117,8 +118,8 @@ public:
      *
      * Lease manpage de `send` y `recv`
      * */
-    int sendsome(const void* data, unsigned int sz);
-    int recvsome(void* data, unsigned int sz);
+    int sendsome(const void* data, unsigned int sz) override;
+    int recvsome(void* data, unsigned int sz) override;
 
     /*
      * `Socket::sendall` envía exactamente `sz` bytes leídos del buffer, ni más,
@@ -140,8 +141,8 @@ public:
      * para envio/recibo, lease `sz`.
      *
      * */
-    int sendall(const void* data, unsigned int sz);
-    int recvall(void* data, unsigned int sz);
+    int sendall(const void* data, unsigned int sz) override;
+    int recvall(void* data, unsigned int sz) override;
 
     /*
      * Acepta una conexión entrante y retorna un nuevo socket
@@ -155,7 +156,7 @@ public:
      * Cierra la conexión ya sea parcial o completamente.
      * Lease manpage de `shutdown`
      * */
-    void shutdown(int how);
+    void shutdown(int how) override;
 
     /*
      * Determina si el stream de envio (send) o de recepción (recv)
@@ -169,7 +170,7 @@ public:
      * Cierra el socket. El cierre no implica un `shutdown`
      * que debe ser llamado explícitamente.
      * */
-    int close();
+    int close() override;
 
     /*
      * Destruye el socket. Si aun esta conectado,
