@@ -4,6 +4,7 @@
 #include <cstring>
 #include <iostream>
 #include <list>
+#include <numeric>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -15,7 +16,7 @@
 
 class MapNamesResponse: public Message {
 private:
-    MessageType message_type = MessageType::MapNamesRequest;
+    MessageType message_type = MessageType::MapNamesResponse;
     std::list<std::string> map_names;
 
 public:
@@ -28,8 +29,8 @@ public:
             uint16_t map_name_length = htons(static_cast<uint16_t>(map_name.size()));
             std::memcpy(buffer + offset, &map_name_length, sizeof(map_name_length));
             offset += sizeof(map_name_length);
-            std::memcpy(buffer + offset, map_name.data(), map_name_length);
-            offset += map_name_length;
+            std::memcpy(buffer + offset, map_name.data(), map_name.size());
+            offset += map_name.size();
         }
         uint16_t payload_length = htons(static_cast<uint16_t>(offset - 3));
         std::memcpy(buffer + 1, &payload_length, sizeof(payload_length));
@@ -37,10 +38,12 @@ public:
 
     size_t serialized_size() const override {
         size_t size = 3;
-        for (const auto& map_name: map_names) {
-            size += sizeof(uint16_t);
-            size += sizeof(uint16_t) + map_name.size();
-        }
+        size += std::accumulate(map_names.begin(), map_names.end(), 0,
+                                [](int sum, const std::string& str) { return sum + str.size(); });
+        size += map_names.size() * sizeof(uint16_t);
+        //        for (const auto& map_name: map_names) {
+        //            size += sizeof(uint16_t) + map_name.size();
+        //        }
         return size;
     }
 

@@ -54,7 +54,10 @@ void ClientHandler::handle_map_names_request() {
             case MessageType::MapNamesRequest: {
                 std::list<std::string> map_names;
                 map_names.emplace_back(generic_map_name);
-                protocol.send_message(MapNamesResponse(std::move(map_names)));
+
+                const MapNamesResponse response(std::move(map_names));
+                protocol.send_message(response);
+                return;
             }
             default:  // Mientras no reciba el mensaje de pedido de mapas continuo recibiendo
                       // mensajes hasta
