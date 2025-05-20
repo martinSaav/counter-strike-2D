@@ -19,7 +19,7 @@ private:
 public:
     explicit Protocol(SocketInterface& peer);
     std::unique_ptr<Message> recv_message();
-    void send_message(const Message& response);
+    void send_message(const Message& message);
     void kill();
 };
 #endif
