@@ -205,7 +205,7 @@ if(TALLER_TESTS)
     # HEY!! TODO XXX: I'm assuming that the code under testing is in taller_common
     # Change this if you have to.
     target_link_libraries(taller_tests
-        taller_common
-        GTest::gtest_main
+            taller_common
+            GTest::gmock_main
     )
 endif()
