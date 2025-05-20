@@ -10,7 +10,6 @@
 
 #include "common/action.h"
 
-#include "events.h"
 #include "player_credentials.h"
 
 struct InvalidCommandType: public std::runtime_error {

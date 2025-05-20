@@ -12,7 +12,6 @@
 #include "common/catedra/queue.h"
 #include "common/catedra/thread.h"
 #include "common/protocol.h"
-#include "server/events.h"
 #include "server/lobby.h"
 #include "server/sender.h"
 
