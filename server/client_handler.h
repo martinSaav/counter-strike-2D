@@ -28,9 +28,9 @@ class ClientHandler: public Thread {
 
     void handle_list_matches_request();
 
-    GameIdentification handle_create_game_request();
+    GameIdentification handle_create_game_request(std::unique_ptr<Message>&& message);
 
-    GameIdentification handle_join_game_request();
+    GameIdentification handle_join_game_request(std::unique_ptr<Message>&& message);
 
     GameIdentification pick_match();
 

@@ -12,8 +12,10 @@
 #include "common/message.h"
 #define generic_match_name "match"
 #define generic_username "username"
+#include "common/dto/create_game_request.h"
 #include "common/dto/create_game_response.h"
 #include "common/dto/game_list_response.h"
+#include "common/dto/join_game_request.h"
 #include "common/dto/join_game_response.h"
 #include "common/dto/map_names_response.h"
 #include "common/dto/player_action.h"
@@ -70,15 +72,17 @@ void ClientHandler::handle_map_names_request() {
 }
 
 
-GameIdentification ClientHandler::handle_create_game_request() {
-    const GameIdentification id = lobby.create_match(generic_match_name, username);
-    const CreateGameResponse message(true);
-    protocol.send_message(message);
+GameIdentification ClientHandler::handle_create_game_request(std::unique_ptr<Message>&& message) {
+    const auto create_message = dynamic_cast<CreateGameRequest*>(message.get());
+    const GameIdentification id = lobby.create_match(create_message->get_game_name(), username);
+    const CreateGameResponse response(true);
+    protocol.send_message(response);
     return id;
 }
 
-GameIdentification ClientHandler::handle_join_game_request() {
-    const GameIdentification id = lobby.join_match(generic_match_name, username);
+GameIdentification ClientHandler::handle_join_game_request(std::unique_ptr<Message>&& message) {
+    const auto join_message = dynamic_cast<JoinGameRequest*>(message.get());
+    const GameIdentification id = lobby.join_match(join_message->get_game_name(), username);
     const JoinGameResponse response(true);
     protocol.send_message(response);
     return id;
@@ -94,10 +98,10 @@ GameIdentification ClientHandler::pick_match() {
                 break;
             }
             case MessageType::CreateGameRequest: {
-                return handle_create_game_request();
+                return handle_create_game_request(std::move(message));
             }
             case MessageType::JoinGameRequest: {
-                return handle_join_game_request();
+                return handle_join_game_request(std::move(message));
             }
             default:
                 break;
