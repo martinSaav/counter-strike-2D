@@ -102,6 +102,14 @@ endif()
 # Program section
 # ---------------
 if(TALLER_CLIENT)
+
+    find_package(Qt6 REQUIRED COMPONENTS Widgets)
+
+    # Activar procesamiento automático de Qt
+    set(CMAKE_AUTOMOC ON)
+    set(CMAKE_AUTOUIC ON)
+    set(CMAKE_AUTORCC ON)
+    
     # HEY!! TODO XXX: Change the name of the executable to the one you like!
     add_executable(taller_client)
 
@@ -115,10 +123,15 @@ if(TALLER_CLIENT)
     set_project_warnings(taller_client ${TALLER_MAKE_WARNINGS_AS_ERRORS} FALSE)
 
     # add libSDL2pp's headers
-    target_include_directories(taller_client PRIVATE ${libSDL2pp_SOURCE_DIR})
+    target_include_directories(taller_client PRIVATE ${libSDL2pp_SOURCE_DIR} ${SDL2_image_SOURCE_DIR}/include ${SDL2_SOURCE_DIR}/include) # AGREGA SDL2_image
 
     # Link the taller_common lib target
-    target_link_libraries(taller_client taller_common SDL2pp::SDL2pp)
+    target_link_libraries(taller_client
+    PRIVATE
+        taller_common
+        SDL2pp::SDL2pp
+        SDL2_image::SDL2_image
+    )
 endif()
 
 if(TALLER_SERVER)

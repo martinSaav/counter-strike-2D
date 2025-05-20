@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LobbyWindow</class>
+ <widget class="QMainWindow" name="LobbyWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>800</width>
+    <height>600</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>800</width>
+    <height>600</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Counter Strike 1.6</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QTableWidget::item:selected {
+    background-color: #ffd180;
+    color: black;
+}</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QPushButton" name="buscarButton">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>230</y>
+      <width>111</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Buscar partida</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="crearButton">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>180</y>
+      <width>111</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Crear partida</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="waitText">
+    <property name="geometry">
+     <rect>
+      <x>380</x>
+      <y>460</y>
+      <width>321</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>15</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="titulo">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>80</y>
+      <width>271</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>URW Bookman</family>
+      <pointsize>20</pointsize>
+      <italic>true</italic>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Counter Strike 1.6</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="unirseButton">
+    <property name="geometry">
+     <rect>
+      <x>390</x>
+      <y>390</y>
+      <width>111</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Unirse partida</string>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="listaPartidas">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>60</y>
+      <width>441</width>
+      <height>311</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QTableWidget::item:selected {
+    background-color: orange;  /* fondo azul */
+    color: white;              /* texto blanco */
+}</string>
+    </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::NoEditTriggers</set>
+    </property>
+    <property name="selectionMode">
+     <enum>QAbstractItemView::SingleSelection</enum>
+    </property>
+    <property name="selectionBehavior">
+     <enum>QAbstractItemView::SelectRows</enum>
+    </property>
+    <property name="gridStyle">
+     <enum>Qt::DotLine</enum>
+    </property>
+    <property name="rowCount">
+     <number>2</number>
+    </property>
+    <property name="columnCount">
+     <number>3</number>
+    </property>
+    <attribute name="horizontalHeaderDefaultSectionSize">
+     <number>140</number>
+    </attribute>
+    <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+     <bool>false</bool>
+    </attribute>
+    <attribute name="horizontalHeaderStretchLastSection">
+     <bool>true</bool>
+    </attribute>
+    <row/>
+    <row/>
+    <column>
+     <property name="text">
+      <string>Nombre partida</string>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+      </font>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Mapa</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Cantidad jugadores</string>
+     </property>
+    </column>
+   </widget>
+   <widget class="QPushButton" name="quitButton">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>280</y>
+      <width>111</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Salir</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="actualizarButton">
+    <property name="geometry">
+     <rect>
+      <x>570</x>
+      <y>390</y>
+      <width>111</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Actualizar</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>23</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

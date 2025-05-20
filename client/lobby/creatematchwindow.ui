@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>createMatchWindow</class>
+ <widget class="QWidget" name="createMatchWindow">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>382</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>400</width>
+    <height>300</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>1000</width>
+    <height>1000</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Create match</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: #2F2F2F;</string>
+  </property>
+  <widget class="QPushButton" name="createButton">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>240</y>
+     <width>101</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Crear partida</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelNameMatch">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>40</y>
+     <width>171</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>15</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Nombre  partida:</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="inputNameMatch">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>30</y>
+     <width>171</width>
+     <height>31</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelMaps">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>90</y>
+     <width>161</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>15</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Seleccionar mapa:</string>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="listMaps">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>70</y>
+     <width>171</width>
+     <height>151</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QListWidget::item:selected {
+    background-color: orange;  /* fondo azul */
+    color: white;              /* texto blanco */
+}</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="backButon">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>240</y>
+     <width>101</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Atras</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="startButton">
+   <property name="geometry">
+    <rect>
+     <x>127</x>
+     <y>290</y>
+     <width>131</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Comenzar Partida</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="waitLabel">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>340</y>
+     <width>231</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
