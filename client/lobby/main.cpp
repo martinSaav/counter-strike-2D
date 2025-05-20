@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     Socket socket(argv[1], argv[2]);
-    Protocol protocolo(std::move(socket));
+    Protocol protocolo(socket);
     MainWindow lobby(protocolo);
 
     lobby.move(900, 900);
