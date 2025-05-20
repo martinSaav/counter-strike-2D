@@ -10,7 +10,6 @@
 #include "common/dto/login_request.h"
 #include "common/game.h"
 #include "common/message.h"
-#define generic_match_name "match"
 #define generic_username "username"
 #include "common/dto/create_game_request.h"
 #include "common/dto/create_game_response.h"
