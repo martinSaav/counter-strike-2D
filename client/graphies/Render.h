@@ -3,6 +3,7 @@
 #include <SDL.h>
 #include <SDL2pp/SDL2pp.hh>
 #include "SDL_image.h"
+#include "../../common/protocol.h"
 
 using namespace SDL2pp;
 
@@ -12,6 +13,8 @@ class Render{
     Texture fondo;
     Texture mira;
     Texture sprites;
+
+    Protocol& protocolo;
     
     int mapa_x = 0, mapa_y = 0; // position of the map
 	float posJugadorX = 0.0, posJugadorY = 0.0;
@@ -21,8 +24,8 @@ class Render{
 
     public:
 
-    Render(Renderer* renderer);
-    void renderFrame(std::string mensaje);
+    Render(Renderer* renderer, Protocol& protocolo);
+    void renderFrame(int posX, int posY);
     
 };
 #endif

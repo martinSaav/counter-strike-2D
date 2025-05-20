@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include <QTableWidgetItem>
 #include "creatematchwindow.h"
-#include "common/protocol.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

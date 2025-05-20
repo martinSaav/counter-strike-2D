@@ -1,16 +1,18 @@
 #include "Render.h"
+#include "../../common/dto/game_state_update.h"
 
 using namespace SDL2pp;
 
-Render::Render(Renderer* renderer):
+Render::Render(Renderer* renderer, Protocol& protocolo):
     sdlRenderer(renderer),
     fondo(*sdlRenderer, Surface(IMG_Load("../client/data/mapa.png"))),
     mira(*sdlRenderer, Surface(IMG_Load("../client/data/mira.png"))),
-    sprites(*sdlRenderer, Surface(IMG_Load("../client/data/jugador.png")).SetColorKey(true, 0))
+    sprites(*sdlRenderer, Surface(IMG_Load("../client/data/jugador.png")).SetColorKey(true, 0)),
+    protocolo(protocolo)
 {
 }
 
-void Render::renderFrame(std::string mensaje){
+void Render::renderFrame(int posX, int posY){
 
     const int jugador_ancho = 25;
     const int jugador_alto = 25;
@@ -21,51 +23,8 @@ void Render::renderFrame(std::string mensaje){
     unsigned int frame_delta = frame_ticks - prev_ticks;
     prev_ticks = frame_ticks;
 
-    // Update game state for this frame:
-    // if character is runnung, move it to the right
-    if (mensaje == "d" && posJugadorX < fondo.GetWidth() - jugador_ancho){
-        posJugadorX += frame_delta * 0.2;
-        angle = 90.0;
-    } 
-
-    if (mensaje == "a" && posJugadorX > 0){
-        posJugadorX -= frame_delta * 0.2;
-        angle = 270.0;
-    } 
-
-    if (mensaje == "w" && posJugadorY > 0){
-        posJugadorY -= frame_delta * 0.2;
-        angle = 0.0;
-    } 
-
-    if (mensaje == "s" && posJugadorY < fondo.GetHeight() - jugador_alto){
-        posJugadorY += frame_delta * 0.2;
-        angle = 180.0;
-    }
-
-    if (mensaje == "wd" && posJugadorX < fondo.GetWidth() - jugador_ancho && posJugadorY > 0){
-        posJugadorX += frame_delta * 0.2;
-        posJugadorY -= frame_delta * 0.2;
-        angle = 45.0;
-    }
-
-    if (mensaje == "wa" && posJugadorX > 0 && posJugadorY > 0){
-        posJugadorX -= frame_delta * 0.2;
-        posJugadorY -= frame_delta * 0.2;
-        angle = 315.0;
-    }
-
-    if (mensaje == "sd" && posJugadorX < fondo.GetWidth() - jugador_ancho && posJugadorY < fondo.GetHeight() - jugador_alto){
-        posJugadorX += frame_delta * 0.2;
-        posJugadorY += frame_delta * 0.2;
-        angle = 135.0;
-    }
-
-    if (mensaje == "sa" && posJugadorX > 0 && posJugadorY < fondo.GetHeight() - jugador_alto){
-        posJugadorX -= frame_delta * 0.2;
-        posJugadorY += frame_delta * 0.2;
-        angle = 225.0;
-    }
+    posJugadorX = posX;
+    posJugadorY = posY;
 
     // Ajustar tamaño de cámara con zoom
     float zoom = 4.0f;

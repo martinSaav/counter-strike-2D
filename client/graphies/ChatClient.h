@@ -1,6 +1,7 @@
 #define CHATCLIENT_H
 #ifdef CHATCLIENT_H
-#include "../../common/protocol.h"
+#include "InputHandler.h"
+#include "Render.h"
 
 class ChatClient {
     private:

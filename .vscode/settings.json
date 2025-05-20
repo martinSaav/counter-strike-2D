@@ -65,6 +65,12 @@
         "cinttypes": "cpp",
         "typeinfo": "cpp",
         "variant": "cpp",
-        "cfenv": "cpp"
+        "cfenv": "cpp",
+        "any": "cpp",
+        "codecvt": "cpp",
+        "forward_list": "cpp",
+        "unordered_set": "cpp",
+        "source_location": "cpp",
+        "fstream": "cpp"
     }
 }

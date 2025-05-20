@@ -1,8 +1,6 @@
 #include <thread>
 #include "ChatClient.h"
-#include "InputHandler.h"
-#include "Render.h"
-
+#include "inputServerHandler.h"
 using namespace SDL2pp;
 
 ChatClient::ChatClient(Protocol& protocolo) : protocolo(protocolo) {
@@ -24,25 +22,29 @@ void ChatClient::run(){
 	Renderer renderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     // Create render object
-    Render render(&renderer);
+    Render render(&renderer, protocolo);
 
     // Create input handler
-    InputHandler inputHandler;
+    InputHandler inputHandler(protocolo);
+
+    InputServerHandler inputServerHandler(protocolo);
 
     std::thread inputThread(&InputHandler::processEvents, &inputHandler);
 
+    std::thread inputServer(&InputServerHandler::processEvents, &inputServerHandler);
+
     // Main loop
     while (true) {
-        //inputHandler.processEvents();
-        auto mensaje = inputHandler.getMensaje();
-        if(mensaje && mensaje.value() == "q"){
-            break; // Exit the loop if "q" is pressed
+        
+        auto mensaje = inputServerHandler.getMensaje();
+        if(mensaje){
+            render.renderFrame(mensaje->get_x(), mensaje->get_y());
         }
         // Si hay mensaje, lo mostramos, sino, mostramos una cadena vacía
-        render.renderFrame(mensaje ? mensaje.value() : "");
         
         SDL_Delay(33);
     }
     inputThread.join();
+    inputServer.join();
     SDL_Quit();
 }

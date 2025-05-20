@@ -3,6 +3,7 @@ add_library(graphies STATIC
     ChatClient.cpp
     Render.cpp
     InputHandler.cpp
+    inputServerHandler.cpp
     # Agrega aquí los .h si deseas (opcional, pero no obligatorio)
 )
 

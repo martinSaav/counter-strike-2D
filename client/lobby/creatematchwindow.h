@@ -2,6 +2,7 @@
 #define CREATEMATCHWINDOW_H
 
 #include <QWidget>
+#include "common/protocol.h"
 
 enum closeType {
     EXITAPP = 0,
@@ -17,7 +18,7 @@ class createMatchWindow : public QWidget
     Q_OBJECT
 
 public:
-    explicit createMatchWindow(std::list<std::string> maps, QWidget *parent = nullptr);
+    createMatchWindow(Protocol& protocolo, std::list<std::string> maps, QWidget *parent = nullptr);
     ~createMatchWindow();
 
 private slots:
@@ -30,6 +31,8 @@ private slots:
 
 private:
     Ui::createMatchWindow *ui;
+
+    Protocol& protocolo;
 
     void desactivarWidgets();
 };

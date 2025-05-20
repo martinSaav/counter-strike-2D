@@ -1,7 +1,9 @@
 #include "InputHandler.h"
 #include <SDL.h>
+#include "../../common/dto/player_action.h"
+#include "../../common/action.h"
 
-InputHandler::InputHandler() {
+InputHandler::InputHandler(Protocol& protocolo) : protocolo(protocolo) {
     SDL_StartTextInput(); // Activa entrada de texto
 }
 
@@ -11,7 +13,7 @@ InputHandler::~InputHandler() {
 
 void InputHandler::processEvents() {
     SDL_Event event;
-    std::string mensajeActual = "";
+    
 
     while (!exitGame()){
         while (SDL_PollEvent(&event)) {
@@ -19,49 +21,48 @@ void InputHandler::processEvents() {
                 quit = true;
         }
     
+        Action* action = nullptr;
+
         // Leer estado del teclado
         const Uint8* state = SDL_GetKeyboardState(NULL);
 
         if (state[SDL_SCANCODE_Q]) {
-            mensajeActual = "q";
-            quit = true;
+        //    mensajeActual = "q";
+           quit = true;
+        }
 
-        }else if (state[SDL_SCANCODE_W] && state[SDL_SCANCODE_D]) {
-            mensajeActual = "wd";
-
-        }else if (state[SDL_SCANCODE_W] && state[SDL_SCANCODE_A]) {
-            mensajeActual = "wa";
-
-        }else if (state[SDL_SCANCODE_S] && state[SDL_SCANCODE_D]) {
-            mensajeActual = "sd";
-
-        }else if (state[SDL_SCANCODE_S] && state[SDL_SCANCODE_A]) {
-            mensajeActual = "sa";
-
-        }else if (state[SDL_SCANCODE_W]){
-            mensajeActual = "w";
+        if (state[SDL_SCANCODE_W]){
+            Action actionActual = Action::MoveUp;
+            action = &actionActual;
+            //mensajeActual = "w";
 
         }else if (state[SDL_SCANCODE_A]){
-            mensajeActual = "a";
+            Action actionActual = Action::MoveLeft;
+            action = &actionActual;
+            //mensajeActual = "a";
 
         }else if (state[SDL_SCANCODE_S]){
-            mensajeActual = "s";
+            Action actionActual = Action::MoveDown;
+            action = &actionActual;
+            //mensajeActual = "s";
 
         }else if (state[SDL_SCANCODE_D]){
-            mensajeActual = "d";
+            Action actionActual = Action::MoveRight;
+            action = &actionActual;
+            //mensajeActual = "d";
             
-        }else if (state[SDL_SCANCODE_Q]){
-            mensajeActual = "q";
         }
+        //else if (state[SDL_SCANCODE_Q]){
+        //    mensajeActual = "q";
+        //}
 
-        if (mensajeActual != "") {
-            std::lock_guard<std::mutex> lock(mtx);
-            mensajes.push(mensajeActual);
-            mensajeActual = ""; // Reinicia el mensaje actual
+        if (action) {
+            PlayerAction playerAction(*action);
+            protocolo.send_message(playerAction);
         }
-    
         SDL_Delay(33);
     }
+    abort();
 }
 
 std::optional<std::string> InputHandler::getMensaje() {

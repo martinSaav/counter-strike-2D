@@ -10,6 +10,8 @@ MainWindow::MainWindow(Protocol& protocolo, QWidget *parent)
     , ui(new Ui::LobbyWindow)
     , protocolo(protocolo)
 {
+    this->setAttribute(Qt::WA_DeleteOnClose); // Para eliminar el widget al cerrarlo
+
     //Instanciamos los widgets
     ui->setupUi(this);
 
@@ -35,7 +37,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_crearButton_clicked()
 {
-    createMatchWindow *windowCreate = new createMatchWindow(this->maps,this);
+    createMatchWindow *windowCreate = new createMatchWindow(this->protocolo, this->maps, this);
 
     windowCreate->setWindowFlags(Qt::Window);  // esto la hace ventana real
     windowCreate->show();
