@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <ranges>
 #include <utility>
-#define rate 30
+#define rate 33
 #define miliseconds_per_iteration (1000 / rate)
 
 GameIdentification Match::join_match(const std::string& username) {
