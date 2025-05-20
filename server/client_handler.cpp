@@ -11,6 +11,7 @@
 #include "common/game.h"
 #include "common/message.h"
 #define generic_match_name "match"
+#define generic_username "username"
 #include "common/dto/game_list_response.h"
 #include "common/dto/map_names_response.h"
 #include "common/dto/player_action.h"
@@ -119,7 +120,8 @@ void ClientHandler::handle_game(Queue<PlayerCommand>& command_queue,
 
 
 void ClientHandler::run() {
-    username = handle_login();
+    //    username = handle_login();
+    username = generic_username;
     handle_map_names_request();
     const auto match_id = pick_match();
     sender = std::make_unique<Sender>(protocol, match_id.sender_queue);
