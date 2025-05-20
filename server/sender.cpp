@@ -6,7 +6,7 @@
 void Sender::run() {
     while (should_keep_running()) {
         try {
-            MatchStatusDTO status = sender_queue.pop();
+            MatchStatusDTO status = sender_queue->pop();
             const auto player = status.players[0];
             protocol.send_message(GameStateUpdate(player.position_x, player.position_y));
         } catch (const ClosedQueue&) {
@@ -22,5 +22,5 @@ void Sender::run() {
 
 void Sender::stop() {
     Thread::stop();
-    sender_queue.close();
+    sender_queue->close();
 }

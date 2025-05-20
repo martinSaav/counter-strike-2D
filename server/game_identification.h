@@ -1,6 +1,9 @@
 #ifndef MATCH_INFO_H
 #define MATCH_INFO_H
 
+#include <memory>
+#include <utility>
+
 #include "common/catedra/queue.h"
 
 #include "match_status_dto.h"
@@ -11,11 +14,14 @@
 class GameIdentification {
 public:
     Queue<PlayerCommand>& command_queue;
-    Queue<MatchStatusDTO>& sender_queue;
-    PlayerCredentials& credentials;
-    GameIdentification(Queue<PlayerCommand>& event_queue, Queue<MatchStatusDTO>& sender_queue,
-                       PlayerCredentials& credentials):
-            command_queue(event_queue), sender_queue(sender_queue), credentials(credentials) {}
+    std::shared_ptr<Queue<MatchStatusDTO>> sender_queue;
+    PlayerCredentials credentials;
+    GameIdentification(Queue<PlayerCommand>& event_queue,
+                       std::shared_ptr<Queue<MatchStatusDTO>> sender_queue,
+                       const PlayerCredentials credentials):
+            command_queue(event_queue),
+            sender_queue(std::move(sender_queue)),
+            credentials(credentials) {}
 };
 
 

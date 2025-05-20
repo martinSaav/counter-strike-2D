@@ -4,6 +4,9 @@
 
 #ifndef SENDER_H
 #define SENDER_H
+#include <memory>
+#include <utility>
+
 #include "common/catedra/queue.h"
 #include "common/catedra/thread.h"
 #include "common/protocol.h"
@@ -12,11 +15,11 @@
 
 class Sender: public Thread {
     Protocol& protocol;
-    Queue<MatchStatusDTO>& sender_queue;
+    std::shared_ptr<Queue<MatchStatusDTO>> sender_queue;
 
 public:
-    Sender(Protocol& protocol, Queue<MatchStatusDTO>& sender_queue):
-            protocol(protocol), sender_queue(sender_queue) {}
+    Sender(Protocol& protocol, std::shared_ptr<Queue<MatchStatusDTO>> sender_queue):
+            protocol(protocol), sender_queue(std::move(sender_queue)) {}
     void run() override;
     void stop() override;
 };
