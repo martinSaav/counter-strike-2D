@@ -18,7 +18,7 @@
 #include "../common/dto/player_action.h"
 
 
-Protocol::Protocol(SocketInterface& peer): peer(peer) {  }
+Protocol::Protocol(SocketInterface& peer): peer(peer) {}
 
 
 std::unique_ptr<Message> Protocol::recv_message() {

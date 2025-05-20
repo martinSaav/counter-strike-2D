@@ -2,9 +2,10 @@
 #define MOCK_SOCKET_H
 
 #include <gmock/gmock.h>
+
 #include "common/catedra/socket_interface.h"
 
-class MockSocket : public SocketInterface {
+class MockSocket: public SocketInterface {
 public:
     MOCK_METHOD(int, sendsome, (const void* data, unsigned int size), (override));
     MOCK_METHOD(int, sendall, (const void* data, unsigned int size), (override));

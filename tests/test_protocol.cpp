@@ -1,8 +1,9 @@
+#include "common/dto/login_request.h"
+#include "common/protocol.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "common/protocol.h"
+
 #include "mock_socket.h"
-#include "common/dto/login_request.h"
 
 using ::testing::_;
 using ::testing::Invoke;
@@ -19,18 +20,16 @@ TEST(ProtocolTest, ReceivesLoginRequestCorrectly) {
     memcpy(&serialized[1], &len, sizeof(len));
     memcpy(&serialized[3], username.c_str(), username.size());
 
-    EXPECT_CALL(mock_socket, recvall(_, 3))
-        .WillOnce(
-            Invoke([&](void* dst, unsigned int) {
-                memcpy(dst, serialized.data(), 3);
-                return 3;
-        }));
+    EXPECT_CALL(mock_socket, recvall(_, 3)).WillOnce(Invoke([&](void* dst, unsigned int) {
+        memcpy(dst, serialized.data(), 3);
+        return 3;
+    }));
 
     EXPECT_CALL(mock_socket, recvall(_, username.size()))
-        .WillOnce(Invoke([&](void* dst, unsigned int) {
-            memcpy(dst, serialized.data() + 3, username.size());
-            return username.size();
-        }));
+            .WillOnce(Invoke([&](void* dst, unsigned int) {
+                memcpy(dst, serialized.data() + 3, username.size());
+                return username.size();
+            }));
 
     Protocol protocol(mock_socket);
     const std::unique_ptr<Message> msg = protocol.recv_message();
