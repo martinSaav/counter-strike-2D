@@ -18,6 +18,7 @@
 class ClientHandler: public Thread {
     Protocol protocol;
     Lobby& lobby;
+    Socket skt;
     std::optional<std::unique_ptr<Sender>> sender;
     std::string username;
 
@@ -40,8 +41,8 @@ class ClientHandler: public Thread {
     void handle_game(Queue<PlayerCommand>& command_queue, const PlayerCredentials& credentials);
 
 public:
-    explicit ClientHandler(Protocol&& protocol, Lobby& lobby):
-            protocol(std::move(protocol)), lobby(lobby) {}
+    explicit ClientHandler(Protocol&& protocol, Lobby& lobby, Socket&& skt):
+            protocol(std::move(protocol)), lobby(lobby), skt(std::move(skt)) {}
     void run() override;
     void stop() override;
 };
