@@ -14,6 +14,8 @@ target_sources(taller_common
         catedra/socket.h
         catedra/queue.h
         catedra/thread.h
+        catedra/socket_interface.h
+        catedra/socket_interface.cpp
         dto/create_game_request.h
         dto/create_game_response.h
         dto/join_game_request.h
