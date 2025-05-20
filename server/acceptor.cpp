@@ -21,8 +21,7 @@ void Acceptor::run() {
 
 void Acceptor::accept_clients() {
     Socket peer = skt.accept();
-    Protocol protocol(peer);
-    Thread* c = new ClientHandler(std::move(protocol), lobby, std::move(peer));
+    Thread* c = new ClientHandler(lobby, std::move(peer));
     clients.push_back(c);
     c->start();
 }
