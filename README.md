@@ -20,7 +20,6 @@ Este proyecto es un juego de Counter-Strike 2D, desarrollado en C++. El juego pe
 ## Requisitos
 - **Sistema Operativo**: Ubuntu 24.04
 - Make
-- Make
 - CMake
 - SDL2
 - Qt5
