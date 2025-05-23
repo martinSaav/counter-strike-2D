@@ -22,7 +22,7 @@ Este proyecto es un juego de Counter-Strike 2D, desarrollado en C++. El juego pe
 - Make
 - CMake
 - SDL2
-- Qt5
+- Qt6
 
 **Integrantes**
 
