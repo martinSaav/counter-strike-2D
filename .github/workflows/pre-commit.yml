@@ -20,13 +20,13 @@ jobs:
 
       - name: Upgrade pip
         run: |
-          python -m pip install --upgrade pip
+            pip install --upgrade pip
 
       - name: Install cppcheck
-        run: sudo apt-get --yes install cppcheck
+        run: sudo apt-get install cppcheck
 
       - name: Install cpplint
-        run: python -m pip install cpplint
+        run: pip install cpplint
  
       - name: Install pre-commit
         run: pip install pre-commit
