@@ -1,45 +1,74 @@
-# Ejemplo de CMAKE para el TP Final
+[![language](https://img.shields.io/badge/language-C++-pink.svg?style=flat-square)](https://cplusplus.com/)
+![os](https://img.shields.io/badge/OS-linux-blue.svg?style=flat-square)
+[![Pre-commit checks](https://github.com/MatiasSagastume/tp-grupal-template/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/MatiasSagastume/tp-grupal-template/actions/workflows/pre-commit.yml)
+# Counter-Strike 2D
 
-**Importante:** el primer commit de este repositorio tiene el setup
-básico para el TP Final que incluye la instalación de la lib de Google
-Tests, `SDL2` y `SDL2pp` (el wrapper de C++).
+## Tabla de Contenidos
+- [Integrantes](#integrantes)
+- [Descripción](#descripción)
+- [Requisitos](#requisitos)
+- [Instalación](#instalación)
+- [Compilación](#compilación)
+- [Ejecución](#ejecución)
+- [Testing](#testing)
+- [Uso de Bibliotecas externas](#uso-de-bibliotecas-externas)
+- [Licencia](#licencia)
 
-El resto de los commits son a modo de ejemplo de como se pueden
-agregar mas código fuente al proyecto.
+## Descripción
+Este proyecto es un juego de Counter-Strike 2D, desarrollado en C++. El juego permite a los jugadores unirse o crear una partida, elegir su equipo (terroristas o antiterroristas) y jugar.
 
-Este ejemplo **no** incluye instalarse otras libs que son dependencias
-tanto de `SDL2` como de `SDL2pp` (pero si estan documentadas en el
-`CMakeFile` para Xubuntu 24.04).
+## Requisitos
+- **Sistema Operativo**: Ubuntu 24.04
+- Make
+- Make
+- CMake
+- SDL2
+- Qt5
 
-Este repo **no** incluye tampoco un instalador.
+**Integrantes**
 
-**Se deben agregar las librerias necesarias y el instalador.**
+- [Manuel Herrera Esteban](https://github.com/Manuuherrera)
+- [Carlos Marias Sagastume](https://github.com/MatiasSagastume)
+- [Martín Alejandro Estrada Saavedra](https://github.com/martinSaav)
 
-También el ejemplo usa una estructura de carpetas muy simple:
+## Compilación
+Para compilar el proyecto, se debe ejecutar el siguiente comando en la terminal:
 
+```bash
+make compile-debug
 ```
-client/
-server/
-editor/
-common/
+
+## Ejecución
+
+### Server
+```bash
+   ./server <port>
 ```
 
-Bien se puede mejorar (cambiando el cmakefile) agregando mas
-sub-carpetas.
+### Cliente
+```bash
+   ./client <hostname> <port>
+```
 
-Asi tambien **deben** ser cambiados los *targets* del cmake (`taller_client`,
-`taller_server`, ...) por nombres mas acordes al TP que se este
-haciendo.
+## Testing
+Para ejecutar los tests, se debe ejecutar el siguiente comando en la terminal:
 
-Tambien, por default solo se compila una version *debug* sin
-optimizar. Si se quiere compilar binarios optimizados
-(lo que cmake llama *release*) se puede, solo hay modificar
-cmake.
+```bash
+   make run-tests
+```
 
-Aprender del ejemplo para saber como extenderlo!
 
-**Importante:** este repositorio **no** incluye pre-commits hooks,
-ni scripts adicionales (como correr valgrind).
+## Uso de Bibliotecas externas
 
-**Eso esta a cargo de los estudiantes,** tal como fue mostrado
-en los tps individuales, recaps y hands-on.
+1. **Biblioteca de Sockets de la catedra Veiga**
+- Autor: eldipa
+- Licencia: GPL v2s
+- Código fuente: https://github.com/eldipa/sockets-en-cpp
+
+2. **Biblioteca de Threads de la catedra Veiga**
+- Autor: eldipa
+- Licencia: GPL v2s
+- Código fuente: https://github.com/eldipa/hands-on-threads
+
+## Licencia
+Este proyecto está bajo la Licencia MIT. Para más detalles, consulta el archivo [LICENSE](LICENSE).

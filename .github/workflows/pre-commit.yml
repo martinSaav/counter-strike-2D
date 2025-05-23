@@ -1,0 +1,38 @@
+name: Pre-commit checks
+
+on:
+  pull_request:
+  push:
+    branches: [main, dev]
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Upgrade pip
+        run: |
+            pip install --upgrade pip
+
+      - name: Install cppcheck
+        run: sudo apt-get install cppcheck
+
+      - name: Install cpplint
+        run: pip install cpplint
+ 
+      - name: Install pre-commit
+        run: pip install pre-commit
+
+      - name: Install pre-commit hooks
+        run: pre-commit install  
+
+      - name: Run pre-commit
+        run: pre-commit run --all-files
