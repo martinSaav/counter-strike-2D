@@ -13,7 +13,13 @@
 - [Testing](#testing)
 - [Uso de Bibliotecas externas](#uso-de-bibliotecas-externas)
 - [Licencia](#licencia)
+  
+## Integrantes
 
+- [Manuel Herrera Esteban](https://github.com/Manuuherrera)
+- [Carlos Marias Sagastume](https://github.com/MatiasSagastume)
+- [Martín Alejandro Estrada Saavedra](https://github.com/martinSaav)
+  
 ## Descripción
 Este proyecto es un juego de Counter-Strike 2D, desarrollado en C++. El juego permite a los jugadores unirse o crear una partida, elegir su equipo (terroristas o antiterroristas) y jugar.
 
@@ -24,12 +30,6 @@ Este proyecto es un juego de Counter-Strike 2D, desarrollado en C++. El juego pe
 - CMake
 - SDL2
 - Qt5
-
-**Integrantes**
-
-- [Manuel Herrera Esteban](https://github.com/Manuuherrera)
-- [Carlos Marias Sagastume](https://github.com/MatiasSagastume)
-- [Martín Alejandro Estrada Saavedra](https://github.com/martinSaav)
 
 ## Compilación
 Para compilar el proyecto, se debe ejecutar el siguiente comando en la terminal:
