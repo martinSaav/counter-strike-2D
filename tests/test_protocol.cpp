@@ -1,14 +1,14 @@
+#include "common/action.h"
 #include "common/dto/create_game_request.h"
 #include "common/dto/create_game_response.h"
-#include "common/dto/join_game_request.h"
-#include "common/dto/join_game_response.h"
 #include "common/dto/game_list_request.h"
 #include "common/dto/game_list_response.h"
+#include "common/dto/join_game_request.h"
+#include "common/dto/join_game_response.h"
 #include "common/dto/login_request.h"
 #include "common/dto/player_action.h"
-#include "common/protocol.h"
 #include "common/game.h"
-#include "common/action.h"
+#include "common/protocol.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -166,11 +166,10 @@ TEST(ProtocolTest, ReceivesCreateGameResponseCorrectly) {
         return 3;
     }));
 
-    EXPECT_CALL(mock_socket, recvall(_, 1))
-            .WillOnce(Invoke([&](void* dst, unsigned int) {
-                memcpy(dst, serialized.data() + 3, 1);
-                return 1;
-            }));
+    EXPECT_CALL(mock_socket, recvall(_, 1)).WillOnce(Invoke([&](void* dst, unsigned int) {
+        memcpy(dst, serialized.data() + 3, 1);
+        return 1;
+    }));
 
     Protocol protocol(mock_socket);
     const std::unique_ptr<Message> msg = protocol.recv_message();
@@ -274,11 +273,10 @@ TEST(ProtocolTest, ReceivesJoinGameResponseCorrectly) {
         return 3;
     }));
 
-    EXPECT_CALL(mock_socket, recvall(_, 1))
-            .WillOnce(Invoke([&](void* dst, unsigned int) {
-                memcpy(dst, serialized.data() + 3, 1);
-                return 1;
-            }));
+    EXPECT_CALL(mock_socket, recvall(_, 1)).WillOnce(Invoke([&](void* dst, unsigned int) {
+        memcpy(dst, serialized.data() + 3, 1);
+        return 1;
+    }));
 
     Protocol protocol(mock_socket);
     const std::unique_ptr<Message> msg = protocol.recv_message();
@@ -476,11 +474,10 @@ TEST(ProtocolTest, ReceivesPlayerActionCorrectly) {
         return 3;
     }));
 
-    EXPECT_CALL(mock_socket, recvall(_, 1))
-            .WillOnce(Invoke([&](void* dst, unsigned int) {
-                memcpy(dst, serialized.data() + 3, 1);
-                return 1;
-            }));
+    EXPECT_CALL(mock_socket, recvall(_, 1)).WillOnce(Invoke([&](void* dst, unsigned int) {
+        memcpy(dst, serialized.data() + 3, 1);
+        return 1;
+    }));
 
     Protocol protocol(mock_socket);
     const std::unique_ptr<Message> msg = protocol.recv_message();
