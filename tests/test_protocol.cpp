@@ -5,8 +5,10 @@
 #include "common/dto/game_list_request.h"
 #include "common/dto/game_list_response.h"
 #include "common/dto/login_request.h"
+#include "common/dto/player_action.h"
 #include "common/protocol.h"
 #include "common/game.h"
+#include "common/action.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -433,4 +435,57 @@ TEST(ProtocolTest, ReceivesGameListResponseCorrectly) {
     EXPECT_EQ(it->map_name, map_name);
     EXPECT_EQ(it->current_players, current_players);
     EXPECT_EQ(it->max_players, max_players);
+}
+
+// PlayerAction Test Cases
+TEST(ProtocolTest, SendsPlayerActionCorrectly) {
+    MockSocket mock_socket;
+
+    const Action action = Action::MoveDown;
+    const PlayerAction req(action);
+    const size_t serialized_size = req.serialized_size();
+    std::vector<uint8_t> serialized(serialized_size);
+    serialized[0] = static_cast<uint8_t>(MessageType::PlayerAction);
+    const uint16_t len = htons(1);
+    memcpy(&serialized[1], &len, sizeof(len));
+    serialized[3] = static_cast<uint8_t>(action);
+
+    EXPECT_CALL(mock_socket, sendall(_, serialized_size))
+            .WillOnce(Invoke([&](const void* data, unsigned int) {
+                EXPECT_EQ(memcmp(data, serialized.data(), serialized_size), 0);
+                return serialized_size;
+            }));
+
+    Protocol protocol(mock_socket);
+    protocol.send_message(req);
+}
+
+TEST(ProtocolTest, ReceivesPlayerActionCorrectly) {
+    MockSocket mock_socket;
+
+    const Action action = Action::MoveDown;
+    const PlayerAction req(action);
+    std::vector<uint8_t> serialized(req.serialized_size());
+    serialized[0] = static_cast<uint8_t>(MessageType::PlayerAction);
+    const uint16_t len = htons(1);
+    memcpy(&serialized[1], &len, sizeof(len));
+    serialized[3] = static_cast<uint8_t>(action);
+
+    EXPECT_CALL(mock_socket, recvall(_, 3)).WillOnce(Invoke([&](void* dst, unsigned int) {
+        memcpy(dst, serialized.data(), 3);
+        return 3;
+    }));
+
+    EXPECT_CALL(mock_socket, recvall(_, 1))
+            .WillOnce(Invoke([&](void* dst, unsigned int) {
+                memcpy(dst, serialized.data() + 3, 1);
+                return 1;
+            }));
+
+    Protocol protocol(mock_socket);
+    const std::unique_ptr<Message> msg = protocol.recv_message();
+
+    auto* player_action = dynamic_cast<PlayerAction*>(msg.get());
+    ASSERT_NE(player_action, nullptr);
+    EXPECT_EQ(player_action->get_action(), action);
 }

@@ -31,7 +31,7 @@ public:
 
     size_t serialized_size() const override { return 4; }
 
-    uint8_t get_action() const { return static_cast<uint8_t>(action); }
+    Action get_action() const { return action; }
 
     static PlayerAction deserialize(const uint8_t* buffer, size_t size) {
         if (size < 4) {
