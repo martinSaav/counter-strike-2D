@@ -1,4 +1,7 @@
 #include "common/dto/create_game_request.h"
+#include "common/dto/create_game_response.h"
+#include "common/dto/join_game_request.h"
+#include "common/dto/join_game_response.h"
 #include "common/dto/game_list_request.h"
 #include "common/dto/game_list_response.h"
 #include "common/dto/login_request.h"
@@ -119,6 +122,168 @@ TEST(ProtocolTest, ReceivesCreateGameCorrectly) {
     auto* create_game = dynamic_cast<CreateGameRequest*>(msg.get());
     ASSERT_NE(create_game, nullptr);
     EXPECT_EQ(create_game->get_game_name(), game_name);
+}
+
+// CreateGameResponse Test Cases
+
+TEST(ProtocolTest, SendsCreateGameResponseCorrectly) {
+    MockSocket mock_socket;
+
+    const bool success = true;
+    const CreateGameResponse req(success);
+    const size_t serialized_size = req.serialized_size();
+    std::vector<uint8_t> serialized(serialized_size);
+    serialized[0] = static_cast<uint8_t>(MessageType::CreateGameResponse);
+    const uint16_t len = htons(1);
+    memcpy(&serialized[1], &len, sizeof(len));
+    serialized[3] = static_cast<uint8_t>(success);
+
+    EXPECT_CALL(mock_socket, sendall(_, serialized_size))
+            .WillOnce(Invoke([&](const void* data, unsigned int) {
+                EXPECT_EQ(memcmp(data, serialized.data(), serialized_size), 0);
+                return serialized_size;
+            }));
+
+    Protocol protocol(mock_socket);
+    protocol.send_message(req);
+}
+
+TEST(ProtocolTest, ReceivesCreateGameResponseCorrectly) {
+    MockSocket mock_socket;
+
+    const bool success = true;
+    const CreateGameResponse req(success);
+    std::vector<uint8_t> serialized(req.serialized_size());
+    serialized[0] = static_cast<uint8_t>(MessageType::CreateGameResponse);
+    const uint16_t len = htons(1);
+    memcpy(&serialized[1], &len, sizeof(len));
+    serialized[3] = static_cast<uint8_t>(success);
+
+    EXPECT_CALL(mock_socket, recvall(_, 3)).WillOnce(Invoke([&](void* dst, unsigned int) {
+        memcpy(dst, serialized.data(), 3);
+        return 3;
+    }));
+
+    EXPECT_CALL(mock_socket, recvall(_, 1))
+            .WillOnce(Invoke([&](void* dst, unsigned int) {
+                memcpy(dst, serialized.data() + 3, 1);
+                return 1;
+            }));
+
+    Protocol protocol(mock_socket);
+    const std::unique_ptr<Message> msg = protocol.recv_message();
+
+    auto* create_game_resp = dynamic_cast<CreateGameResponse*>(msg.get());
+    ASSERT_NE(create_game_resp, nullptr);
+    EXPECT_EQ(create_game_resp->get_success(), success);
+}
+
+// JoinGameRequest Test Cases
+
+TEST(ProtocolTest, SendsJoinGameRequestCorrectly) {
+    MockSocket mock_socket;
+
+    const std::string game_name = "a game";
+    const JoinGameRequest req(game_name);
+    const size_t serialized_size = req.serialized_size();
+    std::vector<uint8_t> serialized(serialized_size);
+    serialized[0] = static_cast<uint8_t>(MessageType::JoinGameRequest);
+    const uint16_t len = htons(game_name.size());
+    memcpy(&serialized[1], &len, sizeof(len));
+    memcpy(&serialized[3], game_name.c_str(), game_name.size());
+
+    EXPECT_CALL(mock_socket, sendall(_, serialized_size))
+            .WillOnce(Invoke([&](const void* data, unsigned int) {
+                EXPECT_EQ(memcmp(data, serialized.data(), serialized_size), 0);
+                return serialized_size;
+            }));
+
+    Protocol protocol(mock_socket);
+    protocol.send_message(req);
+}
+
+TEST(ProtocolTest, ReceivesJoinGameRequestCorrectly) {
+    MockSocket mock_socket;
+
+    const std::string game_name = "a game";
+    const JoinGameRequest req(game_name);
+    std::vector<uint8_t> serialized(req.serialized_size());
+    serialized[0] = static_cast<uint8_t>(MessageType::JoinGameRequest);
+    const uint16_t len = htons(game_name.size());
+    memcpy(&serialized[1], &len, sizeof(len));
+    memcpy(&serialized[3], game_name.c_str(), game_name.size());
+
+    EXPECT_CALL(mock_socket, recvall(_, 3)).WillOnce(Invoke([&](void* dst, unsigned int) {
+        memcpy(dst, serialized.data(), 3);
+        return 3;
+    }));
+
+    EXPECT_CALL(mock_socket, recvall(_, game_name.size()))
+            .WillOnce(Invoke([&](void* dst, unsigned int) {
+                memcpy(dst, serialized.data() + 3, game_name.size());
+                return game_name.size();
+            }));
+
+    Protocol protocol(mock_socket);
+    const std::unique_ptr<Message> msg = protocol.recv_message();
+
+    auto* join_game = dynamic_cast<JoinGameRequest*>(msg.get());
+    ASSERT_NE(join_game, nullptr);
+    EXPECT_EQ(join_game->get_game_name(), game_name);
+}
+
+// JoinGameResponse Test Cases
+
+TEST(ProtocolTest, SendsJoinGameResponseCorrectly) {
+    MockSocket mock_socket;
+
+    const bool success = true;
+    const JoinGameResponse req(success);
+    const size_t serialized_size = req.serialized_size();
+    std::vector<uint8_t> serialized(serialized_size);
+    serialized[0] = static_cast<uint8_t>(MessageType::JoinGameResponse);
+    const uint16_t len = htons(1);
+    memcpy(&serialized[1], &len, sizeof(len));
+    serialized[3] = static_cast<uint8_t>(success);
+
+    EXPECT_CALL(mock_socket, sendall(_, serialized_size))
+            .WillOnce(Invoke([&](const void* data, unsigned int) {
+                EXPECT_EQ(memcmp(data, serialized.data(), serialized_size), 0);
+                return serialized_size;
+            }));
+
+    Protocol protocol(mock_socket);
+    protocol.send_message(req);
+}
+
+TEST(ProtocolTest, ReceivesJoinGameResponseCorrectly) {
+    MockSocket mock_socket;
+
+    const bool success = true;
+    const JoinGameResponse req(success);
+    std::vector<uint8_t> serialized(req.serialized_size());
+    serialized[0] = static_cast<uint8_t>(MessageType::JoinGameResponse);
+    const uint16_t len = htons(1);
+    memcpy(&serialized[1], &len, sizeof(len));
+    serialized[3] = static_cast<uint8_t>(success);
+
+    EXPECT_CALL(mock_socket, recvall(_, 3)).WillOnce(Invoke([&](void* dst, unsigned int) {
+        memcpy(dst, serialized.data(), 3);
+        return 3;
+    }));
+
+    EXPECT_CALL(mock_socket, recvall(_, 1))
+            .WillOnce(Invoke([&](void* dst, unsigned int) {
+                memcpy(dst, serialized.data() + 3, 1);
+                return 1;
+            }));
+
+    Protocol protocol(mock_socket);
+    const std::unique_ptr<Message> msg = protocol.recv_message();
+
+    auto* join_game_resp = dynamic_cast<JoinGameResponse*>(msg.get());
+    ASSERT_NE(join_game_resp, nullptr);
+    EXPECT_EQ(join_game_resp->get_success(), success);
 }
 
 // GameListRequest Test Cases
