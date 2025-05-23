@@ -1,6 +1,7 @@
 [![language](https://img.shields.io/badge/language-C++-pink.svg?style=flat-square)](https://cplusplus.com/)
 ![os](https://img.shields.io/badge/OS-linux-blue.svg?style=flat-square)
-[![Pre-commit checks](https://github.com/MatiasSagastume/tp-grupal-template/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/MatiasSagastume/tp-grupal-template/actions/workflows/pre-commit.yml)
+[![Pre-commit](https://github.com/MatiasSagastume/tp-grupal-template/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/MatiasSagastume/tp-grupal-template/actions/workflows/pre-commit.yml)
+[![CMake Build & Test](https://github.com/MatiasSagastume/tp-grupal-template/actions/workflows/cmake-build-test.yml/badge.svg?branch=main)](https://github.com/MatiasSagastume/tp-grupal-template/actions/workflows/cmake-build-test.yml)
 # Counter-Strike 2D
 
 ## Tabla de Contenidos
@@ -26,10 +27,9 @@ Este proyecto es un juego de Counter-Strike 2D, desarrollado en C++. El juego pe
 ## Requisitos
 - **Sistema Operativo**: Ubuntu 24.04
 - Make
-- Make
 - CMake
 - SDL2
-- Qt5
+- Qt6
 
 ## Compilación
 Para compilar el proyecto, se debe ejecutar el siguiente comando en la terminal:
