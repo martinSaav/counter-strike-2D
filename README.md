@@ -1,6 +1,6 @@
 [![language](https://img.shields.io/badge/language-C++-pink.svg?style=flat-square)](https://cplusplus.com/)
 ![os](https://img.shields.io/badge/OS-linux-blue.svg?style=flat-square)
-[![Pre-commit checks](https://github.com/MatiasSagastume/tp-grupal-template/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/MatiasSagastume/tp-grupal-template/actions/workflows/pre-commit.yml)
+[![Pre-commit](https://github.com/MatiasSagastume/tp-grupal-template/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/MatiasSagastume/tp-grupal-template/actions/workflows/pre-commit.yml)
 # Counter-Strike 2D
 
 ## Tabla de Contenidos
