@@ -13,6 +13,8 @@ using ::testing::_;
 using ::testing::Invoke;
 using ::testing::Return;
 
+// LoginRequest Test Cases
+
 TEST(ProtocolTest, SendsLoginRequestCorrectly) {
     MockSocket mock_socket;
 
@@ -64,6 +66,8 @@ TEST(ProtocolTest, ReceivesLoginRequestCorrectly) {
     ASSERT_NE(login, nullptr);
     EXPECT_EQ(login->get_username(), username);
 }
+
+// CreateGameRequest Test Cases
 
 TEST(ProtocolTest, SendsCreateGameCorrectly) {
     MockSocket mock_socket;
@@ -117,6 +121,8 @@ TEST(ProtocolTest, ReceivesCreateGameCorrectly) {
     EXPECT_EQ(create_game->get_game_name(), game_name);
 }
 
+// GameListRequest Test Cases
+
 TEST(ProtocolTest, SendsGameListRequestCorrectly) {
     MockSocket mock_socket;
 
@@ -157,6 +163,8 @@ TEST(ProtocolTest, ReceivesGameListRequestCorrectly) {
     auto* game_list_req = dynamic_cast<GameListRequest*>(msg.get());
     ASSERT_NE(game_list_req, nullptr);
 }
+
+// GameListResponse Test Cases
 
 TEST(ProtocolTest, SendsGameListResponseCorrectly) {
     MockSocket mock_socket;
