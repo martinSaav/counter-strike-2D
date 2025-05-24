@@ -5,11 +5,17 @@
 #include <utility>
 #define rate 30
 #define miliseconds_per_iteration (1000 / rate)
+#define starting_position_x 0
+#define starting_position_y 0
+#define tiles_per_movement 5
 
 GameIdentification Match::join_match(const std::string& username) {
     std::lock_guard<std::mutex> lck(mtx);
+    if (player_count == max_player_count) {
+        throw MatchFull();
+    }
     player_count++;
-    Player player(username, 0, 0);
+    Player player(username, starting_position_x, starting_position_y);
     PlayerCredentials credentials(player_count);
     players.insert(std::pair{credentials, player});
     auto sender_queue = std::make_shared<Queue<MatchStatusDTO>>();
@@ -29,23 +35,23 @@ void Match::process_command(const PlayerCommand command) {
     switch (command.command_type) {
         case Action::MoveLeft: {
             auto [x, y] = player.get_location();
-            player.set_location(x - 6, y);
+            player.set_location(x - tiles_per_movement, y);
             break;
         }
 
         case Action::MoveRight: {
             auto [x, y] = player.get_location();
-            player.set_location(x + 6, y);
+            player.set_location(x + tiles_per_movement, y);
             break;
         }
         case Action::MoveUp: {
             auto [x, y] = player.get_location();
-            player.set_location(x, y - 6);
+            player.set_location(x, y - tiles_per_movement);
             break;
         }
         case Action::MoveDown: {
             auto [x, y] = player.get_location();
-            player.set_location(x, y + 6);
+            player.set_location(x, y + tiles_per_movement);
             break;
         }
         default:
@@ -104,6 +110,9 @@ void Match::run() {
 }
 
 int Match::get_player_count() const { return player_count; }
+
+
+int Match::get_max_player_count() const { return max_player_count; }
 
 
 void Match::stop() { Thread::stop(); }
