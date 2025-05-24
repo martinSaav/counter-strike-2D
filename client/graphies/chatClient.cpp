@@ -1,5 +1,5 @@
 #include <thread>
-#include "ChatClient.h"
+#include "chatClient.h"
 #include "inputServerHandler.h"
 using namespace SDL2pp;
 
