@@ -3,8 +3,6 @@
 #include <algorithm>
 #include <ranges>
 #include <utility>
-
-#include "game/collision_detector.h"
 #define rate 30
 #define miliseconds_per_iteration (1000 / rate)
 #define starting_position_x 0
@@ -23,35 +21,20 @@ GameIdentification Match::join_match(const std::string& username) {
     auto sender_queue = std::make_shared<Queue<MatchStatusDTO>>();
     const GameIdentification game_identification(commands_queue, sender_queue, credentials);
     senders_queues.push_back(std::move(sender_queue));
-    map.add_player(&player);
     return game_identification;
 }
 
 
-void Match::process_move_player(Player& player, const int x_mov, const int y_mov) {
+void Match::process_move_player(Player& player, const int x_mov, const int y_mov) const {
     auto [old_x, old_y] = player.get_location();
     const int new_x = old_x + x_mov;
     const int new_y = old_y + y_mov;
-    if (!map.check_if_position_is_in_range(new_x, new_y)) {
-        return;
-    }
-    for (const std::vector<Structure> structures = map.get_structures_near_player(player);
-         const auto& structure: structures) {
-        if (CollisionDetector::check_collision_between_player_and_structure(new_x, new_y,
-                                                                            structure)) {
-            return;
-        }
-    }
-    if (const auto& near_players = map.get_near_players(player);
-        std::ranges::any_of(near_players, [&](const auto& p) {
-            return CollisionDetector::check_collision_between_players(new_x, new_y, *p);
-        })) {
+    if (map.check_if_there_is_a_structure_in_pos(new_x, new_y)) {
         return;
     }
     try {
         const Position new_pos(new_x, new_y);
-        auto new_chunks = Map::calculate_player_chunks(new_x, new_y);
-        player.set_location(new_pos, std::move(new_chunks));
+        player.set_location(new_pos);
     } catch (const InvalidPosition&) {}
 }
 

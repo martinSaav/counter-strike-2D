@@ -4,8 +4,13 @@ target_sources(taller_server
         client_handler.cpp
         lobby.cpp
         match.cpp
+        player.cpp
         player_command.cpp
         sender.cpp
+        map.cpp
+        position.cpp
+        structure.cpp
+        chunk.cpp
         main.cpp
     PUBLIC
         client_handler.h
@@ -14,15 +19,15 @@ target_sources(taller_server
         match.h
         match_dto.h
         match_status_dto.h
+        player.h
         player_credentials.h
         player_dto.h
         player_command.h
         sender.h
         acceptor.h
-)
-
-add_subdirectory(game)
-
-target_link_libraries(taller_server game)
-
-target_include_directories(taller_server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+        map.h
+        position.h
+        position_dto.h
+        structure.h
+        chunk.h
+    )
