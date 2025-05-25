@@ -7,6 +7,10 @@ target_sources(taller_server
         player.cpp
         player_command.cpp
         sender.cpp
+        map.cpp
+        position.cpp
+        structure.cpp
+        chunk.cpp
         main.cpp
     PUBLIC
         client_handler.h
@@ -21,4 +25,9 @@ target_sources(taller_server
         player_command.h
         sender.h
         acceptor.h
+        map.h
+        position.h
+        position_dto.h
+        structure.h
+        chunk.h
     )

@@ -24,6 +24,21 @@ GameIdentification Match::join_match(const std::string& username) {
     return game_identification;
 }
 
+
+void Match::process_move_player(Player& player, const int x_mov, const int y_mov) const {
+    auto [old_x, old_y] = player.get_location();
+    const int new_x = old_x + x_mov;
+    const int new_y = old_y + y_mov;
+    if (map.check_if_there_is_a_structure_in_pos(new_x, new_y)) {
+        return;
+    }
+    try {
+        const Position new_pos(new_x, new_y);
+        player.set_location(new_pos);
+    } catch (const InvalidPosition&) {}
+}
+
+
 void Match::process_command(const PlayerCommand command) {
     std::lock_guard<std::mutex> lck(mtx);
     const PlayerCredentials player_credentials = command.credentials;
@@ -34,25 +49,17 @@ void Match::process_command(const PlayerCommand command) {
     Player& player = player_p->second;
     switch (command.command_type) {
         case Action::MoveLeft: {
-            auto [x, y] = player.get_location();
-            player.set_location(x - tiles_per_movement, y);
-            break;
+            return process_move_player(player, -tiles_per_movement, 0);
         }
 
         case Action::MoveRight: {
-            auto [x, y] = player.get_location();
-            player.set_location(x + tiles_per_movement, y);
-            break;
+            return process_move_player(player, tiles_per_movement, 0);
         }
         case Action::MoveUp: {
-            auto [x, y] = player.get_location();
-            player.set_location(x, y - tiles_per_movement);
-            break;
+            return process_move_player(player, 0, -tiles_per_movement);
         }
         case Action::MoveDown: {
-            auto [x, y] = player.get_location();
-            player.set_location(x, y + tiles_per_movement);
-            break;
+            return process_move_player(player, 0, +tiles_per_movement);
         }
         default:
             break;
