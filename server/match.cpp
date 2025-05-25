@@ -29,6 +29,9 @@ void Match::process_move_player(Player& player, const int x_mov, const int y_mov
     auto [old_x, old_y] = player.get_location();
     const int new_x = old_x + x_mov;
     const int new_y = old_y + y_mov;
+    if (!map.check_if_position_is_in_range(new_x, new_y)) {
+        return;
+    }
     if (map.check_if_there_is_a_structure_in_pos(new_x, new_y)) {
         return;
     }
