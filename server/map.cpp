@@ -41,13 +41,13 @@ void Map::add_structure(const Structure structure) {
 }
 
 bool Map::check_if_there_is_a_structure_in_pos(const int x, const int y) const {
-    auto chunk_idx = get_chunk_index(x, y);
-    auto structures_p = structure_chunks.find(chunk_idx);
-    if (structures_p == structure_chunks.end()) {
+    const auto chunk_idx = get_chunk_index(x, y);
+    const auto chunk_p = structure_chunks.find(chunk_idx);
+    if (chunk_p == structure_chunks.end()) {
         return false;
     }
 
-    const std::vector<Structure>& structures = structures_p->second.get_structures();
+    const std::vector<Structure>& structures = chunk_p->second.get_structures();
     return std::any_of(structures.begin(), structures.end(), [x, y](const Structure& structure) {
         return structure.check_if_inside(x, y);
     });
