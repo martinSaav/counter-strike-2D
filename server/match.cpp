@@ -23,6 +23,7 @@ GameIdentification Match::join_match(const std::string& username) {
     auto sender_queue = std::make_shared<Queue<MatchStatusDTO>>();
     const GameIdentification game_identification(commands_queue, sender_queue, credentials);
     senders_queues.push_back(std::move(sender_queue));
+    map.add_player(&player);
     return game_identification;
 }
 
@@ -36,13 +37,21 @@ void Match::process_move_player(Player& player, const int x_mov, const int y_mov
     }
     for (const std::vector<Structure> structures = map.get_structures_near_player(player);
          const auto& structure: structures) {
-        if (CollisionDetector::check_collision_between_player_and_structure(player, structure)) {
+        if (CollisionDetector::check_collision_between_player_and_structure(new_x, new_y,
+                                                                            structure)) {
             return;
         }
     }
+    if (const auto& near_players = map.get_near_players(player);
+        std::ranges::any_of(near_players, [&](const auto& p) {
+            return CollisionDetector::check_collision_between_players(new_x, new_y, *p);
+        })) {
+        return;
+    }
     try {
         const Position new_pos(new_x, new_y);
-        player.set_location(new_pos);
+        auto new_chunks = Map::calculate_player_chunks(new_x, new_y);
+        player.set_location(new_pos, std::move(new_chunks));
     } catch (const InvalidPosition&) {}
 }
 
