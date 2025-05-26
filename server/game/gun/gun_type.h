@@ -4,5 +4,5 @@
 
 #ifndef GUN_TYPES_H
 #define GUN_TYPES_H
-enum class GunType { Primary, Secondary, Knife, Bomb };
+enum class GunType { Primary, Secondary };
 #endif  // GUN_TYPES_H
