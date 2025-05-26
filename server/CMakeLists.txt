@@ -11,6 +11,7 @@ target_sources(taller_server
         position.cpp
         structure.cpp
         chunk.cpp
+        collision_detector.cpp
         main.cpp
     PUBLIC
         client_handler.h
@@ -30,4 +31,5 @@ target_sources(taller_server
         position_dto.h
         structure.h
         chunk.h
+        collision_detector.h
     )
