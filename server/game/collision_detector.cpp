@@ -21,8 +21,9 @@ bool CollisionDetector::check_collision_between_objects(
 }
 
 
-bool CollisionDetector::check_collision_between_player_and_structure(int p_bottom_x, int p_bottom_y,
+bool CollisionDetector::check_collision_between_player_and_structure(Player& player,
                                                                      const Structure& structure) {
+    auto [p_bottom_x, p_bottom_y] = player.get_location();
     const int p_top_x = p_bottom_x + player_hitbox_width;
     const int p_top_y = p_bottom_y + player_hitbox_height;
     auto [s_bottom_x, s_bottom_y] = structure.get_position();
@@ -45,8 +46,8 @@ bool CollisionDetector::check_collision_between_structures(const Structure& stru
 }
 
 
-bool CollisionDetector::check_collision_between_players(int p1_bottom_x, int p1_bottom_y,
-                                                        Player& player2) {
+bool CollisionDetector::check_collision_between_players(Player& player1, Player& player2) {
+    auto [p1_bottom_x, p1_bottom_y] = player1.get_location();
     const int p1_top_x = p1_bottom_x + player_hitbox_width;
     const int p1_top_y = p1_bottom_y + player_hitbox_height;
     auto [p2_bottom_x, p2_bottom_y] = player2.get_location();

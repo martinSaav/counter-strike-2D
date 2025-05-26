@@ -4,7 +4,7 @@
 #include <ranges>
 #include <utility>
 
-#include "collision_detector.h"
+#include "game/collision_detector.h"
 #define rate 30
 #define miliseconds_per_iteration (1000 / rate)
 #define starting_position_x 0

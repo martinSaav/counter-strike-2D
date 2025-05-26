@@ -7,11 +7,11 @@
 
 #include "common/catedra/queue.h"
 #include "common/catedra/thread.h"
+#include "game/map.h"
+#include "game/player.h"
 
 #include "game_identification.h"
-#include "map.h"
 #include "match_status_dto.h"
-#include "player.h"
 #include "player_command.h"
 #include "player_credentials.h"
 
