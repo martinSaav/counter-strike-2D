@@ -2,7 +2,7 @@
 #include <iostream>
 #include <exception>
 #include "lobbywindow.h"
-#include "ChatClient.h"
+#include "chatClient.h"
 
 int main(int argc, char *argv[])  
 {

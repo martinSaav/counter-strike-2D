@@ -29,14 +29,15 @@
    <string notr="true">QTableWidget::item:selected {
     background-color: #ffd180;
     color: black;
-}</string>
+}
+</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QPushButton" name="buscarButton">
     <property name="geometry">
      <rect>
       <x>90</x>
-      <y>230</y>
+      <y>220</y>
       <width>111</width>
       <height>26</height>
      </rect>
@@ -49,7 +50,7 @@
     <property name="geometry">
      <rect>
       <x>90</x>
-      <y>180</y>
+      <y>170</y>
       <width>111</width>
       <height>26</height>
      </rect>
@@ -179,7 +180,7 @@
     <property name="geometry">
      <rect>
       <x>90</x>
-      <y>280</y>
+      <y>390</y>
       <width>111</width>
       <height>26</height>
      </rect>
@@ -201,6 +202,87 @@
      <string>Actualizar</string>
     </property>
    </widget>
+   <widget class="QLabel" name="nameLabel">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>10</y>
+      <width>171</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>14</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="loginButton">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>280</y>
+      <width>111</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Login</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="fondoImage">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>-10</y>
+      <width>811</width>
+      <height>651</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="recursos.qrc">:/imagenes/imagenes/fondo.jpg</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="userImage">
+    <property name="geometry">
+     <rect>
+      <x>540</x>
+      <y>0</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="recursos.qrc">:/imagenes/imagenes/user.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <zorder>fondoImage</zorder>
+   <zorder>buscarButton</zorder>
+   <zorder>crearButton</zorder>
+   <zorder>waitText</zorder>
+   <zorder>titulo</zorder>
+   <zorder>unirseButton</zorder>
+   <zorder>listaPartidas</zorder>
+   <zorder>quitButton</zorder>
+   <zorder>actualizarButton</zorder>
+   <zorder>nameLabel</zorder>
+   <zorder>loginButton</zorder>
+   <zorder>userImage</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -214,6 +296,8 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <resources/>
+ <resources>
+  <include location="recursos.qrc"/>
+ </resources>
  <connections/>
 </ui>

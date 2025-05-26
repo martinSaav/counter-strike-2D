@@ -2,11 +2,12 @@
 set(LOBBY_SOURCES
     main.cpp
     lobbywindow.cpp
-    lobbywindow.h
     lobbywindow.ui
     creatematchwindow.cpp
-    creatematchwindow.h
     creatematchwindow.ui
+    loginwindow.cpp
+    loginwindow.ui
+    recursos.qrc
 )
 
 # Estos archivos van al ejecutable principal

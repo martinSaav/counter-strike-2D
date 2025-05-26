@@ -28,6 +28,9 @@ MainWindow::MainWindow(Protocol& protocolo, QWidget *parent)
     ui->listaPartidas->hide();
     ui->actualizarButton->hide();
     ui->unirseButton->hide();
+    ui->userImage->hide();
+    ui->crearButton->hide();
+    ui->buscarButton->hide();
 }
 
 MainWindow::~MainWindow()
@@ -42,6 +45,7 @@ void MainWindow::on_crearButton_clicked()
     windowCreate->setWindowFlags(Qt::Window);  // esto la hace ventana real
     windowCreate->show();
 
+    windowCreate->move(1200, 1250);           // Posición (x=200, y=150) en la pantalla
     // Ocultamos el lobby
     this->hide();
 }
@@ -118,4 +122,26 @@ void MainWindow::on_buscarButton_clicked()
     ui->unirseButton->show();
 
     this->on_actualizarButton_clicked();
+}
+
+void MainWindow::on_loginButton_clicked()
+{
+    loginwindow *windowLogin = new loginwindow(namePlayer, this);
+
+    windowLogin->setWindowFlags(Qt::Window);  // esto la hace ventana real
+    windowLogin->show();
+
+    // Ocultamos el lobby
+    this->hide();
+
+    connect(windowLogin, &loginwindow::ventanaCerrada, this, [this]() {
+        QString qtexto = QString::fromStdString(this->namePlayer);
+
+        // Mostrar el texto en el QLabel
+        ui->nameLabel->setText(qtexto);
+        ui->userImage->show();
+        ui->crearButton->show();
+        ui->buscarButton->show();
+        ui->loginButton->hide();
+    });
 }
