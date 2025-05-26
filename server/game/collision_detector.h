@@ -12,13 +12,13 @@ class CollisionDetector {
                                                 const std::pair<int, int>& object2_top_coords);
 
 public:
-    static bool check_collision_between_player_and_structure(Player& player,
+    static bool check_collision_between_player_and_structure(int p_bottom_x, int p_bottom_y,
                                                              const Structure& structure);
 
     static bool check_collision_between_structures(const Structure& structure1,
                                                    const Structure& structure2);
 
-    static bool check_collision_between_players(Player& player1, Player& player2);
+    static bool check_collision_between_players(int p1_bottom_x, int p1_bottom_y, Player& player2);
 };
 
 
