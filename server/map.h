@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "chunk.h"
+#include "player.h"
 #include "structure.h"
 
 struct StructureInPosition: public std::runtime_error {
@@ -24,7 +25,7 @@ class Map {
 public:
     Map(const int max_x, const int max_y): max_x(max_x), max_y(max_y) {}
     void add_structure(Structure structure);
-    [[nodiscard]] bool check_if_there_is_a_structure_in_pos(int x, int y) const;
+    std::vector<Structure> get_structures_near_player(Player& player);
     [[nodiscard]] bool check_if_position_is_in_range(int x, int y) const;
 };
 
