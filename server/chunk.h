@@ -1,7 +1,3 @@
-//
-// Created by matias on 25/05/25.
-//
-
 #ifndef CHUNK_H
 #define CHUNK_H
 

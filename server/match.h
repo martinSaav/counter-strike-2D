@@ -39,7 +39,7 @@ class Match: public Thread {
 
     void broadcast_match_status();
 
-    void process_move_player(Player& player, int x_mov, int y_mov) const;
+    void process_move_player(Player& player, int x_mov, int y_mov);
 
 public:
     Match():

@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <ranges>
 #include <utility>
+
+#include "collision_detector.h"
 #define rate 30
 #define miliseconds_per_iteration (1000 / rate)
 #define starting_position_x 0
@@ -25,15 +27,18 @@ GameIdentification Match::join_match(const std::string& username) {
 }
 
 
-void Match::process_move_player(Player& player, const int x_mov, const int y_mov) const {
+void Match::process_move_player(Player& player, const int x_mov, const int y_mov) {
     auto [old_x, old_y] = player.get_location();
     const int new_x = old_x + x_mov;
     const int new_y = old_y + y_mov;
     if (!map.check_if_position_is_in_range(new_x, new_y)) {
         return;
     }
-    if (map.check_if_there_is_a_structure_in_pos(new_x, new_y)) {
-        return;
+    for (const std::vector<Structure> structures = map.get_structures_near_player(player);
+         const auto& structure: structures) {
+        if (CollisionDetector::check_collision_between_player_and_structure(player, structure)) {
+            return;
+        }
     }
     try {
         const Position new_pos(new_x, new_y);
