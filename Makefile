@@ -1,4 +1,4 @@
-.PHONY: all test clean editor client common server build
+.PHONY: all test clean clean-all editor client common server build
 
 compile-debug:
 	mkdir -p build/
@@ -11,4 +11,7 @@ run-tests: compile-debug
 all: clean run-tests
 
 clean:
+	cmake --build build/ --target clean
+
+clean-all:
 	rm -Rf build/
