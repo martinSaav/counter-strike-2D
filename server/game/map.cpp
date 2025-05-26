@@ -61,7 +61,7 @@ std::vector<Structure> Map::get_structures_near_player(Player& player) {
     for (const auto& chunk_idx: chunks_indexes) {
         for (Chunk& chunk = structure_chunks[chunk_idx];
              const auto& structure: chunk.get_structures()) {
-            structures.insert(structure);
+            structures.emplace(structure);
         }
     }
     std::vector<Structure> structures_vector(structures.begin(), structures.end());
