@@ -1,10 +1,16 @@
 #include <thread>
-#include "ChatClient.h"
+#include "chatClient.h"
 #include "inputServerHandler.h"
 using namespace SDL2pp;
 
 ChatClient::ChatClient(Protocol& protocolo) : protocolo(protocolo) {
     // Constructor
+}
+
+// Definición
+double getCurrentTime() {
+    static Uint64 frequency = SDL_GetPerformanceFrequency();
+    return (double)SDL_GetPerformanceCounter() / frequency;
 }
 
 void ChatClient::run(){
@@ -33,16 +39,29 @@ void ChatClient::run(){
 
     std::thread inputServer(&InputServerHandler::processEvents, &inputServerHandler);
 
+
+    const double FPS = 30.0;
+    const double FRAME_TIME = 1.0 / FPS; // en segundos
+
+    double lastTime = getCurrentTime();
     // Main loop
     while (true) {
-        
+        double current = getCurrentTime();
+        double elapsed = current - lastTime;
+        lastTime = current;
+
         auto mensaje = inputServerHandler.getMensaje();
         if(mensaje){
             render.renderFrame(mensaje->get_x(), mensaje->get_y());
         }
-        // Si hay mensaje, lo mostramos, sino, mostramos una cadena vacía
-        
-        SDL_Delay(33);
+
+        // Sleep si el frame fue más rápido de lo esperado
+        double frameTime = getCurrentTime() - current;
+        double delay = FRAME_TIME - frameTime;
+        if (delay > 0) {
+            SDL_Delay((Uint32)(delay * 1000.0)); // convertir a milisegundos
+        }
+        //SDL_Delay(33);
     }
     inputThread.join();
     inputServer.join();

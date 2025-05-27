@@ -1,4 +1,4 @@
-#include "InputHandler.h"
+#include "inputHandler.h"
 #include <SDL.h>
 #include "../../common/dto/player_action.h"
 #include "../../common/action.h"
@@ -13,7 +13,6 @@ InputHandler::~InputHandler() {
 
 void InputHandler::processEvents() {
     SDL_Event event;
-    
 
     while (!exitGame()){
         while (SDL_PollEvent(&event)) {
@@ -27,34 +26,29 @@ void InputHandler::processEvents() {
         const Uint8* state = SDL_GetKeyboardState(NULL);
 
         if (state[SDL_SCANCODE_Q]) {
-        //    mensajeActual = "q";
            quit = true;
         }
 
         if (state[SDL_SCANCODE_W]){
             Action actionActual = Action::MoveUp;
             action = &actionActual;
-            //mensajeActual = "w";
 
         }else if (state[SDL_SCANCODE_A]){
             Action actionActual = Action::MoveLeft;
             action = &actionActual;
-            //mensajeActual = "a";
 
         }else if (state[SDL_SCANCODE_S]){
             Action actionActual = Action::MoveDown;
             action = &actionActual;
-            //mensajeActual = "s";
 
         }else if (state[SDL_SCANCODE_D]){
             Action actionActual = Action::MoveRight;
             action = &actionActual;
-            //mensajeActual = "d";
             
+        }else if (state[SDL_BUTTON_LEFT]){
+            Action actionActual = Action::Shoot;
+            action = &actionActual;
         }
-        //else if (state[SDL_SCANCODE_Q]){
-        //    mensajeActual = "q";
-        //}
 
         if (action) {
             PlayerAction playerAction(*action);

@@ -1,9 +1,10 @@
 # Definimos los archivos fuente directamente
 add_library(graphies STATIC
-    ChatClient.cpp
-    Render.cpp
-    InputHandler.cpp
+    chatClient.cpp
+    render.cpp
+    inputHandler.cpp
     inputServerHandler.cpp
+    textureStore.cpp
     # Agrega aquí los .h si deseas (opcional, pero no obligatorio)
 )
 

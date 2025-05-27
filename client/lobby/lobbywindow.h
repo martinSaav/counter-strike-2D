@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QTableWidgetItem>
 #include "creatematchwindow.h"
+#include "loginwindow.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -30,11 +31,15 @@ private slots:
 
     void on_buscarButton_clicked();
 
+    void on_loginButton_clicked();
+
 private:
     Ui::LobbyWindow *ui;
 
     Protocol& protocolo;
 
     std::list<std::string> maps;
+
+    std::string namePlayer;
 };
 #endif // LOBBYWINDOW_H

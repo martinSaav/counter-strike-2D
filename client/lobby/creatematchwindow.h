@@ -1,7 +1,7 @@
 #ifndef CREATEMATCHWINDOW_H
 #define CREATEMATCHWINDOW_H
 
-#include <QWidget>
+#include <QDialog>
 #include "common/protocol.h"
 
 enum closeType {
@@ -13,7 +13,7 @@ namespace Ui {
 class createMatchWindow;
 }
 
-class createMatchWindow : public QWidget
+class createMatchWindow : public QDialog
 {
     Q_OBJECT
 
