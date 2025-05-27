@@ -1,5 +1,6 @@
 #ifndef GAMESTATEUPDATER_H
 #define GAMESTATEUPDATER_H
+#include <chrono>
 #include <memory>
 #include <vector>
 
@@ -14,7 +15,7 @@ class GameStateUpdater {
 
 public:
     explicit GameStateUpdater(Map& map);
-    void update_game(float time_step);
+    void update_game(std::chrono::time_point<std::chrono::system_clock> current_time);
 };
 
 
