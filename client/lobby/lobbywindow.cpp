@@ -81,7 +81,7 @@ void MainWindow::on_actualizarButton_clicked()
 
     const auto gameList = dynamic_cast<GameListResponse*>(responseGameList.get());
     
-    std::list<Game> games = gameList->get_games();
+    std::list<GameInfo> games = gameList->get_games();
     
     int cantPartidas = games.size();
     std::string cantJugadores;

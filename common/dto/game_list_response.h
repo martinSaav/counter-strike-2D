@@ -10,17 +10,17 @@
 
 #include <arpa/inet.h>
 
-#include "../game.h"
+#include "../game_info.h"
 #include "../message.h"
 #include "../message_type.h"
 
 class GameListResponse: public Message {
 private:
     MessageType message_type = MessageType::GameListResponse;
-    std::list<Game> games;
+    std::list<GameInfo> games;
 
 public:
-    explicit GameListResponse(std::list<Game> games): games(std::move(games)) {}
+    explicit GameListResponse(std::list<GameInfo> games): games(std::move(games)) {}
 
     void serialize(uint8_t* buffer) const override {
         buffer[0] = static_cast<uint8_t>(message_type);
@@ -64,7 +64,7 @@ public:
         uint16_t length;
         std::memcpy(&length, buffer + 1, sizeof(length));
 
-        std::list<Game> games_deserialized;
+        std::list<GameInfo> games_deserialized;
         size_t offset = 3;
         while (offset < static_cast<size_t>(length + 3)) {
             uint16_t name_length;
@@ -82,12 +82,12 @@ public:
             offset += map_name_length;
             uint8_t current_players = buffer[offset++];
             uint8_t max_players = buffer[offset++];
-            games_deserialized.emplace_back(Game{name, map_name, current_players, max_players});
+            games_deserialized.emplace_back(GameInfo{name, map_name, current_players, max_players});
         }
         return GameListResponse(games_deserialized);
     }
 
-    const std::list<Game>& get_games() const { return games; }
+    const std::list<GameInfo>& get_games() const { return games; }
 };
 
 #endif
