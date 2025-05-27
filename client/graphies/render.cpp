@@ -10,9 +10,9 @@ Render::Render(Renderer* renderer, Protocol& protocolo):
     protocolo(protocolo)
 {
     // Cargamos las texturas
-    texturas.loadTexture("fondo", "../client/data/mapa.png", sdlRenderer);
+    texturas.loadTexture("fondo", "../client/data/maps/default_aztec.png", sdlRenderer);
     texturas.loadTexture("mira", "../client/data/mira.png", sdlRenderer);
-    texturas.loadTexture("sprites", "../client/data/jugador.png", sdlRenderer);
+    texturas.loadTexture("sprites", "../client/data/players/t1.bmp", sdlRenderer);
 }
 //SetColorKey(true, 0))
 void Render::renderFrame(int posX, int posY){
@@ -31,7 +31,7 @@ void Render::renderFrame(int posX, int posY){
     prev_ticks = frame_ticks;
 
     // Ajustar tamaño de cámara con zoom
-    float zoom = 4.0f;
+    float zoom = 10.0f;
     int cam_w = sdlRenderer->GetOutputWidth() / zoom;
     int cam_h = sdlRenderer->GetOutputHeight() / zoom;
 
@@ -68,8 +68,8 @@ void Render::renderFrame(int posX, int posY){
     
     sdlRenderer->Copy(
     sprites,
-    Rect(0, 0, 79, 79),  // sprite en el atlas
-    Rect(player_screen_x, player_screen_y, 25 * zoom, 25 * zoom),  // en pantalla
+    Rect(0, 0, 32, 32),  // sprite en el atlas
+    Rect(player_screen_x, player_screen_y, 32 * 2, 32 * 2),  // en pantalla
     angle);
 
     sdlRenderer->Copy(
