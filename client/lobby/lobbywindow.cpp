@@ -42,12 +42,7 @@ void MainWindow::on_crearButton_clicked()
 {
     createMatchWindow *windowCreate = new createMatchWindow(this->protocolo, this->maps, this);
 
-    windowCreate->setWindowFlags(Qt::Window);  // esto la hace ventana real
-    windowCreate->show();
-
-    windowCreate->move(1200, 1250);           // Posición (x=200, y=150) en la pantalla
-    // Ocultamos el lobby
-    this->hide();
+    windowCreate->exec();
 }
 
 void MainWindow::on_unirseButton_clicked()
@@ -128,13 +123,10 @@ void MainWindow::on_loginButton_clicked()
 {
     loginwindow *windowLogin = new loginwindow(namePlayer, this);
 
-    windowLogin->setWindowFlags(Qt::Window);  // esto la hace ventana real
-    windowLogin->show();
-
-    // Ocultamos el lobby
-    this->hide();
-
     connect(windowLogin, &loginwindow::ventanaCerrada, this, [this]() {
+        if (this->namePlayer == ""){ //caso no coloco un nombre
+           return;
+        }
         QString qtexto = QString::fromStdString(this->namePlayer);
 
         // Mostrar el texto en el QLabel
@@ -144,4 +136,6 @@ void MainWindow::on_loginButton_clicked()
         ui->buscarButton->show();
         ui->loginButton->hide();
     });
+
+    windowLogin->exec(); //Aquí se bloquea y se ejecuta la ventana
 }

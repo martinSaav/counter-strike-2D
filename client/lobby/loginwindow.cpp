@@ -2,7 +2,7 @@
 #include "ui_loginwindow.h"
 
 loginwindow::loginwindow(std::string& namePlayer, QWidget *parent)
-    : QWidget(parent)
+    : QDialog(parent)
     , ui(new Ui::loginwindow),
     namePlayer(namePlayer)
 {

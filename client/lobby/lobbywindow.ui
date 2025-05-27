@@ -37,7 +37,7 @@
     <property name="geometry">
      <rect>
       <x>90</x>
-      <y>220</y>
+      <y>190</y>
       <width>111</width>
       <height>26</height>
      </rect>
@@ -50,7 +50,7 @@
     <property name="geometry">
      <rect>
       <x>90</x>
-      <y>170</y>
+      <y>140</y>
       <width>111</width>
       <height>26</height>
      </rect>
@@ -63,7 +63,7 @@
     <property name="geometry">
      <rect>
       <x>380</x>
-      <y>460</y>
+      <y>480</y>
       <width>321</width>
       <height>41</height>
      </rect>
@@ -81,16 +81,16 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>80</y>
-      <width>271</width>
+      <y>30</y>
+      <width>401</width>
       <height>41</height>
      </rect>
     </property>
     <property name="font">
      <font>
       <family>URW Bookman</family>
-      <pointsize>20</pointsize>
-      <italic>true</italic>
+      <pointsize>30</pointsize>
+      <italic>false</italic>
       <bold>true</bold>
      </font>
     </property>
@@ -102,7 +102,7 @@
     <property name="geometry">
      <rect>
       <x>390</x>
-      <y>390</y>
+      <y>440</y>
       <width>111</width>
       <height>26</height>
      </rect>
@@ -114,8 +114,8 @@
    <widget class="QTableWidget" name="listaPartidas">
     <property name="geometry">
      <rect>
-      <x>320</x>
-      <y>60</y>
+      <x>330</x>
+      <y>110</y>
       <width>441</width>
       <height>311</height>
      </rect>
@@ -180,7 +180,7 @@
     <property name="geometry">
      <rect>
       <x>90</x>
-      <y>390</y>
+      <y>310</y>
       <width>111</width>
       <height>26</height>
      </rect>
@@ -193,7 +193,7 @@
     <property name="geometry">
      <rect>
       <x>570</x>
-      <y>390</y>
+      <y>440</y>
       <width>111</width>
       <height>26</height>
      </rect>
@@ -205,9 +205,9 @@
    <widget class="QLabel" name="nameLabel">
     <property name="geometry">
      <rect>
-      <x>600</x>
-      <y>10</y>
-      <width>171</width>
+      <x>640</x>
+      <y>40</y>
+      <width>151</width>
       <height>31</height>
      </rect>
     </property>
@@ -224,7 +224,7 @@
     <property name="geometry">
      <rect>
       <x>90</x>
-      <y>280</y>
+      <y>240</y>
       <width>111</width>
       <height>31</height>
      </rect>
@@ -242,6 +242,12 @@
       <height>651</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <italic>true</italic>
+      <bold>true</bold>
+     </font>
+    </property>
     <property name="text">
      <string/>
     </property>
@@ -255,8 +261,8 @@
    <widget class="QLabel" name="userImage">
     <property name="geometry">
      <rect>
-      <x>540</x>
-      <y>0</y>
+      <x>590</x>
+      <y>30</y>
       <width>41</width>
       <height>41</height>
      </rect>

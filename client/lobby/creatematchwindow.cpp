@@ -4,7 +4,7 @@
 #include "common/dto/create_game_response.h"
 
 createMatchWindow::createMatchWindow(Protocol& protocolo, std::list<std::string> maps, QWidget *parent)
-    : QWidget(parent)
+    : QDialog(parent)
     , ui(new Ui::createMatchWindow)
     , protocolo(protocolo)
 {
@@ -69,6 +69,7 @@ void createMatchWindow::on_backButon_clicked()
 
 void createMatchWindow::on_startButton_clicked()
 {
+    this->parentWidget()->hide();
     this->close();
     QApplication::exit(EXITLOBBY);
 }
