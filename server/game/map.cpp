@@ -102,7 +102,7 @@ std::vector<Player*> Map::get_near_players(Player& player) {
         }
         std::vector<std::pair<int, int>>& other_player_chunks = (*other_player).get_chunk_idxs();
         std::vector<std::pair<int, int>>& player_chunks = player.get_chunk_idxs();
-        std::vector<int> intersection;
+        std::vector<std::pair<int, int>> intersection;
         std::set_intersection(other_player_chunks.begin(), other_player_chunks.end(),
                               player_chunks.begin(), player_chunks.end(),
                               std::back_inserter(intersection));
