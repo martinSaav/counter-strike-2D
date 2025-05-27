@@ -144,8 +144,7 @@ void ClientHandler::handle_game(Queue<PlayerCommand>& command_queue,
 
 
 void ClientHandler::run() {
-    //    username = handle_login();
-    username = generic_username;
+    username = handle_login();
     handle_map_names_request();
     const auto match_id = pick_match();
     sender = std::make_unique<Sender>(protocol, match_id.sender_queue);
