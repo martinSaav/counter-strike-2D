@@ -2,6 +2,7 @@
 #define RENDER_H
 #include <SDL.h>
 #include "../../common/protocol.h"
+#include "../../common/dto/game_state_update.h"
 #include "textureStore.h"
 
 using namespace SDL2pp;
@@ -11,11 +12,16 @@ class Render{
     Renderer* sdlRenderer;
     TextureStore texturas;
     Protocol& protocolo;
-    
-    int mapa_x = 0, mapa_y = 0; // position of the map
+    std::string& namePlayer;
+
+    // Pos del mapa
+    int mapa_x = 0, mapa_y = 0; 
+    // Coordenadas de mi jugador
 	float posJugadorX = 0.0, posJugadorY = 0.0;
+    // Angulo de mi jugador
     double angle = 0.0;
-	int mouseX = 0, mouseY = 0; // mouse position
+    // Pos mouse
+	int mouseX = 0, mouseY = 0;
 	unsigned int prev_ticks = SDL_GetTicks();
 
     // Function to calculate the angle between the player and the mouse
@@ -23,8 +29,8 @@ class Render{
 
     public:
 
-    Render(Renderer* renderer, Protocol& protocolo);
-    void renderFrame(int posX, int posY);
+    Render(Renderer* renderer, Protocol& protocolo, std::string& namePlayer);
+    void renderFrame(std::optional<GameStateUpdate> mensaje);
     
 };
 #endif

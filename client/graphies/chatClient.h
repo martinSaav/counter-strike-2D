@@ -6,10 +6,11 @@
 class ChatClient {
     private:
     Protocol& protocolo; // Protocolo a usar
+    std::string& namePlayer;
 
     public:
     void run(); //loop 
     
-    ChatClient(Protocol& protocolo); // Constructor
+    ChatClient(Protocol& protocolo, std::string& namePlayer); // Constructor
 };
 #endif

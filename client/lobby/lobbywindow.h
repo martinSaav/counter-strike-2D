@@ -5,6 +5,9 @@
 #include <QTableWidgetItem>
 #include "creatematchwindow.h"
 #include "loginwindow.h"
+#include "../../common/dto/join_game_response.h"
+#include "../../common/dto/join_game_request.h"
+#include "../../common/dto/login_request.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -17,7 +20,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(Protocol& protocolo, QWidget *parent = nullptr);
+    MainWindow(Protocol& protocolo, std::string& namePlayer, QWidget *parent = nullptr);
     ~MainWindow();
 
 private slots:
@@ -40,6 +43,6 @@ private:
 
     std::list<std::string> maps;
 
-    std::string namePlayer;
+    std::string& namePlayer;
 };
 #endif // LOBBYWINDOW_H

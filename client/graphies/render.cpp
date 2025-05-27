@@ -1,24 +1,26 @@
 #include "render.h"
-#include "../../common/dto/game_state_update.h"
 #include <cmath>
 
 using namespace SDL2pp;
 
-Render::Render(Renderer* renderer, Protocol& protocolo):
+Render::Render(Renderer* renderer, Protocol& protocolo, std::string& namePlayer):
     sdlRenderer(renderer),
     texturas(),
-    protocolo(protocolo)
+    protocolo(protocolo),
+    namePlayer(namePlayer)
 {
     // Cargamos las texturas
     texturas.loadTexture("fondo", "../client/data/maps/default_aztec.png", sdlRenderer);
     texturas.loadTexture("mira", "../client/data/mira.png", sdlRenderer);
-    texturas.loadTexture("sprites", "../client/data/players/t1.bmp", sdlRenderer);
+    texturas.loadTexture("personaje", "../client/data/players/t1.bmp", sdlRenderer);
 }
 //SetColorKey(true, 0))
-void Render::renderFrame(int posX, int posY){
+void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
+
+    std::list<Player> jugadores = mensaje->get_players();
 
     Texture& fondo = texturas.getTexture("fondo");
-    Texture& sprites = texturas.getTexture("sprites");
+    Texture& personaje = texturas.getTexture("personaje");
     Texture& mira = texturas.getTexture("mira");
 
     const int jugador_ancho = 25;
@@ -32,12 +34,21 @@ void Render::renderFrame(int posX, int posY){
 
     // Ajustar tamaño de cámara con zoom
     float zoom = 10.0f;
+    
+    // Calculo la posicion de la camara en mi jugador
+    for (auto const& jugador : jugadores){
+        if (jugador.get_user_name() == namePlayer){
+           posJugadorX = jugador.get_pos_x();
+           posJugadorY = jugador.get_pos_y();
+        }
+    }
+
     int cam_w = sdlRenderer->GetOutputWidth() / zoom;
     int cam_h = sdlRenderer->GetOutputHeight() / zoom;
 
     // Calcular la posición de la cámara centrada en el jugador
-    int mapa_x = posX - cam_w / 2;
-    int mapa_y = posY - cam_h / 2;
+    int mapa_x = posJugadorX - cam_w / 2;
+    int mapa_y = posJugadorY - cam_h / 2;
 
     // Limitar para que no se salga del fondo
     mapa_x = std::max(0, std::min(mapa_x, fondo.GetWidth() - cam_w));
@@ -54,22 +65,34 @@ void Render::renderFrame(int posX, int posY){
         Rect(mapa_x, mapa_y, cam_w, cam_h),   // qué parte del fondo recortar
         Rect(0, 0, screen_w, screen_h));      // se escala para que llene la pantalla
 
+    for (auto const& jugador : jugadores){
+
+        // Mi personaje lo salteo
+        if (jugador.get_user_name() == namePlayer){
+            continue;
+        }
+
+        sdlRenderer->Copy(
+        personaje,
+        Rect(0, 0, 32, 32),  // sprite en el atlas
+        Rect(jugador.get_pos_x(), jugador.get_pos_y(), 32 * 2, 32 * 2));
+    }
     // --- DIBUJAR jugador centrado ---
-    int player_screen_x = (posX - mapa_x) * zoom;
-    int player_screen_y = (posY - mapa_y) * zoom;
+    //int player_screen_x = (posMyUserX - mapa_x) * zoom;
+    //int player_screen_y = (posMyUserY - mapa_y) * zoom;
 
     SDL_GetMouseState(&mouseX, &mouseY);
 
     // Convertir coordenadas de mouse (pantalla) a coordenadas de mapa
-    int mouse_map_x = mouseX / zoom + mapa_x;
-    int mouse_map_y = mouseY / zoom + mapa_y;
+    //int mouse_map_x = mouseX / zoom + mapa_x;
+    //int mouse_map_y = mouseY / zoom + mapa_y;
 
-    angle = getAnglePlayer(posX, posY, mouse_map_x, mouse_map_y);
+    angle = getAnglePlayer(posJugadorX, posJugadorY, mouseX, mouseY);
     
     sdlRenderer->Copy(
-    sprites,
+    personaje,
     Rect(0, 0, 32, 32),  // sprite en el atlas
-    Rect(player_screen_x, player_screen_y, 32 * 2, 32 * 2),  // en pantalla
+    Rect(posJugadorX, posJugadorY, 32 * 2, 32 * 2),  // en pantalla
     angle);
 
     sdlRenderer->Copy(

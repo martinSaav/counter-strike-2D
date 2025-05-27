@@ -3,7 +3,8 @@
 #include "inputServerHandler.h"
 using namespace SDL2pp;
 
-ChatClient::ChatClient(Protocol& protocolo) : protocolo(protocolo) {
+ChatClient::ChatClient(Protocol& protocolo, std::string& namePlayer) : 
+    protocolo(protocolo), namePlayer(namePlayer){
     // Constructor
 }
 
@@ -28,7 +29,7 @@ void ChatClient::run(){
 	Renderer renderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     // Create render object
-    Render render(&renderer, protocolo);
+    Render render(&renderer, protocolo, namePlayer);
 
     // Create input handler
     InputHandler inputHandler(protocolo);
@@ -52,7 +53,7 @@ void ChatClient::run(){
 
         auto mensaje = inputServerHandler.getMensaje();
         if(mensaje){
-            render.renderFrame(mensaje->get_x(), mensaje->get_y());
+            render.renderFrame(mensaje);
         }
 
         // Sleep si el frame fue más rápido de lo esperado

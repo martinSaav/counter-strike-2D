@@ -16,11 +16,13 @@ int main(int argc, char *argv[])
         return ret;
     }
     
+    std::string namePlayer;
+
     QApplication a(argc, argv);
 
     Socket socket(argv[1], argv[2]);
     Protocol protocolo(socket);
-    MainWindow lobby(protocolo);
+    MainWindow lobby(protocolo, namePlayer);
 
     lobby.move(900, 900);
 
@@ -31,12 +33,13 @@ int main(int argc, char *argv[])
     if (result == EXITAPP) {
         std::cerr << " QApplication closed." << std::endl;
         return result;
+        
+    } else if (result == EXITLOBBY){
+
+        //Creamos el juego para el cliente
+        ChatClient cliente(protocolo, namePlayer);
+
+        cliente.run();
     }
-
-    //Creamos el protocolo a usar del cliente
-    ChatClient cliente(protocolo);
-
-    cliente.run();
-
     return 0;
 }

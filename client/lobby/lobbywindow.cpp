@@ -5,24 +5,16 @@
 #include "common/dto/map_names_request.h"
 #include "common/dto/map_names_response.h"
 
-MainWindow::MainWindow(Protocol& protocolo, QWidget *parent)
+MainWindow::MainWindow(Protocol& protocolo, std::string& namePlayer, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::LobbyWindow)
     , protocolo(protocolo)
+    , namePlayer(namePlayer)
 {
-    this->setAttribute(Qt::WA_DeleteOnClose); // Para eliminar el widget al cerrarlo
+    //this->setAttribute(Qt::WA_DeleteOnClose); // Para eliminar el widget al cerrarlo
 
     //Instanciamos los widgets
     ui->setupUi(this);
-
-    MapNamesRequest requestNamesMaps;
-    protocolo.send_message(requestNamesMaps);
-
-    const std::unique_ptr<Message> responseNameMaps = protocolo.recv_message();
-
-    const auto nameMaps = dynamic_cast<MapNamesResponse*>(responseNameMaps.get());
-    
-    maps = nameMaps->get_mapGames();
 
     //Ocultamos widgets para buscar partidas
     ui->listaPartidas->hide();
@@ -55,18 +47,34 @@ void MainWindow::on_unirseButton_clicked()
 
     if (item) {
 
-        std::string texto = "Esperando a comienzo de partida";
-        QString qtexto = QString::fromStdString(texto);
+        //std::string texto = "Esperando a comienzo de partida";
+        //QString qtexto = QString::fromStdString(texto);
 
         // Mostrar el texto en el QLabel
-        ui->waitText->setText(qtexto);
+        //ui->waitText->setText(qtexto);
 
         // Desactiva todos los widgets
-        this->setEnabled(false);
+        //this->setEnabled(false);
 
-        ui->listaPartidas->clear();
+        //ui->listaPartidas->clear();
 
         //QApplication::exit(EXITLOBBY);
+ 
+        QString map = item->text();
+
+        JoinGameRequest requestJoinGame(map.toStdString());
+        protocolo.send_message(requestJoinGame);
+
+        const std::unique_ptr<Message> responseJoinGame = protocolo.recv_message();
+
+        const auto game = dynamic_cast<JoinGameResponse*>(responseJoinGame.get());
+    
+        bool gameJoined = game->get_success();
+
+        if (gameJoined){
+            this->hide();
+            QApplication::exit(EXITLOBBY);
+        }
     }
 }
 
@@ -135,6 +143,19 @@ void MainWindow::on_loginButton_clicked()
         ui->crearButton->show();
         ui->buscarButton->show();
         ui->loginButton->hide();
+
+        // Mandamos al server el nombre del login
+        LoginRequest requestLogin(this->namePlayer);
+        protocolo.send_message(requestLogin);
+
+        // Pedimos los mapas al servidor
+        MapNamesRequest requestNamesMaps;
+        protocolo.send_message(requestNamesMaps);
+
+        const std::unique_ptr<Message> responseNameMaps = protocolo.recv_message();
+        const auto nameMaps = dynamic_cast<MapNamesResponse*>(responseNameMaps.get());
+
+        maps = nameMaps->get_mapGames();
     });
 
     windowLogin->exec(); //Aquí se bloquea y se ejecuta la ventana
