@@ -97,10 +97,20 @@ GameIdentification ClientHandler::pick_match() {
                 break;
             }
             case MessageType::CreateGameRequest: {
-                return handle_create_game_request(std::move(message));
+                try {
+                    return handle_create_game_request(std::move(message));
+                } catch (const MatchAlreadyExists&) {
+                    protocol.send_message(CreateGameResponse(false));
+                }
             }
             case MessageType::JoinGameRequest: {
-                return handle_join_game_request(std::move(message));
+                try {
+                    return handle_join_game_request(std::move(message));
+                } catch (const MatchFull&) {
+                    protocol.send_message(JoinGameResponse(false));
+                } catch (const MatchNotFound&) {
+                    protocol.send_message(JoinGameResponse(false));
+                }
             }
             default:
                 break;
@@ -134,8 +144,7 @@ void ClientHandler::handle_game(Queue<PlayerCommand>& command_queue,
 
 
 void ClientHandler::run() {
-    //    username = handle_login();
-    username = generic_username;
+    username = handle_login();
     handle_map_names_request();
     const auto match_id = pick_match();
     sender = std::make_unique<Sender>(protocol, match_id.sender_queue);
