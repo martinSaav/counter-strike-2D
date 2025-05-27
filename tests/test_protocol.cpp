@@ -7,7 +7,7 @@
 #include "common/dto/join_game_response.h"
 #include "common/dto/login_request.h"
 #include "common/dto/player_action.h"
-#include "common/game.h"
+#include "common/game_info.h"
 #include "common/protocol.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -339,8 +339,8 @@ TEST(ProtocolTest, SendsGameListResponseCorrectly) {
     uint8_t current_players = 1;
     uint8_t max_players = 2;
 
-    const Game game_one{game_name, map_name, current_players, max_players};
-    const std::list<Game> games = {game_one};
+    const GameInfo game_one{game_name, map_name, current_players, max_players};
+    const std::list<GameInfo> games = {game_one};
     const GameListResponse req(games);
 
     const size_t serialized_size = req.serialized_size();
@@ -384,8 +384,8 @@ TEST(ProtocolTest, ReceivesGameListResponseCorrectly) {
     const uint8_t current_players = 1;
     const uint8_t max_players = 2;
 
-    Game game_one{game_name, map_name, current_players, max_players};
-    std::list<Game> games = {game_one};
+    GameInfo game_one{game_name, map_name, current_players, max_players};
+    std::list<GameInfo> games = {game_one};
     GameListResponse req(games);
 
     std::vector<uint8_t> serialized(req.serialized_size());

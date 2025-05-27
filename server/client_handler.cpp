@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "common/dto/login_request.h"
-#include "common/game.h"
+#include "common/game_info.h"
 #include "common/message.h"
 #define generic_username "username"
 #include "common/dto/create_game_request.h"
@@ -37,9 +37,9 @@ std::string ClientHandler::handle_login() {
 
 void ClientHandler::handle_list_matches_request() {
     const std::vector<MatchDTO> matches = lobby.list_matches();
-    std::list<Game> games;
+    std::list<GameInfo> games;
     for (const auto& match: matches) {
-        Game game;
+        GameInfo game;
         game.current_players = match.number_of_players;
         game.map_name = match.map_name;
         game.name = match.match_name;
