@@ -7,8 +7,8 @@
 #include "../player_dto.h"
 
 #include "position.h"
-#define player_hitbox_height 5
-#define player_hitbox_width 5
+#define player_hitbox_height 32
+#define player_hitbox_width 32
 
 class Player {
     const std::string username;
