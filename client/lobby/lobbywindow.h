@@ -24,7 +24,7 @@ public:
     MainWindow(Protocol& protocolo, std::string& namePlayer, QWidget* parent = nullptr);
     ~MainWindow();
 
-private slots:
+private Q_SLOTS:
     void on_crearButton_clicked();
 
     void on_unirseButton_clicked();
