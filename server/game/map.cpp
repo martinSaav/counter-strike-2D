@@ -1,5 +1,6 @@
 #include "map.h"
 
+#include <algorithm>
 #include <cmath>
 #include <set>
 
@@ -104,9 +105,8 @@ std::vector<std::shared_ptr<Player>> Map::get_near_players(
         std::vector<std::pair<int, int>>& other_player_chunks = other_player->get_chunk_idxs();
         std::vector<std::pair<int, int>>& player_chunks = player->get_chunk_idxs();
         std::vector<std::pair<int, int>> intersection;
-        std::set_intersection(other_player_chunks.begin(), other_player_chunks.end(),
-                              player_chunks.begin(), player_chunks.end(),
-                              std::back_inserter(intersection));
+        std::ranges::set_intersection(other_player_chunks, player_chunks,
+                                      std::back_inserter(intersection));
         if (!intersection.empty()) {
             near_players.emplace_back(other_player);
         }
