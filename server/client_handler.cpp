@@ -25,8 +25,7 @@ std::string ClientHandler::handle_login() {
         switch (message->type()) {
             case MessageType::LoginRequest: {
                 const auto login_message = dynamic_cast<LoginRequest*>(message.get());
-                std::string username = login_message->get_username();
-                return username;
+                return login_message->get_username();
             }
             default:  // Mientras no reciba el mensaje de login continuo recibiendo mensajes hasta
                       // recibirlo.
