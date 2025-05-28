@@ -22,13 +22,13 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje) {
     Texture& personaje = texturas.getTexture("personaje");
     Texture& mira = texturas.getTexture("mira");
 
-    const int jugador_ancho = 25;
-    const int jugador_alto = 25;
+    // const int jugador_ancho = 25;
+    // const int jugador_alto = 25;
 
     // Timing: calculate difference between this and previous frame
     // in milliseconds
     unsigned int frame_ticks = SDL_GetTicks();
-    unsigned int frame_delta = frame_ticks - prev_ticks;
+    // unsigned int frame_delta = frame_ticks - prev_ticks;
     prev_ticks = frame_ticks;
 
     // Ajustar tamaño de cámara con zoom
@@ -46,12 +46,12 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje) {
     int cam_h = sdlRenderer->GetOutputHeight() / zoom;
 
     // Calcular la posición de la cámara centrada en el jugador
-    int mapa_x = posJugadorX - cam_w / 2;
-    int mapa_y = posJugadorY - cam_h / 2;
+    int mapa_jug_x = posJugadorX - cam_w / 2;
+    int mapa_jug_y = posJugadorY - cam_h / 2;
 
     // Limitar para que no se salga del fondo
-    mapa_x = std::max(0, std::min(mapa_x, fondo.GetWidth() - cam_w));
-    mapa_y = std::max(0, std::min(mapa_y, fondo.GetHeight() - cam_h));
+    mapa_jug_x = std::max(0, std::min(mapa_jug_x, fondo.GetWidth() - cam_w));
+    mapa_jug_y = std::max(0, std::min(mapa_jug_y, fondo.GetHeight() - cam_h));
 
     sdlRenderer->Clear();
 
@@ -59,7 +59,8 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje) {
     int screen_h = sdlRenderer->GetOutputHeight();
 
     // --- DIBUJAR fondo ---
-    sdlRenderer->Copy(fondo, Rect(mapa_x, mapa_y, cam_w, cam_h),  // qué parte del fondo recortar
+    sdlRenderer->Copy(fondo,
+                      Rect(mapa_jug_x, mapa_jug_y, cam_w, cam_h),  // qué parte del fondo recortar
                       Rect(0, 0, screen_w, screen_h));  // se escala para que llene la pantalla
 
     for (auto const& jugador: jugadores) {
