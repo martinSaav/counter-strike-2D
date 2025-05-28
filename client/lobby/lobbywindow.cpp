@@ -64,7 +64,7 @@ void MainWindow::on_unirseButton_clicked() {
 
         const std::unique_ptr<Message> responseJoinGame = protocolo.recv_message();
 
-        const auto game = dynamic_cast<JoinGameResponse*>(responseJoinGame.get());
+        const auto* game = dynamic_cast<JoinGameResponse*>(responseJoinGame.get());
 
         bool gameJoined = game->get_success();
 
@@ -87,7 +87,6 @@ void MainWindow::on_actualizarButton_clicked() {
     std::list<GameInfo> games = gameList->get_games();
 
     int cantPartidas = games.size();
-    std::string cantJugadores;
     // Agregar filas a la tabla
     ui->listaPartidas->clear();
     ui->listaPartidas->setRowCount(cantPartidas);
@@ -97,7 +96,7 @@ void MainWindow::on_actualizarButton_clicked() {
         ui->listaPartidas->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(game.name)));
         ui->listaPartidas->setItem(i, 1,
                                    new QTableWidgetItem(QString::fromStdString(game.map_name)));
-        cantJugadores =
+        std::string cantJugadores =
                 std::to_string(game.current_players) + "/" + std::to_string(game.max_players);
         ui->listaPartidas->setItem(i, 2,
                                    new QTableWidgetItem(QString::fromStdString(cantJugadores)));
