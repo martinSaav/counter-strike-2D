@@ -1,14 +1,13 @@
 #include "inputServerHandler.h"
 
-InputServerHandler::InputServerHandler(Protocol& protocolo) : protocolo(protocolo) {
-}
+#include <memory>
+InputServerHandler::InputServerHandler(Protocol& protocolo): protocolo(protocolo) {}
 
-InputServerHandler::~InputServerHandler() {
-}
+InputServerHandler::~InputServerHandler() {}
 
 void InputServerHandler::processEvents() {
 
-    while (!exitGame()){
+    while (!exitGame()) {
 
         const std::unique_ptr<Message> gameState = protocolo.recv_message();
 
@@ -30,6 +29,4 @@ std::optional<GameStateUpdate> InputServerHandler::getMensaje() {
     return std::nullopt;
 }
 
-bool InputServerHandler::exitGame(){
-    return quit;
-}
+bool InputServerHandler::exitGame() { return quit; }

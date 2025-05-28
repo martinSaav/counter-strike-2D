@@ -1,27 +1,27 @@
 #ifndef CREATEMATCHWINDOW_H
 #define CREATEMATCHWINDOW_H
 
-#include <QWidget>
+#include <QDialog>
+#include <list>
+#include <string>
+
 #include "common/protocol.h"
 
-enum closeType {
-    EXITAPP = 0,
-    EXITLOBBY = 1
-};
+enum closeType { EXITAPP = 0, EXITLOBBY = 1 };
 
 namespace Ui {
 class createMatchWindow;
 }
 
-class createMatchWindow : public QWidget
-{
+class createMatchWindow: public QDialog {
     Q_OBJECT
 
 public:
-    createMatchWindow(Protocol& protocolo, std::list<std::string> maps, QWidget *parent = nullptr);
+    createMatchWindow(Protocol& protocolo, const std::list<std::string>& maps,
+                      QWidget* parent = nullptr);
     ~createMatchWindow();
 
-private slots:
+private Q_SLOTS:
 
     void on_createButton_clicked();
 
@@ -30,11 +30,11 @@ private slots:
     void on_startButton_clicked();
 
 private:
-    Ui::createMatchWindow *ui;
+    Ui::createMatchWindow* ui;
 
     Protocol& protocolo;
 
     void desactivarWidgets();
 };
 
-#endif // CREATEMATCHWINDOW_H
+#endif  // CREATEMATCHWINDOW_H

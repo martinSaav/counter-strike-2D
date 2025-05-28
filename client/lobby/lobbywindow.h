@@ -3,6 +3,12 @@
 
 #include <QMainWindow>
 #include <QTableWidgetItem>
+#include <list>
+#include <string>
+
+#include "../../common/dto/join_game_request.h"
+#include "../../common/dto/join_game_response.h"
+
 #include "creatematchwindow.h"
 
 QT_BEGIN_NAMESPACE
@@ -11,15 +17,14 @@ class LobbyWindow;
 }
 QT_END_NAMESPACE
 
-class MainWindow : public QMainWindow
-{
+class MainWindow: public QMainWindow {
     Q_OBJECT
 
 public:
-    MainWindow(Protocol& protocolo, QWidget *parent = nullptr);
+    MainWindow(Protocol& protocolo, std::string& namePlayer, QWidget* parent = nullptr);
     ~MainWindow();
 
-private slots:
+private Q_SLOTS:
     void on_crearButton_clicked();
 
     void on_unirseButton_clicked();
@@ -30,11 +35,15 @@ private slots:
 
     void on_buscarButton_clicked();
 
+    void on_loginButton_clicked();
+
 private:
-    Ui::LobbyWindow *ui;
+    Ui::LobbyWindow* ui;
 
     Protocol& protocolo;
 
     std::list<std::string> maps;
+
+    std::string& namePlayer;
 };
-#endif // LOBBYWINDOW_H
+#endif  // LOBBYWINDOW_H

@@ -27,9 +27,10 @@ target_sources(taller_common
         dto/game_list_response.h
         dto/map_names_request.h
         dto/map_names_response.h
+        dto/player.h
         action.h
         message_type.h
         message.h
         protocol.h
-        game.h
+        game_info.h
     )

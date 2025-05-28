@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "common/dto/login_request.h"
-#include "common/game.h"
+#include "common/game_info.h"
 #include "common/message.h"
 #define generic_username "username"
 #include "common/dto/create_game_request.h"
@@ -25,8 +25,7 @@ std::string ClientHandler::handle_login() {
         switch (message->type()) {
             case MessageType::LoginRequest: {
                 const auto login_message = dynamic_cast<LoginRequest*>(message.get());
-                std::string username = login_message->get_username();
-                return username;
+                return login_message->get_username();
             }
             default:  // Mientras no reciba el mensaje de login continuo recibiendo mensajes hasta
                       // recibirlo.
@@ -37,9 +36,9 @@ std::string ClientHandler::handle_login() {
 
 void ClientHandler::handle_list_matches_request() {
     const std::vector<MatchDTO> matches = lobby.list_matches();
-    std::list<Game> games;
+    std::list<GameInfo> games;
     for (const auto& match: matches) {
-        Game game;
+        GameInfo game;
         game.current_players = match.number_of_players;
         game.map_name = match.map_name;
         game.name = match.match_name;
@@ -97,10 +96,20 @@ GameIdentification ClientHandler::pick_match() {
                 break;
             }
             case MessageType::CreateGameRequest: {
-                return handle_create_game_request(std::move(message));
+                try {
+                    return handle_create_game_request(std::move(message));
+                } catch (const MatchAlreadyExists&) {
+                    protocol.send_message(CreateGameResponse(false));
+                }
             }
             case MessageType::JoinGameRequest: {
-                return handle_join_game_request(std::move(message));
+                try {
+                    return handle_join_game_request(std::move(message));
+                } catch (const MatchFull&) {
+                    protocol.send_message(JoinGameResponse(false));
+                } catch (const MatchNotFound&) {
+                    protocol.send_message(JoinGameResponse(false));
+                }
             }
             default:
                 break;
@@ -134,8 +143,7 @@ void ClientHandler::handle_game(Queue<PlayerCommand>& command_queue,
 
 
 void ClientHandler::run() {
-    //    username = handle_login();
-    username = generic_username;
+    username = handle_login();
     handle_map_names_request();
     const auto match_id = pick_match();
     sender = std::make_unique<Sender>(protocol, match_id.sender_queue);

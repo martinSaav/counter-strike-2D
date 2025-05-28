@@ -1,6 +1,12 @@
 #include "textureStore.h"
 
-void TextureStore::loadTexture(const std::string& name, const std::string& path, Renderer* sdlRenderer) {
+#include <utility>
+
+#include "SDL_image.h"
+using SDL2pp::Surface;
+
+void TextureStore::loadTexture(const std::string& name, const std::string& path,
+                               Renderer* sdlRenderer) {
 
     auto imagen = IMG_Load(path.c_str());
     Texture texture(*sdlRenderer, Surface(imagen).SetColorKey(true, 0));
@@ -18,6 +24,6 @@ Texture& TextureStore::getTexture(const std::string& name) {
 }
 
 void TextureStore::clearTextures() {
-    //Liberamos la textura
+    // Liberamos la textura
     textures.clear();
 }

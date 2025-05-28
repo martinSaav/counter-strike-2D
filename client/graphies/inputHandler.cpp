@@ -1,60 +1,63 @@
-#include "InputHandler.h"
-#include <SDL.h>
-#include "../../common/dto/player_action.h"
-#include "../../common/action.h"
+#include "inputHandler.h"
 
-InputHandler::InputHandler(Protocol& protocolo) : protocolo(protocolo) {
-    SDL_StartTextInput(); // Activa entrada de texto
+#include <SDL.h>
+
+#include "../../common/action.h"
+#include "../../common/dto/player_action.h"
+
+InputHandler::InputHandler(Protocol& protocolo): protocolo(protocolo) {
+    SDL_StartTextInput();  // Activa entrada de texto
 }
 
 InputHandler::~InputHandler() {
-    SDL_StopTextInput(); // Limpia al salir
+    SDL_StopTextInput();  // Limpia al salir
 }
 
 void InputHandler::processEvents() {
     SDL_Event event;
-    
 
-    while (!exitGame()){
+
+    while (!exitGame()) {
+
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT)
                 quit = true;
         }
-    
+
+        Action actionActual;
+
+
         Action* action = nullptr;
 
         // Leer estado del teclado
         const Uint8* state = SDL_GetKeyboardState(NULL);
 
         if (state[SDL_SCANCODE_Q]) {
-        //    mensajeActual = "q";
-           quit = true;
+
+            quit = true;
         }
 
-        if (state[SDL_SCANCODE_W]){
-            Action actionActual = Action::MoveUp;
+        if (state[SDL_SCANCODE_W]) {
+            actionActual = Action::MoveUp;
             action = &actionActual;
-            //mensajeActual = "w";
 
-        }else if (state[SDL_SCANCODE_A]){
-            Action actionActual = Action::MoveLeft;
+        } else if (state[SDL_SCANCODE_A]) {
+            actionActual = Action::MoveLeft;
             action = &actionActual;
-            //mensajeActual = "a";
 
-        }else if (state[SDL_SCANCODE_S]){
-            Action actionActual = Action::MoveDown;
+        } else if (state[SDL_SCANCODE_S]) {
+            actionActual = Action::MoveDown;
             action = &actionActual;
-            //mensajeActual = "s";
 
-        }else if (state[SDL_SCANCODE_D]){
-            Action actionActual = Action::MoveRight;
+        } else if (state[SDL_SCANCODE_D]) {
+            actionActual = Action::MoveRight;
             action = &actionActual;
-            //mensajeActual = "d";
-            
+
+        } else if (state[SDL_BUTTON_LEFT]) {
+            actionActual = Action::Shoot;
+            action = &actionActual;
         }
-        //else if (state[SDL_SCANCODE_Q]){
-        //    mensajeActual = "q";
-        //}
+
 
         if (action) {
             PlayerAction playerAction(*action);
@@ -76,6 +79,4 @@ std::optional<std::string> InputHandler::getMensaje() {
     return std::nullopt;
 }
 
-bool InputHandler::exitGame(){
-    return quit;
-}
+bool InputHandler::exitGame() { return quit; }

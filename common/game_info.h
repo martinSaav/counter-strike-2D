@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <string>
 
-struct Game {
+struct GameInfo {
     std::string name;
     std::string map_name;
     uint8_t current_players;
