@@ -24,7 +24,7 @@ private:
     // Coordenadas de mi jugador
     float posJugadorX = 0.0, posJugadorY = 0.0;
     // Angulo de mi jugador
-    double angle = 0.0;
+    double myAngle = 0.0;
     // Pos mouse
     int mouseX = 0, mouseY = 0;
     unsigned int prev_ticks = SDL_GetTicks();
