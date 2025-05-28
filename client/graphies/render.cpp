@@ -41,7 +41,6 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje) {
             posJugadorY = jugador.get_pos_y();
         }
     }
-
     int cam_w = sdlRenderer->GetOutputWidth() / zoom;
     int cam_h = sdlRenderer->GetOutputHeight() / zoom;
 
@@ -99,6 +98,7 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje) {
 }
 
 double Render::getAnglePlayer(int jugadorX, int jugadorY, int mousex, int mousey) {
+
     // Calcular el ángulo entre el jugador y el mouse
     int dx = mousex - jugadorX;
     int dy = mousey - jugadorY;

@@ -11,23 +11,30 @@ InputHandler::InputHandler(Protocol& protocolo): protocolo(protocolo) {
 
 InputHandler::~InputHandler() {
     SDL_StopTextInput();  // Limpia al salir
+
 }
 
 void InputHandler::processEvents() {
     SDL_Event event;
 
+
     while (!exitGame()) {
+
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT)
                 quit = true;
         }
+
         Action actionActual;
+
+    
         Action* action = nullptr;
 
         // Leer estado del teclado
         const Uint8* state = SDL_GetKeyboardState(NULL);
 
         if (state[SDL_SCANCODE_Q]) {
+
             quit = true;
         }
 
@@ -52,6 +59,7 @@ void InputHandler::processEvents() {
             action = &actionActual;
         }
 
+
         if (action) {
             PlayerAction playerAction(*action);
             protocolo.send_message(playerAction);
@@ -73,3 +81,4 @@ std::optional<std::string> InputHandler::getMensaje() {
 }
 
 bool InputHandler::exitGame() { return quit; }
+

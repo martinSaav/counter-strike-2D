@@ -1,5 +1,6 @@
 #define INPUTHANDLER_H
 #ifdef INPUTHANDLER_H
+
 #include <mutex>
 #include <optional>
 #include <queue>
