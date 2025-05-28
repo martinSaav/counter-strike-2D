@@ -70,6 +70,7 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
 
     // Dibuja jugadores con zoom
     for (auto const& jugador : jugadores) {
+        angleDefault = 0.0;
         if (jugador.get_user_name() == namePlayer) angleDefault = myAngle;
 
         SDL_Rect srcRectPlayers = {0, 0, 32, 32};
