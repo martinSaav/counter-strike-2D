@@ -3,11 +3,13 @@
 
 #include <QMainWindow>
 #include <QTableWidgetItem>
-#include "creatematchwindow.h"
-#include "loginwindow.h"
-#include "../../common/dto/join_game_response.h"
+#include <list>
+#include <string>
+
 #include "../../common/dto/join_game_request.h"
-#include "../../common/dto/login_request.h"
+#include "../../common/dto/join_game_response.h"
+
+#include "creatematchwindow.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -15,12 +17,11 @@ class LobbyWindow;
 }
 QT_END_NAMESPACE
 
-class MainWindow : public QMainWindow
-{
+class MainWindow: public QMainWindow {
     Q_OBJECT
 
 public:
-    MainWindow(Protocol& protocolo, std::string& namePlayer, QWidget *parent = nullptr);
+    MainWindow(Protocol& protocolo, std::string& namePlayer, QWidget* parent = nullptr);
     ~MainWindow();
 
 private slots:
@@ -37,7 +38,7 @@ private slots:
     void on_loginButton_clicked();
 
 private:
-    Ui::LobbyWindow *ui;
+    Ui::LobbyWindow* ui;
 
     Protocol& protocolo;
 
@@ -45,4 +46,4 @@ private:
 
     std::string& namePlayer;
 };
-#endif // LOBBYWINDOW_H
+#endif  // LOBBYWINDOW_H

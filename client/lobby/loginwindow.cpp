@@ -1,25 +1,19 @@
 #include "loginwindow.h"
+
 #include "ui_loginwindow.h"
 
-loginwindow::loginwindow(std::string& namePlayer, QWidget *parent)
-    : QDialog(parent)
-    , ui(new Ui::loginwindow),
-    namePlayer(namePlayer)
-{
+loginwindow::loginwindow(std::string& namePlayer, QWidget* parent):
+        QDialog(parent), ui(new Ui::loginwindow), namePlayer(namePlayer) {
     ui->setupUi(this);
 }
 
-loginwindow::~loginwindow()
-{
-    delete ui;
-}
+loginwindow::~loginwindow() { delete ui; }
 
-void loginwindow::on_loginButton_clicked()
-{
+void loginwindow::on_loginButton_clicked() {
     QString nameInput = ui->usernameInput->toPlainText();
-    if (nameInput != ""){
+    if (nameInput != "") {
 
-        namePlayer = nameInput.toStdString();;
+        namePlayer = nameInput.toStdString();
         // Volvemos a mostrar el lobby
         this->parentWidget()->show();
         this->close();

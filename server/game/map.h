@@ -1,6 +1,7 @@
 #ifndef MAP_H
 #define MAP_H
 #include <map>
+#include <memory>
 #include <utility>
 #include <vector>
 
@@ -18,7 +19,7 @@ struct PositionOutOfRange: public std::runtime_error {
 
 class Map {
     std::map<std::pair<int, int>, Chunk> structure_chunks;
-    std::vector<Player*> players;
+    std::vector<std::shared_ptr<Player>> players;
     static std::pair<int, int> get_chunk_index(int x, int y);
     int max_x;
     int max_y;
@@ -26,10 +27,11 @@ class Map {
 public:
     Map(const int max_x, const int max_y): max_x(max_x), max_y(max_y) {}
     void add_structure(Structure structure);
-    void add_player(Player* player);
-    std::vector<Structure> get_structures_near_player(Player& player);
+    void add_player(std::shared_ptr<Player> player);
+    std::vector<Structure> get_structures_near_player(const std::shared_ptr<Player>& player);
     static std::vector<std::pair<int, int>> calculate_player_chunks(int bottom_x, int bottom_y);
-    std::vector<Player*> get_near_players(Player& player);
+    std::vector<std::shared_ptr<Player>> get_near_players(
+            const std::shared_ptr<Player>& player) const;
     [[nodiscard]] bool check_if_position_is_in_range(int x, int y) const;
 };
 

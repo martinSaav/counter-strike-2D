@@ -44,7 +44,7 @@ void Map::add_structure(const Structure structure) {
 }
 
 
-void Map::add_player(Player* player) { players.emplace_back(player); }
+void Map::add_player(std::shared_ptr<Player> player) { players.emplace_back(player); }
 
 
 bool Map::check_if_position_is_in_range(const int x, const int y) const {
@@ -52,8 +52,8 @@ bool Map::check_if_position_is_in_range(const int x, const int y) const {
 }
 
 
-std::vector<Structure> Map::get_structures_near_player(Player& player) {
-    auto [x, y] = player.get_location();
+std::vector<Structure> Map::get_structures_near_player(const std::shared_ptr<Player>& player) {
+    auto [x, y] = player->get_location();
     std::set<std::pair<int, int>> chunks_indexes;
     const auto chunk_index_1 = get_chunk_index(x, y);
     const auto chunk_index_2 = get_chunk_index(x + player_hitbox_width, y);
@@ -94,14 +94,15 @@ std::vector<std::pair<int, int>> Map::calculate_player_chunks(int bottom_x, int 
 }
 
 
-std::vector<Player*> Map::get_near_players(Player& player) {
-    std::vector<Player*> near_players;
+std::vector<std::shared_ptr<Player>> Map::get_near_players(
+        const std::shared_ptr<Player>& player) const {
+    std::vector<std::shared_ptr<Player>> near_players;
     for (auto other_player: players) {
-        if (*other_player == player) {
+        if (other_player == player) {
             continue;
         }
-        std::vector<std::pair<int, int>>& other_player_chunks = (*other_player).get_chunk_idxs();
-        std::vector<std::pair<int, int>>& player_chunks = player.get_chunk_idxs();
+        std::vector<std::pair<int, int>>& other_player_chunks = other_player->get_chunk_idxs();
+        std::vector<std::pair<int, int>>& player_chunks = player->get_chunk_idxs();
         std::vector<std::pair<int, int>> intersection;
         std::set_intersection(other_player_chunks.begin(), other_player_chunks.end(),
                               player_chunks.begin(), player_chunks.end(),

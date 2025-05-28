@@ -1,26 +1,28 @@
 #ifndef TEXTURESTORE_H
 #define TEXTURESTORE_H
 
-#include <SDL2pp/SDL2pp.hh>
-#include "SDL_image.h"
 #include <map>
+#include <string>
 
-using namespace SDL2pp;
+#include <SDL2pp/SDL2pp.hh>
 
-class TextureStore{
-    private:
-    //Almacena las texturas
+
+using SDL2pp::Renderer;
+using SDL2pp::Texture;
+
+class TextureStore {
+private:
+    // Almacena las texturas
     std::map<std::string, Texture> textures;
 
-    public:
-
+public:
     // Cargamos la textura en la memoria
     void loadTexture(const std::string& name, const std::string& path, Renderer* sdlRenderer);
 
-    //Obtenemos la textura
+    // Obtenemos la textura
     Texture& getTexture(const std::string& name);
 
-    //Liberamos la textura
+    // Liberamos la textura
     void clearTextures();
 };
 #endif

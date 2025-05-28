@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <string>
 #include <utility>
+
 #include <netinet/in.h>
 
 #include "../action.h"
@@ -15,7 +16,7 @@ enum class Status : uint8_t {
     Dead = 0x02,
 };
 
-class Player {
+class PlayerInfo {
 private:
     std::string user_name;
     uint16_t pos_x;
@@ -26,11 +27,19 @@ private:
     uint16_t kills;
     uint16_t deaths;
     Action action;
+
 public:
-    Player(std::string user_name, uint16_t pos_x, uint16_t pos_y, uint16_t health, Status status,
-           float money, uint16_t kills, uint16_t deaths, Action action)
-        : user_name(std::move(user_name)), pos_x(pos_x), pos_y(pos_y), health(health), status(status),
-          money(money), kills(kills), deaths(deaths), action(action) {}
+    PlayerInfo(std::string user_name, uint16_t pos_x, uint16_t pos_y, uint16_t health,
+               Status status, float money, uint16_t kills, uint16_t deaths, Action action):
+            user_name(std::move(user_name)),
+            pos_x(pos_x),
+            pos_y(pos_y),
+            health(health),
+            status(status),
+            money(money),
+            kills(kills),
+            deaths(deaths),
+            action(action) {}
 
     void serialize(uint8_t* buffer) const {
         size_t offset = 0;
@@ -56,9 +65,7 @@ public:
         buffer[offset++] = static_cast<uint8_t>(action);
     }
 
-    size_t serialized_size() const {
-        return 2 + user_name.size() + 1 + 2 * 5 + sizeof(money) + 1;
-    }
+    size_t serialized_size() const { return 2 + user_name.size() + 1 + 2 * 5 + sizeof(money) + 1; }
 
     const std::string& get_user_name() const { return user_name; }
     uint16_t get_pos_x() const { return pos_x; }
@@ -70,7 +77,7 @@ public:
     uint16_t get_deaths() const { return deaths; }
     Action get_action() const { return action; }
 
-    static Player deserialize(const uint8_t* buffer, size_t size) {
+    static PlayerInfo deserialize(const uint8_t* buffer, size_t size) {
         if (size < 2) {
             throw std::runtime_error("");
         }
@@ -91,7 +98,7 @@ public:
         offset += sizeof(pos_y);
         std::memcpy(&health, buffer + offset, sizeof(health));
         offset += sizeof(health);
-        
+
         float money;
         std::memcpy(&money, buffer + offset, sizeof(money));
         offset += sizeof(money);
@@ -103,8 +110,8 @@ public:
 
         Action action = static_cast<Action>(buffer[offset++]);
 
-        return Player(user_name, pos_x, pos_y, health, status, money, kills, deaths, action);
+        return PlayerInfo(user_name, pos_x, pos_y, health, status, money, kills, deaths, action);
     }
 };
 
-#endif 
+#endif

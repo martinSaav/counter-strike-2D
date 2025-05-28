@@ -1,22 +1,23 @@
 #define INPUTHANDLER_H
 #ifdef INPUTHANDLER_H
-#include <string>
-#include <queue>
-#include <optional>
 #include <mutex>
+#include <optional>
+#include <queue>
+#include <string>
+
 #include "../../common/protocol.h"
 
-//Lee el teclado y envía los mensajes al servidor
+// Lee el teclado y envía los mensajes al servidor
 class InputHandler {
-    private:
+private:
     bool quit = false;
     std::queue<std::string> mensajes;
     std::mutex mtx;
     Protocol& protocolo;
 
-    public:
-    InputHandler(Protocol& protocolo);
-    ~InputHandler();  
+public:
+    explicit InputHandler(Protocol& protocolo);
+    ~InputHandler();
 
     void processEvents();
 

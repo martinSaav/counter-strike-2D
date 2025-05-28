@@ -16,15 +16,15 @@
 #include "player_credentials.h"
 
 #define max_number_of_players 10
-#define map_width 100
-#define map_height 100
+#define map_width 400
+#define map_height 400
 
 struct MatchFull: public std::runtime_error {
     MatchFull(): std::runtime_error("Match is full") {}
 };
 
 class Match: public Thread {
-    std::map<PlayerCredentials, Player> players;
+    std::map<PlayerCredentials, std::shared_ptr<Player>> players;
     Queue<PlayerCommand> commands_queue;
     std::vector<std::shared_ptr<Queue<MatchStatusDTO>>> senders_queues;
     std::mutex mtx;
@@ -39,7 +39,7 @@ class Match: public Thread {
 
     void broadcast_match_status();
 
-    void process_move_player(Player& player, int x_mov, int y_mov);
+    void process_move_player(const std::shared_ptr<Player>& player, int x_mov, int y_mov);
 
 public:
     Match():

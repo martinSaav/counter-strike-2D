@@ -17,19 +17,20 @@ GameIdentification Match::join_match(const std::string& username) {
         throw MatchFull();
     }
     player_count++;
-    Player player(username, starting_position_x, starting_position_y);
+    auto player = std::make_shared<Player>(username, starting_position_x, starting_position_y);
     PlayerCredentials credentials(player_count);
     players.insert(std::pair{credentials, player});
     auto sender_queue = std::make_shared<Queue<MatchStatusDTO>>();
     GameIdentification game_identification(commands_queue, sender_queue, credentials);
     senders_queues.push_back(std::move(sender_queue));
-    map.add_player(&player);
+    map.add_player(std::move(player));
     return game_identification;
 }
 
 
-void Match::process_move_player(Player& player, const int x_mov, const int y_mov) {
-    auto [old_x, old_y] = player.get_location();
+void Match::process_move_player(const std::shared_ptr<Player>& player, const int x_mov,
+                                const int y_mov) {
+    auto [old_x, old_y] = player->get_location();
     const int new_x = old_x + x_mov;
     const int new_y = old_y + y_mov;
     if (!map.check_if_position_is_in_range(new_x, new_y)) {
@@ -51,7 +52,7 @@ void Match::process_move_player(Player& player, const int x_mov, const int y_mov
     try {
         const Position new_pos(new_x, new_y);
         auto new_chunks = Map::calculate_player_chunks(new_x, new_y);
-        player.set_location(new_pos, std::move(new_chunks));
+        player->set_location(new_pos, std::move(new_chunks));
     } catch (const InvalidPosition&) {}
 }
 
@@ -63,7 +64,7 @@ void Match::process_command(const PlayerCommand command) {
     if (player_p == players.end()) {
         return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
     }
-    Player& player = player_p->second;
+    const std::shared_ptr<Player>& player = player_p->second;
     switch (command.command_type) {
         case Action::MoveLeft: {
             return process_move_player(player, -tiles_per_movement, 0);
@@ -86,8 +87,9 @@ void Match::process_command(const PlayerCommand command) {
 MatchStatusDTO Match::get_match_status() {
     std::vector<PlayerDTO> player_dtos;
     auto players_view = players | std::views::values;
-    std::ranges::transform(players_view, std::back_inserter(player_dtos),
-                           [](const Player& player) { return player.get_player_info(); });
+    std::ranges::transform(
+            players_view, std::back_inserter(player_dtos),
+            [](const std::shared_ptr<Player>& player) { return player->get_player_info(); });
     return MatchStatusDTO{std::move(player_dtos)};
 }
 

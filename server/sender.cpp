@@ -10,10 +10,10 @@ void Sender::run() {
         try {
             MatchStatusDTO status = sender_queue->pop();
             auto player_dtos = status.players;
-            std::list<Player> players;
+            std::list<PlayerInfo> players;
             for (const auto& player_dto: player_dtos) {
-                Player player(player_dto.username, player_dto.position_x, player_dto.position_y,
-                              100, Status::Alive, 500, 0, 0, Action::MoveUp);
+                PlayerInfo player(player_dto.username, player_dto.position_x, player_dto.position_y,
+                                  100, Status::Alive, 500, 0, 0, Action::MoveUp);
                 players.push_back(player);
             }
             const auto player = status.players[0];
