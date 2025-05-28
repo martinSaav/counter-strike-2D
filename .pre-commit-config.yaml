@@ -17,5 +17,5 @@ repos:
     hooks:
       - id: cppcheck
         files: ^(.*[.]cpp|.*[.]h)$
-        args: ["-project=cppcheck.cfg", "--inline-suppr", "--enable=all", "--suppress=missingIncludeSystem", "--suppress=missingInclude", "--suppress=unusedFunction", "--suppress=unmatchedSuppression", "--suppress=unusedStructMember", "--language=c++", "--std=c++20", "--error-exitcode=1"]
+        args: ["--project=cppcheck.cfg", "--inline-suppr", "--enable=all", "--suppress=missingIncludeSystem", "--suppress=missingInclude", "--suppress=unusedFunction", "--suppress=unmatchedSuppression", "--suppress=unusedStructMember", "--language=c++", "--std=c++20", "--error-exitcode=1"]
 
