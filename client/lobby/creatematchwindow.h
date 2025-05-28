@@ -20,7 +20,7 @@ public:
     createMatchWindow(Protocol& protocolo, std::list<std::string> maps, QWidget* parent = nullptr);
     ~createMatchWindow();
 
-private slots:
+private Q_SLOTS:
 
     void on_createButton_clicked();
 
