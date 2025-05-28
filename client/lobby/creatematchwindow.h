@@ -17,7 +17,8 @@ class createMatchWindow: public QDialog {
     Q_OBJECT
 
 public:
-    createMatchWindow(Protocol& protocolo, std::list<std::string> maps, QWidget* parent = nullptr);
+    createMatchWindow(Protocol& protocolo, const std::list<std::string>& maps,
+                      QWidget* parent = nullptr);
     ~createMatchWindow();
 
 private Q_SLOTS:

@@ -7,7 +7,7 @@
 
 #include "ui_creatematchwindow.h"
 
-createMatchWindow::createMatchWindow(Protocol& protocolo, std::list<std::string> maps,
+createMatchWindow::createMatchWindow(Protocol& protocolo, const std::list<std::string>& maps,
                                      QWidget* parent):
         QDialog(parent), ui(new Ui::createMatchWindow), protocolo(protocolo) {
     this->setAttribute(Qt::WA_DeleteOnClose);  // Para eliminar el widget al cerrarlo
