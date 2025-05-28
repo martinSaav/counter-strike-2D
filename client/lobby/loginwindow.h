@@ -18,10 +18,10 @@ public:
 protected:
     void closeEvent(QCloseEvent* event) override;
 
-private slots:
+private Q_SLOTS:
     void on_loginButton_clicked();
 
-signals:
+Q_SIGNALS:
     void ventanaCerrada();
 
 private:

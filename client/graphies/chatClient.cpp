@@ -48,12 +48,12 @@ void ChatClient::run() {
     const double FPS = 30.0;
     const double FRAME_TIME = 1.0 / FPS;  // en segundos
 
-    double lastTime = getCurrentTime();
+    // double lastTime = getCurrentTime();
     // Main loop
     while (true) {
         double current = getCurrentTime();
-        double elapsed = current - lastTime;
-        lastTime = current;
+        // double elapsed = current - lastTime;
+        // lastTime = current;
 
         auto mensaje = inputServerHandler.getMensaje();
         if (mensaje) {

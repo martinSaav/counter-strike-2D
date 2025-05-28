@@ -30,7 +30,7 @@ void Map::add_structure(const Structure structure) {
         if (!structure_chunks.contains(chunk_idx)) {
             continue;
         }
-        for (Chunk& chunk = structure_chunks[chunk_idx];
+        for (const Chunk& chunk = structure_chunks[chunk_idx];
              const auto& structure2: chunk.get_structures()) {
             if (CollisionDetector::check_collision_between_structures(structure, structure2)) {
                 throw StructureInPosition();
@@ -68,7 +68,7 @@ std::vector<Structure> Map::get_structures_near_player(const std::shared_ptr<Pla
         if (!structure_chunks.contains(chunk_idx)) {
             continue;
         }
-        for (Chunk& chunk = structure_chunks[chunk_idx];
+        for (const Chunk& chunk = structure_chunks[chunk_idx];
              const auto& structure: chunk.get_structures()) {
             structures.emplace(structure);
         }
