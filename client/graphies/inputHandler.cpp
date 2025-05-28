@@ -11,7 +11,6 @@ InputHandler::InputHandler(Protocol& protocolo): protocolo(protocolo) {
 
 InputHandler::~InputHandler() {
     SDL_StopTextInput();  // Limpia al salir
-
 }
 
 void InputHandler::processEvents() {
@@ -27,7 +26,7 @@ void InputHandler::processEvents() {
 
         Action actionActual;
 
-    
+
         Action* action = nullptr;
 
         // Leer estado del teclado
@@ -81,4 +80,3 @@ std::optional<std::string> InputHandler::getMensaje() {
 }
 
 bool InputHandler::exitGame() { return quit; }
-
