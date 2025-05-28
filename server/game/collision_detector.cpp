@@ -1,0 +1,57 @@
+#include "collision_detector.h"
+
+bool CollisionDetector::check_collision_between_objects(
+        const std::pair<int, int>& object1_bottom_coords,
+        const std::pair<int, int>& object1_top_coords,
+        const std::pair<int, int>& object2_bottom_coords,
+        const std::pair<int, int>& object2_top_coords) {
+    if (object1_bottom_coords.first > object2_top_coords.first) {
+        return false;
+    }
+    if (object1_top_coords.first < object2_bottom_coords.first) {
+        return false;
+    }
+    if (object1_bottom_coords.second > object2_top_coords.second) {
+        return false;
+    }
+    if (object1_top_coords.second < object2_bottom_coords.second) {
+        return false;
+    }
+    return true;
+}
+
+
+bool CollisionDetector::check_collision_between_player_and_structure(int p_bottom_x, int p_bottom_y,
+                                                                     const Structure& structure) {
+    const int p_top_x = p_bottom_x + player_hitbox_width;
+    const int p_top_y = p_bottom_y + player_hitbox_height;
+    auto [s_bottom_x, s_bottom_y] = structure.get_position();
+    const int top_s_x = s_bottom_x + structure.width;
+    const int top_s_y = s_bottom_y + structure.height;
+    return check_collision_between_objects({p_bottom_x, p_bottom_y}, {p_top_x, p_top_y},
+                                           {s_bottom_x, s_bottom_y}, {top_s_x, top_s_y});
+}
+
+bool CollisionDetector::check_collision_between_structures(const Structure& structure1,
+                                                           const Structure& structure2) {
+    auto [s1_bottom_x, s1_bottom_y] = structure1.get_position();
+    auto [s2_bottom_x, s2_bottom_y] = structure2.get_position();
+    int s1_top_x = s1_bottom_x + structure1.width;
+    int s1_top_y = s1_bottom_y + structure1.height;
+    int s2_top_x = s2_bottom_x + structure2.width;
+    int s2_top_y = s2_bottom_y + structure2.height;
+    return check_collision_between_objects({s1_bottom_x, s1_bottom_y}, {s1_top_x, s1_top_y},
+                                           {s2_bottom_x, s2_bottom_y}, {s2_top_x, s2_top_y});
+}
+
+
+bool CollisionDetector::check_collision_between_players(int p1_bottom_x, int p1_bottom_y,
+                                                        Player& player2) {
+    const int p1_top_x = p1_bottom_x + player_hitbox_width;
+    const int p1_top_y = p1_bottom_y + player_hitbox_height;
+    auto [p2_bottom_x, p2_bottom_y] = player2.get_location();
+    const int p2_top_x = p2_bottom_x + player_hitbox_width;
+    const int p2_top_y = p2_bottom_y + player_hitbox_height;
+    return check_collision_between_objects({p1_bottom_x, p1_bottom_y}, {p1_top_x, p1_top_y},
+                                           {p2_bottom_x, p2_bottom_y}, {p2_top_x, p2_top_y});
+}

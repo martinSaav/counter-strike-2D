@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <ranges>
 #include <utility>
+
+#include "game/collision_detector.h"
 #define rate 30
 #define miliseconds_per_iteration (1000 / rate)
 #define starting_position_x 0
@@ -15,14 +17,45 @@ GameIdentification Match::join_match(const std::string& username) {
         throw MatchFull();
     }
     player_count++;
-    Player player(username, starting_position_x, starting_position_y);
+    auto player = std::make_shared<Player>(username, starting_position_x, starting_position_y);
     PlayerCredentials credentials(player_count);
     players.insert(std::pair{credentials, player});
     auto sender_queue = std::make_shared<Queue<MatchStatusDTO>>();
-    const GameIdentification game_identification(commands_queue, sender_queue, credentials);
+    GameIdentification game_identification(commands_queue, sender_queue, credentials);
     senders_queues.push_back(std::move(sender_queue));
+    map.add_player(std::move(player));
     return game_identification;
 }
+
+
+void Match::process_move_player(const std::shared_ptr<Player>& player, const int x_mov,
+                                const int y_mov) {
+    auto [old_x, old_y] = player->get_location();
+    const int new_x = old_x + x_mov;
+    const int new_y = old_y + y_mov;
+    if (!map.check_if_position_is_in_range(new_x, new_y)) {
+        return;
+    }
+    for (const std::vector<Structure> structures = map.get_structures_near_player(player);
+         const auto& structure: structures) {
+        if (CollisionDetector::check_collision_between_player_and_structure(new_x, new_y,
+                                                                            structure)) {
+            return;
+        }
+    }
+    if (const auto& near_players = map.get_near_players(player);
+        std::ranges::any_of(near_players, [&](const auto& p) {
+            return CollisionDetector::check_collision_between_players(new_x, new_y, *p);
+        })) {
+        return;
+    }
+    try {
+        const Position new_pos(new_x, new_y);
+        auto new_chunks = Map::calculate_player_chunks(new_x, new_y);
+        player->set_location(new_pos, std::move(new_chunks));
+    } catch (const InvalidPosition&) {}
+}
+
 
 void Match::process_command(const PlayerCommand command) {
     std::lock_guard<std::mutex> lck(mtx);
@@ -31,28 +64,20 @@ void Match::process_command(const PlayerCommand command) {
     if (player_p == players.end()) {
         return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
     }
-    Player& player = player_p->second;
+    const std::shared_ptr<Player>& player = player_p->second;
     switch (command.command_type) {
         case Action::MoveLeft: {
-            auto [x, y] = player.get_location();
-            player.set_location(x - tiles_per_movement, y);
-            break;
+            return process_move_player(player, -tiles_per_movement, 0);
         }
 
         case Action::MoveRight: {
-            auto [x, y] = player.get_location();
-            player.set_location(x + tiles_per_movement, y);
-            break;
+            return process_move_player(player, tiles_per_movement, 0);
         }
         case Action::MoveUp: {
-            auto [x, y] = player.get_location();
-            player.set_location(x, y - tiles_per_movement);
-            break;
+            return process_move_player(player, 0, -tiles_per_movement);
         }
         case Action::MoveDown: {
-            auto [x, y] = player.get_location();
-            player.set_location(x, y + tiles_per_movement);
-            break;
+            return process_move_player(player, 0, +tiles_per_movement);
         }
         default:
             break;
@@ -62,8 +87,9 @@ void Match::process_command(const PlayerCommand command) {
 MatchStatusDTO Match::get_match_status() {
     std::vector<PlayerDTO> player_dtos;
     auto players_view = players | std::views::values;
-    std::ranges::transform(players_view, std::back_inserter(player_dtos),
-                           [](const Player& player) { return player.get_player_info(); });
+    std::ranges::transform(
+            players_view, std::back_inserter(player_dtos),
+            [](const std::shared_ptr<Player>& player) { return player->get_player_info(); });
     return MatchStatusDTO{std::move(player_dtos)};
 }
 
