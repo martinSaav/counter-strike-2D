@@ -9,9 +9,11 @@ class HudSprite : public Component{
     int& weidthScreen;
     int& heightScreen;
 
+    void drawSymbols(int& num, int& posSymbol, int& SymbolX, int& SymbolY);
+
     public:
     HudSprite(Renderer* sdlRenderer, int& weidth, int& height);
 
-    void draw(SDL_Rect& mouse, int health, int money);
+    void draw(SDL_Rect& mouse, int& health, int& money, int& time);
 };
 #endif

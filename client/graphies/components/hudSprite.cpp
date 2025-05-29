@@ -8,13 +8,10 @@ HudSprite::HudSprite(Renderer* sdlRenderer, int& weidth, int& height) :
     texturas.loadTexture("nums", "../client/data/hud/hud_nums.bmp");
 }
 
-void HudSprite::draw(SDL_Rect& mouse, int health, int money){
+void HudSprite::draw(SDL_Rect& mouse, int& health, int& money, int& time){
     Texture& mira = texturas.getTexture("mira");
     Texture& hud_symbols = texturas.getTexture("symbols"); 
-    Texture& nums = texturas.getTexture("nums"); 
-
-    // Dibuja mira sin zoom (porque está en coords de pantalla)
-    sdlRenderer->Copy(mira, SDL2pp::NullOpt, mouse);
+    Texture& nums = texturas.getTexture("nums");
 
     // Aplicamos el color verde
     nums.SetColorMod(100, 200, 100);
@@ -26,58 +23,62 @@ void HudSprite::draw(SDL_Rect& mouse, int health, int money){
 
     int symbolX = weidthScreen * 0.05;
     int symbolY = heightScreen * 0.92;
+    int healthPosSymbol = 0;
 
     // Symbol health
-    SDL_Rect srcRect = {0, 0, anchoSymbols, anchoSymbols};
-    SDL_Rect destRect = {symbolX, symbolY, 60, alturaSymbols};
+    drawSymbols(health, healthPosSymbol, symbolX, symbolY);
 
-    sdlRenderer->Copy(hud_symbols, srcRect, destRect);
+    // Aplicamos el color naranja
+    nums.SetColorMod(255, 165, 0);
+    hud_symbols.SetColorMod(255, 165, 0);
 
-    // Health
-    std::string healthStr = std::to_string(health);
+    // Symbol money
+    symbolX = weidthScreen * 0.75;
+    int moneyPosSymbol = 7;
 
+    drawSymbols(money, moneyPosSymbol, symbolX, symbolY);
+
+    symbolX = weidthScreen * 0.45;
+    symbolY = heightScreen * 0.02;
+    int timePosSymbol = 2;
+
+    // Symbol time
+    drawSymbols(time, timePosSymbol, symbolX, symbolY);
+
+    // Dibuja mira sin zoom (porque está en coords de pantalla)
+    sdlRenderer->Copy(mira, SDL2pp::NullOpt, mouse);
+}
+
+void HudSprite::drawSymbols(int& num, int& posSymbol, int& SymbolX, int& SymbolY){
+    Texture& hud_symbols = texturas.getTexture("symbols"); 
+    Texture& nums = texturas.getTexture("nums"); 
+
+    int anchoNum = 40;
+    int alturaSymbols = 60;
+    int anchoSymbols = 64;
     int contador = 0;
     int posx;
     int posy;
-    for (char c : healthStr){
+
+    // Symbol health
+    SDL_Rect srcRect = {(anchoSymbols + 2) * posSymbol, 0, anchoSymbols, anchoSymbols};
+    SDL_Rect destRect = {SymbolX, SymbolY, alturaSymbols, alturaSymbols};
+
+    sdlRenderer->Copy(hud_symbols, srcRect, destRect);
+
+    //Agregamos separacion entre el symbolo y numeros
+    SymbolX += 7;
+
+    std::string numStr = std::to_string(num);
+    for (char c : numStr){
         int digito = c - '0';
 
         posx = 49 * digito;
         posy = 0;
         srcRect = {posx, posy, anchoNum, 66};
 
-        posx = symbolX + (contador + 1) * 48;
-        destRect = {posx, symbolY, anchoNum, alturaSymbols};
-        contador++;
-        sdlRenderer->Copy(nums, srcRect, destRect);
-    }
-
-    // Aplicamos el color azul
-    nums.SetColorMod(100, 150, 255);
-    hud_symbols.SetColorMod(100, 150, 255);
-
-    // Symbol money
-    symbolX = weidthScreen * 0.75;
-    int moneyPosSymbol = 7;
-
-    srcRect = {(anchoSymbols * moneyPosSymbol) + 2, 0, anchoSymbols, anchoSymbols};
-    destRect = {symbolX,symbolY,60,alturaSymbols};
-
-    sdlRenderer->Copy(hud_symbols, srcRect, destRect);
-
-    // Money
-    std::string moneyStr = std::to_string(money);
-
-    contador = 0;
-    for (char c : moneyStr){
-        int digito = c - '0';
-
-        posx = 48.8 * digito;
-        posy = 0;
-        srcRect = {posx, posy, anchoNum, 66};
-
-        posx = symbolX + (contador + 1) * 48;
-        destRect = {posx, symbolY, anchoNum, alturaSymbols};
+        posx = SymbolX + (contador + 1) * 48;
+        destRect = {posx, SymbolY, anchoNum, alturaSymbols};
         contador++;
         sdlRenderer->Copy(nums, srcRect, destRect);
     }
