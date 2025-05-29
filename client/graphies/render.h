@@ -1,7 +1,7 @@
 #ifndef RENDER_H
 #define RENDER_H
 #include <string>
-
+#include <memory>
 #include <SDL.h>
 
 #include "../../common/dto/game_state_update.h"
@@ -9,20 +9,32 @@
 
 #include "textureStore.h"
 
+#include "components/hudSprite.h"
+#include "components/mapSprite.h"
+#include "components/playerSprite.h"
+
 using SDL2pp::Renderer;
 using SDL2pp::Texture;
 
 class Render {
 private:
     Renderer* sdlRenderer;
-    TextureStore texturas;
     Protocol& protocolo;
     std::string& namePlayer;
 
+    HudSprite hud;
+    MapSprite mapa;
+    PlayerSprite player;
+
+    int screenWidth = 1000;
+    int screenHeight = 1000;
+
     // Pos del mapa
     int mapa_x = 0, mapa_y = 0;
+
     // Coordenadas de mi jugador
-    float posJugadorX = 0.0, posJugadorY = 0.0;
+    PlayerInfo* myPlayer = nullptr;
+
     // Angulo de mi jugador
     double myAngle = 0.0;
     // Pos mouse

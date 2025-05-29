@@ -5,7 +5,9 @@ add_library(graphies STATIC
     inputHandler.cpp
     inputServerHandler.cpp
     textureStore.cpp
-    # Agrega aquí los .h si deseas (opcional, pero no obligatorio)
+    components/hudSprite.cpp
+    components/mapSprite.cpp
+    components/playerSprite.cpp
 )
 
 # Hacemos visible el directorio actual para los includes
