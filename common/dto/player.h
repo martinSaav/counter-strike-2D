@@ -27,10 +27,12 @@ private:
     uint16_t kills;
     uint16_t deaths;
     Action action;
+    int angle;
 
 public:
     PlayerInfo(std::string user_name, uint16_t pos_x, uint16_t pos_y, uint16_t health,
-               Status status, float money, uint16_t kills, uint16_t deaths, Action action):
+               Status status, float money, uint16_t kills, uint16_t deaths, Action action,
+               int angle):
             user_name(std::move(user_name)),
             pos_x(pos_x),
             pos_y(pos_y),
@@ -39,7 +41,9 @@ public:
             money(money),
             kills(kills),
             deaths(deaths),
-            action(action) {}
+            action(action),
+            angle(angle) // Default angle to 0
+             {}
 
     void serialize(uint8_t* buffer) const {
         size_t offset = 0;
@@ -63,9 +67,11 @@ public:
         std::memcpy(buffer + offset, &deaths, sizeof(deaths));
         offset += sizeof(deaths);
         buffer[offset++] = static_cast<uint8_t>(action);
+        std::memcpy(buffer + offset, &angle, sizeof(angle));
+        offset += sizeof(angle);
     }
 
-    size_t serialized_size() const { return 2 + user_name.size() + 1 + 2 * 5 + sizeof(money) + 1; }
+    size_t serialized_size() const { return 2 + user_name.size() + 1 + 2 * 5 + sizeof(money) + 1 + sizeof(angle); }
 
     const std::string& get_user_name() const { return user_name; }
     uint16_t get_pos_x() const { return pos_x; }
@@ -76,6 +82,7 @@ public:
     uint16_t get_kills() const { return kills; }
     uint16_t get_deaths() const { return deaths; }
     Action get_action() const { return action; }
+    int get_angle() const { return angle; }
 
     static PlayerInfo deserialize(const uint8_t* buffer, size_t size) {
         if (size < 2) {
@@ -110,7 +117,11 @@ public:
 
         Action action = static_cast<Action>(buffer[offset++]);
 
-        return PlayerInfo(user_name, pos_x, pos_y, health, status, money, kills, deaths, action);
+        int angle;
+        std::memcpy(&angle, buffer + offset, sizeof(angle));
+        offset += sizeof(angle);
+
+        return PlayerInfo(user_name, pos_x, pos_y, health, status, money, kills, deaths, action, angle);
     }
 };
 
