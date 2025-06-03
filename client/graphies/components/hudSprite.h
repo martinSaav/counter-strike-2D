@@ -14,6 +14,6 @@ class HudSprite : public Component{
     public:
     HudSprite(Renderer* sdlRenderer, int& weidth, int& height);
 
-    void draw(SDL_Rect& mouse, int& health, int& money, int& time);
+    void draw(SDL_Rect& mouse, int& health, int& money, int& time, int& round);
 };
 #endif

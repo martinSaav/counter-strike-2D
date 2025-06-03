@@ -6,12 +6,14 @@ HudSprite::HudSprite(Renderer* sdlRenderer, int& weidth, int& height) :
     texturas.loadTexture("mira", "../client/data/mira.png");
     texturas.loadTexture("symbols", "../client/data/hud/hud_symbols.bmp");
     texturas.loadTexture("nums", "../client/data/hud/hud_nums.bmp");
+    texturas.loadTexture("roundNumbers", "../client/data/hud/roundNumbers.png");
 }
 
-void HudSprite::draw(SDL_Rect& mouse, int& health, int& money, int& time){
+void HudSprite::draw(SDL_Rect& mouse, int& health, int& money, int& time, int& round){
     Texture& mira = texturas.getTexture("mira");
     Texture& hud_symbols = texturas.getTexture("symbols"); 
     Texture& nums = texturas.getTexture("nums");
+    Texture& roundNums = texturas.getTexture("roundNumbers");
 
     // Aplicamos el color verde
     nums.SetColorMod(100, 200, 100);
@@ -39,11 +41,23 @@ void HudSprite::draw(SDL_Rect& mouse, int& health, int& money, int& time){
     drawSymbols(money, moneyPosSymbol, symbolX, symbolY);
 
     symbolX = weidthScreen * 0.45;
-    symbolY = heightScreen * 0.02;
+    //symbolY = heightScreen * 0.02;
     int timePosSymbol = 2;
 
     // Symbol time
     drawSymbols(time, timePosSymbol, symbolX, symbolY);
+
+    // Num round
+    int anchoNumns = 38;
+
+    symbolX = (weidthScreen * 0.5) - anchoNumns / 2;
+    symbolY = heightScreen * 0.02;
+
+    SDL_Rect srcRect = {anchoNumns * (round - 1), 0,anchoNumns, anchoSymbols};
+    SDL_Rect destRect = {symbolX, symbolY, 38, 40};
+
+    sdlRenderer->Copy(roundNums, srcRect, destRect);
+
 
     // Dibuja mira sin zoom (porque está en coords de pantalla)
     sdlRenderer->Copy(mira, SDL2pp::NullOpt, mouse);
@@ -54,7 +68,8 @@ void HudSprite::drawSymbols(int& num, int& posSymbol, int& SymbolX, int& SymbolY
     Texture& nums = texturas.getTexture("nums"); 
 
     int anchoNum = 40;
-    int alturaSymbols = 60;
+    int anchoNumPantalla = 35;
+    int alturaSymbols = 50;
     int anchoSymbols = 64;
     int contador = 0;
     int posx;

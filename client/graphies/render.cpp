@@ -70,9 +70,10 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     int health = myPlayer->get_health();
     int money = myPlayer->get_money();
     int time = mensaje->get_round_time();
-
+    int round = mensaje->get_round();
+    
     SDL_Rect mouse = {mouseX, mouseY, 45, 45};
-    hud.draw(mouse, health, money, time);
+    hud.draw(mouse, health, money, time, round);
 
     sdlRenderer->Present();
 }

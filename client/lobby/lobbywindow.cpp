@@ -12,7 +12,7 @@
 #include "loginwindow.h"
 
 MainWindow::MainWindow(Protocol& protocolo, std::string& namePlayer, QWidget* parent):
-        QMainWindow(parent), ui(new Ui::LobbyWindow), protocolo(protocolo), namePlayer(namePlayer) {
+        QMainWindow(parent), ui(new Ui::LobbyWindow), protocolo(protocolo), namePlayer(namePlayer){
     // this->setAttribute(Qt::WA_DeleteOnClose); // Para eliminar el widget al cerrarlo
 
     // Instanciamos los widgets
@@ -27,55 +27,43 @@ MainWindow::MainWindow(Protocol& protocolo, std::string& namePlayer, QWidget* pa
     ui->buscarButton->hide();
 }
 
-MainWindow::~MainWindow() { delete ui; }
+MainWindow::~MainWindow(){ delete ui; }
 
-void MainWindow::on_crearButton_clicked() {
+void MainWindow::on_crearButton_clicked(){
     createMatchWindow* windowCreate = new createMatchWindow(this->protocolo, this->maps, this);
 
     windowCreate->exec();
 }
 
-void MainWindow::on_unirseButton_clicked() {
+void MainWindow::on_unirseButton_clicked(){
     // Obtener la fila seleccionada
     int filaSeleccionada = ui->listaPartidas->currentRow();
 
     // Obtener el ítem de la primera columna (columna 0) de la fila seleccionada
     QTableWidgetItem* item = ui->listaPartidas->item(filaSeleccionada, 0);
 
-    if (item) {
-
-        // std::string texto = "Esperando a comienzo de partida";
-        // QString qtexto = QString::fromStdString(texto);
-
-        // Mostrar el texto en el QLabel
-        // ui->waitText->setText(qtexto);
-
-        // Desactiva todos los widgets
-        // this->setEnabled(false);
-
-        // ui->listaPartidas->clear();
-
-        // QApplication::exit(EXITLOBBY);
+    if (item){
 
         QString map = item->text();
-
         JoinGameRequest requestJoinGame(map.toStdString());
         protocolo.send_message(requestJoinGame);
 
         const std::unique_ptr<Message> responseJoinGame = protocolo.recv_message();
-
         const auto* game = dynamic_cast<JoinGameResponse*>(responseJoinGame.get());
 
         bool gameJoined = game->get_success();
 
-        if (gameJoined) {
-            this->hide();
-            QApplication::exit(EXITLOBBY);
+        if (gameJoined){
+            // Creamos la ventana de espera
+            tipoUsuario usuario = UNIDO;
+            waitRoom* windoWait = new waitRoom(protocolo, usuario, this);
+            windoWait->setWindowFlags(Qt::Window);  // esto la hace ventana real
+            windoWait->show();
         }
     }
 }
 
-void MainWindow::on_actualizarButton_clicked() {
+void MainWindow::on_actualizarButton_clicked(){
     // recibimos del protocolo
     GameListRequest requestGameList;
     protocolo.send_message(requestGameList);
@@ -111,9 +99,9 @@ void MainWindow::on_actualizarButton_clicked() {
     ui->listaPartidas->setHorizontalHeaderLabels(headers);
 }
 
-void MainWindow::on_quitButton_clicked() { this->close(); }
+void MainWindow::on_quitButton_clicked(){ this->close(); }
 
-void MainWindow::on_buscarButton_clicked() {
+void MainWindow::on_buscarButton_clicked(){
     // Habilitamos los widgets para buscar partida
     ui->buscarButton->setEnabled(false);
     ui->listaPartidas->show();
@@ -123,11 +111,11 @@ void MainWindow::on_buscarButton_clicked() {
     this->on_actualizarButton_clicked();
 }
 
-void MainWindow::on_loginButton_clicked() {
+void MainWindow::on_loginButton_clicked(){
     loginwindow* windowLogin = new loginwindow(namePlayer, this);
 
     connect(windowLogin, &loginwindow::ventanaCerrada, this, [this]() {
-        if (this->namePlayer == "") {  // caso no coloco un nombre
+        if (this->namePlayer == ""){  // caso no coloco un nombre
             return;
         }
         QString qtexto = QString::fromStdString(this->namePlayer);

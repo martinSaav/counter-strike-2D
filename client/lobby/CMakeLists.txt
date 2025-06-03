@@ -7,6 +7,10 @@ set(LOBBY_SOURCES
     creatematchwindow.ui
     loginwindow.cpp
     loginwindow.ui
+    waitroom.cpp
+    waitroom.ui
+    selectskin.cpp
+    selectskin.ui
     recursos.qrc
 )
 

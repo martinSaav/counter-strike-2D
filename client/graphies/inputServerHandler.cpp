@@ -1,6 +1,7 @@
 #include "inputServerHandler.h"
-
+#include <iostream>
 #include <memory>
+
 InputServerHandler::InputServerHandler(Protocol& protocolo): protocolo(protocolo) {}
 
 InputServerHandler::~InputServerHandler() {}
@@ -13,8 +14,12 @@ void InputServerHandler::processEvents() {
 
         const auto game = dynamic_cast<GameStateUpdate*>(gameState.get());
 
-        std::lock_guard<std::mutex> lock(mtx);
-        mensajes.push(*game);
+        //std::lock_guard<std::mutex> lock(mtx);
+        //mensajes.push(*game);
+        if (game) {
+            std::lock_guard<std::mutex> lock(mtx);
+           mensajes.push(std::move(*game));
+        }
     }
 }
 

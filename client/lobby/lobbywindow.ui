@@ -213,7 +213,10 @@
     </property>
     <property name="font">
      <font>
-      <pointsize>14</pointsize>
+      <family>Ubuntu Sans</family>
+      <pointsize>15</pointsize>
+      <italic>true</italic>
+      <bold>true</bold>
      </font>
     </property>
     <property name="text">
