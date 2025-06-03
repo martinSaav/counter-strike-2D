@@ -32,12 +32,3 @@ std::vector<MatchDTO> Lobby::list_matches() {
     }
     return match_dtos;
 }
-
-void Lobby::start_match(const std::string& match_name) {
-    std::lock_guard<std::mutex> guard(mutex);
-    const auto match = matches.find(match_name);
-    if (match == matches.end()) {
-        throw MatchNotFound();
-    }
-    match->second->start_game();
-}
