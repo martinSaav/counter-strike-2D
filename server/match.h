@@ -47,7 +47,9 @@ class Match: public Thread {
 
     void process_move_player(const std::shared_ptr<Player>& player, int x_mov, int y_mov);
 
+
     void broadcast_match_start();
+
 
     void wait_for_match_to_start();
 
@@ -59,8 +61,7 @@ public:
             match_started(false),
             player_count(0),
             max_player_count(max_number_of_players),
-            map(map_width, map_height),
-            {}
+            map(map_width, map_height) {}
     GameIdentification join_match(const std::string& username);
     void run() override;
     void stop() override;
