@@ -25,17 +25,7 @@ enum class MessageType : uint8_t {
     JoinGameResponse = 0x63,
     CreateGameResponse = 0x64,
     JoinTeamResponse = 0x65,
-    GameStateUpdate = 0x66,  //{x y players[] round_number  }
-
-    // creo que este podria reemplazar a GameStarted, RoundStarted y RoundEnded o tambien el
-    // playerjoined y playerleft
-
-    PlayerJoined = 0x67,
-    PlayerLeft = 0x68,
-    GameStarted = 0x69,
-    GameEnded = 0x6A,
-    RoundStarted = 0x6B,
-    RoundEnded = 0x6C,
+    GameStateUpdate = 0x66,
 };
 
 #endif
