@@ -6,15 +6,16 @@
 #define GUN_H
 #include <vector>
 
+#include "server/game/position.h"
+
 #include "bullet.h"
 #include "gun_type.h"
-#include "position.h"
 
 
 class Gun {
     friend class GameStateUpdater;
     bool has_to_shoot();
-    std::vector<Bullet> fire_gun();
+    void fire_gun();
 
 public:
     virtual ~Gun() = default;
