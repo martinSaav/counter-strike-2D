@@ -6,6 +6,7 @@ target_sources(taller_server
         match.cpp
         player_command.cpp
         sender.cpp
+        skin_translator.cpp
         main.cpp
     PUBLIC
         client_handler.h
@@ -20,6 +21,8 @@ target_sources(taller_server
         sender.h
         acceptor.h
         game_ready_notification.h
+        skin_translator.h
+        command_type.h
 )
 
 add_subdirectory(game)
