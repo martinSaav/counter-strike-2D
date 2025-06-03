@@ -20,6 +20,11 @@ target_sources(taller_common
         dto/create_game_response.h
         dto/join_game_request.h
         dto/join_game_response.h
+        dto/join_team_request.h
+        dto/join_team_response.h
+        dto/select_skin_request.h
+        dto/game_ready_request.h
+        dto/game_ready_response.h
         dto/game_state_update.h
         dto/login_request.h
         dto/player_action.h
