@@ -47,7 +47,6 @@ class Match: public Thread {
 
     void process_move_player(const std::shared_ptr<Player>& player, int x_mov, int y_mov);
 
-
     void broadcast_match_start();
 
     void wait_for_match_to_start();
