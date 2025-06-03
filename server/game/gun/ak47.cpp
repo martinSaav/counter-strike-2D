@@ -23,14 +23,16 @@ void Ak47::shoot_gun(const Position final_position) {
         throw NoAmmo();
     }
     const auto pos = final_position.get_position();
-    if (!shoots.empty()) {
+    if (shoots.empty()) {
         const int bullets_to_shoot = std::min(bullets_per_burst, current_ammo);
         current_ammo -= bullets_to_shoot;
         for (int i = 0; i < bullets_to_shoot; i++) {
             shoots.push(pos);
         }
     } else {
-        current_ammo--;
-        shoots.push(pos);
+        if (shoots.size() == 1) {
+            current_ammo--;
+            shoots.push(pos);
+        }
     }
 }
