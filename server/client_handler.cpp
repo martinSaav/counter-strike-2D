@@ -124,6 +124,24 @@ GameIdentification ClientHandler::pick_match() {
     }
 }
 
+
+CommandType ClientHandler::cast_action_to_command(const Action action) {
+    switch (action) {
+        case Action::MoveDown:
+            return CommandType::MoveDown;
+        case Action::MoveUp:
+            return CommandType::MoveUp;
+        case Action::MoveLeft:
+            return CommandType::MoveLeft;
+        case Action::MoveRight:
+            return CommandType::MoveRight;
+        case Action::Shoot:
+            return CommandType::Shoot;
+    }
+    return CommandType::Unknown;
+}
+
+
 void ClientHandler::handle_player_action(Queue<PlayerCommand>& command_queue,
                                          const PlayerCredentials& credentials,
                                          const std::unique_ptr<Message>& message) {
@@ -160,10 +178,6 @@ void ClientHandler::handle_game(Queue<PlayerCommand>& command_queue,
             }
             case MessageType::GameReadyRequest: {
                 handle_game_ready(command_queue, credentials);
-                break;
-            }
-            case MessageType::SelectSkinRequest: {
-                handle_change_skin(command_queue, credentials, message);
                 break;
             }
             case MessageType::SelectSkinRequest: {
