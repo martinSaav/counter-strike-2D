@@ -4,17 +4,20 @@
 
 #ifndef GUN_H
 #define GUN_H
-#include <vector>
 
 #include "server/game/position.h"
 
-#include "bullet.h"
 #include "gun_type.h"
+
+
+struct NoAmmo: public std::runtime_error {
+    NoAmmo(): std::runtime_error("There is no ammunition") {}
+};
 
 
 class Gun {
     friend class GameStateUpdater;
-    bool has_to_shoot();
+    virtual bool has_to_shoot(float current_time);
     void fire_gun();
 
 public:
@@ -22,7 +25,7 @@ public:
 
     virtual GunType get_gun_type();
     virtual void reload_gun() = 0;
-    virtual void shoot_gun(Position& starting_position, Position final_position) = 0;
+    virtual void shoot_gun(Position final_position) = 0;
 };
 
 
