@@ -16,6 +16,7 @@
 #include "../common/dto/map_names_request.h"
 #include "../common/dto/map_names_response.h"
 #include "../common/dto/game_ready_request.h"
+#include "../common/dto/game_ready_response.h"
 #include "../common/dto/player_action.h"
 
 
@@ -88,6 +89,10 @@ std::unique_ptr<Message> Protocol::recv_message() {
         case MessageType::GameListResponse: {
             return std::make_unique<GameListResponse>(
                     GameListResponse::deserialize(buffer.data(), buffer.size()));
+        }
+        case MessageType::GameReadyResponse: {
+            return std::make_unique<GameReadyResponse>(
+                    GameReadyResponse::deserialize(buffer.data(), buffer.size()));
         }
 
         default:
