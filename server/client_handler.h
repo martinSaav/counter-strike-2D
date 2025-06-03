@@ -49,7 +49,6 @@ class ClientHandler: public Thread {
                                    const PlayerCredentials& credentials,
                                    const std::unique_ptr<Message>& message);
 
-
     void handle_game(Queue<PlayerCommand>& command_queue, const PlayerCredentials& credentials);
 
 public:
