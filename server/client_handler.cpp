@@ -136,7 +136,6 @@ void ClientHandler::handle_game_ready() {
     protocol.send_message(GameReadyResponse(true));
 }
 
-
 void ClientHandler::handle_game(Queue<PlayerCommand>& command_queue,
                                 const PlayerCredentials& credentials) {
     while (true) {
