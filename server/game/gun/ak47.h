@@ -8,7 +8,6 @@
 #include <utility>
 
 #include "gun.h"
-#include "position.h"
 
 #define miliseconds_per_shoot 2500
 #define max_ammo 30
