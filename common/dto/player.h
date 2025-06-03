@@ -28,11 +28,12 @@ private:
     uint16_t deaths;
     Action action;
     int angle;
+    std::string skin;
 
 public:
     PlayerInfo(std::string user_name, uint16_t pos_x, uint16_t pos_y, uint16_t health,
                Status status, float money, uint16_t kills, uint16_t deaths, Action action,
-               int angle):
+               int angle, std::string skin):
             user_name(std::move(user_name)),
             pos_x(pos_x),
             pos_y(pos_y),
@@ -42,8 +43,9 @@ public:
             kills(kills),
             deaths(deaths),
             action(action),
-            angle(angle) // Default angle to 0
-             {}
+            angle(angle),
+            skin(std::move(skin))
+            {}
 
     void serialize(uint8_t* buffer) const {
         size_t offset = 0;
@@ -69,6 +71,13 @@ public:
         buffer[offset++] = static_cast<uint8_t>(action);
         std::memcpy(buffer + offset, &angle, sizeof(angle));
         offset += sizeof(angle);
+
+        uint16_t skin_length = htons(static_cast<uint16_t>(skin.size()));
+        std::memcpy(buffer + offset, &skin_length, sizeof(skin_length));
+        offset += sizeof(skin_length);
+        std::memcpy(buffer + offset, skin.data(), skin.size());
+        offset += skin.size();
+
     }
 
     size_t serialized_size() const { return 2 + user_name.size() + 1 + 2 * 5 + sizeof(money) + 1 + sizeof(angle); }
@@ -121,7 +130,16 @@ public:
         std::memcpy(&angle, buffer + offset, sizeof(angle));
         offset += sizeof(angle);
 
-        return PlayerInfo(user_name, pos_x, pos_y, health, status, money, kills, deaths, action, angle);
+        uint16_t skin_length;
+        std::memcpy(&skin_length, buffer + offset, sizeof(skin_length));
+        skin_length = ntohs(skin_length);
+        offset += sizeof(skin_length);
+
+        std::string skin(reinterpret_cast<const char*>(buffer + offset), skin_length);
+        offset += skin_length;
+
+
+        return PlayerInfo(user_name, pos_x, pos_y, health, status, money, kills, deaths, action, angle, skin);
     }
 };
 
