@@ -12,15 +12,6 @@ const std::map<std::string, PlayerSkin>& SkinTranslator::string_to_code_map() {
     return map;
 }
 
-
-const std::map<PlayerSkin, std::string>& SkinTranslator::code_to_string_map() {
-    static const std::map<PlayerSkin, std::string> map = {
-            {PlayerSkin::C1, "C1"}, {PlayerSkin::C2, "C2"}, {PlayerSkin::C3, "C3"},
-            {PlayerSkin::C4, "C4"}, {PlayerSkin::T1, "T1"}, {PlayerSkin::T2, "T2"},
-            {PlayerSkin::T3, "T3"}, {PlayerSkin::T4, "T4"}};
-    return map;
-}
-
 PlayerSkin SkinTranslator::string_to_code(const std::string& name) {
     auto map = string_to_code_map();
     const auto it = map.find(name);
@@ -28,10 +19,4 @@ PlayerSkin SkinTranslator::string_to_code(const std::string& name) {
         throw UnknownSkin();
     }
     return it->second;
-}
-
-
-std::string SkinTranslator::code_to_string(const PlayerSkin skin) {
-    auto map = code_to_string_map();
-    return map.find(skin)->second;
 }

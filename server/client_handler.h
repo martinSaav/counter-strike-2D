@@ -44,11 +44,6 @@ class ClientHandler: public Thread {
     static void handle_game_ready(Queue<PlayerCommand>& command_queue,
                                   const PlayerCredentials& credentials);
 
-
-    static void handle_change_skin(Queue<PlayerCommand>& command_queue,
-                                   const PlayerCredentials& credentials,
-                                   const std::unique_ptr<Message>& message);
-
     void handle_game(Queue<PlayerCommand>& command_queue, const PlayerCredentials& credentials);
 
 public:

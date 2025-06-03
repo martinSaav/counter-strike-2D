@@ -20,8 +20,7 @@ GameIdentification Match::join_match(const std::string& username) {
         throw MatchAlreadyStarted();
     }
     player_count++;
-    auto player = std::make_shared<Player>(username, starting_position_x + 35 * (player_count - 1),
-                                           starting_position_y);
+    auto player = std::make_shared<Player>(username, starting_position_x, starting_position_y);
     PlayerCredentials credentials(player_count);
     players.insert(std::pair{credentials, player});
     auto sender_queue =
@@ -62,11 +61,6 @@ void Match::process_move_player(const std::shared_ptr<Player>& player, const int
 }
 
 
-void Match::process_shoot_request(const std::shared_ptr<Player>& player, const Position& position) {
-    player->shoot(position);
-}
-
-
 void Match::process_command(const PlayerCommand& command) {
     std::lock_guard<std::mutex> lck(mtx);
     const PlayerCredentials player_credentials = command.credentials;
@@ -88,9 +82,6 @@ void Match::process_command(const PlayerCommand& command) {
         }
         case CommandType::MoveDown: {
             return process_move_player(player, 0, +tiles_per_movement);
-        }
-        case CommandType::Shoot: {
-            return process_shoot_request(player, command.position.value());
         }
         default:
             break;
@@ -150,7 +141,7 @@ void Match::wait_for_match_to_start() {
                 const PlayerSkin new_skin = command.new_skin.value();
                 const auto player = players.find(credentials);
                 if (player == players.end()) {
-                    break;
+                    return;
                 }
                 player->second->set_skin(new_skin);
                 break;
@@ -162,21 +153,12 @@ void Match::wait_for_match_to_start() {
 }
 
 
-void Match::update_game() {
-    game_manager.advance_time(miliseconds_per_iteration);
-    for (const auto& player: players | std::views::values) {
-        player->update(game_manager);
-    }
-}
-
-
 void Match::run_game_loop() {
     auto start = std::chrono::system_clock::now();
     while (should_keep_running()) {
         if (PlayerCommand command; commands_queue.try_pop(command)) {
             process_command(command);
         }
-        update_game();
         broadcast_match_status();
         auto end = std::chrono::system_clock::now();
         const auto elapsed =

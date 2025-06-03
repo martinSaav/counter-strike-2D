@@ -37,7 +37,6 @@ class Match: public Thread {
     int player_count;
     const int max_player_count;
     Map map;
-    GameManager game_manager;
     std::atomic<bool> has_finished;
 
     void process_command(const PlayerCommand& command);
@@ -48,13 +47,11 @@ class Match: public Thread {
 
     void process_move_player(const std::shared_ptr<Player>& player, int x_mov, int y_mov);
 
-    void process_shoot_request(const std::shared_ptr<Player>& player, const Position& position);
 
     void broadcast_match_start();
 
-    void wait_for_match_to_start();
 
-    void update_game();
+    void wait_for_match_to_start();
 
     void run_game_loop();
 
@@ -64,8 +61,7 @@ public:
             match_started(false),
             player_count(0),
             max_player_count(max_number_of_players),
-            map(map_width, map_height),
-            game_manager(map) {}
+            map(map_width, map_height) {}
     GameIdentification join_match(const std::string& username);
     void run() override;
     void stop() override;

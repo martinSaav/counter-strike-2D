@@ -14,13 +14,11 @@
 #include "common/dto/create_game_request.h"
 #include "common/dto/create_game_response.h"
 #include "common/dto/game_list_response.h"
+#include "common/dto/game_ready_response.h"
 #include "common/dto/join_game_request.h"
 #include "common/dto/join_game_response.h"
 #include "common/dto/map_names_response.h"
 #include "common/dto/player_action.h"
-#include "common/dto/select_skin_request.h"
-
-#include "skin_translator.h"
 
 std::string ClientHandler::handle_login() {
     while (true) {
@@ -159,14 +157,6 @@ void ClientHandler::handle_game_ready(Queue<PlayerCommand>& command_queue,
 }
 
 
-void ClientHandler::handle_change_skin(Queue<PlayerCommand>& command_queue,
-                                       const PlayerCredentials& credentials,
-                                       const std::unique_ptr<Message>& message) {
-    const auto change_skin_message = dynamic_cast<SelectSkinRequest*>(message.get());
-    const PlayerSkin skin = SkinTranslator::string_to_code(change_skin_message->get_skin());
-    command_queue.push(PlayerCommand(credentials, CommandType::ChangeSkin, skin));
-}
-
 void ClientHandler::handle_game(Queue<PlayerCommand>& command_queue,
                                 const PlayerCredentials& credentials) {
     while (true) {
@@ -176,11 +166,13 @@ void ClientHandler::handle_game(Queue<PlayerCommand>& command_queue,
                 break;
             }
             case MessageType::GameReadyRequest: {
-                handle_game_ready(command_queue, credentials);
-                break;
-            }
-            case MessageType::SelectSkinRequest: {
-                handle_change_skin(command_queue, credentials, message);
+                try {
+                    handle_game_ready(command_queue, credentials);
+                } catch (const MatchNotFound&) {
+                    protocol.send_message(GameReadyResponse(false));
+                } catch (const MatchAlreadyStarted&) {
+                    protocol.send_message(GameReadyResponse(false));
+                }
                 break;
             }
             default:

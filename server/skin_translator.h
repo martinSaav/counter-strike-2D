@@ -17,11 +17,9 @@ struct UnknownSkin: public std::runtime_error {
 
 class SkinTranslator {
     static const std::map<std::string, PlayerSkin>& string_to_code_map();
-    static const std::map<PlayerSkin, std::string>& code_to_string_map();
 
 public:
     static PlayerSkin string_to_code(const std::string& name);
-    static std::string code_to_string(PlayerSkin skin);
 };
 
 
