@@ -1,7 +1,7 @@
 target_sources(game
     PRIVATE
-        bullet.cpp
+        ak47.cpp
     PUBLIC
+        ak47.h
         gun.h
-        bullet.h
         gun_type.h)
