@@ -11,11 +11,12 @@ enum class MessageType : uint8_t {
     JoinGameRequest = 0x04,
     CreateGameRequest = 0x05,
     JoinTeamRequest = 0x06,
-    GameReadyRequest = 0x07,
-    BuyWeaponRequest = 0x08,
-    BuyAmmoRequest = 0x09,
-    PlayerAction = 0x0A,
-    DisconnectRequest = 0x0B,
+    SelectSkinRequest = 0x07,
+    GameReadyRequest = 0x08,
+    BuyWeaponRequest = 0x09,
+    BuyAmmoRequest = 0x0A,
+    PlayerAction = 0x0B,
+    DisconnectRequest = 0x0C,
 
 
     // Server -> Client
