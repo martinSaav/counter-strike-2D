@@ -15,4 +15,6 @@ void Player::set_location(const Position position, std::vector<std::pair<int, in
 }
 
 
-PlayerDTO Player::get_player_info() const { return PlayerDTO{username, position_x, position_y}; }
+PlayerDTO Player::get_player_info() const {
+    return PlayerDTO{username, position_x, position_y, skin, current_angle};
+}
