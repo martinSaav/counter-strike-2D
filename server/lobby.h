@@ -26,7 +26,6 @@ public:
     Lobby() = default;
     GameIdentification create_match(const std::string& match_name, const std::string& player_name);
     GameIdentification join_match(const std::string& match_name, const std::string& player_name);
-    void start_match(const std::string& match_name);
     std::vector<MatchDTO> list_matches();
 };
 

@@ -122,18 +122,38 @@ GameIdentification ClientHandler::pick_match() {
     }
 }
 
+
+CommandType ClientHandler::cast_action_to_command(const Action action) {
+    switch (action) {
+        case Action::MoveDown:
+            return CommandType::MoveDown;
+        case Action::MoveUp:
+            return CommandType::MoveUp;
+        case Action::MoveLeft:
+            return CommandType::MoveLeft;
+        case Action::MoveRight:
+            return CommandType::MoveRight;
+        case Action::Shoot:
+            return CommandType::Shoot;
+    }
+    return CommandType::Unknown;
+}
+
+
 void ClientHandler::handle_player_action(Queue<PlayerCommand>& command_queue,
                                          const PlayerCredentials& credentials,
                                          const std::unique_ptr<Message>& message) {
     const auto player_action_message = dynamic_cast<PlayerAction*>(message.get());
-    const PlayerCommand player_command(credentials, player_action_message->get_action());
+    const PlayerCommand player_command(credentials,
+                                       cast_action_to_command(player_action_message->get_action()));
     command_queue.push(player_command);
 }
 
 
-void ClientHandler::handle_game_ready() {
-    lobby.start_match(match_name);
-    protocol.send_message(GameReadyResponse(true));
+void ClientHandler::handle_game_ready(Queue<PlayerCommand>& command_queue,
+                                      const PlayerCredentials& credentials) {
+    const PlayerCommand command(credentials, CommandType::StartMatch);
+    command_queue.push(command);
 }
 
 
@@ -147,7 +167,7 @@ void ClientHandler::handle_game(Queue<PlayerCommand>& command_queue,
             }
             case MessageType::GameReadyRequest: {
                 try {
-                    handle_game_ready();
+                    handle_game_ready(command_queue, credentials);
                 } catch (const MatchNotFound&) {
                     protocol.send_message(GameReadyResponse(false));
                 } catch (const MatchAlreadyStarted&) {

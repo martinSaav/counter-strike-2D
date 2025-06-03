@@ -33,20 +33,23 @@ class Match: public Thread {
     std::vector<std::shared_ptr<Queue<std::variant<MatchStatusDTO, GameReadyNotification>>>>
             senders_queues;
     std::mutex mtx;
-    std::condition_variable start_match;
     bool match_started;
     int player_count;
     const int max_player_count;
     Map map;
     std::atomic<bool> has_finished;
 
-    void process_command(PlayerCommand command);
+    void process_command(const PlayerCommand& command);
 
     MatchStatusDTO get_match_status();
 
     void broadcast_match_status();
 
     void process_move_player(const std::shared_ptr<Player>& player, int x_mov, int y_mov);
+
+
+    void broadcast_match_start();
+
 
     void wait_for_match_to_start();
 
@@ -60,7 +63,6 @@ public:
             max_player_count(max_number_of_players),
             map(map_width, map_height) {}
     GameIdentification join_match(const std::string& username);
-    void start_game();
     void run() override;
     void stop() override;
     [[nodiscard]] int get_player_count() const;
