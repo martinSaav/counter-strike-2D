@@ -63,8 +63,9 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
         
         int posX = jugador.get_pos_x();
         int posY = jugador.get_pos_y();
+        std::string skinJugador = jugador.get_skin();
 
-        player.draw(posX, posY, camera, zoom, angleDefault);
+        player.draw(posX, posY, camera, zoom, angleDefault, skinJugador);
     }
 
     int health = myPlayer->get_health();

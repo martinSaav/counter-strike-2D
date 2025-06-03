@@ -6,6 +6,7 @@
 #include "common/protocol.h"
 #include "common/dto/game_ready_request.h"
 #include "common/dto/game_ready_response.h"
+#include "common/dto/select_skin_request.h"
 
 enum closeType { EXITAPP = 0, EXITLOBBY = 1 };
 enum tipoUsuario { CREADOR = 0, UNIDO = 1 };
@@ -34,5 +35,6 @@ private:
     Ui::waitRoom *ui;
     Protocol& protocolo;
     tipoUsuario usuario;
+    std::string skinSeleccionada;
 };
 #endif // WAITROOM_H

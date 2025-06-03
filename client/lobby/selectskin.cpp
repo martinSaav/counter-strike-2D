@@ -1,7 +1,7 @@
 #include "selectskin.h"
 #include "ui_selectskin.h"
 
-selectSkin::selectSkin(team teamPlayer, QWidget *parent)
+selectSkin::selectSkin(team teamPlayer,std::sring& skinSeleccionada, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::selectSkin){
         
@@ -32,17 +32,41 @@ selectSkin::~selectSkin(){
 }
 
 void selectSkin::on_button1_clicked(){
+
+    if (teamPlayer == TERRORISTA){
+        skinSeleccionada = "T1";
+    }else {
+        skinSeleccionada = "C1";
+    }   
     this->close();
 }
 
 void selectSkin::on_button2_clicked(){
+
+    if (teamPlayer == TERRORISTA){
+        skinSeleccionada = "T2";
+    }else {
+        skinSeleccionada = "C2";
+    }
     this->close();
 }
 
 void selectSkin::on_button3_clicked(){
+
+    if (teamPlayer == TERRORISTA){
+        skinSeleccionada = "T3";
+    }else {
+        skinSeleccionada = "C3";
+    }
     this->close();
 }
 
 void selectSkin::on_button4_clicked(){
+
+    if (teamPlayer == TERRORISTA){
+        skinSeleccionada = "T4";
+    }else {
+        skinSeleccionada = "C4";
+    }
     this->close();
 }

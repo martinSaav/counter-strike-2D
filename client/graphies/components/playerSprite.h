@@ -11,6 +11,6 @@ class PlayerSprite : public Component{
     public:
     PlayerSprite(Renderer* sdlRenderer);
 
-    void draw(int& posX ,int& posY ,SDL_Rect& camera ,float& zoom, double& angle);
+    void draw(int& posX ,int& posY ,SDL_Rect& camera ,float& zoom, double& angle, std::string& skin);
 };
 #endif
