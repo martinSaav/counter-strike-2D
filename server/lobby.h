@@ -6,8 +6,6 @@
 #include <string>
 #include <vector>
 
-#include "common/catedra/queue.h"
-
 #include "game_identification.h"
 #include "match.h"
 #include "match_dto.h"
@@ -28,6 +26,7 @@ public:
     Lobby() = default;
     GameIdentification create_match(const std::string& match_name, const std::string& player_name);
     GameIdentification join_match(const std::string& match_name, const std::string& player_name);
+    void start_match(const std::string& match_name);
     std::vector<MatchDTO> list_matches();
 };
 

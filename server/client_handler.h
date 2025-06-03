@@ -21,6 +21,7 @@ class ClientHandler: public Thread {
     Protocol protocol;
     std::optional<std::unique_ptr<Sender>> sender;
     std::string username;
+    std::string match_name;
 
     std::string handle_login();
 
@@ -34,9 +35,11 @@ class ClientHandler: public Thread {
 
     GameIdentification pick_match();
 
-    void handle_player_action(Queue<PlayerCommand>& command_queue,
-                              const PlayerCredentials& credentials,
-                              const std::unique_ptr<Message>& message);
+    static void handle_player_action(Queue<PlayerCommand>& command_queue,
+                                     const PlayerCredentials& credentials,
+                                     const std::unique_ptr<Message>& message);
+
+    void handle_game_ready();
 
     void handle_game(Queue<PlayerCommand>& command_queue, const PlayerCredentials& credentials);
 

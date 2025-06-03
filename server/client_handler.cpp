@@ -14,6 +14,7 @@
 #include "common/dto/create_game_request.h"
 #include "common/dto/create_game_response.h"
 #include "common/dto/game_list_response.h"
+#include "common/dto/game_ready_response.h"
 #include "common/dto/join_game_request.h"
 #include "common/dto/join_game_response.h"
 #include "common/dto/map_names_response.h"
@@ -72,7 +73,9 @@ void ClientHandler::handle_map_names_request() {
 
 GameIdentification ClientHandler::handle_create_game_request(std::unique_ptr<Message>&& message) {
     const auto create_message = dynamic_cast<CreateGameRequest*>(message.get());
-    const GameIdentification id = lobby.create_match(create_message->get_game_name(), username);
+    const std::string game_name = create_message->get_game_name();
+    const GameIdentification id = lobby.create_match(game_name, username);
+    match_name = game_name;
     const CreateGameResponse response(true);
     protocol.send_message(response);
     return id;
@@ -80,7 +83,9 @@ GameIdentification ClientHandler::handle_create_game_request(std::unique_ptr<Mes
 
 GameIdentification ClientHandler::handle_join_game_request(std::unique_ptr<Message>&& message) {
     const auto join_message = dynamic_cast<JoinGameRequest*>(message.get());
-    const GameIdentification id = lobby.join_match(join_message->get_game_name(), username);
+    const std::string game_name = join_message->get_game_name();
+    const GameIdentification id = lobby.join_match(game_name, username);
+    match_name = game_name;
     const JoinGameResponse response(true);
     protocol.send_message(response);
     return id;
@@ -121,19 +126,34 @@ void ClientHandler::handle_player_action(Queue<PlayerCommand>& command_queue,
                                          const PlayerCredentials& credentials,
                                          const std::unique_ptr<Message>& message) {
     const auto player_action_message = dynamic_cast<PlayerAction*>(message.get());
-    const PlayerCommand player_command(credentials,
-                                       static_cast<Action>(player_action_message->get_action()));
+    const PlayerCommand player_command(credentials, player_action_message->get_action());
     command_queue.push(player_command);
+}
+
+
+void ClientHandler::handle_game_ready() {
+    lobby.start_match(match_name);
+    protocol.send_message(GameReadyResponse(true));
 }
 
 
 void ClientHandler::handle_game(Queue<PlayerCommand>& command_queue,
                                 const PlayerCredentials& credentials) {
     while (true) {
-        auto message = protocol.recv_message();
-        switch (message->type()) {
+        switch (auto message = protocol.recv_message(); message->type()) {
             case MessageType::PlayerAction: {
                 handle_player_action(command_queue, credentials, message);
+                break;
+            }
+            case MessageType::GameReadyRequest: {
+                try {
+                    handle_game_ready();
+                } catch (const MatchNotFound&) {
+                    protocol.send_message(GameReadyResponse(false));
+                } catch (const MatchAlreadyStarted&) {
+                    protocol.send_message(GameReadyResponse(false));
+                }
+                break;
             }
             default:
                 break;

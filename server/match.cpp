@@ -16,11 +16,15 @@ GameIdentification Match::join_match(const std::string& username) {
     if (player_count == max_player_count) {
         throw MatchFull();
     }
+    if (match_started) {
+        throw MatchAlreadyStarted();
+    }
     player_count++;
     auto player = std::make_shared<Player>(username, starting_position_x, starting_position_y);
     PlayerCredentials credentials(player_count);
     players.insert(std::pair{credentials, player});
-    auto sender_queue = std::make_shared<Queue<MatchStatusDTO>>();
+    auto sender_queue =
+            std::make_shared<Queue<std::variant<MatchStatusDTO, GameReadyNotification>>>();
     GameIdentification game_identification(commands_queue, sender_queue, credentials);
     senders_queues.push_back(std::move(sender_queue));
     map.add_player(std::move(player));
@@ -110,27 +114,61 @@ void Match::broadcast_match_status() {
 }
 
 
-void Match::run() {
-    try {
-        auto start = std::chrono::system_clock::now();
-        while (should_keep_running()) {
-            if (PlayerCommand command; commands_queue.try_pop(command)) {
-                process_command(command);
-            }
-            broadcast_match_status();
-            auto end = std::chrono::system_clock::now();
-            const auto elapsed =
-                    std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-            auto rest = miliseconds_per_iteration - elapsed;
-            if (rest >=
-                0) {  // Si esta adelantado duerme, si no pasa directamente a la proxima iteracion
-                std::this_thread::sleep_for(std::chrono::milliseconds(rest));
-            }
-            start += std::chrono::milliseconds(
-                    miliseconds_per_iteration);  // Sumandole el tiempo exacto que debe
-            // tardar me aseguro que si duerme de mas, cuando se calcule end se entara que esta
-            // atrasado y no dormira.
+void Match::wait_for_match_to_start() {
+    while (!match_started) {
+        std::unique_lock<std::mutex> lck(mtx);
+        start_match.wait(lck);
+    }
+}
+
+
+void Match::start_game() {
+    std::lock_guard<std::mutex> lck(mtx);
+    if (match_started) {
+        throw MatchAlreadyStarted();
+    }
+    match_started = true;
+    auto it = senders_queues.begin();
+    while (it != senders_queues.end()) {
+        try {
+            (*it)->push(GameReadyNotification());
+        } catch (const ClosedQueue&) {
+            it = senders_queues.erase(it);
+            continue;
         }
+        ++it;
+    }
+    start_match.notify_all();
+}
+
+
+void Match::run_game_loop() {
+    auto start = std::chrono::system_clock::now();
+    while (should_keep_running()) {
+        if (PlayerCommand command; commands_queue.try_pop(command)) {
+            process_command(command);
+        }
+        broadcast_match_status();
+        auto end = std::chrono::system_clock::now();
+        const auto elapsed =
+                std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        auto rest = miliseconds_per_iteration - elapsed;
+        if (rest >=
+            0) {  // Si esta adelantado duerme, si no pasa directamente a la proxima iteracion
+            std::this_thread::sleep_for(std::chrono::milliseconds(rest));
+        }
+        start += std::chrono::milliseconds(
+                miliseconds_per_iteration);  // Sumandole el tiempo exacto que debe
+        // tardar me aseguro que si duerme de mas, cuando se calcule end se entara que esta
+        // atrasado y no dormira.
+    }
+}
+
+
+void Match::run() {
+    wait_for_match_to_start();
+    try {
+        run_game_loop();
     } catch (const ClosedQueue&) {}
     commands_queue.close();
 }
@@ -141,4 +179,7 @@ int Match::get_player_count() const { return player_count; }
 int Match::get_max_player_count() const { return max_player_count; }
 
 
-void Match::stop() { Thread::stop(); }
+void Match::stop() {
+    Thread::stop();
+    commands_queue.close();
+}

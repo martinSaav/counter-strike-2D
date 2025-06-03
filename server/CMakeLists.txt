@@ -19,6 +19,7 @@ target_sources(taller_server
         player_command.h
         sender.h
         acceptor.h
+        game_ready_notification.h
 )
 
 add_subdirectory(game)
