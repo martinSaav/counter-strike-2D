@@ -92,6 +92,7 @@ public:
     uint16_t get_deaths() const { return deaths; }
     Action get_action() const { return action; }
     int get_angle() const { return angle; }
+    const std::string& get_skin() const { return skin; }
 
     static PlayerInfo deserialize(const uint8_t* buffer, size_t size) {
         if (size < 2) {
