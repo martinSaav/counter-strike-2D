@@ -35,20 +35,11 @@ class ClientHandler: public Thread {
 
     GameIdentification pick_match();
 
-    static CommandType cast_action_to_command(Action action);
-
     static void handle_player_action(Queue<PlayerCommand>& command_queue,
                                      const PlayerCredentials& credentials,
                                      const std::unique_ptr<Message>& message);
 
-    static void handle_game_ready(Queue<PlayerCommand>& command_queue,
-                                  const PlayerCredentials& credentials);
-
-
-    static void handle_change_skin(Queue<PlayerCommand>& command_queue,
-                                   const PlayerCredentials& credentials,
-                                   const std::unique_ptr<Message>& message);
-
+    void handle_game_ready();
 
     void handle_game(Queue<PlayerCommand>& command_queue, const PlayerCredentials& credentials);
 

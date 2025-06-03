@@ -61,7 +61,7 @@ void Match::process_move_player(const std::shared_ptr<Player>& player, const int
 }
 
 
-void Match::process_command(const PlayerCommand& command) {
+void Match::process_command(const PlayerCommand command) {
     std::lock_guard<std::mutex> lck(mtx);
     const PlayerCredentials player_credentials = command.credentials;
     const auto player_p = players.find(player_credentials);
@@ -70,17 +70,17 @@ void Match::process_command(const PlayerCommand& command) {
     }
     const std::shared_ptr<Player>& player = player_p->second;
     switch (command.command_type) {
-        case CommandType::MoveLeft: {
+        case Action::MoveLeft: {
             return process_move_player(player, -tiles_per_movement, 0);
         }
 
-        case CommandType::MoveRight: {
+        case Action::MoveRight: {
             return process_move_player(player, tiles_per_movement, 0);
         }
-        case CommandType::MoveUp: {
+        case Action::MoveUp: {
             return process_move_player(player, 0, -tiles_per_movement);
         }
-        case CommandType::MoveDown: {
+        case Action::MoveDown: {
             return process_move_player(player, 0, +tiles_per_movement);
         }
         default:
@@ -114,7 +114,20 @@ void Match::broadcast_match_status() {
 }
 
 
-void Match::broadcast_match_start() {
+void Match::wait_for_match_to_start() {
+    while (!match_started) {
+        std::unique_lock<std::mutex> lck(mtx);
+        start_match.wait(lck);
+    }
+}
+
+
+void Match::start_game() {
+    std::lock_guard<std::mutex> lck(mtx);
+    if (match_started) {
+        throw MatchAlreadyStarted();
+    }
+    match_started = true;
     auto it = senders_queues.begin();
     while (it != senders_queues.end()) {
         try {
@@ -125,31 +138,7 @@ void Match::broadcast_match_start() {
         }
         ++it;
     }
-}
-
-
-void Match::wait_for_match_to_start() {
-    while (true) {
-        switch (PlayerCommand command = commands_queue.pop(); command.command_type) {
-            case CommandType::StartMatch: {
-                match_started = true;
-                broadcast_match_start();
-                return;
-            }
-            case CommandType::ChangeSkin: {
-                const PlayerCredentials credentials = command.credentials;
-                const PlayerSkin new_skin = command.new_skin.value();
-                const auto player = players.find(credentials);
-                if (player == players.end()) {
-                    return;
-                }
-                player->second->set_skin(new_skin);
-                break;
-            }
-            default:
-                break;
-        }
-    }
+    start_match.notify_all();
 }
 
 
