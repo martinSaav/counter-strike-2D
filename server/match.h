@@ -60,7 +60,8 @@ public:
             match_started(false),
             player_count(0),
             max_player_count(max_number_of_players),
-            map(map_width, map_height) {}
+            map(map_width, map_height),
+            {}
     GameIdentification join_match(const std::string& username);
     void run() override;
     void stop() override;

@@ -14,7 +14,6 @@
 #include "common/dto/create_game_request.h"
 #include "common/dto/create_game_response.h"
 #include "common/dto/game_list_response.h"
-#include "common/dto/game_ready_response.h"
 #include "common/dto/join_game_request.h"
 #include "common/dto/join_game_response.h"
 #include "common/dto/map_names_response.h"
@@ -168,7 +167,6 @@ void ClientHandler::handle_change_skin(Queue<PlayerCommand>& command_queue,
     command_queue.push(PlayerCommand(credentials, CommandType::ChangeSkin, skin));
 }
 
-
 void ClientHandler::handle_game(Queue<PlayerCommand>& command_queue,
                                 const PlayerCredentials& credentials) {
     while (true) {
@@ -178,17 +176,7 @@ void ClientHandler::handle_game(Queue<PlayerCommand>& command_queue,
                 break;
             }
             case MessageType::GameReadyRequest: {
-                try {
-                    handle_game_ready(command_queue, credentials);
-                } catch (const MatchNotFound&) {
-                    protocol.send_message(GameReadyResponse(false));
-                } catch (const MatchAlreadyStarted&) {
-                    protocol.send_message(GameReadyResponse(false));
-                }
-                break;
-            }
-            case MessageType::SelectSkinRequest: {
-                handle_change_skin(command_queue, credentials, message);
+                handle_game_ready();
                 break;
             }
             default:
