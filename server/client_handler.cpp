@@ -179,6 +179,10 @@ void ClientHandler::handle_game(Queue<PlayerCommand>& command_queue,
                 handle_game_ready(command_queue, credentials);
                 break;
             }
+            case MessageType::SelectSkinRequest: {
+                handle_change_skin(command_queue, credentials, message);
+                break;
+            }
             default:
                 break;
         }
