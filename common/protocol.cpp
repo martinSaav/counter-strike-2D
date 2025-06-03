@@ -17,6 +17,9 @@
 #include "../common/dto/map_names_response.h"
 #include "../common/dto/game_ready_request.h"
 #include "../common/dto/game_ready_response.h"
+#include "../common/dto/join_team_request.h"
+#include "../common/dto/join_team_response.h"
+#include "../common/dto/select_skin_request.h"
 #include "../common/dto/player_action.h"
 
 
@@ -70,6 +73,14 @@ std::unique_ptr<Message> Protocol::recv_message() {
             return std::make_unique<GameReadyRequest>(
                     GameReadyRequest::deserialize(buffer.data(), buffer.size()));
         }
+        case MessageType::JoinTeamRequest: {
+            return std::make_unique<JoinTeamRequest>(
+                    JoinTeamRequest::deserialize(buffer.data(), buffer.size()));
+        }
+        case MessageType::SelectSkinRequest: {
+            return std::make_unique<SelectSkinRequest>(
+                    SelectSkinRequest::deserialize(buffer.data(), buffer.size()));
+        }
         case MessageType::CreateGameResponse: {
             return std::make_unique<CreateGameResponse>(
                     CreateGameResponse::deserialize(buffer.data(), buffer.size()));
@@ -93,6 +104,10 @@ std::unique_ptr<Message> Protocol::recv_message() {
         case MessageType::GameReadyResponse: {
             return std::make_unique<GameReadyResponse>(
                     GameReadyResponse::deserialize(buffer.data(), buffer.size()));
+        }
+        case MessageType::JoinTeamResponse: {
+            return std::make_unique<JoinTeamResponse>(
+                    JoinTeamResponse::deserialize(buffer.data(), buffer.size()));
         }
 
         default:
