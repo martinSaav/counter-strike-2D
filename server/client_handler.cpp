@@ -168,7 +168,6 @@ void ClientHandler::handle_change_skin(Queue<PlayerCommand>& command_queue,
     command_queue.push(PlayerCommand(credentials, CommandType::ChangeSkin, skin));
 }
 
-
 void ClientHandler::handle_game(Queue<PlayerCommand>& command_queue,
                                 const PlayerCredentials& credentials) {
     while (true) {
@@ -185,10 +184,6 @@ void ClientHandler::handle_game(Queue<PlayerCommand>& command_queue,
                 } catch (const MatchAlreadyStarted&) {
                     protocol.send_message(GameReadyResponse(false));
                 }
-                break;
-            }
-            case MessageType::SelectSkinRequest: {
-                handle_change_skin(command_queue, credentials, message);
                 break;
             }
             default:
