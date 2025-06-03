@@ -5,9 +5,10 @@
 #ifndef GUN_H
 #define GUN_H
 
-#include "server/game/position.h"
+#include <stdexcept>
 
 #include "gun_type.h"
+#include "position.h"
 
 
 struct NoAmmo: public std::runtime_error {
