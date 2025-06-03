@@ -5,16 +5,13 @@
 #include "common/dto/game_ready_response.h"
 #include "common/dto/game_state_update.h"
 
-#include "skin_translator.h"
-
 
 void Sender::send_status(const MatchStatusDTO& status) const {
     const auto player_dtos = status.players;
     std::list<PlayerInfo> players;
     for (const auto& player_dto: player_dtos) {
         PlayerInfo player(player_dto.username, player_dto.position_x, player_dto.position_y, 100,
-                          Status::Alive, 500, 0, 0, Action::MoveUp, player_dto.angle,
-                          SkinTranslator::code_to_string(player_dto.skin));
+                          Status::Alive, 500, 0, 0, Action::MoveUp, player_dto.angle);
         players.push_back(player);
     }
     const GameStateUpdate state(true, false, 1, 0, true, false, false, 0, 0, 0, Team::Terrorists,
