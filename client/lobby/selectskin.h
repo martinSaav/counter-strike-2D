@@ -16,7 +16,7 @@ class selectSkin : public QDialog {
     Q_OBJECT
 
 public:
-    explicit selectSkin(team teamPlayer, std::sring& skinSeleccionada, QWidget *parent = nullptr);
+    selectSkin(team& teamPlayer, std::string& skinSeleccionada, QWidget *parent = nullptr);
     ~selectSkin();
 
 private slots:
@@ -28,7 +28,15 @@ private slots:
 
     void on_button4_clicked();
 
+protected:
+    void closeEvent(QCloseEvent* event) override;
+
+signals:
+    void ventanaCerrada();
+
 private:
     Ui::selectSkin *ui;
+    std::string& skinSeleccionada;
+    team& teamPlayer;
 };
 #endif // SELECTSKIN_H

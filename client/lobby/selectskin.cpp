@@ -1,9 +1,11 @@
 #include "selectskin.h"
 #include "ui_selectskin.h"
 
-selectSkin::selectSkin(team teamPlayer,std::sring& skinSeleccionada, QWidget *parent)
+selectSkin::selectSkin(team& teamPlayer,std::string& skinSeleccionada, QWidget *parent)
     : QDialog(parent)
-    , ui(new Ui::selectSkin){
+    , ui(new Ui::selectSkin)
+    , skinSeleccionada(skinSeleccionada)
+    , teamPlayer(teamPlayer){
         
     ui->setupUi(this);
 
@@ -69,4 +71,9 @@ void selectSkin::on_button4_clicked(){
         skinSeleccionada = "C4";
     }
     this->close();
+}
+
+void selectSkin::closeEvent(QCloseEvent* event){
+    emit ventanaCerrada();
+    QDialog::closeEvent(event);
 }

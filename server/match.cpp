@@ -20,7 +20,8 @@ GameIdentification Match::join_match(const std::string& username) {
         throw MatchAlreadyStarted();
     }
     player_count++;
-    auto player = std::make_shared<Player>(username, starting_position_x, starting_position_y);
+    auto player = std::make_shared<Player>(username, starting_position_x + 35 * (player_count - 1),
+                                           starting_position_y);
     PlayerCredentials credentials(player_count);
     players.insert(std::pair{credentials, player});
     auto sender_queue =
@@ -61,7 +62,7 @@ void Match::process_move_player(const std::shared_ptr<Player>& player, const int
 }
 
 
-void Match::process_command(const PlayerCommand command) {
+void Match::process_command(const PlayerCommand& command) {
     std::lock_guard<std::mutex> lck(mtx);
     const PlayerCredentials player_credentials = command.credentials;
     const auto player_p = players.find(player_credentials);
@@ -70,17 +71,17 @@ void Match::process_command(const PlayerCommand command) {
     }
     const std::shared_ptr<Player>& player = player_p->second;
     switch (command.command_type) {
-        case Action::MoveLeft: {
+        case CommandType::MoveLeft: {
             return process_move_player(player, -tiles_per_movement, 0);
         }
 
-        case Action::MoveRight: {
+        case CommandType::MoveRight: {
             return process_move_player(player, tiles_per_movement, 0);
         }
-        case Action::MoveUp: {
+        case CommandType::MoveUp: {
             return process_move_player(player, 0, -tiles_per_movement);
         }
-        case Action::MoveDown: {
+        case CommandType::MoveDown: {
             return process_move_player(player, 0, +tiles_per_movement);
         }
         default:
@@ -114,20 +115,7 @@ void Match::broadcast_match_status() {
 }
 
 
-void Match::wait_for_match_to_start() {
-    while (!match_started) {
-        std::unique_lock<std::mutex> lck(mtx);
-        start_match.wait(lck);
-    }
-}
-
-
-void Match::start_game() {
-    std::lock_guard<std::mutex> lck(mtx);
-    if (match_started) {
-        throw MatchAlreadyStarted();
-    }
-    match_started = true;
+void Match::broadcast_match_start() {
     auto it = senders_queues.begin();
     while (it != senders_queues.end()) {
         try {
@@ -138,7 +126,31 @@ void Match::start_game() {
         }
         ++it;
     }
-    start_match.notify_all();
+}
+
+
+void Match::wait_for_match_to_start() {
+    while (true) {
+        switch (PlayerCommand command = commands_queue.pop(); command.command_type) {
+            case CommandType::StartMatch: {
+                match_started = true;
+                broadcast_match_start();
+                return;
+            }
+            case CommandType::ChangeSkin: {
+                const PlayerCredentials credentials = command.credentials;
+                const PlayerSkin new_skin = command.new_skin.value();
+                const auto player = players.find(credentials);
+                if (player == players.end()) {
+                    break;
+                }
+                player->second->set_skin(new_skin);
+                break;
+            }
+            default:
+                break;
+        }
+    }
 }
 
 

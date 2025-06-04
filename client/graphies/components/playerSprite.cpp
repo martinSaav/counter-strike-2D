@@ -28,5 +28,4 @@ void PlayerSprite::draw(int& posX, int& posY, SDL_Rect& camera,
     };
 
     sdlRenderer->Copy(personaje, srcRect, destRect, angle);
-
 }

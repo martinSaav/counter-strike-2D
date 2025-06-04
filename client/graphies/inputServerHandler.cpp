@@ -14,11 +14,11 @@ void InputServerHandler::processEvents() {
 
         const auto game = dynamic_cast<GameStateUpdate*>(gameState.get());
 
-        //std::lock_guard<std::mutex> lock(mtx);
-        //mensajes.push(*game);
         if (game) {
             std::lock_guard<std::mutex> lock(mtx);
-           mensajes.push(std::move(*game));
+            mensajes.push(std::move(*game));
+        } else{
+            std::cerr << "Unexpected exception: wrong message recibed \n";
         }
     }
 }
