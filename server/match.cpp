@@ -141,7 +141,7 @@ void Match::wait_for_match_to_start() {
                 const PlayerSkin new_skin = command.new_skin.value();
                 const auto player = players.find(credentials);
                 if (player == players.end()) {
-                    return;
+                    break;
                 }
                 player->second->set_skin(new_skin);
                 break;
