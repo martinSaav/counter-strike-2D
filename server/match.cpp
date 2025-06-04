@@ -20,7 +20,8 @@ GameIdentification Match::join_match(const std::string& username) {
         throw MatchAlreadyStarted();
     }
     player_count++;
-    auto player = std::make_shared<Player>(username, starting_position_x, starting_position_y);
+    auto player = std::make_shared<Player>(username, starting_position_x + 35 * (player_count - 1),
+                                           starting_position_y);
     PlayerCredentials credentials(player_count);
     players.insert(std::pair{credentials, player});
     auto sender_queue =
