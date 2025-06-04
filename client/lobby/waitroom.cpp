@@ -18,6 +18,16 @@ waitRoom::~waitRoom(){
 void waitRoom::on_terroristaButton_clicked(){
     team teamPlayer = TERRORISTA;
     selectSkin* windowSkin = new selectSkin(teamPlayer, skinSeleccionada, this);
+    
+    connect(windowSkin, &selectSkin::ventanaCerrada, this, [this]() {
+        if (this->skinSeleccionada == ""){  // caso no coloco un nombre
+            return;
+        }
+        
+        // Mandamos al server la skin del jugador
+        SelectSkinRequest requestSkin(this->skinSeleccionada);
+        protocolo.send_message(requestSkin);
+    });
     windowSkin->exec();
 }
 
