@@ -98,7 +98,7 @@ std::vector<std::pair<int, int>> Map::calculate_player_chunks(int bottom_x, int 
 std::vector<std::shared_ptr<Player>> Map::get_near_players(
         const std::shared_ptr<Player>& player) const {
     std::vector<std::shared_ptr<Player>> near_players;
-    for (auto other_player: players) {
+    for (const auto& other_player: players) {
         if (other_player == player) {
             continue;
         }
@@ -112,4 +112,33 @@ std::vector<std::shared_ptr<Player>> Map::get_near_players(
         }
     }
     return near_players;
+}
+
+
+std::optional<std::variant<Structure, std::shared_ptr<Player>>> Map::trace_bullet_path(
+        int ini_x, int ini_y, Position final_pos) {
+    std::pair<int, int> final_pos_v = final_pos.get_position();
+    double cos =
+            (ini_x * final_pos_v.first + ini_y * final_pos_v.second) /
+            (sqrt(ini_x * ini_y + ini_y * ini_x) *
+             sqrt(final_pos_v.first * final_pos_v.first + final_pos_v.second * final_pos_v.second));
+    double angle = acos(cos);
+    while (angle < 0) {
+        angle += 2 * M_PI;
+    }
+    angle = fmod(angle, 2 * M_PI);
+    while (true) {
+        std::pair<int, int> chunk_idx = get_chunk_index(ini_x, ini_y);
+        auto chunk_p = structure_chunks.find(chunk_idx);
+        if (chunk_p == structure_chunks.end()) {
+            if (std::make_pair<int, int>{ini_x, ini_y} == final_pos.get_position()) {
+                return std::nullopt;
+            }
+        } else {
+            Chunk chunk = chunk_p->second;
+            for (const auto& structure: chunk.get_structures()) {}
+        }
+        ini_x = new_pos.first;
+        ini_y = new_pos.second;
+    }
 }
