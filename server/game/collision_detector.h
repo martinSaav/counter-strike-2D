@@ -19,6 +19,14 @@ public:
                                                    const Structure& structure2);
 
     static bool check_collision_between_players(int p1_bottom_x, int p1_bottom_y, Player& player2);
+
+    static bool check_collision_between_structure_and_bullet(
+            const Structure& structure, int ini_x, int ini_y, int final_x,
+            const std::pair<double, double>& velocity);
+
+    static bool check_collision_between_player_and_bullet(
+            int p_bottom_x, int p_bottom_y, int ini_x, int ini_y, int final_x,
+            const std::pair<double, double>& velocity);
 };
 
 
