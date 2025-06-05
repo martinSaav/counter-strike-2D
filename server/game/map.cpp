@@ -45,7 +45,7 @@ void Map::add_structure(const Structure structure) {
 }
 
 
-void Map::add_player(const std::shared_ptr<Player>& player) { players.emplace_back(player); }
+void Map::add_player(std::shared_ptr<Player> player) { players.emplace_back(player); }
 
 
 bool Map::check_if_position_is_in_range(const int x, const int y) const {
@@ -115,101 +115,30 @@ std::vector<std::shared_ptr<Player>> Map::get_near_players(
 }
 
 
-std::pair<double, double> Map::calculate_bullet_velocity(std::pair<int, int> starting_pos,
-                                                         std::pair<int, int> ending_pos) {
-    const double cos =
-            (starting_pos.first * ending_pos.first + starting_pos.second * ending_pos.second) /
-            (sqrt(starting_pos.first * starting_pos.first +
-                  starting_pos.second * starting_pos.second) *
-             sqrt(ending_pos.first * ending_pos.first + ending_pos.second * ending_pos.second));
+std::optional<std::variant<Structure, std::shared_ptr<Player>>> Map::trace_bullet_path(
+        int ini_x, int ini_y, Position final_pos) {
+    std::pair<int, int> final_pos_v = final_pos.get_position();
+    double cos =
+            (ini_x * final_pos_v.first + ini_y * final_pos_v.second) /
+            (sqrt(ini_x * ini_y + ini_y * ini_x) *
+             sqrt(final_pos_v.first * final_pos_v.first + final_pos_v.second * final_pos_v.second));
     double angle = acos(cos);
     while (angle < 0) {
         angle += 2 * M_PI;
     }
     angle = fmod(angle, 2 * M_PI);
-    const double cos_v = cos(angle);
-    const double sin_v = sin(angle);
-
-    double vel_x;
-    double vel_y;
-    double chunk_size_double = CHUNK_SIZE;
-    if (abs(cos_v) > abs(sin_v)) {
-        const double step = chunk_size_double / abs(cos_v);
-        vel_x = step * cos_v;
-        vel_y = step * sin_v;
-    } else {
-        const double step = chunk_size_double / abs(sin_v);
-        vel_x = step * cos_v;
-        vel_y = step * sin_v;
-    }
-
-    return std::make_pair(vel_x, vel_y);
-}
-
-
-std::pair<std::pair<int, int>, std::pair<double, double>> Map::calculate_new_bullet_position(
-        const std::pair<double, double>& starting_pos, const std::pair<double, double>& velocity) {
-    double ini_x = starting_pos.first;
-    double ini_y = starting_pos.second;
-    double new_x = ini_x + velocity.first;
-    double new_y = ini_y + velocity.second;
-    std::pair<int, int> new_chunk =
-            get_chunk_index(static_cast<int>(new_x), static_cast<int>(new_y));
-    return std::make_pair(new_chunk, std::make_pair(new_x, new_y));
-}
-
-
-std::vector<std::shared_ptr<Player>> Map::get_players_near_point(const int x, const int y) const {
-    const std::pair<int, int> chunk_index = get_chunk_index(x, y);
-    std::vector<std::shared_ptr<Player>> near_players;
-    for (const auto& player: players) {
-        if (std::vector<std::pair<int, int>>& player_chunks = player->get_chunk_idxs();
-            std::ranges::find(player_chunks, chunk_index) != player_chunks.end()) {
-            near_players.emplace_back(player);
-        }
-    }
-    return near_players;
-}
-
-
-std::optional<std::shared_ptr<Player>> Map::trace_bullet_path(int ini_x, int ini_y,
-                                                              const Position final_pos,
-                                                              const Player& gun_owner) {
-    double current_x = ini_x;
-    double current_y = ini_y;
-    std::pair<int, int> chunk_idx = get_chunk_index(ini_x, ini_y);
-    const std::pair<int, int> final_chunk =
-            get_chunk_index(final_pos.get_position().first, final_pos.get_position().second);
-    const std::pair<int, int> final_pos_v = final_pos.get_position();
-    const std::pair<double, double> velocity =
-            calculate_bullet_velocity(std::make_pair<int, int>{ini_x, ini_y}, final_pos_v);
     while (true) {
-        if (auto chunk_p = structure_chunks.find(chunk_idx); chunk_p != structure_chunks.end()) {
-            for (Chunk chunk = chunk_p->second; const auto& structure: chunk.get_structures()) {
-                if (CollisionDetector::check_collision_between_structure_and_bullet(
-                            structure, ini_x, ini_y, final_pos.get_position().first, velocity)) {
-                    return std::nullopt;
-                }
+        std::pair<int, int> chunk_idx = get_chunk_index(ini_x, ini_y);
+        auto chunk_p = structure_chunks.find(chunk_idx);
+        if (chunk_p == structure_chunks.end()) {
+            if (std::make_pair<int, int>{ini_x, ini_y} == final_pos.get_position()) {
+                return std::nullopt;
             }
-            for (auto players = get_players_near_point(current_x, current_y);
-                 const auto& player: players) {
-                if (*player == gun_owner) {
-                    continue;
-                }
-                if (auto [x, y] = player->get_location();
-                    CollisionDetector::check_collision_between_player_and_bullet(
-                            x, y, ini_x, ini_y, final_pos.get_position().first, velocity)) {
-                    return player;
-                }
-            }
+        } else {
+            Chunk chunk = chunk_p->second;
+            for (const auto& structure: chunk.get_structures()) {}
         }
-        if (chunk_idx == final_chunk) {
-            return std::nullopt;
-        }
-        auto [fst, snd] =
-                calculate_new_bullet_position(std::make_pair(current_x, current_y), velocity);
-        chunk_idx = fst;
-        current_x = snd.first;
-        current_y = snd.second;
+        ini_x = new_pos.first;
+        ini_y = new_pos.second;
     }
 }

@@ -4,6 +4,7 @@
 #include <memory>
 #include <optional>
 #include <utility>
+#include <variant>
 #include <vector>
 
 #include "chunk.h"
@@ -21,32 +22,23 @@ struct PositionOutOfRange: public std::runtime_error {
 class Map {
     std::map<std::pair<int, int>, Chunk> structure_chunks;
     std::vector<std::shared_ptr<Player>> players;
+    static std::pair<int, int> get_chunk_index(int x, int y);
+    std::pair<double, double> calculate_bullet_velocity(std::pair<int, int> starting_pos,
+                                                        std::pair<int, int> ending_pos);
     int max_x;
     int max_y;
-
-    static std::pair<int, int> get_chunk_index(int x, int y);
-
-    static std::pair<double, double> calculate_bullet_velocity(std::pair<int, int> starting_pos,
-                                                               std::pair<int, int> ending_pos);
-
-    static std::pair<std::pair<int, int>, std::pair<double, double>> calculate_new_bullet_position(
-            const std::pair<double, double>& starting_pos,
-            const std::pair<double, double>& velocity);
-    [[nodiscard]] std::vector<std::shared_ptr<Player>> get_players_near_point(int x, int y) const;
-
 
 public:
     Map(const int max_x, const int max_y): max_x(max_x), max_y(max_y) {}
     void add_structure(Structure structure);
-    void add_player(const std::shared_ptr<Player>& player);
+    void add_player(std::shared_ptr<Player> player);
     std::vector<Structure> get_structures_near_player(const std::shared_ptr<Player>& player);
     static std::vector<std::pair<int, int>> calculate_player_chunks(int bottom_x, int bottom_y);
-    [[nodiscard]] std::vector<std::shared_ptr<Player>> get_near_players(
+    std::vector<std::shared_ptr<Player>> get_near_players(
             const std::shared_ptr<Player>& player) const;
     [[nodiscard]] bool check_if_position_is_in_range(int x, int y) const;
-    std::optional<std::shared_ptr<Player>> trace_bullet_path(int ini_x, int ini_y,
-                                                             Position final_pos,
-                                                             const Player& gun_owner);
+    std::optional<std::variant<Structure, std::shared_ptr<Player>>> trace_bullet_path(
+            int ini_x, int ini_y, Position final_pos);
 };
 
 
