@@ -173,7 +173,8 @@ std::vector<std::shared_ptr<Player>> Map::get_players_near_point(const int x, co
 
 
 std::optional<std::shared_ptr<Player>> Map::trace_bullet_path(int ini_x, int ini_y,
-                                                              const Position final_pos) {
+                                                              const Position final_pos,
+                                                              const Player& gun_owner) {
     double current_x = ini_x;
     double current_y = ini_y;
     std::pair<int, int> chunk_idx = get_chunk_index(ini_x, ini_y);
@@ -192,8 +193,11 @@ std::optional<std::shared_ptr<Player>> Map::trace_bullet_path(int ini_x, int ini
             }
             for (auto players = get_players_near_point(current_x, current_y);
                  const auto& player: players) {
-                auto [x, y] = player->get_location();
-                if (CollisionDetector::check_collision_between_player_and_bullet(
+                if (*player == gun_owner) {
+                    continue;
+                }
+                if (auto [x, y] = player->get_location();
+                    CollisionDetector::check_collision_between_player_and_bullet(
                             x, y, ini_x, ini_y, final_pos.get_position().first, velocity)) {
                     return player;
                 }
