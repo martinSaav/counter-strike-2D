@@ -4,7 +4,6 @@
 #include <memory>
 #include <optional>
 #include <utility>
-#include <variant>
 #include <vector>
 
 #include "chunk.h"
@@ -33,7 +32,7 @@ class Map {
     static std::pair<std::pair<int, int>, std::pair<double, double>> calculate_new_bullet_position(
             const std::pair<double, double>& starting_pos,
             const std::pair<double, double>& velocity);
-    std::vector<std::shared_ptr<Player>> get_players_near_point(int x, int y) const;
+    [[nodiscard]] std::vector<std::shared_ptr<Player>> get_players_near_point(int x, int y) const;
 
 
 public:
@@ -46,7 +45,8 @@ public:
             const std::shared_ptr<Player>& player) const;
     [[nodiscard]] bool check_if_position_is_in_range(int x, int y) const;
     std::optional<std::shared_ptr<Player>> trace_bullet_path(int ini_x, int ini_y,
-                                                             Position final_pos);
+                                                             Position final_pos,
+                                                             const Player& gun_owner);
 };
 
 
