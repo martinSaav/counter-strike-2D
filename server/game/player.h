@@ -18,11 +18,15 @@
 #include "team.h"
 #define player_hitbox_height 32
 #define player_hitbox_width 32
+#define starting_money 500
+#define max_health 100
 
 class Player {
     friend class GameManager;
     const std::string username;
     PlayerSkin skin;
+    int health;
+    int money;
     int current_angle;
     int position_x;
     int position_y;
@@ -36,10 +40,18 @@ class Player {
     std::vector<std::pair<int, int>>
             chunks_idxs;  // indices de los chunks en los que se encuentra el jugador
     void switch_team();
+    [[nodiscard]] Team get_team() const;
+    void add_kill();
+    void receive_damage(int damage);
+    void buy_weapon(std::unique_ptr<Gun> gun);
+    void switch_weapon();
+    void reload();
 
 public:
     Player(std::string username, const int position_x, const int position_y):
             username(std::move(username)),
+            health(max_health),
+            money(starting_money),
             current_angle(0),
             position_x(position_x),
             position_y(position_y),
@@ -47,7 +59,11 @@ public:
             deaths(0),
             current_team(Team::Terrorist),
             status(Status::Alive) {
-        skin = PlayerSkin::C1;
+        if (current_team == Team::Terrorist) {
+            skin = PlayerSkin::T1;
+        } else {
+            skin = PlayerSkin::C1;
+        }
         chunks_idxs.emplace_back(0, 0);
         secondary_weapon = std::make_unique<Glock>();
         equipped_weapon = GunType::Secondary;
@@ -57,18 +73,10 @@ public:
     void set_angle(const int angle) { current_angle = angle; }
     void set_skin(const PlayerSkin skin) { this->skin = skin; }
     [[nodiscard]] PlayerDTO get_player_info() const;
-    [[nodiscard]] std::string get_username() const { return username; }
-
+    [[nodiscard]] bool is_dead() const;
+    void shoot(const Position& pos) const;
     std::vector<std::pair<int, int>>& get_chunk_idxs() { return chunks_idxs; }
-    bool is_dead();
-    void add_kill();
-    void add_death();
-    void receive_damage(int damage);
-    void buy_weapon(std::unique_ptr<Gun> gun);
-    void switch_weapon(GunType type);
-    void reload();
-    void shoot(Position& pos);
-    void update(Map& map, GameManager& game_manager);
+    void update(GameManager& game_manager);
 
     bool operator==(const Player& player) const = default;
 };
