@@ -27,13 +27,14 @@ private:
     uint16_t kills;
     uint16_t deaths;
     Action action;
-    int angle;
+    uint16_t pos_shoot_x;
+    uint16_t pos_shoot_y;
     std::string skin;
 
 public:
     PlayerInfo(std::string user_name, uint16_t pos_x, uint16_t pos_y, uint16_t health,
                Status status, float money, uint16_t kills, uint16_t deaths, Action action,
-               int angle, std::string skin):
+               uint16_t pos_shoot_x, uint16_t pos_shoot_y, std::string skin):
             user_name(std::move(user_name)),
             pos_x(pos_x),
             pos_y(pos_y),
@@ -43,7 +44,8 @@ public:
             kills(kills),
             deaths(deaths),
             action(action),
-            angle(angle),
+            pos_shoot_x(pos_shoot_x),
+            pos_shoot_y(pos_shoot_y),
             skin(std::move(skin))
             {}
 
@@ -68,10 +70,12 @@ public:
         offset += sizeof(kills);
         std::memcpy(buffer + offset, &deaths, sizeof(deaths));
         offset += sizeof(deaths);
+        
         buffer[offset++] = static_cast<uint8_t>(action);
-        std::memcpy(buffer + offset, &angle, sizeof(angle));
-        offset += sizeof(angle);
-
+        std::memcpy(buffer + offset, &pos_shoot_x, sizeof(pos_shoot_x));
+        offset += sizeof(pos_shoot_x);
+        std::memcpy(buffer + offset, &pos_shoot_y, sizeof(pos_shoot_y));
+        offset += sizeof(pos_shoot_y);
         uint16_t skin_length = htons(static_cast<uint16_t>(skin.size()));
         std::memcpy(buffer + offset, &skin_length, sizeof(skin_length));
         offset += sizeof(skin_length);
@@ -80,7 +84,8 @@ public:
 
     }
 
-    size_t serialized_size() const { return 2 + user_name.size() + 1 + 2 * 5 + sizeof(money) + 1 + sizeof(angle); }
+    size_t serialized_size() const { return 2 + user_name.size() + 1 + 2 * 5 + sizeof(money) + 1 + 
+                                        2 * 2 + 2 + skin.size(); }
 
     const std::string& get_user_name() const { return user_name; }
     uint16_t get_pos_x() const { return pos_x; }
@@ -91,7 +96,8 @@ public:
     uint16_t get_kills() const { return kills; }
     uint16_t get_deaths() const { return deaths; }
     Action get_action() const { return action; }
-    int get_angle() const { return angle; }
+    int get_pos_shoot_x() const { return pos_shoot_x; }
+    int get_pos_shoot_y() const { return pos_shoot_y; }
     const std::string& get_skin() const { return skin; }
 
     static PlayerInfo deserialize(const uint8_t* buffer, size_t size) {
@@ -127,9 +133,11 @@ public:
 
         Action action = static_cast<Action>(buffer[offset++]);
 
-        int angle;
-        std::memcpy(&angle, buffer + offset, sizeof(angle));
-        offset += sizeof(angle);
+        uint16_t pos_shoot_x, pos_shoot_y;
+        std::memcpy(&pos_shoot_x, buffer + offset, sizeof(pos_shoot_x));
+        offset += sizeof(pos_shoot_x);
+        std::memcpy(&pos_shoot_y, buffer + offset, sizeof(pos_shoot_y));
+        offset += sizeof(pos_shoot_y);
 
         uint16_t skin_length;
         std::memcpy(&skin_length, buffer + offset, sizeof(skin_length));
@@ -140,7 +148,8 @@ public:
         offset += skin_length;
 
 
-        return PlayerInfo(user_name, pos_x, pos_y, health, status, money, kills, deaths, action, angle, skin);
+        return PlayerInfo(user_name, pos_x, pos_y, health, status, money, kills, deaths, action, 
+                          pos_shoot_x, pos_shoot_y, skin);
     }
 };
 
