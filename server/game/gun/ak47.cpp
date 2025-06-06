@@ -30,19 +30,17 @@ void Ak47::reset_shoots() {
 
 
 void Ak47::shoot_gun(const Position final_position) {
-    if (current_ammo == 0) {
+    if (current_ammo == 0 || shoots.size() == current_ammo) {
         throw NoAmmo();
     }
     const auto pos = final_position.get_position();
     if (shoots.empty()) {
         const int bullets_to_shoot = std::min(bullets_per_burst, current_ammo);
-        current_ammo -= bullets_to_shoot;
         for (int i = 0; i < bullets_to_shoot; i++) {
             shoots.push(pos);
         }
     } else {
         if (shoots.size() == 1) {
-            current_ammo--;
             shoots.push(pos);
         }
     }
@@ -60,6 +58,7 @@ ShootResult Ak47::fire_gun(Map& map, Player& owner, const float current_time,
     auto [x, y] = current_position.get_position();
     auto [final_x, final_y] = shoots.front();
     shoots.pop();
+    current_ammo--;
     auto player_hit_o = map.trace_bullet_path(x, y, Position(final_x, final_y), owner);
     if (player_hit_o.has_value()) {
         const auto& player_hit = player_hit_o.value();
