@@ -10,15 +10,10 @@
 
 
 class GameManager {
-    Map& map;
-    float time;
-
 public:
-    explicit GameManager(Map& map): map(map), time(0) {}
-    void attack_player(const std::shared_ptr<Player>& attacked, Player& attacker, int damage);
-    void advance_time(const float dt) { time += dt; }
-    float get_time() const { return time; }
-    Map& get_map() const { return map; }
+    GameManager();
+    void attack_player(std::shared_ptr<Player> attacked, std::shared_ptr<Player> attacker,
+                       int damage);
 };
 
 
