@@ -18,7 +18,7 @@ void Sender::send_status(const MatchStatusDTO& status) const {
         players.push_back(player);
     }
     const GameStateUpdate state(true, false, 1, 0, true, false, false, 0, 0, 0, Team::Terrorists,
-                                Team::Terrorists, players);
+                                Team::Terrorists, std::move(players));
     protocol.send_message(state);
 }
 
