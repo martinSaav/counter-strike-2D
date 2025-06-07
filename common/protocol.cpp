@@ -83,8 +83,8 @@ std::unique_ptr<Message> Protocol::recv_message() {
                     SelectSkinRequest::deserialize(buffer.data(), buffer.size()));
         }
         case MessageType::BuyWeaponRequest: {
-            return std::make_unique<BuyweaponRequest>(
-                    BuyweaponRequest::deserialize(buffer.data(), buffer.size()));
+            return std::make_unique<BuyWeaponRequest>(
+                    BuyWeaponRequest::deserialize(buffer.data(), buffer.size()));
         }
         case MessageType::CreateGameResponse: {
             return std::make_unique<CreateGameResponse>(

@@ -20,13 +20,13 @@ enum class Weapon : uint8_t {
     AWP = 0x04,
 };
 
-class BuyweaponRequest: public Message {
+class BuyWeaponRequest: public Message {
 private:
     MessageType message_type = MessageType::BuyWeaponRequest;
     Weapon weapon;
 
 public:
-    explicit BuyweaponRequest(Weapon weapon): weapon(weapon) {}
+    explicit BuyWeaponRequest(Weapon weapon): weapon(weapon) {}
 
     void serialize(uint8_t* buffer) const override {
         buffer[0] = static_cast<uint8_t>(message_type);
@@ -39,12 +39,12 @@ public:
 
     Weapon get_weapon() const { return weapon; }
 
-    static BuyweaponRequest deserialize(const uint8_t* buffer, size_t size) {
+    static BuyWeaponRequest deserialize(const uint8_t* buffer, size_t size) {
         if (size < 4) {
             throw std::runtime_error("");
         }
         uint8_t weapon_deserialized = buffer[3];
-        return BuyweaponRequest(static_cast<Weapon>(weapon_deserialized));
+        return BuyWeaponRequest(static_cast<Weapon>(weapon_deserialized));
     }
 
     MessageType type() const override { return this->message_type; }
