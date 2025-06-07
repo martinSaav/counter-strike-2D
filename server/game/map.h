@@ -33,6 +33,12 @@ class Map {
             const std::pair<double, double>& starting_pos,
             const std::pair<double, double>& velocity);
     [[nodiscard]] std::vector<std::shared_ptr<Player>> get_players_near_point(int x, int y) const;
+    std::optional<int> get_nearest_colliding_structure(const Chunk& chunk, int ini_x, int ini_y,
+                                                       const Position& final_pos,
+                                                       std::pair<double, double> velocity);
+    std::optional<std::pair<std::shared_ptr<Player>, int>> get_nearest_colliding_player(
+            int ini_x, int ini_y, double current_x, double current_y, const Player& gun_owner,
+            const Position& final_pos, std::pair<double, double> velocity);
 
 
 public:

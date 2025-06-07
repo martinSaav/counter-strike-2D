@@ -5,6 +5,7 @@ add_library(game
         player.cpp
         position.cpp
         structure.cpp
+        game_manager.cpp
 )
 
 target_include_directories(game
