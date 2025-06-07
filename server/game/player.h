@@ -9,6 +9,7 @@
 #include "gun/glock.h"
 #include "gun/gun.h"
 #include "gun/gun_type.h"
+#include "gun/knife.h"
 
 #include "game_manager.h"
 #include "map.h"
@@ -34,6 +35,7 @@ class Player {
     int deaths;
     Team current_team;
     Status status;
+    std::unique_ptr<Gun> knife;
     std::unique_ptr<Gun> primary_weapon;
     std::unique_ptr<Gun> secondary_weapon;
     GunType equipped_weapon;
@@ -67,6 +69,7 @@ public:
         chunks_idxs.emplace_back(0, 0);
         secondary_weapon = std::make_unique<Glock>();
         equipped_weapon = GunType::Secondary;
+        knife = std::make_unique<Knife>();
     }
     std::pair<int, int> get_location();
     void set_location(Position position, std::vector<std::pair<int, int>>&& chunks_idxs);
@@ -77,6 +80,7 @@ public:
     void shoot(const Position& pos) const;
     std::vector<std::pair<int, int>>& get_chunk_idxs() { return chunks_idxs; }
     void update(GameManager& game_manager);
+    [[nodiscard]] std::pair<double, double> get_center_coordinates() const;
 
     bool operator==(const Player& player) const = default;
 };

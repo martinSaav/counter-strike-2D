@@ -2,8 +2,10 @@ target_sources(game
     PRIVATE
         ak47.cpp
         glock.cpp
+        knife.cpp
     PUBLIC
         ak47.h
+        knife.h
         glock.h
         gun.h
         gun_type.h

@@ -117,30 +117,23 @@ std::vector<std::shared_ptr<Player>> Map::get_near_players(
 
 std::pair<double, double> Map::calculate_bullet_velocity(std::pair<int, int> starting_pos,
                                                          std::pair<int, int> ending_pos) {
-    const double cos =
-            (starting_pos.first * ending_pos.first + starting_pos.second * ending_pos.second) /
-            (sqrt(starting_pos.first * starting_pos.first +
-                  starting_pos.second * starting_pos.second) *
-             sqrt(ending_pos.first * ending_pos.first + ending_pos.second * ending_pos.second));
-    double angle = acos(cos);
-    while (angle < 0) {
-        angle += 2 * M_PI;
-    }
-    angle = fmod(angle, 2 * M_PI);
-    const double cos_v = cos(angle);
-    const double sin_v = sin(angle);
+    int dx = ending_pos.first - starting_pos.first;
+    int dy = ending_pos.second - starting_pos.second;
+    double mod = std::sqrt(dx * dx + dy * dy);
+    const double vx = dx / mod;
+    const double vy = dy / mod;
 
     double vel_x;
     double vel_y;
     double chunk_size_double = CHUNK_SIZE;
-    if (abs(cos_v) > abs(sin_v)) {
-        const double step = chunk_size_double / abs(cos_v);
-        vel_x = step * cos_v;
-        vel_y = step * sin_v;
+    if (abs(vx) > abs(vy)) {
+        const double step = chunk_size_double / abs(vx);
+        vel_x = step * vx;
+        vel_y = step * vy;
     } else {
-        const double step = chunk_size_double / abs(sin_v);
-        vel_x = step * cos_v;
-        vel_y = step * sin_v;
+        const double step = chunk_size_double / abs(vy);
+        vel_x = step * vx;
+        vel_y = step * vy;
     }
 
     return std::make_pair(vel_x, vel_y);
@@ -258,4 +251,22 @@ std::optional<std::shared_ptr<Player>> Map::trace_bullet_path(int ini_x, int ini
         current_x = new_pos.first;
         current_y = new_pos.second;
     }
+}
+
+
+std::vector<std::shared_ptr<Player>> Map::get_players_near_radio(const double x, const double y,
+                                                                 const double radio) const {
+    std::vector<std::shared_ptr<Player>> resultado;
+
+    for (const auto& player: players) {
+        auto [center_x, center_y] = player->get_center_coordinates();
+        const double dis_x = center_x - x;
+        const double dis_y = center_y - y;
+
+        if (const double distance = sqrt(dis_x * dis_x + dis_y * dis_y); distance <= radio) {
+            resultado.push_back(player);
+        }
+    }
+
+    return resultado;
 }

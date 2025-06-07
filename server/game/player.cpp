@@ -102,6 +102,8 @@ void Player::shoot(const Position& pos) const {
             primary_weapon->shoot_gun(pos);
         } else if (equipped_weapon == GunType::Secondary) {
             secondary_weapon->shoot_gun(pos);
+        } else if (equipped_weapon == GunType::Knife) {
+            knife->shoot_gun(pos);
         }
     } catch (const NoAmmo&) {}
 }
@@ -121,5 +123,16 @@ void Player::update(GameManager& game_manager) {
             !shoot.miss) {
             game_manager.attack_player(shoot.player_hit, *this, shoot.dmg);
         }
+    } else if (knife->has_to_shoot(time)) {
+        if (const ShootResult shoot = knife->fire_gun(map, *this, time, pos); !shoot.miss) {
+            game_manager.attack_player(shoot.player_hit, *this, shoot.dmg);
+        }
     }
+}
+
+
+std::pair<double, double> Player::get_center_coordinates() const {
+    double pos_x = position_x + player_hitbox_width / 2;
+    double pos_y = position_y + player_hitbox_height / 2;
+    return std::make_pair(pos_x, pos_y);
 }

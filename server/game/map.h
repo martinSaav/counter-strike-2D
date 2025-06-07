@@ -53,6 +53,8 @@ public:
     std::optional<std::shared_ptr<Player>> trace_bullet_path(int ini_x, int ini_y,
                                                              Position final_pos,
                                                              const Player& gun_owner);
+    std::vector<std::shared_ptr<Player>> get_players_near_radio(double x, double y,
+                                                                double radio) const;
 };
 
 
