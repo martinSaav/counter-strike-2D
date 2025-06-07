@@ -16,7 +16,7 @@
 enum class Weapon : uint8_t {
     Glock = 0x01,
     AK47 = 0x02,
-    M4 = 0x03,
+    M3 = 0x03,
     AWP = 0x04,
 };
 
