@@ -96,8 +96,8 @@ public:
     uint16_t get_kills() const { return kills; }
     uint16_t get_deaths() const { return deaths; }
     Action get_action() const { return action; }
-    int get_pos_shoot_x() const { return pos_shoot_x; }
-    int get_pos_shoot_y() const { return pos_shoot_y; }
+    uint16_t get_pos_shoot_x() const { return pos_shoot_x; }
+    uint16_t get_pos_shoot_y() const { return pos_shoot_y; }
     const std::string& get_skin() const { return skin; }
 
     static PlayerInfo deserialize(const uint8_t* buffer, size_t size) {
