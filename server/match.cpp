@@ -20,15 +20,21 @@ GameIdentification Match::join_match(const std::string& username) {
         throw MatchAlreadyStarted();
     }
     player_count++;
+    Team player_team;
+    if (player_count % 2 == 0) {
+        player_team = Team::CounterTerrorists;
+    } else {
+        player_team = Team::Terrorists;
+    }
     auto player = std::make_shared<Player>(username, starting_position_x + 35 * (player_count - 1),
-                                           starting_position_y);
+                                           starting_position_y, player_team);
     PlayerCredentials credentials(player_count);
     players.insert(std::pair{credentials, player});
     auto sender_queue =
             std::make_shared<Queue<std::variant<MatchStatusDTO, GameReadyNotification>>>();
     GameIdentification game_identification(commands_queue, sender_queue, credentials);
     senders_queues.push_back(std::move(sender_queue));
-    map.add_player(std::move(player));
+    map.add_player(player);
     return game_identification;
 }
 

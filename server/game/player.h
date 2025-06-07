@@ -6,6 +6,8 @@
 #include <vector>
 
 #include "../player_dto.h"
+#include "dto/game_state_update.h"
+#include "dto/player_info.h"
 #include "gun/glock.h"
 #include "gun/gun.h"
 #include "gun/gun_type.h"
@@ -13,8 +15,6 @@
 
 #include "player_skin.h"
 #include "position.h"
-#include "status.h"
-#include "team.h"
 #define player_hitbox_height 32
 #define player_hitbox_width 32
 #define starting_money 500
@@ -25,7 +25,8 @@ class GameManager;
 class Player {
     friend class GameManager;
     const std::string username;
-    PlayerSkin skin;
+    PlayerSkin terrorist_skin;
+    PlayerSkin ct_skin;
     int health;
     int money;
     int current_angle;
@@ -50,7 +51,7 @@ class Player {
     void reload();
 
 public:
-    Player(std::string username, const int position_x, const int position_y):
+    Player(std::string username, const int position_x, const int position_y, const Team team):
             username(std::move(username)),
             health(max_health),
             money(starting_money),
@@ -59,13 +60,10 @@ public:
             position_y(position_y),
             kills(0),
             deaths(0),
-            current_team(Team::Terrorist),
+            current_team(team),
             status(Status::Alive) {
-        if (current_team == Team::Terrorist) {
-            skin = PlayerSkin::T1;
-        } else {
-            skin = PlayerSkin::C1;
-        }
+        terrorist_skin = PlayerSkin::T1;
+        ct_skin = PlayerSkin::C1;
         chunks_idxs.emplace_back(0, 0);
         secondary_weapon = std::make_unique<Glock>();
         equipped_weapon = GunType::Secondary;
@@ -74,7 +72,7 @@ public:
     std::pair<int, int> get_location();
     void set_location(Position position, std::vector<std::pair<int, int>>&& chunks_idxs);
     void set_angle(const int angle) { current_angle = angle; }
-    void set_skin(const PlayerSkin skin) { this->skin = skin; }
+    void set_skin(PlayerSkin skin);
     [[nodiscard]] PlayerDTO get_player_info() const;
     [[nodiscard]] bool is_dead() const;
     void shoot(const Position& pos) const;
@@ -84,5 +82,4 @@ public:
 
     bool operator==(const Player& player) const = default;
 };
-
 #endif  // PLAYER_H

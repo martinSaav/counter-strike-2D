@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <utility>
 
+#include "../skin_translator.h"
+
 #include "game_manager.h"
 
 
@@ -19,7 +21,12 @@ void Player::set_location(const Position position, std::vector<std::pair<int, in
 
 
 PlayerDTO Player::get_player_info() const {
-    return PlayerDTO{username, position_x, position_y, skin, current_angle};
+    if (current_team == Team::Terrorists) {
+        return PlayerDTO{username, position_x, position_y, terrorist_skin, health,
+                         status,   money,      kills,      deaths};
+    }
+    return PlayerDTO{username, position_x, position_y, ct_skin, health,
+                     status,   money,      kills,      deaths};
 }
 
 
@@ -90,10 +97,10 @@ void Player::reload() {
 
 
 void Player::switch_team() {
-    if (current_team == Team::Terrorist) {
-        current_team = Team::CounterTerrorist;
+    if (current_team == Team::Terrorists) {
+        current_team = Team::CounterTerrorists;
     } else {
-        current_team = Team::Terrorist;
+        current_team = Team::Terrorists;
     }
 }
 
@@ -137,4 +144,13 @@ std::pair<double, double> Player::get_center_coordinates() const {
     double pos_x = position_x + player_hitbox_width / 2;
     double pos_y = position_y + player_hitbox_height / 2;
     return std::make_pair(pos_x, pos_y);
+}
+
+
+void Player::set_skin(const PlayerSkin skin) {
+    if (const Team team = SkinTranslator::get_skin_team(skin); team == Team::Terrorists) {
+        terrorist_skin = skin;
+    } else {
+        ct_skin = skin;
+    }
 }

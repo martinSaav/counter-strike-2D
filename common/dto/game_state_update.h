@@ -15,7 +15,7 @@
 #include "../message.h"
 #include "../message_type.h"
 
-#include "player.h"
+#include "player_info.h"
 
 
 enum class Team : uint8_t {
