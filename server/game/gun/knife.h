@@ -16,8 +16,6 @@ class Knife: public Gun {
     std::pair<int, int> next_shoot;
     bool has_to_fire;
 
-    Knife(): has_to_fire(false) {}
-
     [[nodiscard]] bool has_to_shoot(float current_time) override;
     ShootResult fire_gun(Map& map, Player& owner, float current_time,
                          Position& current_position) override;
@@ -26,6 +24,7 @@ class Knife: public Gun {
     int calculate_damage(double distance);
 
 public:
+    Knife(): has_to_fire(false) {}
     GunType get_gun_type() override { return type; }
     void reload_gun() override;
     void shoot_gun(Position final_position) override;

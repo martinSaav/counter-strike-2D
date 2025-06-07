@@ -225,7 +225,7 @@ std::optional<std::shared_ptr<Player>> Map::trace_bullet_path(int ini_x, int ini
             get_chunk_index(final_pos.get_position().first, final_pos.get_position().second);
     const std::pair<int, int> final_pos_v = final_pos.get_position();
     const std::pair<double, double> velocity =
-            calculate_bullet_velocity(std::make_pair<int, int>{ini_x, ini_y}, final_pos_v);
+            calculate_bullet_velocity({ini_x, ini_y}, final_pos_v);
     while (true) {
         int nearest_structure_distance = -1;
         if (auto chunk_p = structure_chunks.find(chunk_idx); chunk_p != structure_chunks.end()) {

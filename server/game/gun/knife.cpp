@@ -7,6 +7,9 @@
 #include <cmath>
 #include <memory>
 
+#include "map.h"
+#include "player.h"
+
 void Knife::shoot_gun(Position final_position) {
     const auto pos = final_position.get_position();
     next_shoot = pos;

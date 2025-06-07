@@ -7,6 +7,9 @@
 #include <algorithm>
 #include <cmath>
 
+#include "map.h"
+#include "player.h"
+
 int Glock::get_gun_price() { return glock_price; }
 
 void Glock::shoot_gun(Position final_position) {

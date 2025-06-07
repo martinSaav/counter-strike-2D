@@ -6,7 +6,18 @@ add_library(game
         position.cpp
         structure.cpp
         game_manager.cpp
+        player.h
+        chunk.h
+        collision_detector.h
+        map.h
+        position.h
+        structure.h
+        game_manager.h
+        team.h
+        status.h
+        player_skin.h
 )
+
 
 target_include_directories(game
     PUBLIC

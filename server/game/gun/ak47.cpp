@@ -7,6 +7,9 @@
 #include <algorithm>
 #include <cmath>
 
+#include "map.h"
+#include "player.h"
+
 bool Ak47::has_to_shoot(const float current_time) {
     return !shoots.empty() && (current_time - time_since_last_shot > miliseconds_per_shoot);
 }

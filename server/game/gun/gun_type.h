@@ -5,7 +5,5 @@
 #ifndef GUN_TYPES_H
 #define GUN_TYPES_H
 
-#define max_dmg 80
-#define min_dmg 40
 enum class GunType { Primary, Secondary, Knife, Bomb };
 #endif  // GUN_TYPES_H

@@ -25,14 +25,13 @@ class Ak47: public Gun {
     std::queue<std::pair<int, int>> shoots;
     GunType type = GunType::Primary;
 
-    Ak47(): current_ammo(max_ammo), reserve_ammo(max_reserve_ammo), time_since_last_shot(0) {}
-
     [[nodiscard]] bool has_to_shoot(float current_time) override;
     ShootResult fire_gun(Map& map, Player& owner, float current_time,
                          Position& current_position) override;
     void reset_shoots() override;
 
 public:
+    Ak47(): current_ammo(max_ammo), reserve_ammo(max_reserve_ammo), time_since_last_shot(0) {}
     GunType get_gun_type() override { return type; }
     void reload_gun() override;
     void shoot_gun(Position final_position) override;

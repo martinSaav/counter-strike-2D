@@ -11,6 +11,7 @@
 #include "game/player.h"
 
 #include "game_identification.h"
+#include "game_manager.h"
 #include "match_status_dto.h"
 #include "player_command.h"
 #include "player_credentials.h"

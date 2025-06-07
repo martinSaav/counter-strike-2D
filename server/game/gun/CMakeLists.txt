@@ -3,10 +3,12 @@ target_sources(game
         ak47.cpp
         glock.cpp
         knife.cpp
-    PUBLIC
+        shoot_result.cpp
+        PUBLIC
+        gun.h
+        shoot_result.h
+        gun_type.h
         ak47.h
         knife.h
         glock.h
-        gun.h
-        gun_type.h
-        shoot_result.h)
+        )

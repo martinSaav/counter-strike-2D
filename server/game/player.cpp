@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <utility>
 
+#include "game_manager.h"
+
 
 std::pair<int, int> Player::get_location() { return std::make_pair(position_x, position_y); }
 
@@ -116,16 +118,16 @@ void Player::update(GameManager& game_manager) {
     if (primary_weapon && primary_weapon->has_to_shoot(time)) {
         if (const ShootResult shoot = primary_weapon->fire_gun(map, *this, time, pos);
             !shoot.miss) {
-            game_manager.attack_player(shoot.player_hit, *this, shoot.dmg);
+            game_manager.attack_player(shoot.player_hit.value(), *this, shoot.dmg);
         }
     } else if (secondary_weapon && secondary_weapon->has_to_shoot(time)) {
         if (const ShootResult shoot = secondary_weapon->fire_gun(map, *this, time, pos);
             !shoot.miss) {
-            game_manager.attack_player(shoot.player_hit, *this, shoot.dmg);
+            game_manager.attack_player(shoot.player_hit.value(), *this, shoot.dmg);
         }
     } else if (knife->has_to_shoot(time)) {
         if (const ShootResult shoot = knife->fire_gun(map, *this, time, pos); !shoot.miss) {
-            game_manager.attack_player(shoot.player_hit, *this, shoot.dmg);
+            game_manager.attack_player(shoot.player_hit.value(), *this, shoot.dmg);
         }
     }
 }

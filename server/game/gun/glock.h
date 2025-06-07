@@ -22,14 +22,13 @@ class Glock: public Gun {
     std::pair<int, int> next_shoot;
     bool has_to_fire;
 
-    Glock(): current_ammo(max_ammo), reserve_ammo(max_reserve_ammo), has_to_fire(false) {}
-
     [[nodiscard]] bool has_to_shoot(float current_time) override;
     ShootResult fire_gun(Map& map, Player& owner, float current_time,
                          Position& current_position) override;
     void reset_shoots() override;
 
 public:
+    Glock(): current_ammo(max_ammo), reserve_ammo(max_reserve_ammo), has_to_fire(false) {}
     GunType get_gun_type() override { return type; }
     void reload_gun() override;
     void shoot_gun(Position final_position) override;

@@ -11,8 +11,6 @@
 #include "gun/gun_type.h"
 #include "gun/knife.h"
 
-#include "game_manager.h"
-#include "map.h"
 #include "player_skin.h"
 #include "position.h"
 #include "status.h"
@@ -21,6 +19,8 @@
 #define player_hitbox_width 32
 #define starting_money 500
 #define max_health 100
+
+class GameManager;
 
 class Player {
     friend class GameManager;
