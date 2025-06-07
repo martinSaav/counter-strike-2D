@@ -5,6 +5,7 @@ add_library(game
         player.cpp
         position.cpp
         structure.cpp
+        game_manager.cpp
 )
 
 target_include_directories(game
@@ -12,3 +13,4 @@ target_include_directories(game
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+add_subdirectory(gun)

@@ -45,7 +45,7 @@ void Map::add_structure(const Structure structure) {
 }
 
 
-void Map::add_player(std::shared_ptr<Player> player) { players.emplace_back(player); }
+void Map::add_player(const std::shared_ptr<Player>& player) { players.emplace_back(player); }
 
 
 bool Map::check_if_position_is_in_range(const int x, const int y) const {
@@ -98,7 +98,7 @@ std::vector<std::pair<int, int>> Map::calculate_player_chunks(int bottom_x, int 
 std::vector<std::shared_ptr<Player>> Map::get_near_players(
         const std::shared_ptr<Player>& player) const {
     std::vector<std::shared_ptr<Player>> near_players;
-    for (auto other_player: players) {
+    for (const auto& other_player: players) {
         if (other_player == player) {
             continue;
         }
@@ -112,4 +112,161 @@ std::vector<std::shared_ptr<Player>> Map::get_near_players(
         }
     }
     return near_players;
+}
+
+
+std::pair<double, double> Map::calculate_bullet_velocity(std::pair<int, int> starting_pos,
+                                                         std::pair<int, int> ending_pos) {
+    int dx = ending_pos.first - starting_pos.first;
+    int dy = ending_pos.second - starting_pos.second;
+    double mod = std::sqrt(dx * dx + dy * dy);
+    const double vx = dx / mod;
+    const double vy = dy / mod;
+
+    double vel_x;
+    double vel_y;
+    double chunk_size_double = CHUNK_SIZE;
+    if (abs(vx) > abs(vy)) {
+        const double step = chunk_size_double / abs(vx);
+        vel_x = step * vx;
+        vel_y = step * vy;
+    } else {
+        const double step = chunk_size_double / abs(vy);
+        vel_x = step * vx;
+        vel_y = step * vy;
+    }
+
+    return std::make_pair(vel_x, vel_y);
+}
+
+
+std::pair<std::pair<int, int>, std::pair<double, double>> Map::calculate_new_bullet_position(
+        const std::pair<double, double>& starting_pos, const std::pair<double, double>& velocity) {
+    double ini_x = starting_pos.first;
+    double ini_y = starting_pos.second;
+    double new_x = ini_x + velocity.first;
+    double new_y = ini_y + velocity.second;
+    std::pair<int, int> new_chunk =
+            get_chunk_index(static_cast<int>(new_x), static_cast<int>(new_y));
+    return std::make_pair(new_chunk, std::make_pair(new_x, new_y));
+}
+
+
+std::vector<std::shared_ptr<Player>> Map::get_players_near_point(const int x, const int y) const {
+    const std::pair<int, int> chunk_index = get_chunk_index(x, y);
+    std::vector<std::shared_ptr<Player>> near_players;
+    for (const auto& player: players) {
+        if (std::vector<std::pair<int, int>>& player_chunks = player->get_chunk_idxs();
+            std::ranges::find(player_chunks, chunk_index) != player_chunks.end()) {
+            near_players.emplace_back(player);
+        }
+    }
+    return near_players;
+}
+
+
+std::optional<int> Map::get_nearest_colliding_structure(const Chunk& chunk, int ini_x, int ini_y,
+                                                        const Position& final_pos,
+                                                        std::pair<double, double> velocity) {
+    int nearest_structure_distance = -1;
+    for (const auto& structure: chunk.get_structures()) {
+        if (CollisionDetector::check_collision_between_structure_and_bullet(
+                    structure, ini_x, ini_y, final_pos.get_position().first, velocity)) {
+            auto [imp_x, imp_y] = CollisionDetector::get_impact_point(
+                    structure, ini_x, ini_y, final_pos.get_position().first, velocity);
+            if (int structure_dis = sqrt(std::pow(imp_x - ini_x, 2) + std::pow(imp_y - ini_y, 2));
+                structure_dis < nearest_structure_distance || nearest_structure_distance == -1) {
+                nearest_structure_distance = structure_dis;
+            }
+        }
+    }
+    if (nearest_structure_distance != -1) {
+        return nearest_structure_distance;
+    }
+    return std::nullopt;
+}
+
+
+std::optional<std::pair<std::shared_ptr<Player>, int>> Map::get_nearest_colliding_player(
+        int ini_x, int ini_y, double current_x, double current_y, const Player& gun_owner,
+        const Position& final_pos, std::pair<double, double> velocity) {
+    int nearest_player_distance = -1;
+    std::shared_ptr<Player> nearest_player = nullptr;
+    for (auto players = get_players_near_point(current_x, current_y); const auto& player: players) {
+        if (*player == gun_owner) {
+            continue;
+        }
+        if (auto [x, y] = player->get_location();
+            CollisionDetector::check_collision_between_player_and_bullet(
+                    x, y, ini_x, ini_y, final_pos.get_position().first, velocity)) {
+            auto [imp_x, imp_y] = CollisionDetector::get_impact_point(
+                    x, y, ini_x, ini_y, final_pos.get_position().first, velocity);
+            if (int player_dis = sqrt(std::pow(imp_x - ini_x, 2) + std::pow(imp_y - ini_y, 2));
+                player_dis < nearest_player_distance || nearest_player_distance == -1) {
+                nearest_player_distance = player_dis;
+                nearest_player = player;
+            }
+        }
+    }
+    if (nearest_player_distance != -1) {
+        return std::make_pair(nearest_player, nearest_player_distance);
+    }
+    return std::nullopt;
+}
+
+
+std::optional<std::shared_ptr<Player>> Map::trace_bullet_path(int ini_x, int ini_y,
+                                                              const Position final_pos,
+                                                              const Player& gun_owner) {
+    double current_x = ini_x;
+    double current_y = ini_y;
+    std::pair<int, int> chunk_idx = get_chunk_index(ini_x, ini_y);
+    const std::pair<int, int> final_chunk =
+            get_chunk_index(final_pos.get_position().first, final_pos.get_position().second);
+    const std::pair<int, int> final_pos_v = final_pos.get_position();
+    const std::pair<double, double> velocity =
+            calculate_bullet_velocity(std::make_pair<int, int>{ini_x, ini_y}, final_pos_v);
+    while (true) {
+        int nearest_structure_distance = -1;
+        if (auto chunk_p = structure_chunks.find(chunk_idx); chunk_p != structure_chunks.end()) {
+            if (auto nearest_structure_distance_op = get_nearest_colliding_structure(
+                        chunk_p->second, ini_x, ini_y, final_pos, velocity);
+                nearest_structure_distance_op.has_value()) {
+                nearest_structure_distance = nearest_structure_distance_op.value();
+            }
+        }
+        auto nearest_p = get_nearest_colliding_player(ini_x, ini_y, current_x, current_y, gun_owner,
+                                                      final_pos, velocity);
+        if (nearest_p.has_value()) {
+            if (nearest_p.value().second < nearest_structure_distance) {
+                return nearest_p.value().first;
+            }
+        }
+        if (chunk_idx == final_chunk) {
+            return std::nullopt;
+        }
+        auto [new_chunk_idx, new_pos] =
+                calculate_new_bullet_position(std::make_pair(current_x, current_y), velocity);
+        chunk_idx = new_chunk_idx;
+        current_x = new_pos.first;
+        current_y = new_pos.second;
+    }
+}
+
+
+std::vector<std::shared_ptr<Player>> Map::get_players_near_radio(const double x, const double y,
+                                                                 const double radio) const {
+    std::vector<std::shared_ptr<Player>> resultado;
+
+    for (const auto& player: players) {
+        auto [center_x, center_y] = player->get_center_coordinates();
+        const double dis_x = center_x - x;
+        const double dis_y = center_y - y;
+
+        if (const double distance = sqrt(dis_x * dis_x + dis_y * dis_y); distance <= radio) {
+            resultado.push_back(player);
+        }
+    }
+
+    return resultado;
 }
