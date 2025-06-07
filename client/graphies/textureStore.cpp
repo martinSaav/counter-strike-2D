@@ -2,7 +2,6 @@
 
 #include <utility>
 
-#include "SDL_image.h"
 using SDL2pp::Surface;
 
 TextureStore::TextureStore(Renderer* sdlRenderer):

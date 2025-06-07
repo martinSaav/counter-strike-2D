@@ -17,25 +17,18 @@ waitRoom::~waitRoom(){
 
 void waitRoom::on_terroristaButton_clicked(){
     team teamPlayer = TERRORISTA;
-    selectSkin* windowSkin = new selectSkin(teamPlayer, skinSeleccionada, this);
-    
-    connect(windowSkin, &selectSkin::ventanaCerrada, this, [this]() {
-        if (this->skinSeleccionada == ""){  // caso no coloco un nombre
-            return;
-        }
-        
-        // Mandamos al server la skin del jugador
-        SelectSkinRequest requestSkin(this->skinSeleccionada);
-        protocolo.send_message(requestSkin);
-    });
-    windowSkin->exec();
+    this->crearVentanaSeleccionSkin(teamPlayer);
 }
 
 void waitRoom::on_contraterroristaButton_clicked(){
     team teamPlayer = CONTRATERRORISTA;
+    this->crearVentanaSeleccionSkin(teamPlayer);
+}
+
+void waitRoom::crearVentanaSeleccionSkin(team& teamPlayer){
+
     selectSkin* windowSkin = new selectSkin(teamPlayer, skinSeleccionada, this);
 
-    
     connect(windowSkin, &selectSkin::ventanaCerrada, this, [this]() {
         if (this->skinSeleccionada == ""){  // caso no coloco un nombre
             return;
@@ -44,8 +37,13 @@ void waitRoom::on_contraterroristaButton_clicked(){
         // Mandamos al server la skin del jugador
         SelectSkinRequest requestSkin(this->skinSeleccionada);
         protocolo.send_message(requestSkin);
+
     });
     windowSkin->exec();
+
+    // Ocultamos bottones de seleccion de personajes
+    ui->terroristaButton->setEnabled(false);
+    ui->contraterroristaButton->setEnabled(false);
 }
 
 void waitRoom::on_aleatorioButton_clicked(){

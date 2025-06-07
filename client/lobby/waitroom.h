@@ -32,6 +32,9 @@ private slots:
     void on_empezarButton_clicked();
 
 private:
+
+    void crearVentanaSeleccionSkin(team& teamPlayer);
+
     Ui::waitRoom *ui;
     Protocol& protocolo;
     tipoUsuario usuario;

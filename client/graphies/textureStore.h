@@ -3,9 +3,8 @@
 
 #include <map>
 #include <string>
-
+#include "SDL_image.h"
 #include <SDL2pp/SDL2pp.hh>
-
 
 using SDL2pp::Renderer;
 using SDL2pp::Texture;

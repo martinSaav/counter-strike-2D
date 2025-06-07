@@ -29,7 +29,7 @@ void createMatchWindow::on_createButton_clicked(){
         // Obtenemos el mapa seleccionado
         QString map = item->text();
 
-        CreateGameRequest requestGameCreate(nameMatch.toStdString());
+        CreateGameRequest requestGameCreate(nameMatch.toStdString(), map.toStdString());
         protocolo.send_message(requestGameCreate);
 
         const std::unique_ptr<Message> responseGameCreate = protocolo.recv_message();

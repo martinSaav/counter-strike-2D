@@ -60,7 +60,8 @@ void InputHandler::processEvents() {
 
 
         if (action) {
-            PlayerAction playerAction(*action);
+            SDL_GetMouseState(&mouseX, &mouseY);
+            PlayerAction playerAction(*action, mouseX, mouseY);
             protocolo.send_message(playerAction);
         }
         SDL_Delay(33);
@@ -79,4 +80,6 @@ std::optional<std::string> InputHandler::getMensaje() {
     return std::nullopt;
 }
 
-bool InputHandler::exitGame() { return quit; }
+bool InputHandler::exitGame(){
+    return quit;
+}

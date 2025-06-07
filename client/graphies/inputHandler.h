@@ -15,6 +15,8 @@ private:
     std::queue<std::string> mensajes;
     std::mutex mtx;
     Protocol& protocolo;
+    int mouseX = 0;
+    int mouseY = 0;
 
 public:
     explicit InputHandler(Protocol& protocolo);
