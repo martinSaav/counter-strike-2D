@@ -74,17 +74,32 @@ TEST(ProtocolTest, ReceivesLoginRequestCorrectly) {
 
 // CreateGameRequest Test Cases
 
+
+
+
 TEST(ProtocolTest, SendsCreateGameCorrectly) {
     MockSocket mock_socket;
 
     const std::string game_name = "a game";
-    const CreateGameRequest req(game_name);
+    const std::string map_name = "a map";
+    const CreateGameRequest req(game_name, map_name);
     const size_t serialized_size = req.serialized_size();
     std::vector<uint8_t> serialized(serialized_size);
+    size_t offset = 3;
     serialized[0] = static_cast<uint8_t>(MessageType::CreateGameRequest);
-    const uint16_t len = htons(game_name.size());
-    memcpy(&serialized[1], &len, sizeof(len));
-    memcpy(&serialized[3], game_name.c_str(), game_name.size());
+    uint16_t game_name_length = htons(static_cast<uint16_t>(game_name.size()));
+    memcpy(&serialized[offset], &game_name_length, sizeof(game_name_length));
+    offset += sizeof(game_name_length);
+    memcpy(&serialized[offset], game_name.c_str(), game_name.size());
+    offset += game_name.size();
+    uint16_t map_name_length = htons(static_cast<uint16_t>(map_name.size()));
+    memcpy(&serialized[offset], &map_name_length, sizeof(map_name_length));
+    offset += sizeof(map_name_length);
+    memcpy(&serialized[offset], map_name.c_str(), map_name.size());
+    offset += map_name.size();
+    const uint16_t payload_length = htons(static_cast<uint16_t>(offset - 3));
+    memcpy(&serialized[1], &payload_length, sizeof(payload_length));
+    
 
     EXPECT_CALL(mock_socket, sendall(_, serialized_size))
             .WillOnce(Invoke([&](const void* data, unsigned int) {
@@ -95,18 +110,29 @@ TEST(ProtocolTest, SendsCreateGameCorrectly) {
     Protocol protocol(mock_socket);
     protocol.send_message(req);
 }
-
 TEST(ProtocolTest, ReceivesCreateGameCorrectly) {
     MockSocket mock_socket;
 
     const std::string game_name = "a game";
-    const CreateGameRequest req(game_name);
-    std::vector<uint8_t> serialized(req.serialized_size());
+    const std::string map_name = "a map";
+    const CreateGameRequest req(game_name, map_name);
+    const size_t serialized_size = req.serialized_size();
+    std::vector<uint8_t> serialized(serialized_size);
+    size_t offset = 3;
     serialized[0] = static_cast<uint8_t>(MessageType::CreateGameRequest);
-    const uint16_t len = htons(game_name.size());
-    memcpy(&serialized[1], &len, sizeof(len));
-    memcpy(&serialized[3], game_name.c_str(), game_name.size());
-
+    uint16_t game_name_length = htons(static_cast<uint16_t>(game_name.size()));
+    memcpy(&serialized[offset], &game_name_length, sizeof(game_name_length));
+    offset += sizeof(game_name_length);
+    memcpy(&serialized[offset], game_name.c_str(), game_name.size());
+    offset += game_name.size();
+    uint16_t map_name_length = htons(static_cast<uint16_t>(map_name.size()));
+    memcpy(&serialized[offset], &map_name_length, sizeof(map_name_length));
+    offset += sizeof(map_name_length);
+    memcpy(&serialized[offset], map_name.c_str(), map_name.size());
+    offset += map_name.size();
+    const uint16_t payload_length = htons(static_cast<uint16_t>(offset - 3));
+    memcpy(&serialized[1], &payload_length, sizeof(payload_length));
+    
     EXPECT_CALL(mock_socket, recvall(_, 3)).WillOnce(Invoke([&](void* dst, unsigned int) {
         memcpy(dst, serialized.data(), 3);
         return 3;
@@ -125,6 +151,8 @@ TEST(ProtocolTest, ReceivesCreateGameCorrectly) {
     ASSERT_NE(create_game, nullptr);
     EXPECT_EQ(create_game->get_game_name(), game_name);
 }
+
+
 
 // CreateGameResponse Test Cases
 
