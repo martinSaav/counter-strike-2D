@@ -1,8 +1,8 @@
 #include "playerSprite.h"
+
 #include <cmath>
-   
-PlayerSprite::PlayerSprite(Renderer* sdlRenderer)
-    : Component(sdlRenderer){
+
+PlayerSprite::PlayerSprite(Renderer* sdlRenderer): Component(sdlRenderer) {
 
     // Skins
     texturas.loadTexture("T1", "../client/data/players/t1.bmp");
@@ -23,17 +23,13 @@ PlayerSprite::PlayerSprite(Renderer* sdlRenderer)
     texturas.loadTexture("knife", "../client/data/weapons/knife.bmp");
 }
 
-void PlayerSprite::drawPlayer(int& jugadorX, int& jugadorY, SDL_Rect& camera,
-     float& zoom, double& angle, std::string& skin){
+void PlayerSprite::drawPlayer(int& jugadorX, int& jugadorY, SDL_Rect& camera, float& zoom,
+                              double& angle, std::string& skin) {
 
-    Texture& personaje = texturas.getTexture("C1");
+    Texture& personaje = texturas.getTexture(skin);
 
-    SDL_Rect destRect = {
-        int((jugadorX - camera.x) * zoom),
-        int((jugadorY - camera.y) * zoom),
-        int(32 * zoom / 4),
-        int(32 * zoom / 4)
-    };
+    SDL_Rect destRect = {int((jugadorX - camera.x) * zoom), int((jugadorY - camera.y) * zoom),
+                         int(32 * zoom / 4), int(32 * zoom / 4)};
 
     sdlRenderer->Copy(personaje, srcRect, destRect, angle);
 
@@ -41,13 +37,13 @@ void PlayerSprite::drawPlayer(int& jugadorX, int& jugadorY, SDL_Rect& camera,
     this->drawWeapon(jugadorX, jugadorY, camera, zoom, angle, weaponName);
 }
 
-void PlayerSprite::drawWeapon(int& jugadorX, int& jugadorY, SDL_Rect& camera,
-     float& zoom, double& angle, std::string& weaponName){
+void PlayerSprite::drawWeapon(int& jugadorX, int& jugadorY, SDL_Rect& camera, float& zoom,
+                              double& angle, std::string& weaponName) {
 
     Texture& weapon = texturas.getTexture(weaponName);
-    
+
     // Offset desde el centro del personaje hacia la mano, sin rotar
-    float desvioX = 0.0f;  // derecha
+    float desvioX = 0.0f;   // derecha
     float desvioY = -6.0f;  // hacia arriba
 
     // Convertir el ángulo a radianes
@@ -57,12 +53,9 @@ void PlayerSprite::drawWeapon(int& jugadorX, int& jugadorY, SDL_Rect& camera,
     float rotateDesvioX = desvioX * cos(radians) - desvioY * sin(radians);
     float rotateDesvioY = desvioX * sin(radians) + desvioY * cos(radians);
 
-    SDL_Rect destRect = {
-        int((jugadorX + rotateDesvioX - camera.x) * zoom),
-        int((jugadorY + rotateDesvioY - camera.y) * zoom),
-        int(32 * zoom / 4),
-        int(32 * zoom / 4)
-    };
+    SDL_Rect destRect = {int((jugadorX + rotateDesvioX - camera.x) * zoom),
+                         int((jugadorY + rotateDesvioY - camera.y) * zoom), int(32 * zoom / 4),
+                         int(32 * zoom / 4)};
 
     sdlRenderer->Copy(weapon, srcRect, destRect, angle);
 }

@@ -13,15 +13,14 @@ add_library(game
         position.h
         structure.h
         game_manager.h
-        team.h
-        status.h
         player_skin.h
 )
 
-
 target_include_directories(game
-    PUBLIC
+        PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${PROJECT_SOURCE_DIR}/common
 )
+
 
 add_subdirectory(gun)

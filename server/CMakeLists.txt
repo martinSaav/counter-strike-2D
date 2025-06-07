@@ -29,4 +29,7 @@ add_subdirectory(game)
 
 target_link_libraries(taller_server game)
 
-target_include_directories(taller_server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(taller_server PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${PROJECT_SOURCE_DIR}/common
+)

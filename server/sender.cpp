@@ -12,8 +12,9 @@ void Sender::send_status(const MatchStatusDTO& status) const {
     const auto player_dtos = status.players;
     std::list<PlayerInfo> players;
     for (const auto& player_dto: player_dtos) {
-        PlayerInfo player(player_dto.username, player_dto.position_x, player_dto.position_y, 100,
-                          Status::Alive, 500, 0, 0, Action::MoveUp, 0, 0,
+        PlayerInfo player(player_dto.username, player_dto.position_x, player_dto.position_y,
+                          player_dto.health, player_dto.status, player_dto.money, player_dto.kills,
+                          player_dto.deaths, Action::MoveUp, 0, 0,
                           SkinTranslator::code_to_string(player_dto.skin));
         players.push_back(player);
     }

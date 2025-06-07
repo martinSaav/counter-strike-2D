@@ -1,5 +1,5 @@
-#ifndef PLAYER_H
-#define PLAYER_H
+#ifndef PLAYER_INFO_H
+#define PLAYER_INFO_H
 
 #include <cstdint>
 #include <cstring>
@@ -46,8 +46,7 @@ public:
             action(action),
             pos_shoot_x(pos_shoot_x),
             pos_shoot_y(pos_shoot_y),
-            skin(std::move(skin))
-            {}
+            skin(std::move(skin)) {}
 
     void serialize(uint8_t* buffer) const {
         size_t offset = 0;
@@ -70,7 +69,7 @@ public:
         offset += sizeof(kills);
         std::memcpy(buffer + offset, &deaths, sizeof(deaths));
         offset += sizeof(deaths);
-        
+
         buffer[offset++] = static_cast<uint8_t>(action);
         std::memcpy(buffer + offset, &pos_shoot_x, sizeof(pos_shoot_x));
         offset += sizeof(pos_shoot_x);
@@ -81,11 +80,11 @@ public:
         offset += sizeof(skin_length);
         std::memcpy(buffer + offset, skin.data(), skin.size());
         offset += skin.size();
-
     }
 
-    size_t serialized_size() const { return 2 + user_name.size() + 1 + 2 * 5 + sizeof(money) + 1 + 
-                                        2 * 2 + 2 + skin.size(); }
+    size_t serialized_size() const {
+        return 2 + user_name.size() + 1 + 2 * 5 + sizeof(money) + 1 + 2 * 2 + 2 + skin.size();
+    }
 
     const std::string& get_user_name() const { return user_name; }
     uint16_t get_pos_x() const { return pos_x; }
@@ -148,7 +147,7 @@ public:
         offset += skin_length;
 
 
-        return PlayerInfo(user_name, pos_x, pos_y, health, status, money, kills, deaths, action, 
+        return PlayerInfo(user_name, pos_x, pos_y, health, status, money, kills, deaths, action,
                           pos_shoot_x, pos_shoot_y, skin);
     }
 };
