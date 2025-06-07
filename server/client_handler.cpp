@@ -14,11 +14,13 @@
 #include "common/dto/create_game_request.h"
 #include "common/dto/create_game_response.h"
 #include "common/dto/game_list_response.h"
-#include "common/dto/game_ready_response.h"
 #include "common/dto/join_game_request.h"
 #include "common/dto/join_game_response.h"
 #include "common/dto/map_names_response.h"
 #include "common/dto/player_action.h"
+#include "common/dto/select_skin_request.h"
+
+#include "skin_translator.h"
 
 std::string ClientHandler::handle_login() {
     while (true) {
@@ -122,20 +124,48 @@ GameIdentification ClientHandler::pick_match() {
     }
 }
 
+
+CommandType ClientHandler::cast_action_to_command(const Action action) {
+    switch (action) {
+        case Action::MoveDown:
+            return CommandType::MoveDown;
+        case Action::MoveUp:
+            return CommandType::MoveUp;
+        case Action::MoveLeft:
+            return CommandType::MoveLeft;
+        case Action::MoveRight:
+            return CommandType::MoveRight;
+        case Action::Shoot:
+            return CommandType::Shoot;
+    }
+    return CommandType::Unknown;
+}
+
+
 void ClientHandler::handle_player_action(Queue<PlayerCommand>& command_queue,
                                          const PlayerCredentials& credentials,
                                          const std::unique_ptr<Message>& message) {
     const auto player_action_message = dynamic_cast<PlayerAction*>(message.get());
-    const PlayerCommand player_command(credentials, player_action_message->get_action());
+    const PlayerCommand player_command(credentials,
+                                       cast_action_to_command(player_action_message->get_action()));
     command_queue.push(player_command);
 }
 
 
-void ClientHandler::handle_game_ready() {
-    lobby.start_match(match_name);
-    protocol.send_message(GameReadyResponse(true));
+void ClientHandler::handle_game_ready(Queue<PlayerCommand>& command_queue,
+                                      const PlayerCredentials& credentials) {
+    const PlayerCommand command(credentials, CommandType::StartMatch);
+    command_queue.push(command);
 }
 
+
+void ClientHandler::handle_change_skin(Queue<PlayerCommand>& command_queue,
+                                       const PlayerCredentials& credentials,
+                                       const std::unique_ptr<Message>& message) {
+    const auto change_skin_message = dynamic_cast<SelectSkinRequest*>(message.get());
+    const PlayerSkin skin = SkinTranslator::string_to_code(change_skin_message->get_skin());
+    command_queue.push(PlayerCommand(credentials, CommandType::ChangeSkin, skin));
+}
 
 void ClientHandler::handle_game(Queue<PlayerCommand>& command_queue,
                                 const PlayerCredentials& credentials) {
@@ -146,13 +176,7 @@ void ClientHandler::handle_game(Queue<PlayerCommand>& command_queue,
                 break;
             }
             case MessageType::GameReadyRequest: {
-                try {
-                    handle_game_ready();
-                } catch (const MatchNotFound&) {
-                    protocol.send_message(GameReadyResponse(false));
-                } catch (const MatchAlreadyStarted&) {
-                    protocol.send_message(GameReadyResponse(false));
-                }
+                handle_game_ready(command_queue, credentials);
                 break;
             }
             case MessageType::SelectSkinRequest: {
