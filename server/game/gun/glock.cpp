@@ -35,6 +35,7 @@ ShootResult Glock::fire_gun(Map& map, Player& owner, float current_time,
     auto [x, y] = current_position.get_position();
     auto [final_x, final_y] = next_shoot;
     current_ammo--;
+    has_to_fire = false;
     const ImpactInfo impact = map.trace_bullet_path(x, y, Position(final_x, final_y), owner);
     if (impact.impacted_player.has_value()) {
         const auto& player_hit = impact.impacted_player.value();

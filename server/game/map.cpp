@@ -126,12 +126,12 @@ std::pair<double, double> Map::calculate_bullet_velocity(std::pair<int, int> sta
     double vel_x;
     double vel_y;
     double chunk_size_double = CHUNK_SIZE;
-    if (abs(vx) > abs(vy)) {
-        const double step = chunk_size_double / abs(vx);
+    if (std::abs(vx) > std::abs(vy)) {
+        const double step = chunk_size_double / std::abs(vx);
         vel_x = step * vx;
         vel_y = step * vy;
     } else {
-        const double step = chunk_size_double / abs(vy);
+        const double step = chunk_size_double / std::abs(vy);
         vel_x = step * vx;
         vel_y = step * vy;
     }

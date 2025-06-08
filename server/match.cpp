@@ -69,7 +69,10 @@ void Match::process_move_player(const std::shared_ptr<Player>& player, const int
 
 
 void Match::process_shoot_request(const std::shared_ptr<Player>& player, const Position& position) {
-    player->shoot(position);
+    auto [x, y] = position.get_position();
+    if (map.check_if_position_is_in_range(x, y)) {
+        player->shoot(position);
+    }
 }
 
 
