@@ -118,24 +118,34 @@ void Player::shoot(const Position& pos) const {
 }
 
 
+std::unique_ptr<Gun>& Player::get_equipped_gun() {
+    switch (equipped_weapon) {
+        case GunType::Primary: {
+            return primary_weapon;
+        }
+        case GunType::Secondary: {
+            return secondary_weapon;
+        }
+        default: {
+            return knife;
+        }
+    }
+}
+
+
 void Player::update(GameManager& game_manager) {
     Map& map = game_manager.get_map();
     const float time = game_manager.get_time();
     Position pos(this->position_x, this->position_y);
-    if (primary_weapon && primary_weapon->has_to_shoot(time)) {
-        if (const ShootResult shoot = primary_weapon->fire_gun(map, *this, time, pos);
-            !shoot.miss) {
+    if (const std::unique_ptr<Gun>& gun_to_shoot = get_equipped_gun();
+        gun_to_shoot->has_to_shoot(time)) {
+        const ShootResult shoot = gun_to_shoot->fire_gun(map, *this, time, pos);
+        if (!shoot.miss) {
             game_manager.attack_player(shoot.player_hit.value(), *this, shoot.dmg);
         }
-    } else if (secondary_weapon && secondary_weapon->has_to_shoot(time)) {
-        if (const ShootResult shoot = secondary_weapon->fire_gun(map, *this, time, pos);
-            !shoot.miss) {
-            game_manager.attack_player(shoot.player_hit.value(), *this, shoot.dmg);
-        }
-    } else if (knife->has_to_shoot(time)) {
-        if (const ShootResult shoot = knife->fire_gun(map, *this, time, pos); !shoot.miss) {
-            game_manager.attack_player(shoot.player_hit.value(), *this, shoot.dmg);
-        }
+        auto [x, y] = shoot.position;
+        aim_x = x;
+        aim_y = y;
     }
 }
 

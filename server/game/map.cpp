@@ -165,85 +165,100 @@ std::vector<std::shared_ptr<Player>> Map::get_players_near_point(const int x, co
 }
 
 
-std::optional<int> Map::get_nearest_colliding_structure(const Chunk& chunk, int ini_x, int ini_y,
-                                                        const Position& final_pos,
-                                                        std::pair<double, double> velocity) {
+ImpactInfo Map::get_nearest_colliding_structure(const Chunk& chunk, int ini_x, int ini_y,
+                                                const Position& final_pos,
+                                                const std::pair<double, double>& velocity) {
     int nearest_structure_distance = -1;
+    std::pair<int, int> collision_point;
+    auto [final_x, final_y] = final_pos.get_position();
     for (const auto& structure: chunk.get_structures()) {
-        if (CollisionDetector::check_collision_between_structure_and_bullet(
-                    structure, ini_x, ini_y, final_pos.get_position().first, velocity)) {
-            auto [imp_x, imp_y] = CollisionDetector::get_impact_point(
-                    structure, ini_x, ini_y, final_pos.get_position().first, velocity);
+        if (CollisionDetector::check_collision_between_structure_and_bullet(structure, ini_x, ini_y,
+                                                                            final_x, velocity)) {
+            auto [imp_x, imp_y] =
+                    CollisionDetector::get_impact_point(structure, ini_x, ini_y, final_x, velocity);
             if (int structure_dis = sqrt(std::pow(imp_x - ini_x, 2) + std::pow(imp_y - ini_y, 2));
                 structure_dis < nearest_structure_distance || nearest_structure_distance == -1) {
                 nearest_structure_distance = structure_dis;
+                collision_point = std::make_pair(imp_x, imp_y);
             }
         }
     }
     if (nearest_structure_distance != -1) {
-        return nearest_structure_distance;
+        return ImpactInfo{nearest_structure_distance, collision_point};
     }
-    return std::nullopt;
+    return ImpactInfo{};
 }
 
 
-std::optional<std::pair<std::shared_ptr<Player>, int>> Map::get_nearest_colliding_player(
-        int ini_x, int ini_y, double current_x, double current_y, const Player& gun_owner,
-        const Position& final_pos, std::pair<double, double> velocity) {
+ImpactInfo Map::get_nearest_colliding_player(int ini_x, int ini_y, double current_x,
+                                             double current_y, const Player& gun_owner,
+                                             const Position& final_pos,
+                                             std::pair<double, double> velocity) {
+    auto [final_x, final_y] = final_pos.get_position();
     int nearest_player_distance = -1;
+    std::pair<int, int> nearest_player_pos;
     std::shared_ptr<Player> nearest_player = nullptr;
     for (auto players = get_players_near_point(current_x, current_y); const auto& player: players) {
         if (*player == gun_owner) {
             continue;
         }
         if (auto [x, y] = player->get_location();
-            CollisionDetector::check_collision_between_player_and_bullet(
-                    x, y, ini_x, ini_y, final_pos.get_position().first, velocity)) {
-            auto [imp_x, imp_y] = CollisionDetector::get_impact_point(
-                    x, y, ini_x, ini_y, final_pos.get_position().first, velocity);
+            CollisionDetector::check_collision_between_player_and_bullet(x, y, ini_x, ini_y,
+                                                                         final_x, velocity)) {
+            auto [imp_x, imp_y] =
+                    CollisionDetector::get_impact_point(x, y, ini_x, ini_y, final_x, velocity);
             if (int player_dis = sqrt(std::pow(imp_x - ini_x, 2) + std::pow(imp_y - ini_y, 2));
                 player_dis < nearest_player_distance || nearest_player_distance == -1) {
                 nearest_player_distance = player_dis;
                 nearest_player = player;
+                nearest_player_pos = std::make_pair(imp_x, imp_y);
             }
         }
     }
     if (nearest_player_distance != -1) {
-        return std::make_pair(nearest_player, nearest_player_distance);
+        return ImpactInfo{nearest_player_distance, nearest_player_pos, nearest_player};
     }
-    return std::nullopt;
+    return ImpactInfo{};
 }
 
 
-std::optional<std::shared_ptr<Player>> Map::trace_bullet_path(int ini_x, int ini_y,
-                                                              const Position final_pos,
-                                                              const Player& gun_owner) {
+ImpactInfo Map::trace_bullet_path(int ini_x, int ini_y, const Position final_pos,
+                                  const Player& gun_owner) {
     double current_x = ini_x;
     double current_y = ini_y;
     std::pair<int, int> chunk_idx = get_chunk_index(ini_x, ini_y);
-    const std::pair<int, int> final_chunk =
-            get_chunk_index(final_pos.get_position().first, final_pos.get_position().second);
     const std::pair<int, int> final_pos_v = final_pos.get_position();
+    auto [final_x, final_y] = final_pos_v;
+    const std::pair<int, int> final_chunk = get_chunk_index(final_x, final_y);
     const std::pair<double, double> velocity =
             calculate_bullet_velocity({ini_x, ini_y}, final_pos_v);
     while (true) {
         int nearest_structure_distance = -1;
+        std::pair<int, int> nearest_structure_pos;
         if (auto chunk_p = structure_chunks.find(chunk_idx); chunk_p != structure_chunks.end()) {
-            if (auto nearest_structure_distance_op = get_nearest_colliding_structure(
-                        chunk_p->second, ini_x, ini_y, final_pos, velocity);
-                nearest_structure_distance_op.has_value()) {
-                nearest_structure_distance = nearest_structure_distance_op.value();
+            Chunk& chunk = chunk_p->second;
+            ImpactInfo structure_hit =
+                    get_nearest_colliding_structure(chunk, ini_x, ini_y, final_pos, velocity);
+            if (structure_hit.hit) {
+                nearest_structure_distance = structure_hit.distance;
+                nearest_structure_pos = structure_hit.impact_position;
             }
         }
-        auto nearest_p = get_nearest_colliding_player(ini_x, ini_y, current_x, current_y, gun_owner,
-                                                      final_pos, velocity);
-        if (nearest_p.has_value()) {
-            if (nearest_p.value().second < nearest_structure_distance) {
-                return nearest_p.value().first;
+        ImpactInfo player_impacted = get_nearest_colliding_player(
+                ini_x, ini_y, current_x, current_y, gun_owner, final_pos, velocity);
+        if (player_impacted.hit) {
+            if (player_impacted.distance < nearest_structure_distance ||
+                nearest_structure_distance == -1) {
+                return player_impacted;
             }
+            return ImpactInfo{nearest_structure_distance, nearest_structure_pos};
+        }
+        if (nearest_structure_distance != -1) {
+            return ImpactInfo{nearest_structure_distance, nearest_structure_pos};
         }
         if (chunk_idx == final_chunk) {
-            return std::nullopt;
+            const int final_pos_distance = sqrt(pow(final_x - ini_x, 2) + pow(final_y - ini_y, 2));
+            return ImpactInfo{final_pos_distance, final_pos.get_position()};
         }
         auto [new_chunk_idx, new_pos] =
                 calculate_new_bullet_position(std::make_pair(current_x, current_y), velocity);

@@ -32,6 +32,8 @@ class Player {
     int current_angle;
     int position_x;
     int position_y;
+    int aim_x;
+    int aim_y;
     int kills;
     int deaths;
     Team current_team;
@@ -49,6 +51,7 @@ class Player {
     void buy_weapon(std::unique_ptr<Gun> gun);
     void switch_weapon();
     void reload();
+    std::unique_ptr<Gun>& get_equipped_gun();
 
 public:
     Player(std::string username, const int position_x, const int position_y, const Team team):
@@ -58,6 +61,8 @@ public:
             current_angle(0),
             position_x(position_x),
             position_y(position_y),
+            aim_x(0),
+            aim_y(0),
             kills(0),
             deaths(0),
             current_team(team),
@@ -71,7 +76,10 @@ public:
     }
     std::pair<int, int> get_location();
     void set_location(Position position, std::vector<std::pair<int, int>>&& chunks_idxs);
-    void set_angle(const int angle) { current_angle = angle; }
+    void set_aim_pos(const int x, const int y) {
+        aim_x = x;
+        aim_y = y;
+    }
     void set_skin(PlayerSkin skin);
     [[nodiscard]] PlayerDTO get_player_info() const;
     [[nodiscard]] bool is_dead() const;

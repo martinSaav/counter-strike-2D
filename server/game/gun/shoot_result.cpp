@@ -7,6 +7,8 @@
 
 #include "player.h"
 
-ShootResult::ShootResult(): miss(true), dmg(0), player_hit(std::nullopt) {}
-ShootResult::ShootResult(const int dmg, std::shared_ptr<Player> player_hit):
-        miss(false), dmg(dmg), player_hit(std::move(player_hit)) {}
+ShootResult::ShootResult(const std::pair<int, int>& position):
+        miss(true), dmg(0), position(position), player_hit(std::nullopt) {}
+ShootResult::ShootResult(int dmg, const std::pair<int, int>& position,
+                         std::shared_ptr<Player> player_hit):
+        miss(false), dmg(dmg), position(position), player_hit(std::move(player_hit)) {}

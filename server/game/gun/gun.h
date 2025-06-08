@@ -16,6 +16,10 @@ struct NoAmmo: public std::runtime_error {
     NoAmmo(): std::runtime_error("There is no ammunition") {}
 };
 
+struct DontHaveToShoot: public std::runtime_error {
+    DontHaveToShoot(): std::runtime_error("Gun doesnt have to shoot") {}
+};
+
 class Player;
 class Map;
 

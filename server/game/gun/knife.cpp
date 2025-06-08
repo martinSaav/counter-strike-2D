@@ -32,17 +32,18 @@ int Knife::calculate_damage(const double distance) {
 ShootResult Knife::fire_gun(Map& map, Player& owner, float current_time,
                             Position& current_position) {
     if (!has_to_shoot(current_time)) {
-        return ShootResult{};
+        throw DontHaveToShoot();
     }
     has_to_fire = false;
     auto [x_center, y_center] = owner.get_center_coordinates();
     auto [final_x, final_y] = next_shoot;
     double direction_x = final_x - x_center;
     double direction_y = final_y - y_center;
-    double module = sqrt(pow(direction_x, 2) + pow(direction_y, 2));
+    const std::pair<int, int> direction(direction_x, direction_y);
+    const double module = sqrt(pow(direction_x, 2) + pow(direction_y, 2));
     direction_x = direction_x / (module);
     direction_y = direction_y / (module);
-    auto near_players = map.get_players_near_radio(x_center, y_center, knife_range);
+    const auto near_players = map.get_players_near_radio(x_center, y_center, knife_range);
     double nearest_player_distance = -1;
     std::shared_ptr<Player> nearest_player = nullptr;
     for (auto& player: near_players) {
@@ -50,14 +51,12 @@ ShootResult Knife::fire_gun(Map& map, Player& owner, float current_time,
             continue;
         }
         auto [other_x, other_y] = player->get_center_coordinates();
-        std::pair<double, double> attack_vector =
-                std::make_pair(other_x - x_center, other_y - y_center);
-        double mod = sqrt(attack_vector.first * attack_vector.first +
-                          attack_vector.second * attack_vector.second);  // tambien es la distancia
+        const auto [attack_x, attack_y] = std::make_pair(other_x - x_center, other_y - y_center);
+        double mod = sqrt(attack_x * attack_x + attack_y * attack_y);  // tambien es la distancia
         if (mod == 0) {
-            return ShootResult{calculate_damage(0), player};
+            return ShootResult{calculate_damage(0), direction, player};
         }
-        double cos = (attack_vector.first * direction_x + attack_vector.second * direction_y) / mod;
+        double cos = (attack_x * direction_x + attack_y * direction_y) / mod;
         double angle = acos(cos);
         if (angle < max_degree) {
             if (nearest_player_distance > mod || nearest_player_distance == -1) {
@@ -67,9 +66,9 @@ ShootResult Knife::fire_gun(Map& map, Player& owner, float current_time,
         }
     }
     if (nearest_player != nullptr) {
-        return ShootResult{calculate_damage(nearest_player_distance), nearest_player};
+        return ShootResult{calculate_damage(nearest_player_distance), direction, nearest_player};
     }
-    return ShootResult{};
+    return ShootResult{direction};
 }
 
 void Knife::reload_gun() {}
