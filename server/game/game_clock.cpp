@@ -3,3 +3,8 @@
 //
 
 #include "game_clock.h"
+
+
+void GameClock::advance(double dt) {
+
+}
