@@ -146,9 +146,13 @@ void ClientHandler::handle_player_action(Queue<PlayerCommand>& command_queue,
                                          const PlayerCredentials& credentials,
                                          const std::unique_ptr<Message>& message) {
     const auto player_action_message = dynamic_cast<PlayerAction*>(message.get());
-    const PlayerCommand player_command(credentials,
-                                       cast_action_to_command(player_action_message->get_action()));
-    command_queue.push(player_command);
+    try {
+        const Position position(player_action_message->get_pos_mouse_x(),
+                                player_action_message->get_pos_mouse_y());
+        const PlayerCommand player_command(
+                credentials, cast_action_to_command(player_action_message->get_action()), position);
+        command_queue.push(player_command);
+    } catch (const InvalidPosition&) {}
 }
 
 

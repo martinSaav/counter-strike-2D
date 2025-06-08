@@ -81,6 +81,10 @@ void Match::process_command(const PlayerCommand& command) {
         return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
     }
     const std::shared_ptr<Player>& player = player_p->second;
+    if (command.position.has_value()) {
+        auto [x, y] = command.position.value().get_position();
+        player->set_aim_pos(x, y);
+    }
     switch (command.command_type) {
         case CommandType::MoveLeft: {
             return process_move_player(player, -tiles_per_movement, 0);

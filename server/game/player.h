@@ -36,6 +36,7 @@ class Player {
     int aim_y;
     int kills;
     int deaths;
+    bool is_shooting;
     Team current_team;
     Status status;
     std::unique_ptr<Gun> knife;
@@ -65,6 +66,7 @@ public:
             aim_y(0),
             kills(0),
             deaths(0),
+            is_shooting(false),
             current_team(team),
             status(Status::Alive) {
         terrorist_skin = PlayerSkin::T1;

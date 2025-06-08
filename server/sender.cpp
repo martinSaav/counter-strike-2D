@@ -14,8 +14,8 @@ void Sender::send_status(const MatchStatusDTO& status) const {
     for (const auto& player_dto: player_dtos) {
         PlayerInfo player(player_dto.username, player_dto.position_x, player_dto.position_y,
                           player_dto.health, player_dto.status, player_dto.money, player_dto.kills,
-                          player_dto.deaths, Action::MoveUp, 0, 0,
-                          SkinTranslator::code_to_string(player_dto.skin));
+                          player_dto.deaths, player_dto.last_action, player_dto.aim_x,
+                          player_dto.aim_y, SkinTranslator::code_to_string(player_dto.skin));
         players.push_back(player);
     }
     const GameStateUpdate state(true, false, 1, 0, true, false, false, 0, 0, 0, Team::Terrorists,

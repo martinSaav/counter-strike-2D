@@ -21,12 +21,16 @@ void Player::set_location(const Position position, std::vector<std::pair<int, in
 
 
 PlayerDTO Player::get_player_info() const {
-    if (current_team == Team::Terrorists) {
-        return PlayerDTO{username, position_x, position_y, terrorist_skin, health,
-                         status,   money,      kills,      deaths};
+    auto last_action = Action::MoveUp;
+    if (is_shooting) {
+        last_action = Action::Shoot;
     }
-    return PlayerDTO{username, position_x, position_y, ct_skin, health,
-                     status,   money,      kills,      deaths};
+    if (current_team == Team::Terrorists) {
+        return PlayerDTO{username, position_x, position_y, aim_x, aim_y,  terrorist_skin,
+                         health,   status,     money,      kills, deaths, last_action};
+    }
+    return PlayerDTO{username, position_x, position_y, aim_x, aim_y,  ct_skin,
+                     health,   status,     money,      kills, deaths, last_action};
 }
 
 
@@ -134,6 +138,7 @@ std::unique_ptr<Gun>& Player::get_equipped_gun() {
 
 
 void Player::update(GameManager& game_manager) {
+    is_shooting = false;
     Map& map = game_manager.get_map();
     const float time = game_manager.get_time();
     Position pos(this->position_x, this->position_y);
@@ -146,6 +151,7 @@ void Player::update(GameManager& game_manager) {
         auto [x, y] = shoot.position;
         aim_x = x;
         aim_y = y;
+        is_shooting = true;
     }
 }
 
