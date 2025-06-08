@@ -47,7 +47,7 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     mapa.draw(camera, camWidth, camHeight); //Dibujo el mapa
 
     // Angulo default
-    double angleDefault = 0.0;
+    double anglePlayer = 0.0;
 
     // Obtengo mi angulo
     SDL_GetMouseState(&mouseX, &mouseY);
@@ -57,15 +57,26 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     myAngle = getAnglePlayer(myPlayer->get_pos_x(), myPlayer->get_pos_y(), mouse_map_x, mouse_map_y);
 
     // Dibuja jugadores con zoom
+    int posPlayerX = 0;
+    int posPlayerY = 0;
+    int mousePlayerX = 0;
+    int mousePlayerY = 0;
     for (auto const& jugador : jugadores){
-        angleDefault = 0.0;
-        if (jugador.get_user_name() == namePlayer) angleDefault = myAngle;
-        
-        int posX = jugador.get_pos_x();
-        int posY = jugador.get_pos_y();
-        std::string skinJugador = jugador.get_skin();
+        anglePlayer = 0.0;
+        if (jugador.get_user_name() == namePlayer){
+            anglePlayer = myAngle;
 
-        player.drawPlayer(posX, posY, camera, zoom, angleDefault, skinJugador);
+        } else{
+            posPlayerX = jugador.get_pos_x();
+            posPlayerY = jugador.get_pos_y();
+            mousePlayerX = jugador.get_pos_shoot_x();
+            mousePlayerY = jugador.get_pos_shoot_y();
+            mouse_map_x = int(mousePlayerX / zoom + camera.x);
+            mouse_map_y = int(mousePlayerY / zoom + camera.y);
+
+            anglePlayer = getAnglePlayer(posPlayerX, posPlayerY, mouse_map_x, mouse_map_y);
+        }
+        player.drawPlayer(jugador, camera, zoom, anglePlayer);
     }
 
     int health = myPlayer->get_health();

@@ -6,7 +6,7 @@
 
 #include "../../common/dto/game_state_update.h"
 #include "../../common/protocol.h"
-
+#include "../../common/action.h"
 #include "textureStore.h"
 
 #include "components/hudSprite.h"

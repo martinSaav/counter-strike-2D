@@ -468,7 +468,9 @@ TEST(ProtocolTest, SendsPlayerActionCorrectly) {
     MockSocket mock_socket;
 
     const Action action = Action::MoveDown;
-    const PlayerAction req(action);
+    int mouseX = 0;
+    int mouseY = 0;
+    const PlayerAction req(action, mouseX, mouseY);
     const size_t serialized_size = req.serialized_size();
     std::vector<uint8_t> serialized(serialized_size);
     serialized[0] = static_cast<uint8_t>(MessageType::PlayerAction);
@@ -490,7 +492,9 @@ TEST(ProtocolTest, ReceivesPlayerActionCorrectly) {
     MockSocket mock_socket;
 
     const Action action = Action::MoveDown;
-    const PlayerAction req(action);
+    int mouseX = 0;
+    int mouseY = 0;
+    const PlayerAction req(action, mouseX, mouseY);
     std::vector<uint8_t> serialized(req.serialized_size());
     serialized[0] = static_cast<uint8_t>(MessageType::PlayerAction);
     const uint16_t len = htons(1);

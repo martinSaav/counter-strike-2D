@@ -31,6 +31,7 @@ void InputHandler::processEvents() {
 
         // Leer estado del teclado
         const Uint8* state = SDL_GetKeyboardState(NULL);
+        Uint32 mouseState = SDL_GetMouseState(&mouseX, &mouseY);
 
         if (state[SDL_SCANCODE_Q]) {
 
@@ -53,14 +54,12 @@ void InputHandler::processEvents() {
             actionActual = Action::MoveRight;
             action = &actionActual;
 
-        } else if (state[SDL_BUTTON_LEFT]) {
-            actionActual = Action::Shoot;
-            action = &actionActual;
+        } else if (mouseState & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+           actionActual = Action::Shoot;
+           action = &actionActual;
         }
 
-
         if (action) {
-            SDL_GetMouseState(&mouseX, &mouseY);
             PlayerAction playerAction(*action, mouseX, mouseY);
             protocolo.send_message(playerAction);
         }

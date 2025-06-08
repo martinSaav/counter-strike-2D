@@ -5,7 +5,7 @@
 #include <optional>
 #include <queue>
 #include <string>
-
+#include <iostream>
 #include "../../common/protocol.h"
 
 // Lee el teclado y envía los mensajes al servidor
