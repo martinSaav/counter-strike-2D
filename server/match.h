@@ -17,8 +17,8 @@
 #include "player_credentials.h"
 
 #define max_number_of_players 10
-#define map_width 400
-#define map_height 400
+#define map_width 155
+#define map_height 285
 
 struct MatchFull: public std::runtime_error {
     MatchFull(): std::runtime_error("Match is full") {}
