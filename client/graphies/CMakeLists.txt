@@ -5,6 +5,7 @@ add_library(graphies STATIC
     inputHandler.cpp
     inputServerHandler.cpp
     textureStore.cpp
+    configuracion.h
     components/hudSprite.cpp
     components/mapSprite.cpp
     components/playerSprite.cpp

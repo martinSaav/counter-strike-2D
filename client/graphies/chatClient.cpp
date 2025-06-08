@@ -33,10 +33,11 @@ void ChatClient::run() {
     Renderer renderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     // Create render object
-    Render render(&renderer, protocolo, namePlayer);
+    Configuracion configuracion;
+    Render render(&renderer, protocolo, namePlayer, configuracion);
 
     // Create input handler
-    InputHandler inputHandler(protocolo);
+    InputHandler inputHandler(protocolo, configuracion);
 
     InputServerHandler inputServerHandler(protocolo);
 

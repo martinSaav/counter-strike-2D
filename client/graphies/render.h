@@ -2,12 +2,12 @@
 #define RENDER_H
 #include <string>
 #include <memory>
-#include <SDL.h>
 
 #include "../../common/dto/game_state_update.h"
 #include "../../common/protocol.h"
 #include "../../common/action.h"
 #include "textureStore.h"
+#include "configuracion.h"
 
 #include "components/hudSprite.h"
 #include "components/mapSprite.h"
@@ -25,6 +25,8 @@ private:
     HudSprite hud;
     MapSprite mapa;
     PlayerSprite player;
+
+    Configuracion& configuracion;
 
     int screenWidth = 1000;
     int screenHeight = 1000;
@@ -45,7 +47,7 @@ private:
     double getAnglePlayer(int jugadorX, int jugadorY, int mousex, int mousey);
 
 public:
-    Render(Renderer* renderer, Protocol& protocolo, std::string& namePlayer);
+    Render(Renderer* renderer, Protocol& protocolo, std::string& namePlayer, Configuracion& configuracion);
     void renderFrame(std::optional<GameStateUpdate> mensaje);
 };
 #endif

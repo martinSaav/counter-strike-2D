@@ -1,11 +1,10 @@
 #include "inputHandler.h"
 
-#include <SDL.h>
-
 #include "../../common/action.h"
 #include "../../common/dto/player_action.h"
 
-InputHandler::InputHandler(Protocol& protocolo): protocolo(protocolo) {
+InputHandler::InputHandler(Protocol& protocolo, Configuracion& configuracion): 
+protocolo(protocolo), configuracion(configuracion){
     SDL_StartTextInput();  // Activa entrada de texto
 }
 
@@ -60,7 +59,9 @@ void InputHandler::processEvents() {
         }
 
         if (action) {
-            PlayerAction playerAction(*action, mouseX, mouseY);
+            int mouse_map_x = int(mouseX / configuracion.zoom + configuracion.camera.x);
+            int mouse_map_y = int(mouseY / configuracion.zoom + configuracion.camera.y);
+            PlayerAction playerAction(*action, mouse_map_x, mouse_map_y);
             protocolo.send_message(playerAction);
         }
         SDL_Delay(33);

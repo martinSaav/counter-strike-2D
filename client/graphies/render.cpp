@@ -6,9 +6,10 @@
 
 using SDL2pp::Rect;
 
-Render::Render(Renderer* renderer, Protocol& protocolo, std::string& namePlayer):
+Render::Render(Renderer* renderer, Protocol& protocolo, std::string& namePlayer, Configuracion& configuracion):
     sdlRenderer(renderer), protocolo(protocolo), namePlayer(namePlayer),
-    hud(sdlRenderer, screenWidth, screenHeight), mapa(sdlRenderer), player(sdlRenderer)
+    hud(sdlRenderer, screenWidth, screenHeight), mapa(sdlRenderer), player(sdlRenderer),
+    configuracion(configuracion)
 {
 }
 
@@ -16,7 +17,7 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
 
     std::list<PlayerInfo> jugadores = mensaje->get_players();
 
-    float zoom = 10.0f;
+    float zoom = configuracion.zoom;
 
     int worldWidth = mapa.getWidth();
     int worldHeight = mapa.getHeight();
@@ -31,7 +32,8 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
         }
     }
 
-    SDL_Rect camera = {0, 0, camWidth, camHeight};
+    SDL_Rect& camera = configuracion.camera;
+    camera = {0, 0, camWidth, camHeight};
 
     camera.x = myPlayer->get_pos_x() - camWidth / 2;
     camera.y = myPlayer->get_pos_y() - camHeight / 2;
@@ -54,27 +56,22 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     int mouse_map_x = int(mouseX / zoom + camera.x);
     int mouse_map_y = int(mouseY / zoom + camera.y);
 
-    myAngle = getAnglePlayer(myPlayer->get_pos_x(), myPlayer->get_pos_y(), mouse_map_x, mouse_map_y);
-
     // Dibuja jugadores con zoom
     int posPlayerX = 0;
     int posPlayerY = 0;
     int mousePlayerX = 0;
     int mousePlayerY = 0;
     for (auto const& jugador : jugadores){
-        anglePlayer = 0.0;
+
         if (jugador.get_user_name() == namePlayer){
-            anglePlayer = myAngle;
+            anglePlayer = getAnglePlayer(jugador.get_pos_x(), jugador.get_pos_y(), mouse_map_x, mouse_map_y);
 
         } else{
             posPlayerX = jugador.get_pos_x();
             posPlayerY = jugador.get_pos_y();
             mousePlayerX = jugador.get_pos_shoot_x();
             mousePlayerY = jugador.get_pos_shoot_y();
-            mouse_map_x = int(mousePlayerX / zoom + camera.x);
-            mouse_map_y = int(mousePlayerY / zoom + camera.y);
-
-            anglePlayer = getAnglePlayer(posPlayerX, posPlayerY, mouse_map_x, mouse_map_y);
+            anglePlayer = getAnglePlayer(posPlayerX, posPlayerY, mousePlayerX, mousePlayerY);
         }
         player.drawPlayer(jugador, camera, zoom, anglePlayer);
     }
