@@ -9,6 +9,11 @@ enum class Action : uint8_t {
     MoveLeft = 0x03,
     MoveRight = 0x04,
     Shoot = 0x05,
+    Reload = 0x06,
+    EquipWeapon = 0x07,
+    PlantBomb = 0x08,
+    DefuseBomb = 0x09,
+    Idle = 0x0A
 };
 
 #endif

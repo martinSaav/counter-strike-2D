@@ -10,6 +10,7 @@
 #include <netinet/in.h>
 
 #include "../action.h"
+#include "../weapon.h"
 
 enum class Status : uint8_t {
     Alive = 0x01,
@@ -30,11 +31,19 @@ private:
     uint16_t pos_shoot_x;
     uint16_t pos_shoot_y;
     std::string skin;
+    Weapon primary_weapon;
+    uint16_t primary_weapon_ammo;
+    Weapon secondary_weapon;
+    uint16_t secondary_weapon_ammo;
+    Weapon knife;
+    Weapon bomb;
 
 public:
     PlayerInfo(std::string user_name, uint16_t pos_x, uint16_t pos_y, uint16_t health,
                Status status, float money, uint16_t kills, uint16_t deaths, Action action,
-               uint16_t pos_shoot_x, uint16_t pos_shoot_y, std::string skin):
+               uint16_t pos_shoot_x, uint16_t pos_shoot_y, std::string skin, Weapon primary_weapon,
+               uint16_t primary_weapon_ammo, Weapon secondary_weapon,
+               uint16_t secondary_weapon_ammo, Weapon knife, Weapon bomb):
             user_name(std::move(user_name)),
             pos_x(pos_x),
             pos_y(pos_y),
@@ -46,7 +55,13 @@ public:
             action(action),
             pos_shoot_x(pos_shoot_x),
             pos_shoot_y(pos_shoot_y),
-            skin(std::move(skin)) {}
+            skin(std::move(skin)),
+            primary_weapon(primary_weapon),
+            primary_weapon_ammo(primary_weapon_ammo),
+            secondary_weapon(secondary_weapon),
+            secondary_weapon_ammo(secondary_weapon_ammo),
+            knife(knife),
+            bomb(bomb) {}
 
     void serialize(uint8_t* buffer) const {
         size_t offset = 0;
@@ -80,10 +95,21 @@ public:
         offset += sizeof(skin_length);
         std::memcpy(buffer + offset, skin.data(), skin.size());
         offset += skin.size();
+
+        buffer[offset++] = static_cast<uint8_t>(primary_weapon);
+        uint16_t primary_weapon_ammo_net = htons(primary_weapon_ammo);
+        std::memcpy(buffer + offset, &primary_weapon_ammo_net, sizeof(primary_weapon_ammo_net));
+        offset += sizeof(primary_weapon_ammo_net);
+        buffer[offset++] = static_cast<uint8_t>(secondary_weapon);
+        uint16_t secondary_weapon_ammo_net = htons(secondary_weapon_ammo);
+        std::memcpy(buffer + offset, &secondary_weapon_ammo_net, sizeof(secondary_weapon_ammo_net));
+        offset += sizeof(secondary_weapon_ammo_net);
+        buffer[offset++] = static_cast<uint8_t>(knife);
+        buffer[offset++] = static_cast<uint8_t>(bomb);
     }
 
     size_t serialized_size() const {
-        return 2 + user_name.size() + 1 + 2 * 5 + sizeof(money) + 1 + 2 * 2 + 2 + skin.size();
+        return 2 + user_name.size() + 1 + 2 * 5 + sizeof(money) + 1 + 2 * 2 + 2 + skin.size() + 3;
     }
 
     const std::string& get_user_name() const { return user_name; }
@@ -98,6 +124,12 @@ public:
     uint16_t get_pos_shoot_x() const { return pos_shoot_x; }
     uint16_t get_pos_shoot_y() const { return pos_shoot_y; }
     const std::string& get_skin() const { return skin; }
+    Weapon get_primary_weapon() const { return primary_weapon; }
+    uint16_t get_primary_weapon_ammo() const { return primary_weapon_ammo; }
+    Weapon get_secondary_weapon() const { return secondary_weapon; }
+    uint16_t get_secondary_weapon_ammo() const { return secondary_weapon_ammo; }
+    Weapon get_knife() const { return knife; }
+    Weapon get_bomb() const { return bomb; }
 
     static PlayerInfo deserialize(const uint8_t* buffer, size_t size) {
         if (size < 2) {
@@ -146,9 +178,22 @@ public:
         std::string skin(reinterpret_cast<const char*>(buffer + offset), skin_length);
         offset += skin_length;
 
+        Weapon primary_weapon = static_cast<Weapon>(buffer[offset++]);
+        uint16_t primary_weapon_ammo;
+        std::memcpy(&primary_weapon_ammo, buffer + offset, sizeof(primary_weapon_ammo));
+        primary_weapon_ammo = ntohs(primary_weapon_ammo);
+        offset += sizeof(primary_weapon_ammo);
+        Weapon secondary_weapon = static_cast<Weapon>(buffer[offset++]);
+        uint16_t secondary_weapon_ammo;
+        std::memcpy(&secondary_weapon_ammo, buffer + offset, sizeof(secondary_weapon_ammo));
+        secondary_weapon_ammo = ntohs(secondary_weapon_ammo);
+        offset += sizeof(secondary_weapon_ammo);
+        Weapon knife = static_cast<Weapon>(buffer[offset++]);
+        Weapon bomb = static_cast<Weapon>(buffer[offset++]);
 
         return PlayerInfo(user_name, pos_x, pos_y, health, status, money, kills, deaths, action,
-                          pos_shoot_x, pos_shoot_y, skin);
+                          pos_shoot_x, pos_shoot_y, skin, primary_weapon, primary_weapon_ammo,
+                          secondary_weapon, secondary_weapon_ammo, knife, bomb);
     }
 };
 

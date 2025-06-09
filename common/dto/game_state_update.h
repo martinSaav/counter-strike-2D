@@ -14,14 +14,11 @@
 #include "../action.h"
 #include "../message.h"
 #include "../message_type.h"
+#include "../team.h"
+#include "../weapon.h"
 
 #include "player_info.h"
 
-
-enum class Team : uint8_t {
-    Terrorists = 0x01,
-    CounterTerrorists = 0x02,
-};
 
 class GameStateUpdate: public Message {
 private:
