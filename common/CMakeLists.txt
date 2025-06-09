@@ -35,6 +35,7 @@ target_sources(taller_common
         dto/map_names_response.h
         dto/buy_weapon_request.h
         dto/player_info.h
+        dto/dropped_weapon.h
         action.h
         message_type.h
         message.h
