@@ -41,6 +41,9 @@ GameIdentification Match::join_match(const std::string& username) {
 
 void Match::process_move_player(const std::shared_ptr<Player>& player, const int x_mov,
                                 const int y_mov) {
+    if (!game_manager.can_player_move_or_shoot(player)) {
+        return;
+    }
     auto [old_x, old_y] = player->get_location();
     const int new_x = old_x + x_mov;
     const int new_y = old_y + y_mov;
@@ -69,6 +72,9 @@ void Match::process_move_player(const std::shared_ptr<Player>& player, const int
 
 
 void Match::process_shoot_request(const std::shared_ptr<Player>& player, const Position& position) {
+    if (!game_manager.can_player_move_or_shoot(player)) {
+        return;
+    }
     auto [x, y] = position.get_position();
     if (map.check_if_position_is_in_range(x, y)) {
         player->shoot(position);
@@ -116,7 +122,20 @@ MatchStatusDTO Match::get_match_status() {
     std::ranges::transform(
             players_view, std::back_inserter(player_dtos),
             [](const std::shared_ptr<Player>& player) { return player->get_player_info(); });
-    return MatchStatusDTO{std::move(player_dtos)};
+    TimeInformation info = game_manager.get_time_information();
+    return MatchStatusDTO{std::move(player_dtos),
+                          match_started,
+                          false,
+                          info.round,
+                          info.round_time,
+                          info.round_started,
+                          info.round_ended,
+                          info.bomb_planted,
+                          info.bomb_x,
+                          info.bomb_y,
+                          info.bomb_timer,
+                          info.round_winner,
+                          Team::Terrorists};
 }
 
 
@@ -175,11 +194,47 @@ void Match::wait_for_match_to_start() {
 }
 
 
+void Match::setup_round_start() {
+    std::lock_guard<std::mutex> lck(mtx);
+    game_clock.reset();
+    int terorrist_spawn_x = player_hitbox_width;
+    int counter_spawn_x = map_width - player_hitbox_width;
+    for (const auto& player: players | std::views::values) {
+        if (player->is_dead()) {
+            player->resurrect();
+        }
+        if (player->get_team() == Team::Terrorists) {
+            constexpr int terorrist_spawn_y = 0 + player_hitbox_height;
+            const Position new_pos(terorrist_spawn_x, terorrist_spawn_y);
+            player->set_location(new_pos,
+                                 map.calculate_player_chunks(terorrist_spawn_x, terorrist_spawn_y));
+            terorrist_spawn_x += player_hitbox_width;
+        } else {
+            constexpr int counter_spawn_y = map_height - player_hitbox_height;
+            const Position new_pos(counter_spawn_x, counter_spawn_y);
+            player->set_location(new_pos,
+                                 map.calculate_player_chunks(counter_spawn_x, counter_spawn_y));
+            counter_spawn_x -= player_hitbox_width;
+        }
+    }
+}
+
+
 void Match::update_game() {
-    game_manager.advance_time(miliseconds_per_iteration);
+    std::lock_guard<std::mutex> lck(mtx);
+    try {
+        game_clock.advance(miliseconds_per_iteration);
+    } catch (const RoundAlreadyFinished&) {
+        game_manager.advance_round();
+        setup_round_start();
+    }
+    std::vector<std::shared_ptr<Player>> players_vector;
     for (const auto& player: players | std::views::values) {
         player->update(game_manager);
+        players_vector.push_back(player);
     }
+
+    game_manager.check_winning_cond(players_vector);
 }
 
 
@@ -210,6 +265,7 @@ void Match::run_game_loop() {
 void Match::run() {
     wait_for_match_to_start();
     try {
+        setup_round_start();
         run_game_loop();
     } catch (const ClosedQueue&) {}
     commands_queue.close();

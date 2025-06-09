@@ -45,6 +45,9 @@ void Player::receive_damage(const int damage) {
     if (health == 0) {
         status = Status::Dead;
         deaths++;
+        primary_weapon = nullptr;
+        secondary_weapon = std::make_unique<Glock>();
+        equipped_weapon = GunType::Secondary;
     }
 }
 
@@ -140,7 +143,7 @@ std::unique_ptr<Gun>& Player::get_equipped_gun() {
 void Player::update(GameManager& game_manager) {
     is_shooting = false;
     Map& map = game_manager.get_map();
-    const float time = game_manager.get_time();
+    const double time = game_manager.get_time();
     Position pos(this->position_x, this->position_y);
     if (const std::unique_ptr<Gun>& gun_to_shoot = get_equipped_gun();
         gun_to_shoot->has_to_shoot(time)) {

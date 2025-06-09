@@ -46,7 +46,6 @@ class Player {
     std::vector<std::pair<int, int>>
             chunks_idxs;  // indices de los chunks en los que se encuentra el jugador
     void switch_team();
-    [[nodiscard]] Team get_team() const;
     void add_kill();
     void receive_damage(int damage);
     void buy_weapon(std::unique_ptr<Gun> gun);
@@ -89,7 +88,8 @@ public:
     std::vector<std::pair<int, int>>& get_chunk_idxs() { return chunks_idxs; }
     void update(GameManager& game_manager);
     [[nodiscard]] std::pair<double, double> get_center_coordinates() const;
-
+    [[nodiscard]] Team get_team() const;
+    void resurrect() { status = Status::Alive; }
     bool operator==(const Player& player) const = default;
 };
 #endif  // PLAYER_H

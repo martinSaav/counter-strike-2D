@@ -14,6 +14,10 @@ add_library(game
         structure.h
         game_manager.h
         player_skin.h
+        time_information.h
+        game_clock.cpp
+        game_clock.h
+        time_information.h
 )
 
 target_include_directories(game
