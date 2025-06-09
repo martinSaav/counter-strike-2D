@@ -27,6 +27,7 @@ target_sources(taller_common
         dto/game_ready_response.h
         dto/game_state_update.h
         dto/login_request.h
+        dto/login_response.h
         dto/player_action.h
         dto/game_list_request.h
         dto/game_list_response.h
