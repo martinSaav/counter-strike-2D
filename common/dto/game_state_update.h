@@ -16,8 +16,8 @@
 #include "../message_type.h"
 #include "../team.h"
 #include "../weapon.h"
-#include "dropped_weapon.h"
 
+#include "dropped_weapon.h"
 #include "player_info.h"
 
 
@@ -43,7 +43,8 @@ public:
     explicit GameStateUpdate(bool game_started, bool game_ended, uint8_t round, float round_time,
                              bool round_started, bool round_ended, bool bomb_planted,
                              uint16_t bomb_x, uint16_t bomb_y, float bomb_timer, Team round_winner,
-                             Team game_winner, std::list<PlayerInfo> players, std::list<DroppedWeapon> dropped_weapons):
+                             Team game_winner, std::list<PlayerInfo> players,
+                             std::list<DroppedWeapon> dropped_weapons):
             game_started(game_started),
             game_ended(game_ended),
             round(round),

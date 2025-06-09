@@ -3,9 +3,11 @@
 
 #include <cstdint>
 #include <cstring>
-#include <netinet/in.h>
-#include "../weapon.h"
 #include <stdexcept>
+
+#include <netinet/in.h>
+
+#include "../weapon.h"
 
 class DroppedWeapon {
 private:
@@ -14,8 +16,8 @@ private:
     uint16_t pos_y;
 
 public:
-    DroppedWeapon(Weapon weapon, uint16_t pos_x, uint16_t pos_y)
-        : weapon(weapon), pos_x(pos_x), pos_y(pos_y) {}
+    DroppedWeapon(Weapon weapon, uint16_t pos_x, uint16_t pos_y):
+            weapon(weapon), pos_x(pos_x), pos_y(pos_y) {}
 
     void serialize(uint8_t* buffer) const {
         buffer[0] = static_cast<uint8_t>(weapon);
@@ -39,13 +41,11 @@ public:
         return DroppedWeapon(weapon, x, y);
     }
 
-    size_t serialized_size() const {
-        return sizeof(Weapon) + 2 * sizeof(uint16_t);
-    }
+    size_t serialized_size() const { return sizeof(Weapon) + 2 * sizeof(uint16_t); }
 
     Weapon get_weapon() const { return weapon; }
     uint16_t get_pos_x() const { return pos_x; }
     uint16_t get_pos_y() const { return pos_y; }
 };
 
-#endif  
+#endif

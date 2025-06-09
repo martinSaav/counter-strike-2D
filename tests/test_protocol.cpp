@@ -75,8 +75,6 @@ TEST(ProtocolTest, ReceivesLoginRequestCorrectly) {
 // CreateGameRequest Test Cases
 
 
-
-
 TEST(ProtocolTest, SendsCreateGameCorrectly) {
     MockSocket mock_socket;
 
@@ -99,7 +97,7 @@ TEST(ProtocolTest, SendsCreateGameCorrectly) {
     offset += map_name.size();
     const uint16_t payload_length = htons(static_cast<uint16_t>(offset - 3));
     memcpy(&serialized[1], &payload_length, sizeof(payload_length));
-    
+
 
     EXPECT_CALL(mock_socket, sendall(_, serialized_size))
             .WillOnce(Invoke([&](const void* data, unsigned int) {
@@ -132,7 +130,7 @@ TEST(ProtocolTest, ReceivesCreateGameCorrectly) {
     offset += map_name.size();
     const uint16_t payload_length = htons(static_cast<uint16_t>(offset - 3));
     memcpy(&serialized[1], &payload_length, sizeof(payload_length));
-    
+
     EXPECT_CALL(mock_socket, recvall(_, 3)).WillOnce(Invoke([&](void* dst, unsigned int) {
         memcpy(dst, serialized.data(), 3);
         return 3;
@@ -151,7 +149,6 @@ TEST(ProtocolTest, ReceivesCreateGameCorrectly) {
     ASSERT_NE(create_game, nullptr);
     EXPECT_EQ(create_game->get_game_name(), game_name);
 }
-
 
 
 // CreateGameResponse Test Cases
