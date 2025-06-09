@@ -51,7 +51,10 @@ void Player::receive_damage(const int damage) {
     }
 }
 
-void Player::add_kill() { kills++; }
+void Player::add_kill() {
+    kills++;
+    money += money_per_kill;
+}
 
 
 void Player::buy_weapon(std::unique_ptr<Gun> gun) {
