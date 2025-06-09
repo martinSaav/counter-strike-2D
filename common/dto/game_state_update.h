@@ -20,7 +20,6 @@
 #include "player_info.h"
 
 
-
 class GameStateUpdate: public Message {
 private:
     MessageType message_type = MessageType::GameStateUpdate;

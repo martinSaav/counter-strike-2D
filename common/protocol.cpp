@@ -5,23 +5,23 @@
 #include <utility>
 #include <vector>
 
+#include "../common/dto/buy_weapon_request.h"
 #include "../common/dto/create_game_request.h"
 #include "../common/dto/create_game_response.h"
 #include "../common/dto/game_list_request.h"
 #include "../common/dto/game_list_response.h"
+#include "../common/dto/game_ready_request.h"
+#include "../common/dto/game_ready_response.h"
 #include "../common/dto/game_state_update.h"
 #include "../common/dto/join_game_request.h"
 #include "../common/dto/join_game_response.h"
+#include "../common/dto/join_team_request.h"
+#include "../common/dto/join_team_response.h"
 #include "../common/dto/login_request.h"
 #include "../common/dto/map_names_request.h"
 #include "../common/dto/map_names_response.h"
-#include "../common/dto/game_ready_request.h"
-#include "../common/dto/game_ready_response.h"
-#include "../common/dto/join_team_request.h"
-#include "../common/dto/join_team_response.h"
-#include "../common/dto/buy_weapon_request.h"
-#include "../common/dto/select_skin_request.h"
 #include "../common/dto/player_action.h"
+#include "../common/dto/select_skin_request.h"
 
 
 Protocol::Protocol(SocketInterface& peer): peer(peer) {}

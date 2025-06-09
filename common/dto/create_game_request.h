@@ -18,7 +18,8 @@ private:
     std::string map_name;
 
 public:
-    explicit CreateGameRequest(std::string game_name, std::string map_name): game_name(std::move(game_name)), map_name(std::move(map_name)) {}
+    explicit CreateGameRequest(std::string game_name, std::string map_name):
+            game_name(std::move(game_name)), map_name(std::move(map_name)) {}
 
     void serialize(uint8_t* buffer) const override {
         buffer[0] = static_cast<uint8_t>(message_type);
@@ -38,7 +39,9 @@ public:
         memcpy(buffer + 1, &payload_length, sizeof(payload_length));
     }
 
-    size_t serialized_size() const override { return 3 + game_name.size() + sizeof(uint16_t) + map_name.size() + sizeof(uint16_t); }
+    size_t serialized_size() const override {
+        return 3 + game_name.size() + sizeof(uint16_t) + map_name.size() + sizeof(uint16_t);
+    }
 
     const std::string& get_game_name() const { return game_name; }
     const std::string& get_map_name() const { return map_name; }
@@ -63,7 +66,7 @@ public:
         offset += sizeof(map_name_length);
 
         std::string map_name(reinterpret_cast<const char*>(buffer + offset), map_name_length);
-        offset += map_name_length;
+        // offset += map_name_length;
 
         return CreateGameRequest(std::move(game_name), std::move(map_name));
     }

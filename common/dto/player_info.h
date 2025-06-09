@@ -42,8 +42,8 @@ public:
     PlayerInfo(std::string user_name, uint16_t pos_x, uint16_t pos_y, uint16_t health,
                Status status, float money, uint16_t kills, uint16_t deaths, Action action,
                uint16_t pos_shoot_x, uint16_t pos_shoot_y, std::string skin, Weapon primary_weapon,
-               uint16_t primary_weapon_ammo, Weapon secondary_weapon, uint16_t secondary_weapon_ammo,
-               Weapon knife, Weapon bomb):
+               uint16_t primary_weapon_ammo, Weapon secondary_weapon,
+               uint16_t secondary_weapon_ammo, Weapon knife, Weapon bomb):
             user_name(std::move(user_name)),
             pos_x(pos_x),
             pos_y(pos_y),
@@ -61,8 +61,7 @@ public:
             secondary_weapon(secondary_weapon),
             secondary_weapon_ammo(secondary_weapon_ammo),
             knife(knife),
-            bomb(bomb)
-            {}
+            bomb(bomb) {}
 
     void serialize(uint8_t* buffer) const {
         size_t offset = 0;
