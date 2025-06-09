@@ -4,11 +4,13 @@
 #include <cstdint>
 
 enum class Weapon : uint8_t {
-    Knife = 0x00,
-    Glock = 0x01,
-    AK47 = 0x02,
-    M3 = 0x03,
-    AWP = 0x04,
+    None = 0x00,
+    Knife = 0x01,
+    Bomb = 0x02,
+    Glock = 0x03,
+    AK47 = 0x04,
+    M3 = 0x05,
+    AWP = 0x06,
 };
 
 

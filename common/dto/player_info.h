@@ -36,12 +36,14 @@ private:
     Weapon secondary_weapon;
     uint16_t secondary_weapon_ammo;
     Weapon knife;
+    Weapon bomb;
 
 public:
     PlayerInfo(std::string user_name, uint16_t pos_x, uint16_t pos_y, uint16_t health,
                Status status, float money, uint16_t kills, uint16_t deaths, Action action,
                uint16_t pos_shoot_x, uint16_t pos_shoot_y, std::string skin, Weapon primary_weapon,
-               uint16_t primary_weapon_ammo, Weapon secondary_weapon, uint16_t secondary_weapon_ammo,Weapon knife):
+               uint16_t primary_weapon_ammo, Weapon secondary_weapon, uint16_t secondary_weapon_ammo,
+               Weapon knife, Weapon bomb):
             user_name(std::move(user_name)),
             pos_x(pos_x),
             pos_y(pos_y),
@@ -58,7 +60,8 @@ public:
             primary_weapon_ammo(primary_weapon_ammo),
             secondary_weapon(secondary_weapon),
             secondary_weapon_ammo(secondary_weapon_ammo),
-            knife(knife)
+            knife(knife),
+            bomb(bomb)
             {}
 
     void serialize(uint8_t* buffer) const {
@@ -103,6 +106,7 @@ public:
         std::memcpy(buffer + offset, &secondary_weapon_ammo_net, sizeof(secondary_weapon_ammo_net));
         offset += sizeof(secondary_weapon_ammo_net);
         buffer[offset++] = static_cast<uint8_t>(knife);
+        buffer[offset++] = static_cast<uint8_t>(bomb);
     }
 
     size_t serialized_size() const {
@@ -180,10 +184,11 @@ public:
         secondary_weapon_ammo = ntohs(secondary_weapon_ammo);
         offset += sizeof(secondary_weapon_ammo);
         Weapon knife = static_cast<Weapon>(buffer[offset++]);
+        Weapon bomb = static_cast<Weapon>(buffer[offset++]);
 
         return PlayerInfo(user_name, pos_x, pos_y, health, status, money, kills, deaths, action,
                           pos_shoot_x, pos_shoot_y, skin, primary_weapon, primary_weapon_ammo,
-                          secondary_weapon, secondary_weapon_ammo, knife);
+                          secondary_weapon, secondary_weapon_ammo, knife, bomb);
     }
 };
 
