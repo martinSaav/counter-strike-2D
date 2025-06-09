@@ -68,7 +68,7 @@ ShootResult Ak47::fire_gun(Map& map, Player& owner, const float current_time,
         auto [player_hit_x, player_hit_y] = player_hit->get_location();
         const double distance = std::sqrt(pow(x - player_hit_x, 2) + pow(y - player_hit_y, 2));
         const int damage_before_distance = min_dmg + std::rand() % (max_dmg - min_dmg + 1);
-        const double damage = static_cast<double>(damage_before_distance) / 1 + (distance / 10);
+        const double damage = static_cast<double>(damage_before_distance) / (1 + distance / 10);
         return ShootResult{static_cast<int>(damage), impact.impact_position, player_hit};
     }
     return ShootResult{impact.impact_position};
