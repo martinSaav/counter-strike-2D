@@ -10,6 +10,7 @@
 #include "game/map.h"
 #include "game/player.h"
 
+#include "game_clock.h"
 #include "game_identification.h"
 #include "game_manager.h"
 #include "match_status_dto.h"
@@ -38,6 +39,7 @@ class Match: public Thread {
     int player_count;
     const int max_player_count;
     Map map;
+    GameClock game_clock;
     GameManager game_manager;
     std::atomic<bool> has_finished;
 
@@ -55,6 +57,8 @@ class Match: public Thread {
 
     void wait_for_match_to_start();
 
+    void setup_round_start();
+
     void update_game();
 
     void run_game_loop();
@@ -66,7 +70,7 @@ public:
             player_count(0),
             max_player_count(max_number_of_players),
             map(map_width, map_height),
-            game_manager(map) {}
+            game_manager(map, game_clock) {}
     GameIdentification join_match(const std::string& username);
     void run() override;
     void stop() override;

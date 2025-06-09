@@ -18,8 +18,11 @@ void Sender::send_status(const MatchStatusDTO& status) const {
                           player_dto.aim_y, SkinTranslator::code_to_string(player_dto.skin));
         players.push_back(player);
     }
-    const GameStateUpdate state(true, false, 1, 0, true, false, false, 0, 0, 0, Team::Terrorists,
-                                Team::Terrorists, std::move(players));
+    const GameStateUpdate state(status.game_started, status.game_ended, status.round,
+                                status.round_time, status.round_started, status.round_ended,
+                                status.bomb_planted, status.bomb_x, status.bomb_y,
+                                status.bomb_timer, status.round_winner, status.game_winner,
+                                std::move(players));
     protocol.send_message(state);
 }
 
