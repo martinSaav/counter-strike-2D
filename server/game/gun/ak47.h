@@ -14,8 +14,8 @@
 #define max_reserve_ammo 60
 #define bullets_per_burst 3
 #define ak_price 600
-#define max_dmg 40
-#define min_dmg 20
+#define max_dmg 30
+#define min_dmg 10
 #define max_range 300
 
 class Ak47: public Gun {
