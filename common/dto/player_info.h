@@ -32,14 +32,16 @@ private:
     uint16_t pos_shoot_y;
     std::string skin;
     Weapon primary_weapon;
+    uint16_t primary_weapon_ammo;
     Weapon secondary_weapon;
+    uint16_t secondary_weapon_ammo;
     Weapon knife;
 
 public:
     PlayerInfo(std::string user_name, uint16_t pos_x, uint16_t pos_y, uint16_t health,
                Status status, float money, uint16_t kills, uint16_t deaths, Action action,
                uint16_t pos_shoot_x, uint16_t pos_shoot_y, std::string skin, Weapon primary_weapon,
-               Weapon secondary_weapon, Weapon knife):
+               uint16_t primary_weapon_ammo, Weapon secondary_weapon, uint16_t secondary_weapon_ammo,Weapon knife):
             user_name(std::move(user_name)),
             pos_x(pos_x),
             pos_y(pos_y),
@@ -53,7 +55,9 @@ public:
             pos_shoot_y(pos_shoot_y),
             skin(std::move(skin)),
             primary_weapon(primary_weapon),
+            primary_weapon_ammo(primary_weapon_ammo),
             secondary_weapon(secondary_weapon),
+            secondary_weapon_ammo(secondary_weapon_ammo),
             knife(knife)
             {}
 
@@ -91,7 +95,13 @@ public:
         offset += skin.size();
 
         buffer[offset++] = static_cast<uint8_t>(primary_weapon);
+        uint16_t primary_weapon_ammo_net = htons(primary_weapon_ammo);
+        std::memcpy(buffer + offset, &primary_weapon_ammo_net, sizeof(primary_weapon_ammo_net));
+        offset += sizeof(primary_weapon_ammo_net);
         buffer[offset++] = static_cast<uint8_t>(secondary_weapon);
+        uint16_t secondary_weapon_ammo_net = htons(secondary_weapon_ammo);
+        std::memcpy(buffer + offset, &secondary_weapon_ammo_net, sizeof(secondary_weapon_ammo_net));
+        offset += sizeof(secondary_weapon_ammo_net);
         buffer[offset++] = static_cast<uint8_t>(knife);
     }
 
@@ -160,13 +170,20 @@ public:
         offset += skin_length;
 
         Weapon primary_weapon = static_cast<Weapon>(buffer[offset++]);
+        uint16_t primary_weapon_ammo;
+        std::memcpy(&primary_weapon_ammo, buffer + offset, sizeof(primary_weapon_ammo));
+        primary_weapon_ammo = ntohs(primary_weapon_ammo);
+        offset += sizeof(primary_weapon_ammo);
         Weapon secondary_weapon = static_cast<Weapon>(buffer[offset++]);
+        uint16_t secondary_weapon_ammo;
+        std::memcpy(&secondary_weapon_ammo, buffer + offset, sizeof(secondary_weapon_ammo));
+        secondary_weapon_ammo = ntohs(secondary_weapon_ammo);
+        offset += sizeof(secondary_weapon_ammo);
         Weapon knife = static_cast<Weapon>(buffer[offset++]);
 
-
         return PlayerInfo(user_name, pos_x, pos_y, health, status, money, kills, deaths, action,
-                          pos_shoot_x, pos_shoot_y, skin, primary_weapon,
-                          secondary_weapon, knife);
+                          pos_shoot_x, pos_shoot_y, skin, primary_weapon, primary_weapon_ammo,
+                          secondary_weapon, secondary_weapon_ammo, knife);
     }
 };
 
