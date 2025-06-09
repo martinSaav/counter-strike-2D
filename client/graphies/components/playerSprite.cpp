@@ -23,7 +23,10 @@ PlayerSprite::PlayerSprite(Renderer* sdlRenderer): Component(sdlRenderer) {
     texturas.loadTexture("knife", "../client/data/weapons/knife.bmp");
 
     // Bullets
-    texturas.loadTexture("shade", "../client/data/hud/hud_shade.bmp");
+    texturas.loadTexture("tiro", "../client/data/hud/explocion.png");
+
+    // Death
+    texturas.loadTexture("hud_symbols", "../client/data/hud/hud_symbols.png");
 }
 
 void PlayerSprite::drawPlayer(const PlayerInfo& jugador, SDL_Rect& camera ,float& zoom, double& angle) {
@@ -43,12 +46,11 @@ void PlayerSprite::drawPlayer(const PlayerInfo& jugador, SDL_Rect& camera ,float
     std::string weaponName = "ak47";
     this->drawWeapon(jugadorX, jugadorY, camera, zoom, angle, weaponName);
 
-    bool hayDisparo = true;
-    //if (hayDisparo){
-    //    int shootX = 40;
-    //    int shootY = 40;
-    //    drawBullet(jugadorX, jugadorY, camera, zoom, shootX, shootY, angle);
-    //}
+    if (jugador.get_action() == Action::Shoot){
+        int shootX = jugador.get_pos_shoot_x();
+        int shootY = jugador.get_pos_shoot_y();
+        drawBullet(camera, zoom, shootX, shootY, angle);
+    }
 }
 
 void PlayerSprite::drawWeapon(int& jugadorX, int& jugadorY, SDL_Rect& camera, float& zoom,
@@ -67,42 +69,40 @@ void PlayerSprite::drawWeapon(int& jugadorX, int& jugadorY, SDL_Rect& camera, fl
     float rotateDesvioX = desvioX * cos(radians) - desvioY * sin(radians);
     float rotateDesvioY = desvioX * sin(radians) + desvioY * cos(radians);
 
-    SDL_Rect destRect = {int((jugadorX + rotateDesvioX - camera.x) * zoom),
-                         int((jugadorY + rotateDesvioY - camera.y) * zoom), int(32 * zoom / 4),
-                         int(32 * zoom / 4)};
+    SDL_Rect destRect = {
+        int((jugadorX + rotateDesvioX - camera.x) * zoom),
+        int((jugadorY + rotateDesvioY - camera.y) * zoom), int(32 * zoom / 4),
+        int(32 * zoom / 4)};
 
     sdlRenderer->Copy(weapon, srcRect, destRect, angle);
 }
 
-void PlayerSprite::drawBullet(int& jugadorX, int& jugadorY, SDL_Rect& camera, float& zoom,
-        int& shootX, int& shootY, double& angle) {
+void PlayerSprite::drawBullet(SDL_Rect& camera, float& zoom, int& shootX, int& shootY, double& angle) {
 
-    Texture& shade = texturas.getTexture("shade");
+    SDL_Rect srcRectBullet = {0,0,360,360};
 
-    angle += 90;
-    int altoBala = 1;
-    //int anchoBala = calcularDistancia(jugadorX, jugadorY, shootX, shootY);
-
-    // Transformar a coordenadas de renderizado
-    int renderJugadorX = int((jugadorX - camera.x) * zoom);
-    int renderJugadorY = int((jugadorY - camera.y) * zoom);
-    int renderShootX = int((shootX - camera.x) * zoom);
-    int renderShootY = int((shootY - camera.y) * zoom);
-
-    // Calcular distancia en pantalla
-    int anchoBala = calcularDistancia(renderJugadorX, renderJugadorY, renderShootX, renderShootY);
-
-
-
-    SDL_Rect srcRect = {0, 0, 250, altoBala};
-    //SDL_Rect destRect = {jugadorX, jugadorY, anchoBala, altoBala};
-    SDL_Rect destRect = {renderJugadorX, renderJugadorY, anchoBala, altoBala};
-
-    sdlRenderer->Copy(shade, srcRect, destRect, angle);
+    SDL_Rect destRect = {
+    int((shootX - camera.x) * zoom),
+    int((shootY - camera.y) * zoom),
+    int(4 * zoom),
+    int(4 * zoom)
+    };
+    
+    Texture& tiro = texturas.getTexture("tiro");
+    sdlRenderer->Copy(tiro, srcRectBullet, destRect);
 }
 
-float PlayerSprite::calcularDistancia(int& x1, int& y1, int& x2, int& y2) {
-    int dx = x2 - x1;
-    int dy = y2 - y1;
-    return std::sqrt(dx * dx + dy * dy);
+void PlayerSprite::drawPlayerDeath(int jugadorX, int jugadorY, SDL_Rect& camera, float& zoom) {
+    Texture& hud_symbols = texturas.getTexture("hud_symbols");
+    hud_symbols.SetColorMod(255, 0, 0);
+
+    int posSymbolDeath = 12; 
+    SDL_Rect srcRectDeath = {64 * 12,0,64,64};
+
+    SDL_Rect destRect = {
+    int((jugadorX - camera.x) * zoom),
+    int((jugadorY - camera.y) * zoom),
+    int(32 * zoom / 6), int(32 * zoom / 6)};
+    
+    sdlRenderer->Copy(hud_symbols, srcRectDeath, destRect);
 }

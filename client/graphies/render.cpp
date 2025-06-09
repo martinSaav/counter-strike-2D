@@ -63,6 +63,11 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     int mousePlayerY = 0;
     for (auto const& jugador : jugadores){
 
+        if (jugador.get_health() == 0){
+            player.drawPlayerDeath(jugador.get_pos_x(), jugador.get_pos_y(), camera, zoom);
+            continue;
+        }
+
         if (jugador.get_user_name() == namePlayer){
             anglePlayer = getAnglePlayer(jugador.get_pos_x(), jugador.get_pos_y(), mouse_map_x, mouse_map_y);
 

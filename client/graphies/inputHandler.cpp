@@ -53,16 +53,20 @@ void InputHandler::processEvents() {
             actionActual = Action::MoveRight;
             action = &actionActual;
 
-        } else if (mouseState & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-           actionActual = Action::Shoot;
-           action = &actionActual;
         }
 
         if (action) {
-            int mouse_map_x = int(mouseX / configuracion.zoom + configuracion.camera.x);
-            int mouse_map_y = int(mouseY / configuracion.zoom + configuracion.camera.y);
+            mouse_map_x = int(mouseX / configuracion.zoom + configuracion.camera.x);
+            mouse_map_y = int(mouseY / configuracion.zoom + configuracion.camera.y);
             PlayerAction playerAction(*action, mouse_map_x, mouse_map_y);
             protocolo.send_message(playerAction);
+        }
+
+        // Disparo (por clic, independiente del movimiento)
+        if (mouseState & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+            mouse_map_x = int(mouseX / configuracion.zoom + configuracion.camera.x);
+            mouse_map_y = int(mouseY / configuracion.zoom + configuracion.camera.y);
+            protocolo.send_message(PlayerAction(Action::Shoot, mouse_map_x, mouse_map_y));
         }
         SDL_Delay(33);
     }

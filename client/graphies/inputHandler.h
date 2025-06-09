@@ -18,6 +18,9 @@ private:
     Protocol& protocolo;
     int mouseX = 0;
     int mouseY = 0;
+
+    int mouse_map_x = 0;
+    int mouse_map_y = 0;
     Configuracion& configuracion;
 
 public:
