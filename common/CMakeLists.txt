@@ -32,10 +32,12 @@ target_sources(taller_common
         dto/game_list_response.h
         dto/map_names_request.h
         dto/map_names_response.h
+        dto/buy_weapon_request.h
         dto/player_info.h
         action.h
         message_type.h
         message.h
         protocol.h
         game_info.h
+        team.h
     )

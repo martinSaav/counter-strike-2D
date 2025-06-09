@@ -11,14 +11,8 @@
 
 #include "../message.h"
 #include "../message_type.h"
+#include "../weapon.h"
 
-
-enum class Weapon : uint8_t {
-    Glock = 0x01,
-    AK47 = 0x02,
-    M3 = 0x03,
-    AWP = 0x04,
-};
 
 class BuyWeaponRequest: public Message {
 private:

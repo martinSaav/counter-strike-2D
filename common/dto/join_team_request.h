@@ -10,7 +10,7 @@
 
 #include "../message.h"
 #include "../message_type.h"
-#include "game_state_update.h"
+#include "../team.h"
 
 class JoinTeamRequest: public Message {
 private:
