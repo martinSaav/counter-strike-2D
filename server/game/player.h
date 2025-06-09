@@ -89,7 +89,10 @@ public:
     void update(GameManager& game_manager);
     [[nodiscard]] std::pair<double, double> get_center_coordinates() const;
     [[nodiscard]] Team get_team() const;
-    void resurrect() { status = Status::Alive; }
+    void resurrect() {
+        status = Status::Alive;
+        health = max_health;
+    }
     bool operator==(const Player& player) const = default;
 };
 #endif  // PLAYER_H

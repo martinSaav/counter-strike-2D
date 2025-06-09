@@ -28,7 +28,7 @@ void GameClock::advance(double dt) {
             current_stage = Stages::AfterRoundStage;
             stage_time -= duration;
         } else if (current_stage == Stages::AfterRoundStage) {
-            has_round_finished = true;
+            throw RoundAlreadyFinished();
         }
     }
 }

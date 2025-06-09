@@ -195,7 +195,6 @@ void Match::wait_for_match_to_start() {
 
 
 void Match::setup_round_start() {
-    std::lock_guard<std::mutex> lck(mtx);
     game_clock.reset();
     int terorrist_spawn_x = player_hitbox_width;
     int counter_spawn_x = map_width - player_hitbox_width;
@@ -227,6 +226,7 @@ void Match::update_game() {
     } catch (const RoundAlreadyFinished&) {
         game_manager.advance_round();
         setup_round_start();
+        return;
     }
     std::vector<std::shared_ptr<Player>> players_vector;
     for (const auto& player: players | std::views::values) {
