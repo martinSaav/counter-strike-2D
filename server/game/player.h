@@ -19,6 +19,7 @@
 #define player_hitbox_width 32
 #define starting_money 500
 #define max_health 100
+#define money_per_kill 300
 
 class GameManager;
 
