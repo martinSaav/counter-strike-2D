@@ -17,6 +17,7 @@
 #include "../team.h"
 #include "../weapon.h"
 
+#include "dropped_weapon.h"
 #include "player_info.h"
 
 
@@ -36,12 +37,14 @@ private:
     Team round_winner;
     Team game_winner;
     std::list<PlayerInfo> players;
+    std::list<DroppedWeapon> dropped_weapons;
 
 public:
     explicit GameStateUpdate(bool game_started, bool game_ended, uint8_t round, float round_time,
                              bool round_started, bool round_ended, bool bomb_planted,
                              uint16_t bomb_x, uint16_t bomb_y, float bomb_timer, Team round_winner,
-                             Team game_winner, std::list<PlayerInfo> players):
+                             Team game_winner, std::list<PlayerInfo> players,
+                             std::list<DroppedWeapon> dropped_weapons):
             game_started(game_started),
             game_ended(game_ended),
             round(round),
@@ -54,7 +57,8 @@ public:
             bomb_timer(bomb_timer),
             round_winner(round_winner),
             game_winner(game_winner),
-            players(std::move(players)) {}
+            players(std::move(players)),
+            dropped_weapons(std::move(dropped_weapons)) {}
 
 
     void serialize(uint8_t* buffer) const override {
@@ -94,6 +98,15 @@ public:
             offset += player.serialized_size();
         }
 
+        uint16_t num_weapons = htons(static_cast<uint16_t>(dropped_weapons.size()));
+        std::memcpy(buffer + offset, &num_weapons, sizeof(num_weapons));
+        offset += sizeof(num_weapons);
+
+        for (const auto& weapon: dropped_weapons) {
+            weapon.serialize(buffer + offset);
+            offset += weapon.serialized_size();
+        }
+
         uint16_t payload_length = htons(static_cast<uint16_t>(offset - 3));
         std::memcpy(buffer + 1, &payload_length, sizeof(payload_length));
     }
@@ -110,6 +123,11 @@ public:
         size += std::accumulate(players.begin(), players.end(), 0,
                                 [](const size_t sum, const PlayerInfo& player) {
                                     return sum + player.serialized_size();
+                                });
+
+        size += std::accumulate(dropped_weapons.begin(), dropped_weapons.end(), 0,
+                                [](const size_t sum, const DroppedWeapon& weapon) {
+                                    return sum + weapon.serialized_size();
                                 });
         return size;
     }
@@ -129,6 +147,7 @@ public:
     float get_bomb_timer() const { return bomb_timer; }
     Team get_round_winner() const { return round_winner; }
     Team get_game_winner() const { return game_winner; }
+    std::list<DroppedWeapon> get_dropped_weapons() const { return dropped_weapons; }
 
 
     static GameStateUpdate deserialize(const uint8_t* buffer, size_t size) {
@@ -173,9 +192,21 @@ public:
             players.push_back(player);
         }
 
+        uint16_t num_weapons;
+        std::memcpy(&num_weapons, buffer + offset, sizeof(num_weapons));
+        num_weapons = ntohs(num_weapons);
+        offset += sizeof(num_weapons);
+
+        std::list<DroppedWeapon> dropped_weapons;
+        for (int i = 0; i < num_weapons; ++i) {
+            DroppedWeapon weapon = DroppedWeapon::deserialize(buffer + offset, size - offset);
+            offset += weapon.serialized_size();
+            dropped_weapons.push_back(weapon);
+        }
+
         return GameStateUpdate(game_started, game_ended, round, round_time, round_started,
                                round_ended, bomb_planted, bomb_x, bomb_y, bomb_timer, round_winner,
-                               game_winner, std::move(players));
+                               game_winner, std::move(players), std::move(dropped_weapons));
     }
 };
 #endif
