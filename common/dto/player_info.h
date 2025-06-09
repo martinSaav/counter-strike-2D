@@ -125,6 +125,12 @@ public:
     uint16_t get_pos_shoot_x() const { return pos_shoot_x; }
     uint16_t get_pos_shoot_y() const { return pos_shoot_y; }
     const std::string& get_skin() const { return skin; }
+    Weapon get_primary_weapon() const { return primary_weapon; }
+    uint16_t get_primary_weapon_ammo() const { return primary_weapon_ammo; }
+    Weapon get_secondary_weapon() const { return secondary_weapon; }
+    uint16_t get_secondary_weapon_ammo() const { return secondary_weapon_ammo; }
+    Weapon get_knife() const { return knife; }
+    Weapon get_bomb() const { return bomb; }
 
     static PlayerInfo deserialize(const uint8_t* buffer, size_t size) {
         if (size < 2) {
