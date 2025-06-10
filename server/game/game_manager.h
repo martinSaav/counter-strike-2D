@@ -11,6 +11,7 @@
 #include "player.h"
 #include "time_information.h"
 
+#define time_to_defuse 3000
 
 class GameManager {
     Map& map;
@@ -47,6 +48,15 @@ public:
     [[nodiscard]] double get_time() const { return clock.get_time(); }
     [[nodiscard]] TimeInformation get_time_information() const;
     [[nodiscard]] Map& get_map() const { return map; }
+    void plant_bomb(int x, int y);
+    [[nodiscard]] bool is_bomb_planted() const { return bomb_planted; }
+    [[nodiscard]] bool can_plant_bomb(int x, int y) const;
+    void explode_bomb(const std::vector<std::shared_ptr<Player>>& players);
+    void start_defusing(const std::shared_ptr<Player>& player) const;
+    void has_finished_defusing(const std::shared_ptr<Player>& player);
+    void drop_bomb(const std::shared_ptr<Player>& player,
+                   std::unique_ptr<BombEncapsulator> bomb) const;
+    void drop_weapon(const std::shared_ptr<Player>& player, std::unique_ptr<Gun> gun) const;
 };
 
 

@@ -7,8 +7,14 @@
 
 #include "player.h"
 
+ShootResult::ShootResult(): type(ShootType::PlantingBomb), miss(false), dmg(0) {}
+
 ShootResult::ShootResult(const std::pair<int, int>& position):
-        miss(true), dmg(0), position(position), player_hit(std::nullopt) {}
+        type(ShootType::Miss), miss(true), dmg(0), position(position), player_hit(std::nullopt) {}
 ShootResult::ShootResult(int dmg, const std::pair<int, int>& position,
                          std::shared_ptr<Player> player_hit):
-        miss(false), dmg(dmg), position(position), player_hit(std::move(player_hit)) {}
+        type(ShootType::Hit),
+        miss(false),
+        dmg(dmg),
+        position(position),
+        player_hit(std::move(player_hit)) {}

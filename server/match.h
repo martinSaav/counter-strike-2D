@@ -53,6 +53,10 @@ class Match: public Thread {
 
     void process_shoot_request(const std::shared_ptr<Player>& player, const Position& position);
 
+    void process_defuse_request(const std::shared_ptr<Player>& player) const;
+
+    void process_reload_request(const std::shared_ptr<Player>& player) const;
+
     void broadcast_match_start();
 
     void wait_for_match_to_start();

@@ -75,10 +75,19 @@ void Match::process_shoot_request(const std::shared_ptr<Player>& player, const P
     if (!game_manager.can_player_move_or_shoot(player)) {
         return;
     }
-    auto [x, y] = position.get_position();
-    if (map.check_if_position_is_in_range(x, y)) {
+    if (auto [x, y] = position.get_position(); map.check_if_position_is_in_range(x, y)) {
         player->shoot(position);
     }
+}
+
+
+void Match::process_defuse_request(const std::shared_ptr<Player>& player) const {
+    game_manager.start_defusing(player);
+}
+
+
+void Match::process_reload_request(const std::shared_ptr<Player>& player) const {
+    player->reload();
 }
 
 
@@ -110,6 +119,15 @@ void Match::process_command(const PlayerCommand& command) {
         }
         case CommandType::Shoot: {
             return process_shoot_request(player, command.position.value());
+        }
+        case CommandType::PlantBomb: {
+            return process_shoot_request(player, command.position.value());
+        }
+        case CommandType::DefuseBomb: {
+            return process_defuse_request(player);
+        }
+        case CommandType::Reload: {
+            return process_reload_request(player);
         }
         default:
             break;
@@ -199,9 +217,7 @@ void Match::setup_round_start() {
     int terorrist_spawn_x = player_hitbox_width;
     int counter_spawn_x = map_width - player_hitbox_width;
     for (const auto& player: players | std::views::values) {
-        if (player->is_dead()) {
-            player->resurrect();
-        }
+        player->restore();
         if (player->get_team() == Team::Terrorists) {
             constexpr int terorrist_spawn_y = 0 + player_hitbox_height;
             const Position new_pos(terorrist_spawn_x, terorrist_spawn_y);
@@ -228,6 +244,7 @@ void Match::update_game() {
         setup_round_start();
         return;
     }
+    if (game_manager.is_bomb_planted() && game_clock.has_bomb_exploded()) {}
     std::vector<std::shared_ptr<Player>> players_vector;
     for (const auto& player: players | std::views::values) {
         player->update(game_manager);
