@@ -2,6 +2,7 @@
 
 #include <list>
 
+#include "catedra/liberror.h"
 #include "common/dto/game_ready_response.h"
 #include "common/dto/game_state_update.h"
 
@@ -18,7 +19,8 @@ void Sender::send_status(const MatchStatusDTO& status) const {
                           player_dto.aim_y, SkinTranslator::code_to_string(player_dto.skin),
                           player_dto.primary_weapon, player_dto.primary_weapon_ammo,
                           player_dto.secondary_weapon, player_dto.secondary_weapon_ammo,
-                          player_dto.knife, player_dto.bomb);
+                          player_dto.knife, player_dto.bomb, player_dto.current_weapon,
+                          player_dto.current_weapon_ammo);
         players.push_back(player);
     }
     const GameStateUpdate state(status.game_started, status.game_ended, status.round,
@@ -41,9 +43,10 @@ void Sender::run() {
             }
         } catch (const ClosedQueue&) {
             break;
+        } catch (const LibError&) {
+            return;
         } catch (const std::exception& e) {
             std::cerr << "Unexpected exception: " << e.what() << std::endl;
-
         } catch (...) {
             std::cerr << "Unexpected exception: <unknown>\n";
         }
@@ -53,4 +56,5 @@ void Sender::run() {
 void Sender::stop() {
     Thread::stop();
     sender_queue->close();
+    is_alive = false;
 }

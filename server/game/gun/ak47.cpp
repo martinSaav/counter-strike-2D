@@ -9,6 +9,17 @@
 
 #include "map.h"
 #include "player.h"
+#define miliseconds_per_shoot 2500
+#define max_ammo 30
+#define max_reserve_ammo 60
+#define bullets_per_burst 3
+#define ak_price 600
+#define max_dmg 30
+#define min_dmg 10
+#define max_range 300
+
+Ak47::Ak47(): current_ammo(max_ammo), reserve_ammo(max_reserve_ammo), time_since_last_shot(0) {}
+
 
 bool Ak47::has_to_shoot(const float current_time) {
     return !shoots.empty() && (current_time - time_since_last_shot > miliseconds_per_shoot);

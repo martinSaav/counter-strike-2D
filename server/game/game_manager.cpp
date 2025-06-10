@@ -176,3 +176,39 @@ void GameManager::pick_weapon(const std::shared_ptr<Player>& player) {
         player->equip_weapon(std::move(gun));
     }
 }
+
+
+bool GameManager::has_to_switch_sides() const { return current_round == 6; }
+
+
+bool GameManager::has_ended() const {
+    if (tt_rounds >= 6) {
+        return true;
+    }
+    if (ct_rounds >= 6) {
+        return true;
+    }
+    if (current_round == 10) {
+        return true;
+    }
+    return false;
+}
+
+
+void GameManager::give_bomb_to_random_player(const std::vector<std::shared_ptr<Player>>& players) {
+    const int amount_of_tt = std::count_if(players.begin(), players.end(),
+                                           [](const std::shared_ptr<Player>& player) {
+                                               return player->current_team == Team::Terrorists;
+                                           });
+    const int bomb_player = std::rand() % (amount_of_tt);
+    int current_tt = 0;
+    for (auto& player: players) {
+        if (player->current_team == Team::Terrorists) {
+            if (current_tt == bomb_player) {
+                player->equip_bomb(std::make_unique<BombEncapsulator>());
+                return;
+            }
+            current_tt++;
+        }
+    }
+}

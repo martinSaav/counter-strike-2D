@@ -9,8 +9,6 @@
 
 #include "gun.h"
 
-#define max_degree (M_PI / 8)
-#define knife_range 30
 class Knife: public Gun {
     GunType type = GunType::Knife;
     std::pair<int, int> next_shoot;

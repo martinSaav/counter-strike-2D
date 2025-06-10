@@ -151,7 +151,7 @@ MatchStatusDTO Match::get_match_status() {
     TimeInformation info = game_manager.get_time_information();
     return MatchStatusDTO{std::move(player_dtos),
                           match_started,
-                          false,
+                          has_finished,
                           info.round,
                           info.round_time,
                           info.round_started,
@@ -223,10 +223,20 @@ void Match::wait_for_match_to_start() {
 
 void Match::setup_round_start() {
     game_clock.reset();
+    if (game_manager.has_to_switch_sides()) {
+        for (const auto& player: players | std::views::values) {
+            player->switch_team();
+        }
+    }
+    if (game_manager.has_ended()) {
+        has_finished = true;
+    }
     int terorrist_spawn_x = player_hitbox_width;
     int counter_spawn_x = map_width - player_hitbox_width;
+    std::vector<std::shared_ptr<Player>> players_vector;
     for (const auto& player: players | std::views::values) {
         player->restore();
+        players_vector.push_back(player);
         if (player->get_team() == Team::Terrorists) {
             constexpr int terorrist_spawn_y = 0 + player_hitbox_height;
             const Position new_pos(terorrist_spawn_x, terorrist_spawn_y);
@@ -241,6 +251,7 @@ void Match::setup_round_start() {
             counter_spawn_x -= player_hitbox_width;
         }
     }
+    game_manager.give_bomb_to_random_player(players_vector);
 }
 
 
@@ -266,7 +277,7 @@ void Match::update_game() {
 
 void Match::run_game_loop() {
     auto start = std::chrono::system_clock::now();
-    while (should_keep_running()) {
+    while (should_keep_running() && !has_finished) {
         if (PlayerCommand command; commands_queue.try_pop(command)) {
             process_command(command);
         }

@@ -147,6 +147,8 @@ CommandType ClientHandler::cast_action_to_command(const Action action) {
             return CommandType::Reload;
         case Action::Idle:
             return CommandType::Unknown;
+        case Action::SwitchWeapon:
+            return CommandType::SwitchWeapon;
     }
     return CommandType::Unknown;
 }

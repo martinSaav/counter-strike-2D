@@ -35,8 +35,23 @@ PlayerDTO Player::get_player_info() {
     if (bomb != nullptr) {
         bomb_info = Weapon::Bomb;
     }
+    Weapon current_weapon;
+    int current_weapon_ammo;
     WeaponInfo primary_info = get_primary_weapon_info();
     WeaponInfo secondary_info = get_secondary_weapon_info();
+    if (equipped_weapon == GunType::Primary) {
+        current_weapon = primary_info.weapon_type;
+        current_weapon_ammo = primary_info.ammo;
+    } else if (equipped_weapon == GunType::Secondary) {
+        current_weapon = secondary_info.weapon_type;
+        current_weapon_ammo = secondary_info.ammo;
+    } else if (equipped_weapon == GunType::Knife) {
+        current_weapon = Weapon::Knife;
+        current_weapon_ammo = 0;
+    } else {
+        current_weapon = Weapon::Bomb;
+        current_weapon_ammo = 0;
+    }
     if (current_team == Team::Terrorists) {
         return PlayerDTO{username,
                          position_x,
@@ -55,7 +70,9 @@ PlayerDTO Player::get_player_info() {
                          secondary_info.ammo,
                          Weapon::Knife,
                          bomb_info,
-                         last_action};
+                         last_action,
+                         current_weapon,
+                         current_weapon_ammo};
     }
     return PlayerDTO{username,
                      position_x,
@@ -74,7 +91,9 @@ PlayerDTO Player::get_player_info() {
                      secondary_info.ammo,
                      Weapon::Knife,
                      bomb_info,
-                     last_action};
+                     last_action,
+                     current_weapon,
+                     current_weapon_ammo};
 }
 
 
