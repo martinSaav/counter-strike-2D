@@ -9,6 +9,15 @@
 
 #include "map.h"
 #include "player.h"
+#define max_ammo 20
+#define max_reserve_ammo 40
+#define glock_price 200
+#define max_dmg 40
+#define min_dmg 20
+#define max_range 150
+
+Glock::Glock(): current_ammo(max_ammo), reserve_ammo(max_reserve_ammo), has_to_fire(false) {}
+
 
 int Glock::get_gun_price() { return glock_price; }
 

@@ -10,6 +10,9 @@
 #include "map.h"
 #include "player.h"
 
+#define max_degree (M_PI / 8)
+#define knife_range 30
+
 void Knife::shoot_gun(Position final_position) {
     const auto pos = final_position.get_position();
     next_shoot = pos;

@@ -8,12 +8,6 @@
 #include <utility>
 
 #include "gun.h"
-#define max_ammo 20
-#define max_reserve_ammo 40
-#define glock_price 200
-#define max_dmg 40
-#define min_dmg 20
-#define max_range 150
 
 class Glock: public Gun {
     int current_ammo;
@@ -28,7 +22,7 @@ class Glock: public Gun {
     void reset_shoots() override;
 
 public:
-    Glock(): current_ammo(max_ammo), reserve_ammo(max_reserve_ammo), has_to_fire(false) {}
+    Glock();
     GunType get_gun_type() override { return type; }
     void reload_gun() override;
     void shoot_gun(Position final_position) override;
