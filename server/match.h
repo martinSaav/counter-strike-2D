@@ -57,6 +57,8 @@ class Match: public Thread {
 
     void process_reload_request(const std::shared_ptr<Player>& player) const;
 
+    void process_pick_weapon_request(const std::shared_ptr<Player>& player);
+
     void broadcast_match_start();
 
     void wait_for_match_to_start();

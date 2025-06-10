@@ -46,11 +46,18 @@ Team Player::get_team() const { return current_team; }
 bool Player::is_dead() const { return status == Status::Dead; }
 
 
-void Player::receive_damage(const int damage) {
+void Player::receive_damage(const GameManager& manager, const int damage) {
     health = std::max(0, health - damage);
     if (health == 0) {
         status = Status::Dead;
         deaths++;
+        if (bomb != nullptr) {
+            manager.drop_bomb(*this, std::move(bomb));
+        } else if (equipped_weapon == GunType::Primary) {
+            manager.drop_weapon(*this, std::move(primary_weapon));
+        } else if (equipped_weapon == GunType::Secondary) {
+            manager.drop_weapon(*this, std::move(secondary_weapon));
+        }
         primary_weapon = nullptr;
         secondary_weapon = std::make_unique<Glock>();
         equipped_weapon = GunType::Secondary;
@@ -221,10 +228,11 @@ void Player::equip_weapon(std::unique_ptr<Gun> gun) {
     if (is_planting) {
         is_planting = false;
     }
-    GunType type = gun->get_gun_type();
+    const GunType type = gun->get_gun_type();
     if (type == GunType::Primary) {
         primary_weapon = std::move(gun);
     } else if (type == GunType::Secondary) {
         secondary_weapon = std::move(gun);
     }
+    equipped_weapon = type;
 }

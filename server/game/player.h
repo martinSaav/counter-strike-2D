@@ -56,7 +56,7 @@ class Player {
             chunks_idxs;  // indices de los chunks en los que se encuentra el jugador
     void switch_team();
     void add_kill();
-    void receive_damage(GameManager& manager, int damage);
+    void receive_damage(const GameManager& manager, int damage);
     void buy_weapon(std::unique_ptr<Gun> gun);
     void switch_weapon();
     std::unique_ptr<Gun>& get_equipped_gun();
@@ -72,11 +72,11 @@ public:
             aim_x(0),
             aim_y(0),
             kills(0),
+            deaths(0),
+            is_shooting(false),
             is_planting(false),
             is_defusing(false),
             defuse_time(0),
-            deaths(0),
-            is_shooting(false),
             current_team(team),
             status(Status::Alive) {
         terrorist_skin = PlayerSkin::T1;

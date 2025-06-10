@@ -49,7 +49,7 @@ class Map {
 
 
 public:
-    Map(const int max_x, const int max_y): max_x(max_x), max_y(max_y) {}
+    Map(const int x, const int y): dropped_bomb({Position(0, 0), nullptr}), max_x(x), max_y(y) {}
     void add_structure(Structure structure);
     void add_bombsite(BombSite site);
     void add_player(const std::shared_ptr<Player>& player);

@@ -149,15 +149,30 @@ void GameManager::has_finished_defusing(const std::shared_ptr<Player>& player) {
 }
 
 
-void GameManager::drop_bomb(const std::shared_ptr<Player>& player,
-                            std::unique_ptr<BombEncapsulator> bomb) const {
-    auto [x, y] = player->get_location();
+void GameManager::drop_bomb(Player& player, std::unique_ptr<BombEncapsulator> bomb) const {
+    auto [x, y] = player.get_location();
     map.drop_bomb(std::move(bomb), x, y);
 }
 
 
-void GameManager::drop_weapon(const std::shared_ptr<Player>& player,
-                              std::unique_ptr<Gun> gun) const {
-    auto [x, y] = player->get_location();
+void GameManager::drop_weapon(Player& player, std::unique_ptr<Gun> gun) const {
+    auto [x, y] = player.get_location();
     map.drop_weapon(std::move(gun), x, y);
+}
+
+
+void GameManager::pick_weapon(const std::shared_ptr<Player>& player) {
+    if (player->is_dead()) {
+        return;
+    }
+    auto [x, y] = player->get_location();
+    if (player->current_team != Team::CounterTerrorists) {
+        if (std::unique_ptr<BombEncapsulator> bomb = map.pick_bomb(x, y); bomb != nullptr) {
+            player->equip_bomb(std::move(bomb));
+        }
+        return;
+    }
+    if (std::unique_ptr<Gun> gun = map.pick_weapon(x, y); gun != nullptr) {
+        player->equip_weapon(std::move(gun));
+    }
 }
