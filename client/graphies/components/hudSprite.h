@@ -6,6 +6,7 @@
 enum HudType {
     HEALTH = 0,
     TIME = 2,
+    SHOP = 4,
     MONEY = 7,
     DOBLEPUNTO = 10
 };
@@ -34,8 +35,9 @@ class HudSprite : public Component{
         int& weaponX, int& cantBalas);
 
     public:
-    HudSprite(Renderer* sdlRenderer, int& weidth, int& height);
+    HudSprite(Renderer* sdlRenderer, Configuracion& configuracion, int& weidth, int& height);
 
     void draw(SDL_Rect& mouse, int& health, int& money, int& time, int& round);
+
 };
 #endif

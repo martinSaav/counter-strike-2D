@@ -3,6 +3,7 @@
 #include <thread>
 
 #include "SDL_image.h"
+#include "SDL_mixer.h"
 #include "inputHandler.h"
 #include "inputServerHandler.h"
 using SDL2pp::Renderer;

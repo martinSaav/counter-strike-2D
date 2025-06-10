@@ -1,7 +1,8 @@
 #include "hudSprite.h"
+#include <cmath>
 
-HudSprite::HudSprite(Renderer* sdlRenderer, int& weidth, int& height) : 
-    Component(sdlRenderer), weidthScreen(weidth), heightScreen(height){
+HudSprite::HudSprite(Renderer* sdlRenderer, Configuracion& configuracion, int& weidth, int& height) : 
+    Component(sdlRenderer, configuracion), weidthScreen(weidth), heightScreen(height){
 
     texturas.loadTexture("mira", "../client/data/mira.png");
     texturas.loadTexture("symbols", "../client/data/hud/hud_symbols.png");
@@ -42,6 +43,14 @@ void HudSprite::draw(SDL_Rect& mouse, int& health, int& money, int& time, int& r
     nums.SetColorMod(255, 165, 0);
     hud_symbols.SetColorMod(255, 165, 0);
 
+    if (time < 45){
+        // Shop
+        symbolX = weidthScreen * 0.30;
+        tipo = SHOP;
+        int numTipo = tipo;
+        drawSymbol(numTipo, symbolX, symbolY, hud_symbols);
+    }
+    
     // time
     symbolX = weidthScreen * 0.45;
     tipo = TIME;

@@ -6,6 +6,7 @@ add_library(graphies STATIC
     inputServerHandler.cpp
     textureStore.cpp
     configuracion.h
+    musicManager.cpp
     components/hudSprite.cpp
     components/mapSprite.cpp
     components/playerSprite.cpp
@@ -26,4 +27,4 @@ find_package(SDL2 REQUIRED)
 target_include_directories(graphies PUBLIC ${SDL2_INCLUDE_DIRS})
 
 # Link SDL2 library
-target_link_libraries(graphies PUBLIC ${SDL2_LIBRARIES} SDL2::SDL2 SDL2pp::SDL2pp SDL2_image::SDL2_image)
+target_link_libraries(graphies PUBLIC ${SDL2_LIBRARIES} SDL2::SDL2 SDL2pp::SDL2pp SDL2_image::SDL2_image SDL2_mixer::SDL2_mixer)

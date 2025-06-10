@@ -9,15 +9,15 @@ class PlayerSprite : public Component{
     private:
     SDL_Rect srcRect = {0, 0, 32, 32};
 
-    void drawWeapon(int& jugadorX, int& jugadorY, SDL_Rect& camera, float& zoom,double& angle, std::string& weaponName);
+    void drawWeapon(int& jugadorX, int& jugadorY,double& angle, std::string& weaponName);
 
-    void drawBullet(SDL_Rect& camera, float& zoom, int& shootX, int& shootY, double& angle);
+    void drawBullet(int& shootX, int& shootY, double& angle);
 
     public:
-    PlayerSprite(Renderer* sdlRenderer);
+    PlayerSprite(Renderer* sdlRenderer, Configuracion& configuracion);
 
-    void drawPlayer(const PlayerInfo& jugador, SDL_Rect& camera ,float& zoom, double& angle);
+    void drawPlayer(const PlayerInfo& jugador, double& angle);
 
-    void drawPlayerDeath(int jugadorX, int jugadorY, SDL_Rect& camera ,float& zoom);
+    void drawPlayerDeath(int jugadorX, int jugadorY);
 };
 #endif

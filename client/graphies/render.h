@@ -3,11 +3,9 @@
 #include <string>
 #include <memory>
 
-#include "../../common/dto/game_state_update.h"
 #include "../../common/protocol.h"
 #include "../../common/action.h"
 #include "textureStore.h"
-#include "configuracion.h"
 
 #include "components/hudSprite.h"
 #include "components/mapSprite.h"
@@ -22,11 +20,11 @@ private:
     Protocol& protocolo;
     std::string& namePlayer;
 
+    Configuracion& configuracion;
+    
     HudSprite hud;
     MapSprite mapa;
     PlayerSprite player;
-
-    Configuracion& configuracion;
 
     int screenWidth = 1000;
     int screenHeight = 1000;
@@ -39,6 +37,10 @@ private:
 
     // Angulo de mi jugador
     double myAngle = 0.0;
+
+    // Angulo default
+    double anglePlayer = 0.0;
+    
     // Pos mouse
     int mouseX = 0, mouseY = 0;
     unsigned int prev_ticks = SDL_GetTicks();
@@ -46,8 +48,11 @@ private:
     // Function to calculate the angle between the player and the mouse
     double getAnglePlayer(int jugadorX, int jugadorY, int mousex, int mousey);
 
+    float normalizarAngulo(float angulo);
+
 public:
     Render(Renderer* renderer, Protocol& protocolo, std::string& namePlayer, Configuracion& configuracion);
     void renderFrame(std::optional<GameStateUpdate> mensaje);
+    bool puntoEnVision(int playerX, int playerY, float visionAngleDeg, float fovDeg, float radius, int puntoX, int puntoY);
 };
 #endif

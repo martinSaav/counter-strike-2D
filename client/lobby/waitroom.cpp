@@ -9,9 +9,22 @@ waitRoom::waitRoom(Protocol& protocolo, tipoUsuario& usuario, QWidget *parent)
 
     ui->setupUi(this);
     this->parentWidget()->hide();
+
+    if (usuario == UNIDO){
+        ui->empezarButton->setEnabled(false);
+
+        connect(this, &waitRoom::gameReady, this, [this]() {
+            this->close();
+            QApplication::exit(EXITLOBBY);
+        });
+        socketThread = std::thread(&waitRoom::ask_game_started, this);
+    }
 }
 
 waitRoom::~waitRoom(){
+    if (socketThread.joinable()) {
+        socketThread.join();
+    }
     delete ui;
 }
 
@@ -52,18 +65,24 @@ void waitRoom::on_aleatorioButton_clicked(){
 
 void waitRoom::on_empezarButton_clicked(){
 
-    if (this->skinSeleccionada == ""){  // caso no coloco un nombre
-        skinSeleccionada = "C1";
-    }
+    // Empezamos la partida
+    GameReadyRequest gameReady;
+    protocolo.send_message(gameReady);
 
-    if (usuario == CREADOR){
-        GameReadyRequest gameReady;
-        protocolo.send_message(gameReady);
-    }
     const std::unique_ptr<Message> responseGameReady = protocolo.recv_message();
     const auto game = dynamic_cast<GameReadyResponse*>(responseGameReady.get());
-    bool gameReady = game->get_success();
+    bool gameStart = game->get_success();
 
     this->close();
     QApplication::exit(EXITLOBBY);
+}
+
+void waitRoom::ask_game_started(){
+    const std::unique_ptr<Message> responseGameReady = protocolo.recv_message();
+    const auto game = dynamic_cast<GameReadyResponse*>(responseGameReady.get());
+    bool gameStart = game->get_success();
+
+    if (gameStart) {
+       emit gameReady();  // <-- comunicar al hilo principal
+    }
 }

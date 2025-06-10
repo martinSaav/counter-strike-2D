@@ -2,6 +2,7 @@
 #define WAITROOM_H
 
 #include <QWidget>
+#include <thread>
 #include "selectskin.h"
 #include "common/protocol.h"
 #include "common/dto/game_ready_request.h"
@@ -31,9 +32,16 @@ private slots:
 
     void on_empezarButton_clicked();
 
+signals:
+    void gameReady();
+
 private:
 
     void crearVentanaSeleccionSkin(team& teamPlayer);
+
+    void ask_game_started();
+
+    std::thread socketThread;
 
     Ui::waitRoom *ui;
     Protocol& protocolo;
