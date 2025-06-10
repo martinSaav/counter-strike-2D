@@ -91,6 +91,11 @@ void Match::process_reload_request(const std::shared_ptr<Player>& player) const 
 }
 
 
+void Match::process_pick_weapon_request(const std::shared_ptr<Player>& player) {
+    game_manager.pick_weapon(player);
+}
+
+
 void Match::process_command(const PlayerCommand& command) {
     std::lock_guard<std::mutex> lck(mtx);
     const PlayerCredentials player_credentials = command.credentials;
@@ -128,6 +133,9 @@ void Match::process_command(const PlayerCommand& command) {
         }
         case CommandType::Reload: {
             return process_reload_request(player);
+        }
+        case CommandType::EquipWeapon: {
+            return process_pick_weapon_request(player);
         }
         default:
             break;
