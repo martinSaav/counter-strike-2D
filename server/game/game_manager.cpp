@@ -4,13 +4,16 @@
 
 #include "game_manager.h"
 
+#include <utility>
+
+#include "map.h"
 
 void GameManager::attack_player(const std::shared_ptr<Player>& attacked, Player& attacker,
                                 const int damage) {
     if (attacked->current_team == attacker.current_team) {
         return;
     }
-    attacked->receive_damage(damage);
+    attacked->receive_damage(*this, damage);
     if (attacked->is_dead()) {
         attacker.add_kill();
     }
@@ -93,4 +96,83 @@ TimeInformation GameManager::get_time_information() const {
                            0,
                            0,
                            last_winner};
+}
+
+
+void GameManager::plant_bomb(const int x, const int y) {
+    map.plant_bomb(x, y);
+    clock.set_post_plant_stage();
+    bomb_planted = true;
+    bomb_x = x;
+    bomb_y = y;
+}
+
+
+void GameManager::explode_bomb(const std::vector<std::shared_ptr<Player>>& players) {
+    for (auto& player: players) {
+        if (!player->is_dead()) {
+            auto [p_x, p_y] = player->get_location();
+            const double distance_to_bomb = sqrt(pow(p_x - bomb_x, 2) + pow(p_y - bomb_y, 2));
+            const double damage = bomb_dmg / (1 + distance_to_bomb / 10);
+            player->receive_damage(*this, static_cast<int>(damage));
+        }
+    }
+}
+
+
+bool GameManager::can_plant_bomb(const int x, const int y) const {
+    return map.can_plant_bomb(x, y);
+}
+
+
+void GameManager::start_defusing(const std::shared_ptr<Player>& player) const {
+    if (player->current_team != Team::CounterTerrorists) {
+        return;
+    }
+    if (!map.can_defuse(player)) {
+        return;
+    }
+    player->is_defusing = true;
+    player->defuse_time = clock.get_time();
+}
+
+
+void GameManager::has_finished_defusing(const std::shared_ptr<Player>& player) {
+    if (!player->is_defusing) {
+        return;
+    }
+    if (clock.get_time() - player->defuse_time - time_to_defuse >= 0) {
+        player->is_defusing = false;
+        bomb_defused = true;
+        clock.set_after_round_stage();
+    }
+}
+
+
+void GameManager::drop_bomb(Player& player, std::unique_ptr<BombEncapsulator> bomb) const {
+    auto [x, y] = player.get_location();
+    map.drop_bomb(std::move(bomb), x, y);
+}
+
+
+void GameManager::drop_weapon(Player& player, std::unique_ptr<Gun> gun) const {
+    auto [x, y] = player.get_location();
+    map.drop_weapon(std::move(gun), x, y);
+}
+
+
+void GameManager::pick_weapon(const std::shared_ptr<Player>& player) {
+    if (player->is_dead()) {
+        return;
+    }
+    auto [x, y] = player->get_location();
+    if (player->current_team != Team::CounterTerrorists) {
+        if (std::unique_ptr<BombEncapsulator> bomb = map.pick_bomb(x, y); bomb != nullptr) {
+            player->equip_bomb(std::move(bomb));
+        }
+        return;
+    }
+    if (std::unique_ptr<Gun> gun = map.pick_weapon(x, y); gun != nullptr) {
+        player->equip_weapon(std::move(gun));
+    }
 }

@@ -1,19 +1,16 @@
 //
-// Created by matias on 06/06/25.
+// Created by matias on 09/06/25.
 //
 
-#ifndef KNIFE_H
-#define KNIFE_H
-#include <cmath>
-#include <utility>
-
+#ifndef BOMBENCAPSULATOR_H
+#define BOMBENCAPSULATOR_H
+#include "bomb.h"
 #include "gun.h"
 
-#define max_degree (M_PI / 8)
-#define knife_range 30
-class Knife: public Gun {
-    GunType type = GunType::Knife;
-    std::pair<int, int> next_shoot;
+
+class BombEncapsulator: public Gun {
+    GunType type = GunType::Bomb;
+    Bomb bomb;
     bool has_to_fire;
 
     [[nodiscard]] bool has_to_shoot(float current_time) override;
@@ -21,16 +18,16 @@ class Knife: public Gun {
                          Position& current_position) override;
     void reset_shoots() override;
 
-    int calculate_damage(double distance);
-
 public:
-    Knife(): has_to_fire(false) {}
+    BombEncapsulator(): has_to_fire(false) {}
+    bool has_finished_planting(float current_time) const;
     GunType get_gun_type() override { return type; }
     void reload_gun() override;
     void shoot_gun(Position final_position) override;
     int get_gun_price() override { return 0; }
-    WeaponInfo get_weapon_name() override { return WeaponInfo{Weapon::Knife, 0}; }
+    bool is_planting();
+    WeaponInfo get_weapon_name() override { return WeaponInfo{Weapon::Bomb, 0}; }
 };
 
 
-#endif  // KNIFE_H
+#endif  // BOMBENCAPSULATOR_H

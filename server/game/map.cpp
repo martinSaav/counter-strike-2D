@@ -285,3 +285,88 @@ std::vector<std::shared_ptr<Player>> Map::get_players_near_radio(const double x,
 
     return resultado;
 }
+
+
+void Map::add_bombsite(const BombSite site) { bomb_sites.push_back(site); }
+
+
+void Map::plant_bomb(int x, int y) { bomb_position = std::make_pair(x, y); }
+
+
+bool Map::can_plant_bomb(int x, int y) const {
+    return std::ranges::any_of(bomb_sites.begin(), bomb_sites.end(),
+                               [&](const auto& site) { return site.is_position_inside(x, y); });
+}
+
+
+bool Map::can_defuse(const std::shared_ptr<Player>& player) const {
+    if (!bomb_position.has_value()) {
+        return false;
+    }
+    const Position bomb_p(bomb_position.value().first, bomb_position.value().second);
+    const Structure bomb_hitbox(bomb_hitbox_height, bomb_hitbox_width, bomb_p);
+    if (auto [x, y] = player->get_location();
+        CollisionDetector::check_collision_between_player_and_structure(x, y, bomb_hitbox)) {
+        return true;
+    }
+    return false;
+}
+
+
+void Map::clear_bomb() { bomb_position = std::nullopt; }
+
+
+void Map::drop_bomb(std::unique_ptr<BombEncapsulator> bomb, const int x, const int y) {
+    Position pos(x, y);
+    dropped_bomb = std::make_pair(pos, std::move(bomb));
+}
+
+
+void Map::drop_weapon(std::unique_ptr<Gun> gun, const int x, const int y) {
+    Position pos(x, y);
+    auto pair = std::make_pair(pos, std::move(gun));
+    dropped_guns.push_back(std::move(pair));
+}
+
+
+std::unique_ptr<Gun> Map::pick_weapon(int x, int y) {
+    auto it = dropped_guns.begin();
+    while (it != dropped_guns.end()) {
+        if (it->second == nullptr) {
+            it = dropped_guns.erase(it);
+        }
+        if (const Structure gun_hitbox(gun_hitbox_height, gun_hitbox_width, it->first);
+            CollisionDetector::check_collision_between_player_and_structure(x, y, gun_hitbox)) {
+            return std::move(it->second);
+        }
+        ++it;
+    }
+    return nullptr;
+}
+
+
+std::unique_ptr<BombEncapsulator> Map::pick_bomb(const int x, const int y) {
+    if (dropped_bomb.second == nullptr) {
+        return nullptr;
+    }
+    if (const Structure bomb_hitbox(bomb_hitbox_height, bomb_hitbox_width, dropped_bomb.first);
+        CollisionDetector::check_collision_between_player_and_structure(x, y, bomb_hitbox)) {
+        return std::move(dropped_bomb.second);
+    }
+    return nullptr;
+}
+
+
+std::list<DroppedWeapon> Map::get_dropped_weapons() {
+    std::list<DroppedWeapon> weapons;
+    auto it = dropped_guns.begin();
+    while (it != dropped_guns.end()) {
+        if (it->second == nullptr) {
+            it = dropped_guns.erase(it);
+        }
+        auto [x, y] = it->first.get_position();
+        weapons.emplace_back(it->second->get_weapon_name().weapon_type, x, y);
+        ++it;
+    }
+    return weapons;
+}

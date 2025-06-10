@@ -10,7 +10,11 @@
 #include "gun_type.h"
 #include "position.h"
 #include "shoot_result.h"
+#include "weapon.h"
+#include "weapon_info.h"
 
+#define gun_hitbox_width 30
+#define gun_hitbox_height 30
 
 struct NoAmmo: public std::runtime_error {
     NoAmmo(): std::runtime_error("There is no ammunition") {}
@@ -37,6 +41,7 @@ public:
     virtual void reload_gun() = 0;
     virtual void shoot_gun(Position final_position) = 0;
     virtual int get_gun_price() = 0;
+    virtual WeaponInfo get_weapon_name() = 0;
 };
 
 

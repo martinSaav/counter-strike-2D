@@ -12,6 +12,12 @@ std::pair<int, int> Player::get_location() { return std::make_pair(position_x, p
 
 
 void Player::set_location(const Position position, std::vector<std::pair<int, int>>&& chunks_idxs) {
+    if (is_planting) {
+        is_planting = false;
+    }
+    if (is_defusing) {
+        is_defusing = false;
+    }
     auto [new_x, new_y] = position.get_position();
     position_x = new_x;
     position_y = new_y;
@@ -20,17 +26,55 @@ void Player::set_location(const Position position, std::vector<std::pair<int, in
 }
 
 
-PlayerDTO Player::get_player_info() const {
-    auto last_action = Action::MoveUp;
+PlayerDTO Player::get_player_info() {
+    auto last_action = Action::Idle;
     if (is_shooting) {
         last_action = Action::Shoot;
     }
-    if (current_team == Team::Terrorists) {
-        return PlayerDTO{username, position_x, position_y, aim_x, aim_y,  terrorist_skin,
-                         health,   status,     money,      kills, deaths, last_action};
+    Weapon bomb_info = Weapon::None;
+    if (bomb != nullptr) {
+        bomb_info = Weapon::Bomb;
     }
-    return PlayerDTO{username, position_x, position_y, aim_x, aim_y,  ct_skin,
-                     health,   status,     money,      kills, deaths, last_action};
+    WeaponInfo primary_info = get_primary_weapon_info();
+    WeaponInfo secondary_info = get_secondary_weapon_info();
+    if (current_team == Team::Terrorists) {
+        return PlayerDTO{username,
+                         position_x,
+                         position_y,
+                         aim_x,
+                         aim_y,
+                         terrorist_skin,
+                         health,
+                         status,
+                         money,
+                         kills,
+                         deaths,
+                         primary_info.weapon_type,
+                         primary_info.ammo,
+                         secondary_info.weapon_type,
+                         secondary_info.ammo,
+                         Weapon::Knife,
+                         bomb_info,
+                         last_action};
+    }
+    return PlayerDTO{username,
+                     position_x,
+                     position_y,
+                     aim_x,
+                     aim_y,
+                     ct_skin,
+                     health,
+                     status,
+                     money,
+                     kills,
+                     deaths,
+                     primary_info.weapon_type,
+                     primary_info.ammo,
+                     secondary_info.weapon_type,
+                     secondary_info.ammo,
+                     Weapon::Knife,
+                     bomb_info,
+                     last_action};
 }
 
 
@@ -40,18 +84,28 @@ Team Player::get_team() const { return current_team; }
 bool Player::is_dead() const { return status == Status::Dead; }
 
 
-void Player::receive_damage(const int damage) {
+void Player::receive_damage(const GameManager& manager, const int damage) {
     health = std::max(0, health - damage);
     if (health == 0) {
         status = Status::Dead;
         deaths++;
+        if (bomb != nullptr) {
+            manager.drop_bomb(*this, std::move(bomb));
+        } else if (equipped_weapon == GunType::Primary) {
+            manager.drop_weapon(*this, std::move(primary_weapon));
+        } else if (equipped_weapon == GunType::Secondary) {
+            manager.drop_weapon(*this, std::move(secondary_weapon));
+        }
         primary_weapon = nullptr;
         secondary_weapon = std::make_unique<Glock>();
         equipped_weapon = GunType::Secondary;
     }
 }
 
-void Player::add_kill() { kills++; }
+void Player::add_kill() {
+    kills++;
+    money += money_per_kill;
+}
 
 
 void Player::buy_weapon(std::unique_ptr<Gun> gun) {
@@ -67,6 +121,12 @@ void Player::buy_weapon(std::unique_ptr<Gun> gun) {
 
 
 void Player::switch_weapon() {
+    if (is_planting) {
+        is_planting = false;
+    }
+    if (is_defusing) {
+        is_defusing = false;
+    }
     switch (equipped_weapon) {
         case GunType::Primary: {
             equipped_weapon = GunType::Secondary;
@@ -91,15 +151,16 @@ void Player::switch_weapon() {
 
 
 void Player::reload() {
+    if (is_planting) {
+        is_planting = false;
+    }
     try {
         if (equipped_weapon == GunType::Primary) {
             primary_weapon->reload_gun();
         } else if (equipped_weapon == GunType::Secondary) {
             secondary_weapon->reload_gun();
         }
-    } catch (const NoAmmo&) {
-        switch_weapon();
-    }
+    } catch (const NoAmmo&) {}
 }
 
 
@@ -112,7 +173,13 @@ void Player::switch_team() {
 }
 
 
-void Player::shoot(const Position& pos) const {
+void Player::shoot(const Position& pos) {
+    if (is_defusing) {
+        is_defusing = false;
+    }
+    if (is_planting) {
+        is_planting = false;
+    }
     try {
         if (equipped_weapon == GunType::Primary) {
             primary_weapon->shoot_gun(pos);
@@ -120,6 +187,8 @@ void Player::shoot(const Position& pos) const {
             secondary_weapon->shoot_gun(pos);
         } else if (equipped_weapon == GunType::Knife) {
             knife->shoot_gun(pos);
+        } else if (equipped_weapon == GunType::Bomb) {
+            bomb->shoot_gun(pos);
         }
     } catch (const NoAmmo&) {}
 }
@@ -141,12 +210,20 @@ std::unique_ptr<Gun>& Player::get_equipped_gun() {
 
 
 void Player::update(GameManager& game_manager) {
+    if (status == Status::Dead) {
+        return;
+    }
     is_shooting = false;
     Map& map = game_manager.get_map();
     const double time = game_manager.get_time();
     Position pos(this->position_x, this->position_y);
     if (const std::unique_ptr<Gun>& gun_to_shoot = get_equipped_gun();
         gun_to_shoot->has_to_shoot(time)) {
+        if (gun_to_shoot->get_gun_type() == GunType::Bomb) {
+            if (game_manager.can_plant_bomb(position_x, position_y)) {
+                gun_to_shoot->fire_gun(map, *this, time, pos);
+            }
+        }
         const ShootResult shoot = gun_to_shoot->fire_gun(map, *this, time, pos);
         if (!shoot.miss) {
             game_manager.attack_player(shoot.player_hit.value(), *this, shoot.dmg);
@@ -155,6 +232,10 @@ void Player::update(GameManager& game_manager) {
         aim_x = x;
         aim_y = y;
         is_shooting = true;
+    }
+    if (is_planting && bomb->has_finished_planting(time)) {
+        game_manager.plant_bomb(position_x, position_y);
+        bomb = nullptr;
     }
 }
 
@@ -172,4 +253,40 @@ void Player::set_skin(const PlayerSkin skin) {
     } else {
         ct_skin = skin;
     }
+}
+
+
+void Player::start_planting() { is_planting = true; }
+
+
+void Player::equip_weapon(std::unique_ptr<Gun> gun) {
+    if (is_defusing) {
+        is_defusing = false;
+    }
+    if (is_planting) {
+        is_planting = false;
+    }
+    const GunType type = gun->get_gun_type();
+    if (type == GunType::Primary) {
+        primary_weapon = std::move(gun);
+    } else if (type == GunType::Secondary) {
+        secondary_weapon = std::move(gun);
+    }
+    equipped_weapon = type;
+}
+
+
+WeaponInfo Player::get_primary_weapon_info() {
+    if (primary_weapon == nullptr) {
+        return WeaponInfo{Weapon::None, 0};
+    }
+    return primary_weapon->get_weapon_name();
+}
+
+
+WeaponInfo Player::get_secondary_weapon_info() {
+    if (secondary_weapon == nullptr) {
+        return WeaponInfo{Weapon::None, 0};
+    }
+    return secondary_weapon->get_weapon_name();
 }

@@ -14,8 +14,8 @@
 #define max_reserve_ammo 60
 #define bullets_per_burst 3
 #define ak_price 600
-#define max_dmg 40
-#define min_dmg 20
+#define max_dmg 30
+#define min_dmg 10
 #define max_range 300
 
 class Ak47: public Gun {
@@ -36,6 +36,7 @@ public:
     void reload_gun() override;
     void shoot_gun(Position final_position) override;
     int get_gun_price() override;
+    WeaponInfo get_weapon_name() override { return WeaponInfo{Weapon::AK47, current_ammo}; }
 };
 
 

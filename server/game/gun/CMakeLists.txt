@@ -4,6 +4,8 @@ target_sources(game
         glock.cpp
         knife.cpp
         shoot_result.cpp
+        bomb.cpp
+        bomb_encapsulator.cpp
         PUBLIC
         gun.h
         shoot_result.h
@@ -11,4 +13,6 @@ target_sources(game
         ak47.h
         knife.h
         glock.h
+        bomb.h
+        bomb_encapsulator.h
         )

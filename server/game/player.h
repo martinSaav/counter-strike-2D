@@ -8,6 +8,7 @@
 #include "../player_dto.h"
 #include "dto/game_state_update.h"
 #include "dto/player_info.h"
+#include "gun/bomb_encapsulator.h"
 #include "gun/glock.h"
 #include "gun/gun.h"
 #include "gun/gun_type.h"
@@ -15,15 +16,20 @@
 
 #include "player_skin.h"
 #include "position.h"
-#define player_hitbox_height 32
-#define player_hitbox_width 32
+#include "weapon_info.h"
+#define player_hitbox_height 15
+#define player_hitbox_width 15
 #define starting_money 500
 #define max_health 100
+#define money_per_kill 300
 
 class GameManager;
 
+class Bomb;
+
 class Player {
     friend class GameManager;
+    friend class Bomb;
     const std::string username;
     PlayerSkin terrorist_skin;
     PlayerSkin ct_skin;
@@ -37,20 +43,23 @@ class Player {
     int kills;
     int deaths;
     bool is_shooting;
+    bool is_planting;
+    bool is_defusing;
+    float defuse_time;
     Team current_team;
     Status status;
     std::unique_ptr<Gun> knife;
     std::unique_ptr<Gun> primary_weapon;
     std::unique_ptr<Gun> secondary_weapon;
+    std::unique_ptr<BombEncapsulator> bomb;
     GunType equipped_weapon;
     std::vector<std::pair<int, int>>
             chunks_idxs;  // indices de los chunks en los que se encuentra el jugador
     void switch_team();
     void add_kill();
-    void receive_damage(int damage);
+    void receive_damage(const GameManager& manager, int damage);
     void buy_weapon(std::unique_ptr<Gun> gun);
     void switch_weapon();
-    void reload();
     std::unique_ptr<Gun>& get_equipped_gun();
 
 public:
@@ -66,6 +75,9 @@ public:
             kills(0),
             deaths(0),
             is_shooting(false),
+            is_planting(false),
+            is_defusing(false),
+            defuse_time(0),
             current_team(team),
             status(Status::Alive) {
         terrorist_skin = PlayerSkin::T1;
@@ -82,17 +94,28 @@ public:
         aim_y = y;
     }
     void set_skin(PlayerSkin skin);
-    [[nodiscard]] PlayerDTO get_player_info() const;
+    [[nodiscard]] PlayerDTO get_player_info();
     [[nodiscard]] bool is_dead() const;
-    void shoot(const Position& pos) const;
+    void shoot(const Position& pos);
     std::vector<std::pair<int, int>>& get_chunk_idxs() { return chunks_idxs; }
     void update(GameManager& game_manager);
     [[nodiscard]] std::pair<double, double> get_center_coordinates() const;
     [[nodiscard]] Team get_team() const;
-    void resurrect() {
-        status = Status::Alive;
+    void restore() {
+        if (status == Status::Dead) {
+            status = Status::Alive;
+        }
         health = max_health;
     }
+    void start_planting();
+    void equip_bomb(std::unique_ptr<BombEncapsulator> bomb) { this->bomb = std::move(bomb); }
+    void equip_weapon(std::unique_ptr<Gun> gun);
+    [[nodiscard]] bool is_currently_defusing() const { return is_defusing; }
+    void start_defusing() { is_defusing = true; }
+    void reload();
     bool operator==(const Player& player) const = default;
+    WeaponInfo get_primary_weapon_info();
+    WeaponInfo get_secondary_weapon_info();
+    [[nodiscard]] bool has_bomb() const { return bomb != nullptr; }
 };
 #endif  // PLAYER_H

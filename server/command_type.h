@@ -13,6 +13,11 @@ enum class CommandType {
     Shoot,
     StartMatch,
     ChangeSkin,
+    DefuseBomb,
+    Reload,
+    EquipWeapon,
+    PlantBomb,
+    Idle,
     Unknown
 };
 
