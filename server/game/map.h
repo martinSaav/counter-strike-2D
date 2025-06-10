@@ -1,5 +1,6 @@
 #ifndef MAP_H
 #define MAP_H
+#include <list>
 #include <map>
 #include <memory>
 #include <optional>
@@ -69,6 +70,7 @@ public:
     void drop_bomb(std::unique_ptr<BombEncapsulator> bomb, int x, int y);
     std::unique_ptr<Gun> pick_weapon(int x, int y);
     std::unique_ptr<BombEncapsulator> pick_bomb(int x, int y);
+    std::list<DroppedWeapon> get_dropped_weapons();
 };
 
 

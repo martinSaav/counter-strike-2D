@@ -355,3 +355,18 @@ std::unique_ptr<BombEncapsulator> Map::pick_bomb(const int x, const int y) {
     }
     return nullptr;
 }
+
+
+std::list<DroppedWeapon> Map::get_dropped_weapons() {
+    std::list<DroppedWeapon> weapons;
+    auto it = dropped_guns.begin();
+    while (it != dropped_guns.end()) {
+        if (it->second == nullptr) {
+            it = dropped_guns.erase(it);
+        }
+        auto [x, y] = it->first.get_position();
+        weapons.emplace_back(it->second->get_weapon_name(), x, y);
+        ++it;
+    }
+    return weapons;
+}

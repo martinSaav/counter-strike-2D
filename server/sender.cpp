@@ -22,7 +22,7 @@ void Sender::send_status(const MatchStatusDTO& status) const {
                                 status.round_time, status.round_started, status.round_ended,
                                 status.bomb_planted, status.bomb_x, status.bomb_y,
                                 status.bomb_timer, status.round_winner, status.game_winner,
-                                std::move(players));
+                                std::move(players), status.dropped_weapons);
     protocol.send_message(state);
 }
 
