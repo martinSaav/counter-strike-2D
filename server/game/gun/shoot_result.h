@@ -10,13 +10,18 @@
 
 class Player;
 
+enum class ShootType { Hit, Miss, PlantingBomb };
+
 class ShootResult {
 public:
+    const ShootType type;
     const bool miss;
     const int dmg;
     const std::pair<int, int> position;
     const std::optional<std::shared_ptr<Player>> player_hit;
 
+
+    ShootResult();
     explicit ShootResult(const std::pair<int, int>& position);
     ShootResult(int dmg, const std::pair<int, int>& position, std::shared_ptr<Player> player_hit);
 };

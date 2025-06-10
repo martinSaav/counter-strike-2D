@@ -18,6 +18,7 @@ add_library(game
         game_clock.cpp
         game_clock.h
         time_information.h
+        bomb_site.h
 )
 
 target_include_directories(game

@@ -137,6 +137,16 @@ CommandType ClientHandler::cast_action_to_command(const Action action) {
             return CommandType::MoveRight;
         case Action::Shoot:
             return CommandType::Shoot;
+        case Action::DefuseBomb:
+            return CommandType::DefuseBomb;
+        case Action::EquipWeapon:
+            return CommandType::EquipWeapon;
+        case Action::PlantBomb:
+            return CommandType::PlantBomb;
+        case Action::Reload:
+            return CommandType::Reload;
+        case Action::Idle:
+            return CommandType::Unknown;
     }
     return CommandType::Unknown;
 }
