@@ -17,8 +17,8 @@
 #include "player_skin.h"
 #include "position.h"
 #include "weapon_info.h"
-#define player_hitbox_height 32
-#define player_hitbox_width 32
+#define player_hitbox_height 15
+#define player_hitbox_width 15
 #define starting_money 500
 #define max_health 100
 #define money_per_kill 300
