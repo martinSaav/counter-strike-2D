@@ -12,6 +12,8 @@
 
 #define max_degree (M_PI / 8)
 #define knife_range 30
+#define min_dmg 40
+#define max_dmg 70
 
 void Knife::shoot_gun(Position final_position) {
     const auto pos = final_position.get_position();
