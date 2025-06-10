@@ -124,7 +124,7 @@ public:
                                 [](const size_t sum, const PlayerInfo& player) {
                                     return sum + player.serialized_size();
                                 });
-
+        size += 2;              // num_weapons
         size += std::accumulate(dropped_weapons.begin(), dropped_weapons.end(), 0,
                                 [](const size_t sum, const DroppedWeapon& weapon) {
                                     return sum + weapon.serialized_size();
