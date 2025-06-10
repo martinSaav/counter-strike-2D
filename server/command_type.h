@@ -18,7 +18,8 @@ enum class CommandType {
     EquipWeapon,
     PlantBomb,
     Idle,
-    Unknown
+    Unknown,
+    SwitchWeapon
 };
 
 #endif  // COMMAND_TYPE_H
