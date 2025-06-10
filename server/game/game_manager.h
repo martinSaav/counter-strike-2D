@@ -56,8 +56,10 @@ public:
     void has_finished_defusing(const std::shared_ptr<Player>& player);
     void drop_bomb(Player& player, std::unique_ptr<BombEncapsulator> bomb) const;
     void drop_weapon(Player& player, std::unique_ptr<Gun> gun) const;
-
     void pick_weapon(const std::shared_ptr<Player>& player);
+    [[nodiscard]] bool has_to_switch_sides() const;
+    [[nodiscard]] bool has_ended() const;
+    void give_bomb_to_random_player(const std::vector<std::shared_ptr<Player>>& players);
 };
 
 
