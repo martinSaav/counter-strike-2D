@@ -20,10 +20,19 @@ public:
     const int money;
     int kills;
     int deaths;
+    Weapon primary_weapon;
+    uint16_t primary_weapon_ammo;
+    Weapon secondary_weapon;
+    uint16_t secondary_weapon_ammo;
+    Weapon knife;
+    Weapon bomb;
     Action last_action;
     PlayerDTO(std::string username, const int position_x, const int position_y, const int aim_x,
               const int aim_y, const PlayerSkin skin, const int health, const Status status,
-              const int money, const int kills, const int deaths, const Action last_action):
+              const int money, const int kills, const int deaths, const Weapon primary_weapon,
+              const int primary_weapon_ammo, const Weapon secondary_weapon,
+              const int secondary_weapon_ammo, const Weapon knife, const Weapon bomb,
+              const Action last_action):
             username(std::move(username)),
             position_x(position_x),
             position_y(position_y),
@@ -35,6 +44,12 @@ public:
             money(money),
             kills(kills),
             deaths(deaths),
+            primary_weapon(primary_weapon),
+            primary_weapon_ammo(primary_weapon_ammo),
+            secondary_weapon(secondary_weapon),
+            secondary_weapon_ammo(secondary_weapon_ammo),
+            knife(knife),
+            bomb(bomb),
             last_action(last_action) {}
 };
 #endif  // PLAYERDTO_H

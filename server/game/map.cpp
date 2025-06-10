@@ -365,7 +365,7 @@ std::list<DroppedWeapon> Map::get_dropped_weapons() {
             it = dropped_guns.erase(it);
         }
         auto [x, y] = it->first.get_position();
-        weapons.emplace_back(it->second->get_weapon_name(), x, y);
+        weapons.emplace_back(it->second->get_weapon_name().weapon_type, x, y);
         ++it;
     }
     return weapons;

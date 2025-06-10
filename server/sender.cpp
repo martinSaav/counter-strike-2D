@@ -15,7 +15,10 @@ void Sender::send_status(const MatchStatusDTO& status) const {
         PlayerInfo player(player_dto.username, player_dto.position_x, player_dto.position_y,
                           player_dto.health, player_dto.status, player_dto.money, player_dto.kills,
                           player_dto.deaths, player_dto.last_action, player_dto.aim_x,
-                          player_dto.aim_y, SkinTranslator::code_to_string(player_dto.skin));
+                          player_dto.aim_y, SkinTranslator::code_to_string(player_dto.skin),
+                          player_dto.primary_weapon, player_dto.primary_weapon_ammo,
+                          player_dto.secondary_weapon, player_dto.secondary_weapon_ammo,
+                          player_dto.knife, player_dto.bomb);
         players.push_back(player);
     }
     const GameStateUpdate state(status.game_started, status.game_ended, status.round,

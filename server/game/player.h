@@ -16,6 +16,7 @@
 
 #include "player_skin.h"
 #include "position.h"
+#include "weapon_info.h"
 #define player_hitbox_height 32
 #define player_hitbox_width 32
 #define starting_money 500
@@ -93,7 +94,7 @@ public:
         aim_y = y;
     }
     void set_skin(PlayerSkin skin);
-    [[nodiscard]] PlayerDTO get_player_info() const;
+    [[nodiscard]] PlayerDTO get_player_info();
     [[nodiscard]] bool is_dead() const;
     void shoot(const Position& pos);
     std::vector<std::pair<int, int>>& get_chunk_idxs() { return chunks_idxs; }
@@ -113,5 +114,8 @@ public:
     void start_defusing() { is_defusing = true; }
     void reload();
     bool operator==(const Player& player) const = default;
+    WeaponInfo get_primary_weapon_info();
+    WeaponInfo get_secondary_weapon_info();
+    [[nodiscard]] bool has_bomb() const { return bomb != nullptr; }
 };
 #endif  // PLAYER_H

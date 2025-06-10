@@ -26,17 +26,55 @@ void Player::set_location(const Position position, std::vector<std::pair<int, in
 }
 
 
-PlayerDTO Player::get_player_info() const {
-    auto last_action = Action::MoveUp;
+PlayerDTO Player::get_player_info() {
+    auto last_action = Action::Idle;
     if (is_shooting) {
         last_action = Action::Shoot;
     }
-    if (current_team == Team::Terrorists) {
-        return PlayerDTO{username, position_x, position_y, aim_x, aim_y,  terrorist_skin,
-                         health,   status,     money,      kills, deaths, last_action};
+    Weapon bomb_info = Weapon::None;
+    if (bomb != nullptr) {
+        bomb_info = Weapon::Bomb;
     }
-    return PlayerDTO{username, position_x, position_y, aim_x, aim_y,  ct_skin,
-                     health,   status,     money,      kills, deaths, last_action};
+    WeaponInfo primary_info = get_primary_weapon_info();
+    WeaponInfo secondary_info = get_secondary_weapon_info();
+    if (current_team == Team::Terrorists) {
+        return PlayerDTO{username,
+                         position_x,
+                         position_y,
+                         aim_x,
+                         aim_y,
+                         terrorist_skin,
+                         health,
+                         status,
+                         money,
+                         kills,
+                         deaths,
+                         primary_info.weapon_type,
+                         primary_info.ammo,
+                         secondary_info.weapon_type,
+                         secondary_info.ammo,
+                         Weapon::Knife,
+                         bomb_info,
+                         last_action};
+    }
+    return PlayerDTO{username,
+                     position_x,
+                     position_y,
+                     aim_x,
+                     aim_y,
+                     ct_skin,
+                     health,
+                     status,
+                     money,
+                     kills,
+                     deaths,
+                     primary_info.weapon_type,
+                     primary_info.ammo,
+                     secondary_info.weapon_type,
+                     secondary_info.ammo,
+                     Weapon::Knife,
+                     bomb_info,
+                     last_action};
 }
 
 
@@ -195,7 +233,7 @@ void Player::update(GameManager& game_manager) {
         aim_y = y;
         is_shooting = true;
     }
-    if (is_planting && bomb->bomb_has_finished_planting(time)) {
+    if (is_planting && bomb->has_finished_planting(time)) {
         game_manager.plant_bomb(position_x, position_y);
         bomb = nullptr;
     }
@@ -235,4 +273,20 @@ void Player::equip_weapon(std::unique_ptr<Gun> gun) {
         secondary_weapon = std::move(gun);
     }
     equipped_weapon = type;
+}
+
+
+WeaponInfo Player::get_primary_weapon_info() {
+    if (primary_weapon == nullptr) {
+        return WeaponInfo{Weapon::None, 0};
+    }
+    return primary_weapon->get_weapon_name();
+}
+
+
+WeaponInfo Player::get_secondary_weapon_info() {
+    if (secondary_weapon == nullptr) {
+        return WeaponInfo{Weapon::None, 0};
+    }
+    return secondary_weapon->get_weapon_name();
 }

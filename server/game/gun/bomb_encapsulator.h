@@ -20,13 +20,13 @@ class BombEncapsulator: public Gun {
 
 public:
     BombEncapsulator(): has_to_fire(false) {}
-    bool bomb_has_finished_planting(float current_time);
+    bool has_finished_planting(float current_time) const;
     GunType get_gun_type() override { return type; }
     void reload_gun() override;
     void shoot_gun(Position final_position) override;
     int get_gun_price() override { return 0; }
     bool is_planting();
-    Weapon get_weapon_name() override { return Weapon::Bomb; }
+    WeaponInfo get_weapon_name() override { return WeaponInfo{Weapon::Bomb, 0}; }
 };
 
 

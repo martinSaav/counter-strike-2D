@@ -30,7 +30,7 @@ void BombEncapsulator::reload_gun() {}
 void BombEncapsulator::shoot_gun(Position final_position) { has_to_fire = true; }
 
 
-bool BombEncapsulator::bomb_has_finished_planting(const float current_time) {
+bool BombEncapsulator::has_finished_planting(const float current_time) const {
     return bomb.has_finished_planting(current_time);
 }
 
