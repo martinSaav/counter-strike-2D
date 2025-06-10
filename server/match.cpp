@@ -161,7 +161,8 @@ MatchStatusDTO Match::get_match_status() {
                           info.bomb_y,
                           info.bomb_timer,
                           info.round_winner,
-                          Team::Terrorists};
+                          Team::Terrorists,
+                          map.get_dropped_weapons()};
 }
 
 

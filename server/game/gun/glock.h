@@ -33,6 +33,7 @@ public:
     void reload_gun() override;
     void shoot_gun(Position final_position) override;
     int get_gun_price() override;
+    Weapon get_weapon_name() override { return Weapon::Glock; }
 };
 
 
