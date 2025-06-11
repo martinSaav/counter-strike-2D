@@ -25,7 +25,7 @@ public:
     Sender(Protocol& protocol,
            std::shared_ptr<Queue<std::variant<MatchStatusDTO, GameReadyNotification>>>
                    sender_queue):
-            protocol(protocol), sender_queue(std::move(sender_queue)), running(true) {}
+            protocol(protocol), running(true), sender_queue(std::move(sender_queue)) {}
     void run() override;
     void stop() override;
     bool is_running();

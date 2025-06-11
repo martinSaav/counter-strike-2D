@@ -102,36 +102,41 @@ void ClientHandler::handle_disconnect_request(Queue<PlayerCommand>& command_queu
 
 
 std::optional<GameIdentification> ClientHandler::pick_match() {
-    while (true) {
-        auto message = protocol.recv_message();
-        switch (message->type()) {
-            case MessageType::GameListRequest: {
-                handle_list_matches_request();
-                break;
-            }
-            case MessageType::CreateGameRequest: {
-                try {
-                    return handle_create_game_request(std::move(message));
-                } catch (const MatchAlreadyExists&) {
-                    protocol.send_message(CreateGameResponse(false));
+    while (should_keep_running()) {
+        try {
+            auto message = protocol.recv_message();
+            switch (message->type()) {
+                case MessageType::GameListRequest: {
+                    handle_list_matches_request();
+                    break;
                 }
-            }
-            case MessageType::JoinGameRequest: {
-                try {
-                    return handle_join_game_request(std::move(message));
-                } catch (const MatchFull&) {
-                    protocol.send_message(JoinGameResponse(false));
-                } catch (const MatchNotFound&) {
-                    protocol.send_message(JoinGameResponse(false));
+                case MessageType::CreateGameRequest: {
+                    try {
+                        return handle_create_game_request(std::move(message));
+                    } catch (const MatchAlreadyExists&) {
+                        protocol.send_message(CreateGameResponse(false));
+                    }
                 }
+                case MessageType::JoinGameRequest: {
+                    try {
+                        return handle_join_game_request(std::move(message));
+                    } catch (const MatchFull&) {
+                        protocol.send_message(JoinGameResponse(false));
+                    } catch (const MatchNotFound&) {
+                        protocol.send_message(JoinGameResponse(false));
+                    }
+                }
+                case MessageType::DisconnectRequest: {
+                    return std::nullopt;
+                }
+                default:
+                    break;
             }
-            case MessageType::DisconnectRequest: {
-                return std::nullopt;
-            }
-            default:
-                break;
+        } catch (const std::exception& e) {
+            return std::nullopt;
         }
     }
+    return std::nullopt;
 }
 
 
@@ -195,7 +200,7 @@ void ClientHandler::handle_change_skin(Queue<PlayerCommand>& command_queue,
 
 void ClientHandler::handle_game(Queue<PlayerCommand>& command_queue,
                                 const PlayerCredentials& credentials) {
-    while (true) {
+    while (should_keep_running() && sender.value()->is_running()) {
         try {
             switch (auto message = protocol.recv_message(); message->type()) {
                 case MessageType::PlayerAction: {
@@ -216,7 +221,7 @@ void ClientHandler::handle_game(Queue<PlayerCommand>& command_queue,
                 default:
                     break;
             }
-        } catch (const LibError&) {
+        } catch (const std::exception&) {
             return handle_disconnect_request(command_queue, credentials);
         }
     }
@@ -224,8 +229,16 @@ void ClientHandler::handle_game(Queue<PlayerCommand>& command_queue,
 
 
 void ClientHandler::run() {
-    username = handle_login();
-    handle_map_names_request();
+    try {
+        username = handle_login();
+        handle_map_names_request();
+    } catch (const std::exception& e) {
+        if (!should_keep_running()) {
+            return;
+        }
+        std::cerr << "Unexpected exception: " << e.what() << std::endl;
+        return;
+    }
     const auto match_id_o = pick_match();
     if (!match_id_o.has_value()) {
         return;

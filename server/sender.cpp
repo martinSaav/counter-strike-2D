@@ -55,7 +55,6 @@ void Sender::run() {
         }
     }
     running = false;
-    sender_queue->close();
 }
 
 
@@ -66,6 +65,6 @@ void Sender::stop() {
     Thread::stop();
     try {
         sender_queue->close();
-    } catch (...) {}
+    } catch (const ClosedQueue&) {}
     running = false;
 }
