@@ -5,6 +5,7 @@
 #include "game_manager.h"
 
 #include <utility>
+#include <algorithm>
 
 #include "map.h"
 
