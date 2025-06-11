@@ -370,3 +370,19 @@ std::list<DroppedWeapon> Map::get_dropped_weapons() {
     }
     return weapons;
 }
+
+
+void Map::remove_player(const std::shared_ptr<Player>& player) {
+    auto it = players.begin();
+    while (it != players.end()) {
+        if (*it == nullptr) {
+            it = players.erase(it);
+            continue;
+        }
+        if (*it == player) {
+            players.erase(it);
+            continue;
+        }
+        ++it;
+    }
+}

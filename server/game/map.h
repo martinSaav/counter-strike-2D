@@ -70,6 +70,7 @@ public:
     void drop_bomb(std::unique_ptr<BombEncapsulator> bomb, int x, int y);
     std::unique_ptr<Gun> pick_weapon(int x, int y);
     std::unique_ptr<BombEncapsulator> pick_bomb(int x, int y);
+    void remove_player(const std::shared_ptr<Player>& player);
     std::list<DroppedWeapon> get_dropped_weapons();
 };
 
