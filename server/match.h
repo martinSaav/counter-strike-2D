@@ -59,6 +59,8 @@ class Match: public Thread {
 
     void process_pick_weapon_request(const std::shared_ptr<Player>& player);
 
+    void process_leave_match_request(std::shared_ptr<Player> player);
+
     void broadcast_match_start();
 
     void wait_for_match_to_start();
@@ -68,6 +70,8 @@ class Match: public Thread {
     void update_game();
 
     void run_game_loop();
+
+    void wait_for_players_to_leave_match();
 
 public:
     Match():
@@ -82,6 +86,7 @@ public:
     void stop() override;
     [[nodiscard]] int get_player_count() const;
     [[nodiscard]] int get_max_player_count() const;
+    [[nodiscard]] bool has_match_finished() const;
 };
 
 #endif  // GAME_LOOP_H

@@ -8,16 +8,19 @@
 
 #include "lobby.h"
 
-class Acceptor {
+class Acceptor: public Thread {
     Socket skt;
     Lobby lobby;
     std::vector<Thread*> clients;
 
     void accept_clients();
+    void reap_dead();
+    void free_clients();
 
 public:
     explicit Acceptor(Socket&& socket): skt(std::move(socket)) {}
-    void run();
+    void run() override;
+    void stop() override;
 };
 
 #endif  // ACCEPTOR_H

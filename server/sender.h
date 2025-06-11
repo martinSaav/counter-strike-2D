@@ -16,8 +16,8 @@
 
 class Sender: public Thread {
     Protocol& protocol;
+    std::atomic<bool> running;
     std::shared_ptr<Queue<std::variant<MatchStatusDTO, GameReadyNotification>>> sender_queue;
-    std::atomic_bool is_alive;
 
     void send_status(const MatchStatusDTO& status) const;
 
@@ -25,10 +25,10 @@ public:
     Sender(Protocol& protocol,
            std::shared_ptr<Queue<std::variant<MatchStatusDTO, GameReadyNotification>>>
                    sender_queue):
-            protocol(protocol), sender_queue(std::move(sender_queue)), is_alive(true) {}
+            protocol(protocol), running(true), sender_queue(std::move(sender_queue)) {}
     void run() override;
     void stop() override;
-    [[nodiscard]] bool is_sender_alive() const { return is_alive.load(); }
+    bool is_running();
 };
 
 #endif  // SENDER_H

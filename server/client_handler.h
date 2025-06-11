@@ -29,11 +29,14 @@ class ClientHandler: public Thread {
 
     void handle_list_matches_request();
 
+    void handle_disconnect_request(Queue<PlayerCommand>& command_queue,
+                                   const PlayerCredentials& credentials);
+
     GameIdentification handle_create_game_request(std::unique_ptr<Message>&& message);
 
     GameIdentification handle_join_game_request(std::unique_ptr<Message>&& message);
 
-    GameIdentification pick_match();
+    std::optional<GameIdentification> pick_match();
 
     static CommandType cast_action_to_command(Action action);
 
