@@ -15,7 +15,6 @@ InputHandler::~InputHandler() {
 void InputHandler::processEvents() {
     SDL_Event event;
 
-
     while (!exitGame()) {
 
         while (SDL_PollEvent(&event)) {

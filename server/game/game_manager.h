@@ -6,7 +6,7 @@
 #define GAME_MANAGER_H
 #include <memory>
 #include <vector>
-
+#include <algorithm>
 #include "game_clock.h"
 #include "player.h"
 #include "time_information.h"

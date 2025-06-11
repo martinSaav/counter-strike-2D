@@ -32,6 +32,7 @@ PlayerSprite::PlayerSprite(Renderer* sdlRenderer, Configuracion& configuracion):
 
 void PlayerSprite::drawPlayer(const PlayerInfo& jugador, double& angle) {
 
+    angle += 90;
     int jugadorX = jugador.get_pos_x();
     int jugadorY = jugador.get_pos_y();
     std::string skin = jugador.get_skin();

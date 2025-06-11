@@ -16,7 +16,7 @@ MapSprite::MapSprite(Renderer* sdlRenderer, Configuracion& configuracion)
     texturas.loadTexture("shop", "../client/data/maps/shop2.png");
 
     // camp field
-    texturas.loadTexture("field", "../client/data/maps/field2.png");
+    texturas.loadTexture("field", "../client/data/maps/field.png");
 }
 
 void MapSprite::draw(SDL_Rect& camera ,int& camWidth ,int& camHeight){

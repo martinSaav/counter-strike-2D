@@ -64,7 +64,11 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     int mousePlayerX = 0;
     int mousePlayerY = 0;
 
+    //visionAngle: debe ser el ángulo real hacia donde está mirando el jugador (sin correcciones de sprite ni nada).
     myAngle = getAnglePlayer(myPlayer->get_pos_x(), myPlayer->get_pos_y(), mouse_map_x, mouse_map_y);
+    float visionAngle = myAngle;
+    if (visionAngle < 0) visionAngle += 360.0;
+
     for (auto const& jugador : jugadores){
 
         if (jugador.get_health() == 0){
@@ -74,22 +78,17 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
 
         if (jugador.get_user_name() == namePlayer){
             player.drawPlayer(jugador, myAngle);
+            continue;
+        }
 
-        } else{
-            posPlayerX = jugador.get_pos_x();
-            posPlayerY = jugador.get_pos_y();
-            mousePlayerX = jugador.get_pos_shoot_x();
-            mousePlayerY = jugador.get_pos_shoot_y();
-            anglePlayer = getAnglePlayer(posPlayerX, posPlayerY, mousePlayerX, mousePlayerY);
-
-            //visionAngle: debe ser el ángulo real hacia donde está mirando el jugador (sin correcciones de sprite ni nada).
-            int mouse_map_x = int(mouseX / configuracion.zoom + configuracion.camera.x);
-            int mouse_map_y = int(mouseY / configuracion.zoom + configuracion.camera.y);
-
-            float visionAngle = myAngle + 90;
-            if (puntoEnVision(myPlayer->get_pos_x(), myPlayer->get_pos_y(), visionAngle, 80.0f, 40.0f, jugador.get_pos_x(), jugador.get_pos_y())) {
-               player.drawPlayer(jugador, anglePlayer);
-            }
+        posPlayerX = jugador.get_pos_x();
+        posPlayerY = jugador.get_pos_y();
+        mousePlayerX = jugador.get_pos_shoot_x();
+        mousePlayerY = jugador.get_pos_shoot_y();
+        anglePlayer = getAnglePlayer(posPlayerX, posPlayerY, mousePlayerX, mousePlayerY);
+            
+        if (puntoEnVision(myPlayer->get_pos_x(), myPlayer->get_pos_y(), visionAngle, 70.0f, 60.0f, jugador.get_pos_x(), jugador.get_pos_y())) {
+           player.drawPlayer(jugador, anglePlayer);
         }
     }
 
@@ -129,7 +128,7 @@ double Render::getAnglePlayer(int jugadorX, int jugadorY, int mousex, int mousey
     double angleRadians = atan2(dy, dx);  // da un ángulo en radianes entre -π y π
     double angleDegrees = angleRadians * 180 / M_PI;
 
-    return angleDegrees + 90.0;  // Ajustar para que apunte hacia la dirección del mouse
+    return angleDegrees;  // Ajustar para que apunte hacia la dirección del mouse
 }
 
 bool Render::puntoEnVision(int playerX, int playerY, float visionAngleDeg, float fovDeg, float radius, int puntoX, int puntoY) {
@@ -141,7 +140,7 @@ bool Render::puntoEnVision(int playerX, int playerY, float visionAngleDeg, float
     if (distancia > radius) return false;
 
     // angulo hacia el punto
-    float angleToPoint = std::atan2(-dy, dx) * 180.0f / M_PI;
+    float angleToPoint = std::atan2(dy, dx) * 180.0f / M_PI;
 
     // Normalizar ángulos a [0, 360)
     visionAngleDeg = normalizarAngulo(visionAngleDeg);
