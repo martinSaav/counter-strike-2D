@@ -42,19 +42,30 @@ void Sender::run() {
                 protocol.send_message(GameReadyResponse(true));
             }
         } catch (const ClosedQueue&) {
-            break;
-        } catch (const LibError&) {
+            running = false;
             return;
+        } catch (const LibError&) {
+            break;
         } catch (const std::exception& e) {
             std::cerr << "Unexpected exception: " << e.what() << std::endl;
+            break;
         } catch (...) {
             std::cerr << "Unexpected exception: <unknown>\n";
+            break;
         }
     }
+    running = false;
+    sender_queue->close();
 }
+
+
+bool Sender::is_running() { return running; }
+
 
 void Sender::stop() {
     Thread::stop();
-    sender_queue->close();
-    is_alive = false;
+    try {
+        sender_queue->close();
+    } catch (...) {}
+    running = false;
 }

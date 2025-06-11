@@ -96,6 +96,23 @@ void Match::process_pick_weapon_request(const std::shared_ptr<Player>& player) {
 }
 
 
+void Match::process_leave_match_request(std::shared_ptr<Player> player) {
+    map.remove_player(player);
+    auto it = players.begin();
+    while (it != players.end()) {
+        if (it->second == nullptr) {
+            it = players.erase(it);
+            continue;
+        }
+        if (it->second == player) {
+            players.erase(it);
+            return;
+        }
+        ++it;
+    }
+}
+
+
 void Match::process_command(const PlayerCommand& command) {
     std::lock_guard<std::mutex> lck(mtx);
     const PlayerCredentials player_credentials = command.credentials;
@@ -136,6 +153,9 @@ void Match::process_command(const PlayerCommand& command) {
         }
         case CommandType::EquipWeapon: {
             return process_pick_weapon_request(player);
+        }
+        case CommandType::LeaveMatch: {
+            return process_leave_match_request(player);
         }
         default:
             break;
@@ -264,7 +284,7 @@ void Match::update_game() {
         setup_round_start();
         return;
     }
-    if (game_manager.is_bomb_planted() && game_clock.has_bomb_exploded()) {}
+
     std::vector<std::shared_ptr<Player>> players_vector;
     for (const auto& player: players | std::views::values) {
         player->update(game_manager);

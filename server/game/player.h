@@ -101,9 +101,7 @@ public:
     [[nodiscard]] std::pair<double, double> get_center_coordinates() const;
     [[nodiscard]] Team get_team() const;
     void restore() {
-        if (status == Status::Dead) {
-            status = Status::Alive;
-        }
+        status = Status::Alive;
         bomb = nullptr;
         health = max_health;
     }

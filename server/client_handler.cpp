@@ -11,6 +11,7 @@
 #include "common/game_info.h"
 #include "common/message.h"
 #define generic_username "username"
+#include "catedra/liberror.h"
 #include "common/dto/create_game_request.h"
 #include "common/dto/create_game_response.h"
 #include "common/dto/game_list_response.h"
@@ -94,7 +95,13 @@ GameIdentification ClientHandler::handle_join_game_request(std::unique_ptr<Messa
 }
 
 
-GameIdentification ClientHandler::pick_match() {
+void ClientHandler::handle_disconnect_request(Queue<PlayerCommand>& command_queue,
+                                              const PlayerCredentials& credentials) {
+    command_queue.push(PlayerCommand(credentials, CommandType::LeaveMatch));
+}
+
+
+std::optional<GameIdentification> ClientHandler::pick_match() {
     while (true) {
         auto message = protocol.recv_message();
         switch (message->type()) {
@@ -117,6 +124,9 @@ GameIdentification ClientHandler::pick_match() {
                 } catch (const MatchNotFound&) {
                     protocol.send_message(JoinGameResponse(false));
                 }
+            }
+            case MessageType::DisconnectRequest: {
+                return std::nullopt;
             }
             default:
                 break;
@@ -186,21 +196,28 @@ void ClientHandler::handle_change_skin(Queue<PlayerCommand>& command_queue,
 void ClientHandler::handle_game(Queue<PlayerCommand>& command_queue,
                                 const PlayerCredentials& credentials) {
     while (true) {
-        switch (auto message = protocol.recv_message(); message->type()) {
-            case MessageType::PlayerAction: {
-                handle_player_action(command_queue, credentials, message);
-                break;
+        try {
+            switch (auto message = protocol.recv_message(); message->type()) {
+                case MessageType::PlayerAction: {
+                    handle_player_action(command_queue, credentials, message);
+                    break;
+                }
+                case MessageType::GameReadyRequest: {
+                    handle_game_ready(command_queue, credentials);
+                    break;
+                }
+                case MessageType::SelectSkinRequest: {
+                    handle_change_skin(command_queue, credentials, message);
+                    break;
+                }
+                case MessageType::DisconnectRequest: {
+                    return handle_disconnect_request(command_queue, credentials);
+                }
+                default:
+                    break;
             }
-            case MessageType::GameReadyRequest: {
-                handle_game_ready(command_queue, credentials);
-                break;
-            }
-            case MessageType::SelectSkinRequest: {
-                handle_change_skin(command_queue, credentials, message);
-                break;
-            }
-            default:
-                break;
+        } catch (const LibError&) {
+            return handle_disconnect_request(command_queue, credentials);
         }
     }
 }
@@ -209,21 +226,32 @@ void ClientHandler::handle_game(Queue<PlayerCommand>& command_queue,
 void ClientHandler::run() {
     username = handle_login();
     handle_map_names_request();
-    const auto match_id = pick_match();
+    const auto match_id_o = pick_match();
+    if (!match_id_o.has_value()) {
+        return;
+    }
+    GameIdentification match_id = match_id_o.value();
     sender = std::make_unique<Sender>(protocol, match_id.sender_queue);
     sender.value()->start();
-    handle_game(match_id.command_queue, match_id.credentials);
+    try {
+        handle_game(match_id.command_queue, match_id.credentials);
+    } catch (const ClosedQueue&) {
+    } catch (const std::exception& e) {
+        std::cerr << "Unexpected exception: " << e.what() << std::endl;
+    } catch (...) {
+        std::cerr << "Unexpected exception: <unknown>\n";
+    }
+
     if (sender.has_value()) {
-        sender.value()->join();
+        const auto& sender_v = sender.value();
+        if (sender_v->is_alive()) {
+            sender_v->stop();
+        }
+        sender_v->join();
     }
 }
 
 void ClientHandler::stop() {
     Thread::stop();
-    if (sender.has_value()) {
-        sender.value()->stop();
-        sender.value()->join();
-        sender = std::nullopt;
-    }
     protocol.kill();
 }
