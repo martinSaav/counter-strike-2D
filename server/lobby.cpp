@@ -32,3 +32,28 @@ std::vector<MatchDTO> Lobby::list_matches() {
     }
     return match_dtos;
 }
+
+
+void Lobby::remove_finished_matches() {
+    std::lock_guard<std::mutex> guard(mutex);
+    for (auto it = matches.begin(); it != matches.end();) {
+        if (it->second->has_match_finished()) {
+            it->second->join();
+            it = matches.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
+
+void Lobby::kill_all_matches() {
+    std::lock_guard<std::mutex> guard(mutex);
+    for (auto it = matches.begin(); it != matches.end();) {
+        if (it->second->is_alive()) {
+            it->second->stop();
+        }
+        it->second->join();
+        ++it;
+    }
+}

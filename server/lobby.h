@@ -27,6 +27,8 @@ public:
     GameIdentification create_match(const std::string& match_name, const std::string& player_name);
     GameIdentification join_match(const std::string& match_name, const std::string& player_name);
     std::vector<MatchDTO> list_matches();
+    void remove_finished_matches();
+    void kill_all_matches();
 };
 
 #endif  // LOBBY_H

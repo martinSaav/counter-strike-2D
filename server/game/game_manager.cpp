@@ -4,8 +4,8 @@
 
 #include "game_manager.h"
 
-#include <utility>
 #include <algorithm>
+#include <utility>
 
 #include "map.h"
 
@@ -212,4 +212,15 @@ void GameManager::give_bomb_to_random_player(const std::vector<std::shared_ptr<P
             current_tt++;
         }
     }
+}
+
+
+Team GameManager::get_match_winner() const {
+    if (tt_rounds >= 6) {
+        return Team::Terrorists;
+    }
+    if (ct_rounds >= 6) {
+        return Team::CounterTerrorists;
+    }
+    return Team::Terrorists;
 }

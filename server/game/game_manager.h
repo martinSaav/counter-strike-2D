@@ -59,6 +59,7 @@ public:
     void pick_weapon(const std::shared_ptr<Player>& player);
     [[nodiscard]] bool has_to_switch_sides() const;
     [[nodiscard]] bool has_ended() const;
+    Team get_match_winner() const;
     void give_bomb_to_random_player(const std::vector<std::shared_ptr<Player>>& players);
 };
 

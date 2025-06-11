@@ -71,6 +71,8 @@ class Match: public Thread {
 
     void run_game_loop();
 
+    void wait_for_players_to_leave_match();
+
 public:
     Match():
             commands_queue(Queue<PlayerCommand>()),
@@ -84,6 +86,7 @@ public:
     void stop() override;
     [[nodiscard]] int get_player_count() const;
     [[nodiscard]] int get_max_player_count() const;
+    [[nodiscard]] bool has_match_finished() const;
 };
 
 #endif  // GAME_LOOP_H

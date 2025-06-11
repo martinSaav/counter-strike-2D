@@ -102,10 +102,12 @@ void Match::process_leave_match_request(std::shared_ptr<Player> player) {
     while (it != players.end()) {
         if (it->second == nullptr) {
             it = players.erase(it);
+            player_count--;
             continue;
         }
         if (it->second == player) {
             players.erase(it);
+            player_count--;
             return;
         }
         ++it;
@@ -181,7 +183,7 @@ MatchStatusDTO Match::get_match_status() {
                           info.bomb_y,
                           info.bomb_timer,
                           info.round_winner,
-                          Team::Terrorists,
+                          game_manager.get_match_winner(),
                           map.get_dropped_weapons()};
 }
 
@@ -319,13 +321,33 @@ void Match::run_game_loop() {
 }
 
 
+void Match::wait_for_players_to_leave_match() {
+    while (player_count > 0) {
+        try {
+            switch (const PlayerCommand command = commands_queue.pop(); command.command_type) {
+                case CommandType::LeaveMatch: {
+                    player_count--;
+                    return;
+                }
+                default:
+                    break;
+            }
+        } catch (const ClosedQueue&) {
+            return;
+        }
+    }
+}
+
+
 void Match::run() {
     wait_for_match_to_start();
     try {
         setup_round_start();
         run_game_loop();
-    } catch (const ClosedQueue&) {}
-    commands_queue.close();
+    } catch (const ClosedQueue&) {
+        return;
+    }
+    wait_for_players_to_leave_match();
 }
 
 int Match::get_player_count() const { return player_count; }
@@ -336,5 +358,9 @@ int Match::get_max_player_count() const { return max_player_count; }
 
 void Match::stop() {
     Thread::stop();
+    has_finished = true;
     commands_queue.close();
 }
+
+
+bool Match::has_match_finished() const { return has_finished && player_count == 0; }
