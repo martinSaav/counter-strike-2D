@@ -22,6 +22,7 @@
 #include "../common/dto/map_names_response.h"
 #include "../common/dto/player_action.h"
 #include "../common/dto/select_skin_request.h"
+#include "../common/dto/disconnect_request.h"
 
 
 Protocol::Protocol(SocketInterface& peer): peer(peer) {}
@@ -85,6 +86,10 @@ std::unique_ptr<Message> Protocol::recv_message() {
         case MessageType::BuyWeaponRequest: {
             return std::make_unique<BuyWeaponRequest>(
                     BuyWeaponRequest::deserialize(buffer.data(), buffer.size()));
+        }
+        case MessageType::DisconnectRequest: {
+            return std::make_unique<DisconnectRequest>(
+                    DisconnectRequest::deserialize(buffer.data(), buffer.size()));
         }
         case MessageType::CreateGameResponse: {
             return std::make_unique<CreateGameResponse>(
