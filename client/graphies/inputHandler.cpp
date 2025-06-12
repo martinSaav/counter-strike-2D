@@ -52,6 +52,18 @@ void InputHandler::processEvents() {
             actionActual = Action::MoveRight;
             action = &actionActual;
 
+        } else if (state[SDL_SCANCODE_1]) {
+            actionActual = Action::SetKnife;
+            action = &actionActual;
+
+        } else if (state[SDL_SCANCODE_2]) {
+            actionActual = Action::SetPrimaryWeapon;
+            action = &actionActual;
+
+        } else if (state[SDL_SCANCODE_3]) {
+            actionActual = Action::SetSecondaryWeapon;
+            action = &actionActual;
+
         }
 
         if (action) {
