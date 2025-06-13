@@ -75,6 +75,7 @@ void Match::process_move_player(const std::shared_ptr<Player>& player, const int
 
 void Match::process_movement_request(PlayerCredentials credentials, CommandType command,
                                      Position aim_pos) {
+    std::lock_guard<std::mutex> lck(mtx);
     const PlayerCredentials player_credentials = credentials;
     const auto player_p = players.find(player_credentials);
     if (player_p == players.end()) {
@@ -114,6 +115,7 @@ void Match::process_shoot(const std::shared_ptr<Player>& player, const Position&
 }
 
 void Match::process_shoot_request(PlayerCredentials credentials, Position aim_pos) {
+    std::lock_guard<std::mutex> lck(mtx);
     const PlayerCredentials player_credentials = credentials;
     const auto player_p = players.find(player_credentials);
     if (player_p == players.end()) {
@@ -133,6 +135,7 @@ void Match::process_defuse(const std::shared_ptr<Player>& player) {
 
 
 void Match::process_defuse_request(const PlayerCredentials credentials) {
+    std::lock_guard<std::mutex> lck(mtx);
     const PlayerCredentials player_credentials = credentials;
     const auto player_p = players.find(player_credentials);
     if (player_p == players.end()) {
@@ -152,6 +155,7 @@ void Match::process_reload(const std::shared_ptr<Player>& player) {
 
 
 void Match::process_reload_request(PlayerCredentials credentials) {
+    std::lock_guard<std::mutex> lck(mtx);
     const PlayerCredentials player_credentials = credentials;
     const auto player_p = players.find(player_credentials);
     if (player_p == players.end()) {
@@ -171,6 +175,7 @@ void Match::process_pick_weapon(const std::shared_ptr<Player>& player) {
 
 
 void Match::process_pick_weapon_request(const PlayerCredentials credentials) {
+    std::lock_guard<std::mutex> lck(mtx);
     const PlayerCredentials player_credentials = credentials;
     const auto player_p = players.find(player_credentials);
     if (player_p == players.end()) {
@@ -201,6 +206,7 @@ void Match::process_leave_match(const std::shared_ptr<Player>& player) {
 
 
 void Match::process_leave_match_request(const PlayerCredentials credentials) {
+    std::lock_guard<std::mutex> lck(mtx);
     const PlayerCredentials player_credentials = credentials;
     const auto player_p = players.find(player_credentials);
     if (player_p == players.end()) {
@@ -274,6 +280,7 @@ void Match::process_change_skin(const std::shared_ptr<Player>& player,
 
 void Match::process_change_skin_request(const PlayerCredentials credentials,
                                         const PlayerSkin new_skin) {
+    std::lock_guard<std::mutex> lck(mtx);
     const PlayerCredentials player_credentials = credentials;
     const auto player_p = players.find(player_credentials);
     if (player_p == players.end()) {
@@ -297,7 +304,6 @@ void Match::process_game_ready_request() { process_game_ready(); }
 
 void Match::wait_for_match_to_start() {
     while (!match_started) {
-        std::lock_guard<std::mutex> lck(mtx);
         std::shared_ptr<PlayerCommand> command = commands_queue.pop();
         command->process_command(this);
     }
@@ -315,6 +321,7 @@ void Match::process_buy_weapon(const std::shared_ptr<Player>& player, const Weap
 
 
 void Match::process_buy_weapon_request(const PlayerCredentials credentials, const Weapon weapon) {
+    std::lock_guard<std::mutex> lck(mtx);
     const PlayerCredentials player_credentials = credentials;
     const auto player_p = players.find(player_credentials);
     if (player_p == players.end()) {
@@ -334,6 +341,7 @@ void Match::process_switch_weapon(const std::shared_ptr<Player>& player, GunType
 
 
 void Match::process_switch_weapon_request(PlayerCredentials credentials, GunType gun_type) {
+    std::lock_guard<std::mutex> lck(mtx);
     const PlayerCredentials player_credentials = credentials;
     const auto player_p = players.find(player_credentials);
     if (player_p == players.end()) {
@@ -402,7 +410,6 @@ void Match::run_game_loop() {
     auto start = std::chrono::system_clock::now();
     while (should_keep_running() && !has_finished) {
         if (std::shared_ptr<PlayerCommand> command; commands_queue.try_pop(command)) {
-            std::lock_guard<std::mutex> lck(mtx);
             command->process_command(this);
         }
         update_game();

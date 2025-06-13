@@ -11,14 +11,14 @@ target_sources(taller_server
         commands/leave_match_command.cpp
         commands/movement_command.cpp
         commands/shoot_command.cpp
-        commands/game_ready_command.h
+        commands/game_ready_command.cpp
         commands/switch_weapon_command.cpp
         commands/reload_weapon_command.cpp
         commands/defuse_bomb_command.cpp
         commands/equip_weapon_command.cpp
         request_processor.cpp
         gun_shop.cpp
-        message_parser.h
+        message_parser.cpp
         main.cpp
     PUBLIC
         client_handler.h

@@ -17,6 +17,7 @@
 #include "dto/buy_weapon_request.h"
 #include "dto/player_action.h"
 #include "dto/select_skin_request.h"
+#include "gun/gun_type.h"
 
 #include "skin_translator.h"
 
