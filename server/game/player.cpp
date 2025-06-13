@@ -139,33 +139,36 @@ void Player::buy_weapon(std::unique_ptr<Gun> gun) {
 }
 
 
-void Player::switch_weapon() {
-    if (is_planting) {
-        is_planting = false;
-    }
-    if (is_defusing) {
-        is_defusing = false;
-    }
+void Player::switch_weapon(GunType gun_type) {
+    is_planting = false;
+    is_defusing = false;
+
     switch (equipped_weapon) {
         case GunType::Primary: {
-            equipped_weapon = GunType::Secondary;
             primary_weapon->reset_shoots();
             break;
         }
         case GunType::Secondary: {
-            equipped_weapon = GunType::Knife;
             secondary_weapon->reset_shoots();
             break;
         }
-        default: {
-            if (primary_weapon != nullptr) {
-                equipped_weapon = GunType::Primary;
-            } else {
-                equipped_weapon = GunType::Secondary;
-            }
+        case GunType::Knife: {
+            knife->reset_shoots();
+            break;
+        }
+        case GunType::Bomb: {
+            bomb->reset_shoots();
             break;
         }
     }
+
+    if (gun_type == GunType::Primary && primary_weapon == nullptr) {
+        return;
+    }
+    if (gun_type == GunType::Bomb && bomb == nullptr) {
+        return;
+    }
+    equipped_weapon = gun_type;
 }
 
 

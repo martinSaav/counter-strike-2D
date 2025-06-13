@@ -5,6 +5,8 @@
 #include <utility>
 
 #include "game/collision_detector.h"
+
+#include "gun_shop.h"
 #define rate 30
 #define miliseconds_per_iteration (1000 / rate)
 #define starting_position_x 0
@@ -71,7 +73,38 @@ void Match::process_move_player(const std::shared_ptr<Player>& player, const int
 }
 
 
-void Match::process_shoot_request(const std::shared_ptr<Player>& player, const Position& position) {
+void Match::process_movement_request(PlayerCredentials credentials, CommandType command,
+                                     Position aim_pos) {
+    const PlayerCredentials player_credentials = credentials;
+    const auto player_p = players.find(player_credentials);
+    if (player_p == players.end()) {
+        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
+    }
+    const std::shared_ptr<Player>& player = player_p->second;
+    auto [x, y] = aim_pos.get_position();
+    player->set_aim_pos(x, y);
+    switch (command) {
+        case CommandType::MoveLeft: {
+            return process_move_player(player, -tiles_per_movement, 0);
+        }
+
+        case CommandType::MoveRight: {
+            return process_move_player(player, tiles_per_movement, 0);
+        }
+        case CommandType::MoveUp: {
+            return process_move_player(player, 0, -tiles_per_movement);
+        }
+        case CommandType::MoveDown: {
+            return process_move_player(player, 0, +tiles_per_movement);
+        }
+        default: {
+            break;
+        }
+    }
+}
+
+
+void Match::process_shoot(const std::shared_ptr<Player>& player, const Position& position) {
     if (!game_manager.can_player_move_or_shoot(player)) {
         return;
     }
@@ -80,23 +113,75 @@ void Match::process_shoot_request(const std::shared_ptr<Player>& player, const P
     }
 }
 
+void Match::process_shoot_request(PlayerCredentials credentials, Position aim_pos) {
+    const PlayerCredentials player_credentials = credentials;
+    const auto player_p = players.find(player_credentials);
+    if (player_p == players.end()) {
+        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
+    }
+    const std::shared_ptr<Player>& player = player_p->second;
+    process_shoot(player, aim_pos);
+}
 
-void Match::process_defuse_request(const std::shared_ptr<Player>& player) const {
+
+void Match::process_defuse(const std::shared_ptr<Player>& player) {
+    if (!game_manager.can_player_move_or_shoot(player)) {
+        return;
+    }
     game_manager.start_defusing(player);
 }
 
 
-void Match::process_reload_request(const std::shared_ptr<Player>& player) const {
+void Match::process_defuse_request(const PlayerCredentials credentials) {
+    const PlayerCredentials player_credentials = credentials;
+    const auto player_p = players.find(player_credentials);
+    if (player_p == players.end()) {
+        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
+    }
+    const std::shared_ptr<Player>& player = player_p->second;
+    process_defuse(player);
+}
+
+
+void Match::process_reload(const std::shared_ptr<Player>& player) {
+    if (!game_manager.can_player_move_or_shoot(player)) {
+        return;
+    }
     player->reload();
 }
 
 
-void Match::process_pick_weapon_request(const std::shared_ptr<Player>& player) {
+void Match::process_reload_request(PlayerCredentials credentials) {
+    const PlayerCredentials player_credentials = credentials;
+    const auto player_p = players.find(player_credentials);
+    if (player_p == players.end()) {
+        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
+    }
+    const std::shared_ptr<Player>& player = player_p->second;
+    process_reload(player);
+}
+
+
+void Match::process_pick_weapon(const std::shared_ptr<Player>& player) {
+    if (!game_manager.can_player_move_or_shoot(player)) {
+        return;
+    }
     game_manager.pick_weapon(player);
 }
 
 
-void Match::process_leave_match_request(std::shared_ptr<Player> player) {
+void Match::process_pick_weapon_request(const PlayerCredentials credentials) {
+    const PlayerCredentials player_credentials = credentials;
+    const auto player_p = players.find(player_credentials);
+    if (player_p == players.end()) {
+        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
+    }
+    const std::shared_ptr<Player>& player = player_p->second;
+    process_pick_weapon(player);
+}
+
+
+void Match::process_leave_match(const std::shared_ptr<Player>& player) {
     map.remove_player(player);
     auto it = players.begin();
     while (it != players.end()) {
@@ -115,53 +200,14 @@ void Match::process_leave_match_request(std::shared_ptr<Player> player) {
 }
 
 
-void Match::process_command(const PlayerCommand& command) {
-    std::lock_guard<std::mutex> lck(mtx);
-    const PlayerCredentials player_credentials = command.credentials;
+void Match::process_leave_match_request(const PlayerCredentials credentials) {
+    const PlayerCredentials player_credentials = credentials;
     const auto player_p = players.find(player_credentials);
     if (player_p == players.end()) {
         return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
     }
     const std::shared_ptr<Player>& player = player_p->second;
-    if (command.position.has_value()) {
-        auto [x, y] = command.position.value().get_position();
-        player->set_aim_pos(x, y);
-    }
-    switch (command.command_type) {
-        case CommandType::MoveLeft: {
-            return process_move_player(player, -tiles_per_movement, 0);
-        }
-
-        case CommandType::MoveRight: {
-            return process_move_player(player, tiles_per_movement, 0);
-        }
-        case CommandType::MoveUp: {
-            return process_move_player(player, 0, -tiles_per_movement);
-        }
-        case CommandType::MoveDown: {
-            return process_move_player(player, 0, +tiles_per_movement);
-        }
-        case CommandType::Shoot: {
-            return process_shoot_request(player, command.position.value());
-        }
-        case CommandType::PlantBomb: {
-            return process_shoot_request(player, command.position.value());
-        }
-        case CommandType::DefuseBomb: {
-            return process_defuse_request(player);
-        }
-        case CommandType::Reload: {
-            return process_reload_request(player);
-        }
-        case CommandType::EquipWeapon: {
-            return process_pick_weapon_request(player);
-        }
-        case CommandType::LeaveMatch: {
-            return process_leave_match_request(player);
-        }
-        default:
-            break;
-    }
+    process_leave_match(player);
 }
 
 MatchStatusDTO Match::get_match_status() {
@@ -218,28 +264,83 @@ void Match::broadcast_match_start() {
 }
 
 
-void Match::wait_for_match_to_start() {
-    while (true) {
-        switch (PlayerCommand command = commands_queue.pop(); command.command_type) {
-            case CommandType::StartMatch: {
-                match_started = true;
-                broadcast_match_start();
-                return;
-            }
-            case CommandType::ChangeSkin: {
-                const PlayerCredentials credentials = command.credentials;
-                const PlayerSkin new_skin = command.new_skin.value();
-                const auto player = players.find(credentials);
-                if (player == players.end()) {
-                    break;
-                }
-                player->second->set_skin(new_skin);
-                break;
-            }
-            default:
-                break;
-        }
+void Match::process_change_skin(const std::shared_ptr<Player>& player,
+                                const PlayerSkin new_skin) const {
+    if (!match_started) {
+        player->set_skin(new_skin);
     }
+}
+
+
+void Match::process_change_skin_request(const PlayerCredentials credentials,
+                                        const PlayerSkin new_skin) {
+    const PlayerCredentials player_credentials = credentials;
+    const auto player_p = players.find(player_credentials);
+    if (player_p == players.end()) {
+        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
+    }
+    const std::shared_ptr<Player>& player = player_p->second;
+    process_change_skin(player, new_skin);
+}
+
+
+void Match::process_game_ready() {
+    if (!match_started) {
+        match_started = true;
+        broadcast_match_start();
+    }
+}
+
+
+void Match::process_game_ready_request() { process_game_ready(); }
+
+
+void Match::wait_for_match_to_start() {
+    while (!match_started) {
+        std::lock_guard<std::mutex> lck(mtx);
+        std::shared_ptr<PlayerCommand> command = commands_queue.pop();
+        command->process_command(this);
+    }
+}
+
+void Match::process_buy_weapon(const std::shared_ptr<Player>& player, const Weapon weapon) {
+    if (!game_manager.can_player_buy()) {
+        return;
+    }
+    try {
+        std::unique_ptr<Gun> gun = GunShop::get_gun(weapon);
+        player->buy_weapon(std::move(gun));
+    } catch (const CantBuyWeapon&) {}
+}
+
+
+void Match::process_buy_weapon_request(const PlayerCredentials credentials, const Weapon weapon) {
+    const PlayerCredentials player_credentials = credentials;
+    const auto player_p = players.find(player_credentials);
+    if (player_p == players.end()) {
+        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
+    }
+    const std::shared_ptr<Player>& player = player_p->second;
+    process_buy_weapon(player, weapon);
+}
+
+
+void Match::process_switch_weapon(const std::shared_ptr<Player>& player, GunType gun_type) {
+    if (!game_manager.can_player_move_or_shoot(player)) {
+        return;
+    }
+    player->switch_weapon(gun_type);
+}
+
+
+void Match::process_switch_weapon_request(PlayerCredentials credentials, GunType gun_type) {
+    const PlayerCredentials player_credentials = credentials;
+    const auto player_p = players.find(player_credentials);
+    if (player_p == players.end()) {
+        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
+    }
+    const std::shared_ptr<Player>& player = player_p->second;
+    process_switch_weapon(player, gun_type);
 }
 
 
@@ -300,8 +401,9 @@ void Match::update_game() {
 void Match::run_game_loop() {
     auto start = std::chrono::system_clock::now();
     while (should_keep_running() && !has_finished) {
-        if (PlayerCommand command; commands_queue.try_pop(command)) {
-            process_command(command);
+        if (std::shared_ptr<PlayerCommand> command; commands_queue.try_pop(command)) {
+            std::lock_guard<std::mutex> lck(mtx);
+            command->process_command(this);
         }
         update_game();
         broadcast_match_status();
@@ -324,14 +426,8 @@ void Match::run_game_loop() {
 void Match::wait_for_players_to_leave_match() {
     while (player_count > 0) {
         try {
-            switch (const PlayerCommand command = commands_queue.pop(); command.command_type) {
-                case CommandType::LeaveMatch: {
-                    player_count--;
-                    return;
-                }
-                default:
-                    break;
-            }
+            const std::shared_ptr<PlayerCommand> command = commands_queue.pop();
+            command->process_command(this);
         } catch (const ClosedQueue&) {
             return;
         }

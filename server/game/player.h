@@ -57,8 +57,6 @@ class Player {
             chunks_idxs;  // indices de los chunks en los que se encuentra el jugador
     void add_kill();
     void receive_damage(const GameManager& manager, int damage);
-    void buy_weapon(std::unique_ptr<Gun> gun);
-    void switch_weapon();
     std::unique_ptr<Gun>& get_equipped_gun();
 
 public:
@@ -116,5 +114,7 @@ public:
     WeaponInfo get_secondary_weapon_info();
     [[nodiscard]] bool has_bomb() const { return bomb != nullptr; }
     void switch_team();
+    void switch_weapon(GunType gun_type);
+    void buy_weapon(std::unique_ptr<Gun> gun);
 };
 #endif  // PLAYER_H

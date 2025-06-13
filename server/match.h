@@ -5,18 +5,19 @@
 #include <string>
 #include <vector>
 
+#include "commands/player_command.h"
 #include "common/catedra/queue.h"
 #include "common/catedra/thread.h"
 #include "game/map.h"
 #include "game/player.h"
 
+#include "command_type.h"
 #include "game_clock.h"
 #include "game_identification.h"
 #include "game_manager.h"
 #include "match_status_dto.h"
-#include "player_command.h"
 #include "player_credentials.h"
-
+#include "request_processor.h"
 #define max_number_of_players 10
 #define map_width 155
 #define map_height 285
@@ -30,8 +31,9 @@ struct MatchAlreadyStarted: public std::runtime_error {
 };
 
 class Match: public Thread {
+    friend class RequestProcessor;
     std::map<PlayerCredentials, std::shared_ptr<Player>> players;
-    Queue<PlayerCommand> commands_queue;
+    Queue<std::shared_ptr<PlayerCommand>> commands_queue;
     std::vector<std::shared_ptr<Queue<std::variant<MatchStatusDTO, GameReadyNotification>>>>
             senders_queues;
     std::mutex mtx;
@@ -43,23 +45,50 @@ class Match: public Thread {
     GameManager game_manager;
     std::atomic<bool> has_finished;
 
-    void process_command(const PlayerCommand& command);
-
     MatchStatusDTO get_match_status();
 
     void broadcast_match_status();
 
     void process_move_player(const std::shared_ptr<Player>& player, int x_mov, int y_mov);
 
-    void process_shoot_request(const std::shared_ptr<Player>& player, const Position& position);
+    void process_movement_request(PlayerCredentials credentials, CommandType command,
+                                  Position aim_pos);
 
-    void process_defuse_request(const std::shared_ptr<Player>& player) const;
+    void process_shoot(const std::shared_ptr<Player>& player, const Position& position);
 
-    void process_reload_request(const std::shared_ptr<Player>& player) const;
+    void process_shoot_request(PlayerCredentials credentials, Position aim_pos);
 
-    void process_pick_weapon_request(const std::shared_ptr<Player>& player);
+    void process_defuse(const std::shared_ptr<Player>& player);
 
-    void process_leave_match_request(std::shared_ptr<Player> player);
+    void process_defuse_request(PlayerCredentials credentials);
+
+    void process_reload(const std::shared_ptr<Player>& player);
+
+    void process_reload_request(PlayerCredentials credentials);
+
+    void process_pick_weapon(const std::shared_ptr<Player>& player);
+
+    void process_pick_weapon_request(PlayerCredentials credentials);
+
+    void process_leave_match(const std::shared_ptr<Player>& player);
+
+    void process_leave_match_request(PlayerCredentials credentials);
+
+    void process_change_skin(const std::shared_ptr<Player>& player, PlayerSkin new_skin) const;
+
+    void process_change_skin_request(PlayerCredentials credentials, PlayerSkin new_skin);
+
+    void process_game_ready();
+
+    void process_game_ready_request();
+
+    void process_buy_weapon(const std::shared_ptr<Player>& player, Weapon weapon);
+
+    void process_buy_weapon_request(PlayerCredentials credentials, Weapon weapon);
+
+    void process_switch_weapon(const std::shared_ptr<Player>& player, GunType gun_type);
+
+    void process_switch_weapon_request(PlayerCredentials credentials, GunType gun_type);
 
     void broadcast_match_start();
 
@@ -75,7 +104,7 @@ class Match: public Thread {
 
 public:
     Match():
-            commands_queue(Queue<PlayerCommand>()),
+            commands_queue(Queue<std::shared_ptr<PlayerCommand>>()),
             match_started(false),
             player_count(0),
             max_player_count(max_number_of_players),
