@@ -7,8 +7,10 @@
 #include "bomb.h"
 #include "gun.h"
 
+class Player;
 
 class BombEncapsulator: public Gun {
+    friend class Player;
     GunType type = GunType::Bomb;
     Bomb bomb;
     bool has_to_fire;

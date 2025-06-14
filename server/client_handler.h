@@ -15,6 +15,8 @@
 #include "server/lobby.h"
 #include "server/sender.h"
 
+#include "message_parser.h"
+
 class ClientHandler: public Thread {
     Lobby& lobby;
     Socket skt;
@@ -29,8 +31,6 @@ class ClientHandler: public Thread {
 
     void handle_list_matches_request();
 
-    void handle_disconnect_request(Queue<PlayerCommand>& command_queue,
-                                   const PlayerCredentials& credentials);
 
     GameIdentification handle_create_game_request(std::unique_ptr<Message>&& message);
 
@@ -38,21 +38,9 @@ class ClientHandler: public Thread {
 
     std::optional<GameIdentification> pick_match();
 
-    static CommandType cast_action_to_command(Action action);
 
-    static void handle_player_action(Queue<PlayerCommand>& command_queue,
-                                     const PlayerCredentials& credentials,
-                                     const std::unique_ptr<Message>& message);
-
-    static void handle_game_ready(Queue<PlayerCommand>& command_queue,
-                                  const PlayerCredentials& credentials);
-
-
-    static void handle_change_skin(Queue<PlayerCommand>& command_queue,
-                                   const PlayerCredentials& credentials,
-                                   const std::unique_ptr<Message>& message);
-
-    void handle_game(Queue<PlayerCommand>& command_queue, const PlayerCredentials& credentials);
+    void handle_game(MessageParser parser, Queue<std::shared_ptr<PlayerCommand>>& command_queue,
+                     const PlayerCredentials& credentials);
 
 public:
     explicit ClientHandler(Lobby& lobby, Socket&& skt):
