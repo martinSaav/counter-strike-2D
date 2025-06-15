@@ -212,8 +212,8 @@ void GameManager::give_bomb_to_random_player(const std::vector<std::shared_ptr<P
                                            [](const std::shared_ptr<Player>& player) {
                                                return player->current_team == Team::Terrorists;
                                            });
-    const int bomb_player = std::rand() % (amount_of_tt);
-    int current_tt = 0;
+    const int bomb_player = std::rand() % (amount_of_tt + 1);
+    int current_tt = 1;
     for (auto& player: players) {
         if (player->current_team == Team::Terrorists) {
             if (current_tt == bomb_player) {
