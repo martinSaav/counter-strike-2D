@@ -2,7 +2,6 @@
 #define PLAYERSPRITE_H
 
 #include "component.h"
-#include "../../common/dto/player_info.h"
 
 class PlayerSprite : public Component{
 

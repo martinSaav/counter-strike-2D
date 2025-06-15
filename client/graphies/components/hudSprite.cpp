@@ -20,7 +20,8 @@ HudSprite::HudSprite(Renderer* sdlRenderer, Configuracion& configuracion) :
     texturas.loadTexture("shop", "../client/data/maps/shop.png");
 }
 
-void HudSprite::draw(SDL_Rect& mouse, int& health, int& money, int& time, int& round){
+void HudSprite::draw(SDL_Rect& mouse, int& health, int& money, int& time, int& round,
+        Weapon& weaponPLayer, int& ammoWeapon){
     Texture& mira = texturas.getTexture("mira");
     Texture& hud_symbols = texturas.getTexture("symbols"); 
     Texture& nums = texturas.getTexture("nums");
@@ -63,12 +64,37 @@ void HudSprite::draw(SDL_Rect& mouse, int& health, int& money, int& time, int& r
     drawHuds(time, tipo, symbolX, symbolY);
 
     // weapon
-    int cantBalas = 20;
     symbolX = weidthWindow * 0.76;
-    int anchoWeapons = 45;
-    int weaponX = 0;
 
-    drawWeapon(symbolX, symbolY, anchoWeapons, weaponX, cantBalas);
+    int anchoWeapon;
+    int weaponTextureX;
+
+    // Coordenadas de la textura
+    switch (weaponPLayer)
+    {
+    case Weapon::AK47:
+        anchoWeapon = 45;
+        weaponTextureX = 0;
+        break;
+    case Weapon::Glock:
+        anchoWeapon = 24;
+        weaponTextureX = 147;
+        break;
+    case Weapon::Knife:
+        anchoWeapon = 52;
+        weaponTextureX = 171;
+        break;
+    case Weapon::AWP:
+        anchoWeapon = 56;
+        weaponTextureX = 90;
+        break;
+    case Weapon::M3:
+        anchoWeapon = 46;
+        weaponTextureX = 45;
+        break;
+    }
+
+    drawWeapon(symbolX, symbolY, anchoWeapon, weaponTextureX, ammoWeapon, weaponPLayer);
 
     // money
     symbolX = weidthWindow * 0.80;
@@ -149,8 +175,8 @@ void HudSprite::drawNumRound(int& round, int& symbolX, int& symbolY){
     sdlRenderer->Copy(roundNums, srcRect, destRect);
 }
 
-void HudSprite::drawWeapon(int& symbolX, int& symbolY, int& anchoWeapons,
-        int& weaponX, int& cantBalas){
+void HudSprite::drawWeapon(int& symbolX, int& symbolY, int& anchoWeapon,
+        int& weaponTextureX, int& ammoWeapon, Weapon& weaponPLayer){
     Texture& weapon = texturas.getTexture("weapons");
     Texture& slot = texturas.getTexture("slot");
     Texture& bullets = texturas.getTexture("bullets");
@@ -164,7 +190,7 @@ void HudSprite::drawWeapon(int& symbolX, int& symbolY, int& anchoWeapons,
     // default
     int alturaWeapons = 17;
 
-    int anchoWeaponsPantalla = anchoWeapons * 2;
+    int anchoWeaponsPantalla = anchoWeapon * 2;
     int alturaWeaponsPantalla = alturaWeapons * 2;
 
     int anchoSlotPantalla = 200;
@@ -180,10 +206,13 @@ void HudSprite::drawWeapon(int& symbolX, int& symbolY, int& anchoWeapons,
     sdlRenderer->Copy(slot, SDL2pp::NullOpt, destRect);
 
     // Weapon
-    SDL_Rect srcRect = {weaponX, 0, anchoWeapons, alturaWeapons};
+    SDL_Rect srcRect = {weaponTextureX, 0, anchoWeapon, alturaWeapons};
     destRect = {symbolX + 5, symbolY + 5, anchoWeaponsPantalla, alturaWeaponsPantalla};
     sdlRenderer->Copy(weapon, srcRect, destRect);
 
+    if (weaponPLayer == Weapon::Knife){
+        return;
+    }
     // Dibujo bala
     srcRect = {0, 0, anchoBullets, alturaBullets};
     symbolX += anchoSlotPantalla - anchoBullets;
@@ -198,7 +227,7 @@ void HudSprite::drawWeapon(int& symbolX, int& symbolY, int& anchoWeapons,
     symbolY += altoNumPantalla;
     
     int separacionNums = 0;
-    std::string numStr = std::to_string(cantBalas);
+    std::string numStr = std::to_string(ammoWeapon);
     for (char c : numStr){
         int digito = c - '0';
 

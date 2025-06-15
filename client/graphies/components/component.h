@@ -4,6 +4,7 @@
 #include "textureStore.h"
 #include "musicManager.h"
 #include "configuracion.h"
+#include "../../common/dto/player_info.h"
 
 class Component{
 

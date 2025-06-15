@@ -30,13 +30,15 @@ class HudSprite : public Component{
 
     void drawNumRound(int& round, int& symbolX, int& symbolY);
 
-    void drawWeapon(int& symbolX, int& symbolY, int& anchoWeapons, int& weaponX, int& cantBalas);
+    void drawWeapon(int& symbolX, int& symbolY, int& anchoWeapon, int& weaponTextureX,
+        int& ammoWeapon, Weapon& weaponPLayer);
 
     void drawShop();
 
     public:
     HudSprite(Renderer* sdlRenderer, Configuracion& configuracion);
 
-    void draw(SDL_Rect& mouse, int& health, int& money, int& time, int& round);
+    void draw(SDL_Rect& mouse, int& health, int& money, int& time, int& round,
+        Weapon& weaponPLayer, int& ammoWeapon);
 };
 #endif

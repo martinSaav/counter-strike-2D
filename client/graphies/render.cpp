@@ -95,9 +95,11 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     int money = myPlayer->get_money();
     int time = mensaje->get_round_time();
     int round = mensaje->get_round();
-    
+    Weapon myWeapon = myPlayer->get_active_weapon();
+    int myWeaponAmmo = myPlayer->get_active_weapon_ammo();
+
     SDL_Rect mouse = {mouseX, mouseY, 40, 40};
-    hud.draw(mouse, health, money, time, round);
+    hud.draw(mouse, health, money, time, round, myWeapon, myWeaponAmmo);
 
     if (mensaje->is_round_ended()){
         Team team = mensaje->get_round_winner();
