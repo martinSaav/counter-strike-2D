@@ -158,6 +158,8 @@ public:
     uint16_t get_secondary_weapon_ammo() const { return secondary_weapon_ammo; }
     Weapon get_knife() const { return knife; }
     Weapon get_bomb() const { return bomb; }
+    Weapon get_active_weapon() const { return active_weapon; }
+    uint16_t get_active_weapon_ammo() const { return active_weapon_ammo; }
 
     static PlayerInfo deserialize(const uint8_t* buffer, size_t size) {
         if (size < 2) {

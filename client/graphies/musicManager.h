@@ -8,10 +8,13 @@
 #include <SDL2pp/SDL2pp.hh>
 
 enum tipoMusic{
-    DISPARO,
+    DISPARO_AK47,
+    DISPARO_PISTOL,
+    KNIFE,
     CAMINANDO,
     STEP,
-    TIMER
+    TIMER,
+    NONE
 };
 
 class MusicManager{

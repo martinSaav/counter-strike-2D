@@ -7,7 +7,7 @@ struct Configuracion{
     SDL_Rect camera = {0, 0, 0, 0};
     float zoom = 20.0f;
     int widthWindow, heightWindow;
-    int tiempoDeCompra = 45;
+    int tiempoDeCompra = 10; //45;
 
     // Constructor
     Configuracion(int width, int height) {

@@ -8,12 +8,16 @@ MusicManager::MusicManager(){
 
     // En el constructor:
     std::string ubicacionPistol = "../client/data/sounds/pistolShot.wav";
+    std::string ubicacionKnife = "../client/data/sounds/knife.wav";
     std::string ubicacionStep = "../client/data/sounds/step.wav";
     std::string ubicacionTimer = "../client/data/sounds/timer.wav";
 
     Mix_Music *musica;
     musica = Mix_LoadMUS(ubicacionPistol.c_str());
-    ficheroDeMusica[tipoMusic::DISPARO] = musica;
+    ficheroDeMusica[tipoMusic::DISPARO_PISTOL] = musica;
+
+    musica = Mix_LoadMUS(ubicacionKnife.c_str());
+    ficheroDeMusica[tipoMusic::KNIFE] = musica;
 
     musica = Mix_LoadMUS(ubicacionTimer.c_str());
     ficheroDeMusica[tipoMusic::TIMER] = musica;

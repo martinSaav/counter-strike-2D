@@ -114,7 +114,7 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
         }
     }
     
-    if (time > configuracion.tiempoDeCompra){
+    if (time >= configuracion.tiempoDeCompra){
         mapa.drawCampField(myAngle, myPlayer->get_pos_x(), myPlayer->get_pos_y());
     }
     sdlRenderer->Present();

@@ -22,6 +22,7 @@ PlayerSprite::PlayerSprite(Renderer* sdlRenderer, Configuracion& configuracion):
     texturas.loadTexture("m3", "../client/data/weapons/m3.bmp");
     texturas.loadTexture("glock", "../client/data/weapons/glock.bmp");
     texturas.loadTexture("knife", "../client/data/weapons/knife.bmp");
+    texturas.loadTexture("bomb", "../client/data/weapons/bomb.bmp");
 
     // Bullets
     texturas.loadTexture("tiro", "../client/data/hud/explocion.png");
@@ -45,15 +46,15 @@ void PlayerSprite::drawPlayer(const PlayerInfo& jugador, double& angle) {
 
     sdlRenderer->Copy(personaje, srcRect, destRect, angle);
 
-    std::string weaponName = "ak47";
-    this->drawWeapon(jugadorX, jugadorY, angle, weaponName);
+    Weapon weaponPlayer = jugador.get_active_weapon();
+    this->drawWeapon(jugadorX, jugadorY, angle, weaponPlayer);
 
     if (jugador.get_action() == Action::Shoot){
         int shootX = jugador.get_pos_shoot_x();
         int shootY = jugador.get_pos_shoot_y();
         drawBullet(shootX, shootY, angle);
 
-        tipoMusic music = DISPARO;
+        tipoMusic music = castShoot(weaponPlayer);
         int cantVeces = 1;
         sounds.loadMusic(music, cantVeces);
     }
@@ -64,13 +65,18 @@ void PlayerSprite::drawPlayer(const PlayerInfo& jugador, double& angle) {
     //}
 }
 
-void PlayerSprite::drawWeapon(int& jugadorX, int& jugadorY, double& angle, std::string& weaponName) {
+void PlayerSprite::drawWeapon(int& jugadorX, int& jugadorY, double& angle, Weapon& weaponPlayer) {
 
-    Texture& weapon = texturas.getTexture(weaponName);
+    std::string weaponName = castWeapon(weaponPlayer);
+    Texture& weaponTexture = texturas.getTexture(weaponName);
 
     // Offset desde el centro del personaje hacia la mano, sin rotar
     float desvioX = 0.0f;   // derecha
-    float desvioY = -3.0f;  // hacia arriba
+    float desvioY = -2.2f;
+    if (weaponName == "ak47"){
+        desvioY = -3.0f;  // hacia arriba
+    }
+    
 
     // Convertir el ángulo a radianes
     float radians = angle * M_PI / 180.0f;
@@ -86,7 +92,7 @@ void PlayerSprite::drawWeapon(int& jugadorX, int& jugadorY, double& angle, std::
         int(32 * configuracion.zoom / 8)
     };
 
-    sdlRenderer->Copy(weapon, SDL2pp::NullOpt, destRect, angle);
+    sdlRenderer->Copy(weaponTexture, SDL2pp::NullOpt, destRect, angle);
 }
 
 void PlayerSprite::drawBullet(int& shootX, int& shootY, double& angle) {
@@ -117,4 +123,39 @@ void PlayerSprite::drawPlayerDeath(int jugadorX, int jugadorY) {
     };
     
     sdlRenderer->Copy(hud_symbols, srcRectDeath, destRect);
+}
+
+
+std::string PlayerSprite::castWeapon(Weapon& weapon){
+    switch (weapon)
+    {
+    case Weapon::Knife:
+        return "knife";
+    case Weapon::Bomb:
+        return "bomb";
+    case Weapon::Glock:
+        return "glock";
+    case Weapon::AK47:
+        return "ak47";
+    case Weapon::M3:
+        return "m3";
+    case Weapon::AWP:
+        return "awp";
+    default:
+        // None
+        return "None";
+    }
+}
+
+tipoMusic PlayerSprite::castShoot(Weapon& weapon){
+    switch (weapon)
+    {
+    case Weapon::Knife:
+        return KNIFE;
+    case Weapon::Glock:
+        return DISPARO_PISTOL;
+    case Weapon::AK47:
+        return DISPARO_AK47;
+    }
+    return NONE;
 }
