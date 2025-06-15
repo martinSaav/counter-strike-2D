@@ -12,6 +12,8 @@
 #include "time_information.h"
 
 #define time_to_defuse 3000
+#define round_winner_money 900
+#define round_loser_money 300
 
 class GameManager {
     Map& map;
@@ -43,7 +45,7 @@ public:
     void attack_player(const std::shared_ptr<Player>& attacked, Player& attacker, int damage);
     bool can_player_buy();
     bool can_player_move_or_shoot(const std::shared_ptr<Player>& player);
-    void advance_round();
+    void advance_round(const std::vector<std::shared_ptr<Player>>& players);
     void check_winning_cond(const std::vector<std::shared_ptr<Player>>& players);
     [[nodiscard]] double get_time() const { return clock.get_time(); }
     [[nodiscard]] TimeInformation get_time_information() const;

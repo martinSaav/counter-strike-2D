@@ -391,7 +391,9 @@ void Match::update_game() {
     try {
         game_clock.advance(miliseconds_per_iteration);
     } catch (const RoundAlreadyFinished&) {
-        game_manager.advance_round();
+        const std::vector<std::shared_ptr<Player>> players_vector(
+                (players | std::views::values).begin(), (players | std::views::values).end());
+        game_manager.advance_round(players_vector);
         setup_round_start();
         return;
     }

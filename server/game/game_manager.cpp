@@ -36,7 +36,23 @@ bool GameManager::can_player_move_or_shoot(const std::shared_ptr<Player>& player
 }
 
 
-void GameManager::advance_round() {
+void GameManager::advance_round(const std::vector<std::shared_ptr<Player>>& players) {
+    for (auto& player: players) {
+        if (player->current_team == last_winner) {
+            if (current_round != 6) {
+                player->money += round_winner_money;
+            } else {
+                player->money += round_loser_money;
+            }
+
+        } else {
+            if (current_round != 6) {
+                player->money += round_loser_money;
+            } else {
+                player->money += round_winner_money;
+            }
+        }
+    }
     current_round++;
     round_won = false;
 }
