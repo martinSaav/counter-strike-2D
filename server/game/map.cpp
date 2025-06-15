@@ -368,6 +368,10 @@ std::list<DroppedWeapon> Map::get_dropped_weapons() {
         weapons.emplace_back(it->second->get_weapon_name().weapon_type, x, y);
         ++it;
     }
+    if (dropped_bomb.second != nullptr) {
+        auto [x, y] = dropped_bomb.first.get_position();
+        weapons.emplace_back(dropped_bomb.second->get_weapon_name().weapon_type, x, y);
+    }
     return weapons;
 }
 
