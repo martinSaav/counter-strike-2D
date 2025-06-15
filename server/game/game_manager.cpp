@@ -61,7 +61,7 @@ void GameManager::check_winning_cond(const std::vector<std::shared_ptr<Player>>&
         tt_rounds++;
         last_winner = Team::Terrorists;
         round_won = true;
-    } else if (bomb_defused) {
+    } else if (bomb_defused || (alive_terrorists == 0 && !bomb_planted)) {
         ct_rounds++;
         last_winner = Team::CounterTerrorists;
         clock.set_after_round_stage();
@@ -69,11 +69,6 @@ void GameManager::check_winning_cond(const std::vector<std::shared_ptr<Player>>&
     } else if (alive_counter_terrorists == 0) {
         tt_rounds++;
         last_winner = Team::Terrorists;
-        clock.set_after_round_stage();
-        round_won = true;
-    } else if (alive_terrorists == 0 && !bomb_planted) {
-        ct_rounds++;
-        last_winner = Team::CounterTerrorists;
         clock.set_after_round_stage();
         round_won = true;
     }
