@@ -198,9 +198,12 @@ void Match::process_leave_match(const std::shared_ptr<Player>& player) {
         if (it->second == player) {
             players.erase(it);
             player_count--;
-            return;
+            break;
         }
         ++it;
+    }
+    if (player_count <= 1) {
+        has_finished = true;
     }
 }
 
@@ -359,7 +362,7 @@ void Match::setup_round_start() {
             player->switch_team();
         }
     }
-    if (game_manager.has_ended()) {
+    if (game_manager.has_ended() || player_count == 0) {
         has_finished = true;
     }
     int terorrist_spawn_x = player_hitbox_width;
