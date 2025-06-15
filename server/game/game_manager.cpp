@@ -55,6 +55,9 @@ void GameManager::advance_round(const std::vector<std::shared_ptr<Player>>& play
     }
     current_round++;
     round_won = false;
+    bomb_defused = false;
+    bomb_x = 0;
+    bomb_y = 0;
 }
 
 

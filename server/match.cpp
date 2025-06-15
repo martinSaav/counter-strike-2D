@@ -374,17 +374,18 @@ void Match::setup_round_start() {
         if (player->get_team() == Team::Terrorists) {
             constexpr int terorrist_spawn_y = 0 + player_hitbox_height;
             const Position new_pos(terorrist_spawn_x, terorrist_spawn_y);
-            player->set_location(new_pos,
-                                 map.calculate_player_chunks(terorrist_spawn_x, terorrist_spawn_y));
+            player->set_location(
+                    new_pos, Map::calculate_player_chunks(terorrist_spawn_x, terorrist_spawn_y));
             terorrist_spawn_x += player_hitbox_width;
         } else {
             constexpr int counter_spawn_y = map_height - player_hitbox_height;
             const Position new_pos(counter_spawn_x, counter_spawn_y);
             player->set_location(new_pos,
-                                 map.calculate_player_chunks(counter_spawn_x, counter_spawn_y));
+                                 Map::calculate_player_chunks(counter_spawn_x, counter_spawn_y));
             counter_spawn_x -= player_hitbox_width;
         }
     }
+    map.clear_bomb();
     game_manager.give_bomb_to_random_player(players_vector);
 }
 

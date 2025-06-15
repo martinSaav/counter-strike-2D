@@ -313,7 +313,10 @@ bool Map::can_defuse(const std::shared_ptr<Player>& player) const {
 }
 
 
-void Map::clear_bomb() { bomb_position = std::nullopt; }
+void Map::clear_bomb() {
+    bomb_position = std::nullopt;
+    dropped_bomb.second = nullptr;
+}
 
 
 void Map::drop_bomb(std::unique_ptr<BombEncapsulator> bomb, const int x, const int y) {
