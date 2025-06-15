@@ -73,7 +73,7 @@ void Match::process_move_player(const std::shared_ptr<Player>& player, const int
 }
 
 
-void Match::process_movement_request(PlayerCredentials credentials, CommandType command,
+void Match::process_movement_request(PlayerCredentials credentials, MovementType command,
                                      Position aim_pos) {
     std::lock_guard<std::mutex> lck(mtx);
     const PlayerCredentials player_credentials = credentials;
@@ -85,17 +85,17 @@ void Match::process_movement_request(PlayerCredentials credentials, CommandType 
     auto [x, y] = aim_pos.get_position();
     player->set_aim_pos(x, y);
     switch (command) {
-        case CommandType::MoveLeft: {
+        case MovementType::MoveLeft: {
             return process_move_player(player, -tiles_per_movement, 0);
         }
 
-        case CommandType::MoveRight: {
+        case MovementType::MoveRight: {
             return process_move_player(player, tiles_per_movement, 0);
         }
-        case CommandType::MoveUp: {
+        case MovementType::MoveUp: {
             return process_move_player(player, 0, -tiles_per_movement);
         }
-        case CommandType::MoveDown: {
+        case MovementType::MoveDown: {
             return process_move_player(player, 0, +tiles_per_movement);
         }
         default: {

@@ -11,11 +11,11 @@
 #include "game/map.h"
 #include "game/player.h"
 
-#include "command_type.h"
 #include "game_clock.h"
 #include "game_identification.h"
 #include "game_manager.h"
 #include "match_status_dto.h"
+#include "movement_type.h"
 #include "player_credentials.h"
 #include "request_processor.h"
 #define max_number_of_players 10
@@ -51,7 +51,7 @@ class Match: public Thread {
 
     void process_move_player(const std::shared_ptr<Player>& player, int x_mov, int y_mov);
 
-    void process_movement_request(PlayerCredentials credentials, CommandType command,
+    void process_movement_request(PlayerCredentials credentials, MovementType command,
                                   Position aim_pos);
 
     void process_shoot(const std::shared_ptr<Player>& player, const Position& position);

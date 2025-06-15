@@ -7,7 +7,7 @@
 #include "match.h"
 
 void RequestProcessor::process_movement_request(const PlayerCredentials credentials,
-                                                const CommandType command, const Position aim_pos,
+                                                const MovementType command, const Position aim_pos,
                                                 Match* match) {
     match->process_movement_request(credentials, command, aim_pos);
 }

@@ -6,7 +6,7 @@
 #define REQUEST_PROCESSOR_H
 #include "gun/gun_type.h"
 
-#include "command_type.h"
+#include "movement_type.h"
 #include "player_credentials.h"
 #include "player_skin.h"
 #include "position.h"
@@ -16,7 +16,7 @@ class Match;
 
 class RequestProcessor {
 public:
-    static void process_movement_request(PlayerCredentials credentials, CommandType command,
+    static void process_movement_request(PlayerCredentials credentials, MovementType command,
                                          Position aim_pos, Match* match);
     static void process_shoot_request(PlayerCredentials credentials, Position aim_pos,
                                       Match* match);

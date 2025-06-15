@@ -65,16 +65,17 @@ std::shared_ptr<PlayerCommand> MessageParser::parse_action(
             return std::make_shared<ShootCommand>(credentials, position);
         }
         case Action::MoveDown: {
-            return std::make_shared<MovementCommand>(credentials, CommandType::MoveDown, position);
+            return std::make_shared<MovementCommand>(credentials, MovementType::MoveDown, position);
         }
         case Action::MoveUp: {
-            return std::make_shared<MovementCommand>(credentials, CommandType::MoveUp, position);
+            return std::make_shared<MovementCommand>(credentials, MovementType::MoveUp, position);
         }
         case Action::MoveLeft: {
-            return std::make_shared<MovementCommand>(credentials, CommandType::MoveLeft, position);
+            return std::make_shared<MovementCommand>(credentials, MovementType::MoveLeft, position);
         }
         case Action::MoveRight: {
-            return std::make_shared<MovementCommand>(credentials, CommandType::MoveRight, position);
+            return std::make_shared<MovementCommand>(credentials, MovementType::MoveRight,
+                                                     position);
         }
         case Action::Reload: {
             return std::make_shared<ReloadWeaponCommand>(credentials);

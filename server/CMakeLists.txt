@@ -33,7 +33,7 @@ target_sources(taller_server
         acceptor.h
         game_ready_notification.h
         skin_translator.h
-        command_type.h
+        movement_type.h
         commands/player_command.h
         commands/buy_weapon_command.h
         commands/change_skin_command.h
