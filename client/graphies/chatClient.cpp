@@ -27,20 +27,24 @@ void ChatClient::run() {
     SDL_ShowCursor(SDL_DISABLE);  // desabilitamos el mouse
 
     // Create main window
-    Window window("Counter Strike 1.6", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1000, 1000,
-                  SDL_WINDOW_SHOWN);  // pantalla completa
+    int widthWindow = 1000;
+    int heightWindow = 1000;
+
+    Window window("Counter Strike 1.6", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        widthWindow, heightWindow, SDL_WINDOW_SHOWN);  // pantalla completa
 
     // Create accelerated video renderer with default driver
     Renderer renderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     // Create render object
-    Configuracion configuracion;
+    Configuracion configuracion(widthWindow, heightWindow);
+    
     Render render(&renderer, protocolo, namePlayer, configuracion);
 
     // Create input handler
-    InputHandler inputHandler(protocolo, configuracion);
+    InputHandler inputHandler(protocolo, configuracion, gameOver);
 
-    InputServerHandler inputServerHandler(protocolo);
+    InputServerHandler inputServerHandler(protocolo, gameOver);
 
     std::thread inputThread(&InputHandler::processEvents, &inputHandler);
 
@@ -52,7 +56,7 @@ void ChatClient::run() {
 
     // double lastTime = getCurrentTime();
     // Main loop
-    while (true) {
+    while (!gameOver) {
         double current = getCurrentTime();
         // double elapsed = current - lastTime;
         // lastTime = current;
@@ -70,6 +74,7 @@ void ChatClient::run() {
         }
         // SDL_Delay(33);
     }
+    protocolo.kill();
     inputThread.join();
     inputServer.join();
     SDL_Quit();

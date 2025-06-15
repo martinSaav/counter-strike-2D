@@ -3,7 +3,7 @@
 MapSprite::MapSprite(Renderer* sdlRenderer, Configuracion& configuracion)
     : Component(sdlRenderer, configuracion){
 
-    texturas.loadTexture("fondo", "../client/data/maps/default_aztec.png");
+    texturas.loadTexture("map", "../client/data/maps/default_aztec.png");
 
     // round
     texturas.loadTexture("terroristWins", "../client/data/hud/terroristWins.png");
@@ -12,44 +12,43 @@ MapSprite::MapSprite(Renderer* sdlRenderer, Configuracion& configuracion)
     // bomb
     texturas.loadTexture("bomb", "../client/data/weapons/bomb.bmp");
 
-    // shop
-    texturas.loadTexture("shop", "../client/data/maps/shop2.png");
-
     // camp field
     texturas.loadTexture("field", "../client/data/maps/field.png");
 }
 
-void MapSprite::draw(SDL_Rect& camera ,int& camWidth ,int& camHeight){
+void MapSprite::draw(){
 
-    Texture& fondo = texturas.getTexture("fondo");
+    Texture& map = texturas.getTexture("map");
+    int camWidth = configuracion.widthWindow / configuracion.zoom;
+    int camHeight = configuracion.heightWindow / configuracion.zoom;
 
-    SDL_Rect srcRect = {camera.x, camera.y, camWidth, camHeight};
-    sdlRenderer->Copy(fondo, srcRect, destRectMap);
+    SDL_Rect srcRect = {configuracion.camera.x, configuracion.camera.y, camWidth, camHeight};
+    sdlRenderer->Copy(map, srcRect, destRectMap);
 }
 
 int MapSprite::getWidth(){
-    Texture& fondo = texturas.getTexture("fondo");
+    Texture& map = texturas.getTexture("map");
 
-    int worldWidth = fondo.GetWidth();
+    int worldWidth = map.GetWidth();
     return worldWidth;
 }
 
 int MapSprite::getHeight(){
-    Texture& fondo = texturas.getTexture("fondo");
+    Texture& map = texturas.getTexture("map");
     
-    int worldHeight = fondo.GetHeight();
+    int worldHeight = map.GetHeight();
     return worldHeight;
 }
 
-void MapSprite::drawEndRound(Team& team, int weidthScreen, int heightScreen, int zoom){
+void MapSprite::drawEndRound(Team& team, int zoom){
     Texture& terroristWins = texturas.getTexture("terroristWins");
     Texture& counterterroristWins = texturas.getTexture("counterterroristWins");
 
     int anchoCartel = 210;
     int altoCartel = 50;
     int anchoCartelPantalla = anchoCartel * zoom / 8;
-    int symbolX = (weidthScreen * 0.5) - anchoCartelPantalla / 2;
-    int symbolY = heightScreen * 0.2;
+    int symbolX = (configuracion.widthWindow * 0.5) - anchoCartelPantalla / 2;
+    int symbolY = configuracion.heightWindow * 0.2;
 
     SDL_Rect srcRect = {0, 0, anchoCartel, 50};
 
@@ -98,26 +97,7 @@ void MapSprite::drawBomb(int bomb_x, int bomb_y){
     int(32 * configuracion.zoom / 8), int(32 * configuracion.zoom / 8)
     };
 
-    sdlRenderer->Copy(bomb, srcRectBomb, destRectBomb);
-}
-
-void MapSprite::drawShop(int weidthScreen, int heightScreen){
-    Texture& shop = texturas.getTexture("shop");
-    
-    int altoCartel = 200;
-    int anchoCartel = 500;
-
-    int symbolX = (weidthScreen * 0.5) - anchoCartel * 2 / 2;
-    int symbolY = heightScreen * 0.2;
-
-    SDL_Rect srcRect = {0, 0, anchoCartel, altoCartel};
-    SDL_Rect destRect = {
-        symbolX,
-        symbolY,
-        anchoCartel * 2,
-        altoCartel * 2
-    };
-    sdlRenderer->Copy(shop, srcRect, destRect);
+    sdlRenderer->Copy(bomb, SDL2pp::NullOpt, destRectBomb);
 }
 
 void MapSprite::drawCampField(int angle, int playerX, int playerY){

@@ -10,19 +10,17 @@
 // Recibe mensajes del servidor y los guarda en una cola
 class InputServerHandler {
 private:
-    bool quit = false;
+    bool& gameOver;
     std::queue<GameStateUpdate> mensajes;
     std::mutex mtx;
     Protocol& protocolo;
 
 public:
-    explicit InputServerHandler(Protocol& protocolo);
+    explicit InputServerHandler(Protocol& protocolo, bool& gameOver);
     ~InputServerHandler();
 
     void processEvents();
 
     std::optional<GameStateUpdate> getMensaje();
-
-    bool exitGame();
 };
 #endif

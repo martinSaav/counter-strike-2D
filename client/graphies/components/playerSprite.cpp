@@ -86,12 +86,10 @@ void PlayerSprite::drawWeapon(int& jugadorX, int& jugadorY, double& angle, std::
         int(32 * configuracion.zoom / 8)
     };
 
-    sdlRenderer->Copy(weapon, srcRect, destRect, angle);
+    sdlRenderer->Copy(weapon, SDL2pp::NullOpt, destRect, angle);
 }
 
 void PlayerSprite::drawBullet(int& shootX, int& shootY, double& angle) {
-
-    SDL_Rect srcRectBullet = {0,0,360,360};
 
     SDL_Rect destRect = {
     int((shootX - configuracion.camera.x) * configuracion.zoom),
@@ -101,7 +99,7 @@ void PlayerSprite::drawBullet(int& shootX, int& shootY, double& angle) {
     };
     
     Texture& tiro = texturas.getTexture("tiro");
-    sdlRenderer->Copy(tiro, srcRectBullet, destRect);
+    sdlRenderer->Copy(tiro, SDL2pp::NullOpt, destRect);
 }
 
 void PlayerSprite::drawPlayerDeath(int jugadorX, int jugadorY) {

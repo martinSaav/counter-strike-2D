@@ -1,8 +1,8 @@
 #include "hudSprite.h"
 #include <cmath>
 
-HudSprite::HudSprite(Renderer* sdlRenderer, Configuracion& configuracion, int& weidth, int& height) : 
-    Component(sdlRenderer, configuracion), weidthScreen(weidth), heightScreen(height){
+HudSprite::HudSprite(Renderer* sdlRenderer, Configuracion& configuracion) : 
+    Component(sdlRenderer, configuracion){
 
     texturas.loadTexture("mira", "../client/data/mira.png");
     texturas.loadTexture("symbols", "../client/data/hud/hud_symbols.png");
@@ -15,6 +15,9 @@ HudSprite::HudSprite(Renderer* sdlRenderer, Configuracion& configuracion, int& w
 
     // slot
     texturas.loadTexture("slot", "../client/data/weapons/hud_slot.png");
+
+    // shop
+    texturas.loadTexture("shop", "../client/data/maps/shop.png");
 }
 
 void HudSprite::draw(SDL_Rect& mouse, int& health, int& money, int& time, int& round){
@@ -27,14 +30,17 @@ void HudSprite::draw(SDL_Rect& mouse, int& health, int& money, int& time, int& r
     nums.SetColorMod(100, 200, 100);
     hud_symbols.SetColorMod(100, 200, 100);
 
+    int weidthWindow = configuracion.widthWindow;
+    int heightWindow = configuracion.heightWindow;
+
     // num round
     int anchoNums = 38;
-    int symbolX = (weidthScreen * 0.5) - anchoNums / 2;
-    int symbolY = heightScreen * 0.02;
+    int symbolX = (weidthWindow * 0.5) - anchoNums / 2;
+    int symbolY = heightWindow * 0.02;
     drawNumRound(round, symbolX, symbolY);
 
-    symbolX = weidthScreen * 0.05;
-    symbolY = heightScreen * 0.92;
+    symbolX = weidthWindow * 0.05;
+    symbolY = heightWindow * 0.92;
 
     // health
     drawHuds(health, tipo, symbolX, symbolY);
@@ -43,36 +49,40 @@ void HudSprite::draw(SDL_Rect& mouse, int& health, int& money, int& time, int& r
     nums.SetColorMod(255, 165, 0);
     hud_symbols.SetColorMod(255, 165, 0);
 
-    if (time < 45){
+    if (time < configuracion.tiempoDeCompra){
         // Shop
-        symbolX = weidthScreen * 0.30;
+        symbolX = weidthWindow * 0.30;
         tipo = SHOP;
         int numTipo = tipo;
         drawSymbol(numTipo, symbolX, symbolY, hud_symbols);
     }
     
     // time
-    symbolX = weidthScreen * 0.45;
+    symbolX = weidthWindow * 0.45;
     tipo = TIME;
     drawHuds(time, tipo, symbolX, symbolY);
 
     // weapon
     int cantBalas = 20;
-    symbolX = weidthScreen * 0.76;
+    symbolX = weidthWindow * 0.76;
     int anchoWeapons = 45;
     int weaponX = 0;
 
     drawWeapon(symbolX, symbolY, anchoWeapons, weaponX, cantBalas);
 
     // money
-    symbolX = weidthScreen * 0.80;
-    symbolY = heightScreen * 0.92;
+    symbolX = weidthWindow * 0.80;
+    symbolY = heightWindow * 0.92;
     symbolY -= alturaSymbols;
     tipo = MONEY;
     drawHuds(money, tipo, symbolX, symbolY);
 
     // mira
     sdlRenderer->Copy(mira, SDL2pp::NullOpt, mouse);
+
+    if (time < configuracion.tiempoDeCompra){
+        drawShop();
+    }
 }
 
 void HudSprite::drawHuds(int& num, HudType tipo, int& symbolX, int& symbolY){
@@ -157,9 +167,6 @@ void HudSprite::drawWeapon(int& symbolX, int& symbolY, int& anchoWeapons,
     int anchoWeaponsPantalla = anchoWeapons * 2;
     int alturaWeaponsPantalla = alturaWeapons * 2;
 
-    int anchoSlot = 150;
-    int alturaSlot = 40;
-
     int anchoSlotPantalla = 200;
 
     int alturaBullets = 50;
@@ -169,12 +176,11 @@ void HudSprite::drawWeapon(int& symbolX, int& symbolY, int& anchoWeapons,
     int anchoBulletsPantalla = 40;
 
     // Slot
-    SDL_Rect srcRect = {0, 0, anchoSlot, alturaSlot};
     SDL_Rect destRect = {symbolX, symbolY, anchoSlotPantalla, altoSymbolPantalla};
-    sdlRenderer->Copy(slot, srcRect, destRect);
+    sdlRenderer->Copy(slot, SDL2pp::NullOpt, destRect);
 
     // Weapon
-    srcRect = {weaponX, 0, anchoWeapons, alturaWeapons};
+    SDL_Rect srcRect = {weaponX, 0, anchoWeapons, alturaWeapons};
     destRect = {symbolX + 5, symbolY + 5, anchoWeaponsPantalla, alturaWeaponsPantalla};
     sdlRenderer->Copy(weapon, srcRect, destRect);
 
@@ -203,4 +209,22 @@ void HudSprite::drawWeapon(int& symbolX, int& symbolY, int& anchoWeapons,
 
         symbolX += anchoNumPantalla;
     }
+}
+
+void HudSprite::drawShop(){
+    Texture& shop = texturas.getTexture("shop");
+
+    int altoCartelPantalla = 600;
+    int anchoCartelPantalla = 600;
+
+    int symbolX = (configuracion.widthWindow * 0.5) - anchoCartelPantalla / 2;
+    int symbolY = configuracion.heightWindow * 0.2;
+
+    SDL_Rect destRect = {
+        symbolX,
+        symbolY,
+        anchoCartelPantalla,
+        altoCartelPantalla
+    };
+    sdlRenderer->Copy(shop, SDL2pp::NullOpt, destRect);
 }

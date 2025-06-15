@@ -11,11 +11,10 @@ enum HudType {
     DOBLEPUNTO = 10
 };
 
+// huds Sobre la pantalla
 class HudSprite : public Component{
 
     private:
-    int& weidthScreen;
-    int& heightScreen;
     int alturaSymbols = 64;
     int anchoSymbols = 64;
     int anchoNum = 50;
@@ -31,13 +30,13 @@ class HudSprite : public Component{
 
     void drawNumRound(int& round, int& symbolX, int& symbolY);
 
-    void drawWeapon(int& symbolX, int& symbolY, int& anchoWeapons,
-        int& weaponX, int& cantBalas);
+    void drawWeapon(int& symbolX, int& symbolY, int& anchoWeapons, int& weaponX, int& cantBalas);
+
+    void drawShop();
 
     public:
-    HudSprite(Renderer* sdlRenderer, Configuracion& configuracion, int& weidth, int& height);
+    HudSprite(Renderer* sdlRenderer, Configuracion& configuracion);
 
     void draw(SDL_Rect& mouse, int& health, int& money, int& time, int& round);
-
 };
 #endif

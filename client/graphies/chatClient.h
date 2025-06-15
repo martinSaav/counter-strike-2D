@@ -9,6 +9,8 @@ private:
     Protocol& protocolo;  // Protocolo a usar
     std::string& namePlayer;
 
+    bool gameOver = false;
+
 public:
     void run();  // loop
 

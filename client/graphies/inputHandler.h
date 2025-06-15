@@ -12,25 +12,23 @@
 // Lee el teclado y envía los mensajes al servidor
 class InputHandler {
 private:
-    bool quit = false;
+    bool& gameOver;
     std::queue<std::string> mensajes;
     std::mutex mtx;
     Protocol& protocolo;
-    int mouseX = 0;
-    int mouseY = 0;
-
-    int mouse_map_x = 0;
-    int mouse_map_y = 0;
     Configuracion& configuracion;
 
+    int mouseX = 0;
+    int mouseY = 0;
+    int mouse_map_x = 0;
+    int mouse_map_y = 0;
+
 public:
-    InputHandler(Protocol& protocolo, Configuracion& configuracion);
+    InputHandler(Protocol& protocolo, Configuracion& configuracion, bool& gameOver);
     ~InputHandler();
 
     void processEvents();
 
     std::optional<std::string> getMensaje();
-
-    bool exitGame();
 };
 #endif

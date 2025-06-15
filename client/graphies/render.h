@@ -26,12 +26,6 @@ private:
     MapSprite mapa;
     PlayerSprite player;
 
-    int screenWidth = 1000;
-    int screenHeight = 1000;
-
-    // Pos del mapa
-    int mapa_x = 0, mapa_y = 0;
-
     // Coordenadas de mi jugador
     PlayerInfo* myPlayer = nullptr;
 

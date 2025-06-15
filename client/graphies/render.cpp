@@ -8,7 +8,7 @@ using SDL2pp::Rect;
 
 Render::Render(Renderer* renderer, Protocol& protocolo, std::string& namePlayer, Configuracion& configuracion):
     sdlRenderer(renderer), protocolo(protocolo), namePlayer(namePlayer),
-    configuracion(configuracion), hud(sdlRenderer, configuracion, screenWidth, screenHeight),
+    configuracion(configuracion), hud(sdlRenderer, configuracion),
     mapa(sdlRenderer, configuracion), player(sdlRenderer, configuracion)
 {
 }
@@ -22,8 +22,8 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     int worldWidth = mapa.getWidth();
     int worldHeight = mapa.getHeight();
 
-    int camWidth = screenWidth / zoom;
-    int camHeight = screenHeight / zoom;
+    int camWidth = configuracion.widthWindow / zoom;
+    int camHeight = configuracion.heightWindow / zoom;
 
     // Calcula la posición del jugador
     for (auto& jugador : jugadores){
@@ -33,7 +33,6 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     }
 
     SDL_Rect& camera = configuracion.camera;
-    camera = {0, 0, camWidth, camHeight};
 
     camera.x = myPlayer->get_pos_x() - camWidth / 2;
     camera.y = myPlayer->get_pos_y() - camHeight / 2;
@@ -51,7 +50,7 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
         mapa.desactivateBomb();
     }
 
-    mapa.draw(camera, camWidth, camHeight); //Dibujo el mapa
+    mapa.draw(); //Dibujo el mapa
 
     // Obtengo mi angulo
     SDL_GetMouseState(&mouseX, &mouseY);
@@ -102,7 +101,7 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
 
     if (mensaje->is_round_ended()){
         Team team = mensaje->get_round_winner();
-        mapa.drawEndRound(team, screenWidth, screenHeight, zoom);
+        mapa.drawEndRound(team, zoom);
     }
     
     if (mensaje->is_bomb_planted() && !mensaje->is_round_ended()){
@@ -114,8 +113,10 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
             mapa.activateBomb();
         }
     }
-    //mapa.drawShop(screenWidth, screenHeight);
-    mapa.drawCampField(myAngle, myPlayer->get_pos_x(), myPlayer->get_pos_y());
+    
+    if (time > configuracion.tiempoDeCompra){
+        mapa.drawCampField(myAngle, myPlayer->get_pos_x(), myPlayer->get_pos_y());
+    }
     sdlRenderer->Present();
 }
 
