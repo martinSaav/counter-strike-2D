@@ -47,6 +47,6 @@ private:
 public:
     Render(Renderer* renderer, Protocol& protocolo, std::string& namePlayer, Configuracion& configuracion);
     void renderFrame(std::optional<GameStateUpdate> mensaje);
-    bool puntoEnVision(int playerX, int playerY, float visionAngleDeg, float fovDeg, float radius, int puntoX, int puntoY);
+    bool puntoEnVision(int playerX, int playerY, float visionAngleDeg, int puntoX, int puntoY);
 };
 #endif

@@ -18,6 +18,13 @@ HudSprite::HudSprite(Renderer* sdlRenderer, Configuracion& configuracion) :
 
     // shop
     texturas.loadTexture("shop", "../client/data/maps/shop.png");
+
+    // weapons dropped
+    texturas.loadTexture("ak47_dropped", "../client/data/weapons/ak47_d.bmp");
+    texturas.loadTexture("glock_dropped", "../client/data/weapons/glock_d.bmp");
+    texturas.loadTexture("awp_dropped", "../client/data/weapons/awp_d.bmp");
+    texturas.loadTexture("m3_dropped", "../client/data/weapons/m3_d.bmp");
+    texturas.loadTexture("bomb_dropped", "../client/data/weapons/bomb_d.bmp");
 }
 
 void HudSprite::draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlayer){
@@ -272,4 +279,39 @@ void HudSprite::drawShop(){
         altoCartelPantalla
     };
     sdlRenderer->Copy(shop, SDL2pp::NullOpt, destRect);
+}
+
+void HudSprite::drawWeaponDroped(Weapon weapon, int weaponX, int weaponY){
+
+    int anchoWeapon = 40;
+    int altoWeapon = 40;
+    std::string weaponDropped;
+    switch (weapon)
+    {
+    case Weapon::AK47:
+        weaponDropped = "ak47_dropped";
+        break;
+    case Weapon::Glock:
+        weaponDropped = "glock_dropped";
+        break;
+    case Weapon::AWP:
+        weaponDropped = "awp_dropped";
+        break;
+    case Weapon::M3:
+        weaponDropped = "m3_dropped";
+        break;
+    case Weapon::Bomb:
+        weaponDropped = "bomb_dropped";
+        break;
+    }
+
+    Texture& textureWeapon = texturas.getTexture(weaponDropped);
+
+    SDL_Rect destRect = {
+        int((weaponX - configuracion.camera.x) * configuracion.zoom),
+        int((weaponY - configuracion.camera.y) * configuracion.zoom),
+        anchoWeapon,
+        altoWeapon
+    };
+    sdlRenderer->Copy(textureWeapon, SDL2pp::NullOpt, destRect);
 }
