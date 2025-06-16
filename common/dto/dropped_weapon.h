@@ -46,7 +46,7 @@ public:
     Weapon get_weapon() const { return weapon; }
 
     uint16_t get_pos_x() const { return pos_x; }
-    
+
     uint16_t get_pos_y() const { return pos_y; }
 };
 

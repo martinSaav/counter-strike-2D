@@ -78,7 +78,7 @@ public:
     MessageType type() const override { return message_type; }
 
     size_t serialized_size() const override {
-        size_t size = HEADER_SIZE; // header
+        size_t size = HEADER_SIZE;  // header
         for (const auto& game: games) {
             size += sizeof(uint16_t) + game.name.size();
             size += sizeof(uint16_t) + game.map_name.size();

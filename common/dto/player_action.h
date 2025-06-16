@@ -54,7 +54,7 @@ public:
 
     size_t serialized_size() const override {
         return HEADER_SIZE + sizeof(action) + 2 * sizeof(uint16_t);
-    } 
+    }
 
     Action get_action() const { return action; }
 

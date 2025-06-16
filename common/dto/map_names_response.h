@@ -58,7 +58,7 @@ public:
         }
         return MapNamesResponse(map_names_deserialized);
     }
-    
+
     MessageType type() const override { return message_type; }
 
     size_t serialized_size() const override {

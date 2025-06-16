@@ -45,8 +45,8 @@ public:
                Status status, uint16_t money, uint16_t kills, uint16_t deaths, Action action,
                uint16_t pos_shoot_x, uint16_t pos_shoot_y, std::string skin, Weapon primary_weapon,
                uint16_t primary_weapon_ammo, Weapon secondary_weapon,
-               uint16_t secondary_weapon_ammo, Weapon knife, Weapon bomb,
-               Weapon active_weapon, uint16_t active_weapon_ammo):
+               uint16_t secondary_weapon_ammo, Weapon knife, Weapon bomb, Weapon active_weapon,
+               uint16_t active_weapon_ammo):
             user_name(std::move(user_name)),
             pos_x(pos_x),
             pos_y(pos_y),
@@ -66,8 +66,7 @@ public:
             knife(knife),
             bomb(bomb),
             active_weapon(active_weapon),
-            active_weapon_ammo(active_weapon_ammo)
-            {}
+            active_weapon_ammo(active_weapon_ammo) {}
 
     void serialize(uint8_t* buffer) const {
         size_t offset = 0;
@@ -116,7 +115,7 @@ public:
         buffer[offset++] = static_cast<uint8_t>(active_weapon);
         uint16_t active_weapon_ammo_net = htons(active_weapon_ammo);
         std::memcpy(buffer + offset, &active_weapon_ammo_net, sizeof(active_weapon_ammo_net));
-        offset += sizeof(active_weapon_ammo_net);
+        // offset += sizeof(active_weapon_ammo_net);
     }
 
     static PlayerInfo deserialize(const uint8_t* buffer, size_t size) {
@@ -183,33 +182,32 @@ public:
         uint16_t active_weapon_ammo;
         std::memcpy(&active_weapon_ammo, buffer + offset, sizeof(active_weapon_ammo));
         active_weapon_ammo = ntohs(active_weapon_ammo);
-        offset += sizeof(active_weapon_ammo);
-
+        // offset += sizeof(active_weapon_ammo);
 
         return PlayerInfo(user_name, pos_x, pos_y, health, status, money, kills, deaths, action,
                           pos_shoot_x, pos_shoot_y, skin, primary_weapon, primary_weapon_ammo,
-                          secondary_weapon, secondary_weapon_ammo, knife, bomb, active_weapon, active_weapon_ammo);
+                          secondary_weapon, secondary_weapon_ammo, knife, bomb, active_weapon,
+                          active_weapon_ammo);
     }
 
     size_t serialized_size() const {
-        return
-            sizeof(uint16_t) + user_name.size() + // user_name
-            sizeof(status) + // status
-            2 * sizeof(uint16_t) + // pos_x, pos_y
-            sizeof(uint16_t) + // health
-            sizeof(money) + // money
-            2 * sizeof(uint16_t) + // kills, deaths
-            sizeof(action) + // action
-            2 * sizeof(uint16_t) + // pos_shoot_x, pos_shoot_y
-            sizeof(uint16_t) + skin.size() + // skin
-            sizeof(Weapon) + // primary_weapon
-            sizeof(uint16_t) + // primary_weapon_ammo
-            sizeof(Weapon) + // secondary_weapon
-            sizeof(uint16_t) + // secondary_weapon_ammo
-            sizeof(Weapon) + // knife
-            sizeof(Weapon) + // bomb
-            sizeof(Weapon) + // active_weapon
-            sizeof(uint16_t); // active_weapon_ammo
+        return sizeof(uint16_t) + user_name.size() +  // user_name
+               sizeof(status) +                       // status
+               2 * sizeof(uint16_t) +                 // pos_x, pos_y
+               sizeof(uint16_t) +                     // health
+               sizeof(money) +                        // money
+               2 * sizeof(uint16_t) +                 // kills, deaths
+               sizeof(action) +                       // action
+               2 * sizeof(uint16_t) +                 // pos_shoot_x, pos_shoot_y
+               sizeof(uint16_t) + skin.size() +       // skin
+               sizeof(Weapon) +                       // primary_weapon
+               sizeof(uint16_t) +                     // primary_weapon_ammo
+               sizeof(Weapon) +                       // secondary_weapon
+               sizeof(uint16_t) +                     // secondary_weapon_ammo
+               sizeof(Weapon) +                       // knife
+               sizeof(Weapon) +                       // bomb
+               sizeof(Weapon) +                       // active_weapon
+               sizeof(uint16_t);                      // active_weapon_ammo
     }
 
     const std::string& get_user_name() const { return user_name; }
@@ -249,7 +247,7 @@ public:
     Weapon get_bomb() const { return bomb; }
 
     Weapon get_active_weapon() const { return active_weapon; }
-    
+
     uint16_t get_active_weapon_ammo() const { return active_weapon_ammo; }
 };
 

@@ -173,19 +173,19 @@ public:
     MessageType type() const override { return message_type; }
 
     size_t serialized_size() const override {
-        size_t size = HEADER_SIZE;        // header
-        size += 1 + 1 + 1;      // game_started, game_ended, round
-        size += sizeof(float);  // round_time
-        size += 1 + 1 + 1;      // round_started, round_ended, bomb_planted
-        size += 2 + 2;          // bomb_x, bomb_y
-        size += sizeof(float);  // bomb_timer
-        size += 1 + 1;          // round_winner, game_winner
-        size += 2;              // num_players
+        size_t size = HEADER_SIZE;  // header
+        size += 1 + 1 + 1;          // game_started, game_ended, round
+        size += sizeof(float);      // round_time
+        size += 1 + 1 + 1;          // round_started, round_ended, bomb_planted
+        size += 2 + 2;              // bomb_x, bomb_y
+        size += sizeof(float);      // bomb_timer
+        size += 1 + 1;              // round_winner, game_winner
+        size += 2;                  // num_players
         size += std::accumulate(players.begin(), players.end(), 0,
                                 [](const size_t sum, const PlayerInfo& player) {
                                     return sum + player.serialized_size();
                                 });
-        size += 2;              // num_weapons
+        size += 2;  // num_weapons
         size += std::accumulate(dropped_weapons.begin(), dropped_weapons.end(), 0,
                                 [](const size_t sum, const DroppedWeapon& weapon) {
                                     return sum + weapon.serialized_size();

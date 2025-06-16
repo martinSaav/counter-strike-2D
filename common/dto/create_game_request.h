@@ -67,12 +67,12 @@ public:
     MessageType type() const override { return this->message_type; }
 
     size_t serialized_size() const override {
-        size_t size = HEADER_SIZE; // header
-        size += sizeof(uint16_t) + game_name.size(); // game name
-        size += sizeof(uint16_t) + map_name.size(); // map name
+        size_t size = HEADER_SIZE;                    // header
+        size += sizeof(uint16_t) + game_name.size();  // game name
+        size += sizeof(uint16_t) + map_name.size();   // map name
         return size;
     }
-    
+
     const std::string& get_game_name() const { return game_name; }
 
     const std::string& get_map_name() const { return map_name; }

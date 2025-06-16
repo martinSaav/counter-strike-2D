@@ -42,9 +42,9 @@ public:
 
     MessageType type() const override { return this->message_type; }
 
-    size_t serialized_size() const override { 
-        size_t size = HEADER_SIZE; // header
-        size += sizeof(success); // success
+    size_t serialized_size() const override {
+        size_t size = HEADER_SIZE;  // header
+        size += sizeof(success);    // success
         return size;
     }
 
