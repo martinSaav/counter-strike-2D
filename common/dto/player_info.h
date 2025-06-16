@@ -24,7 +24,7 @@ private:
     uint16_t pos_y;
     uint16_t health;
     Status status;
-    float money;
+    uint16_t money;
     uint16_t kills;
     uint16_t deaths;
     Action action;
@@ -42,7 +42,7 @@ private:
 
 public:
     PlayerInfo(std::string user_name, uint16_t pos_x, uint16_t pos_y, uint16_t health,
-               Status status, float money, uint16_t kills, uint16_t deaths, Action action,
+               Status status, uint16_t money, uint16_t kills, uint16_t deaths, Action action,
                uint16_t pos_shoot_x, uint16_t pos_shoot_y, std::string skin, Weapon primary_weapon,
                uint16_t primary_weapon_ammo, Weapon secondary_weapon,
                uint16_t secondary_weapon_ammo, Weapon knife, Weapon bomb,
@@ -141,7 +141,7 @@ public:
         std::memcpy(&health, buffer + offset, sizeof(health));
         offset += sizeof(health);
 
-        float money;
+        uint16_t money;
         std::memcpy(&money, buffer + offset, sizeof(money));
         offset += sizeof(money);
 
@@ -197,7 +197,7 @@ public:
             sizeof(status) + // status
             2 * sizeof(uint16_t) + // pos_x, pos_y
             sizeof(uint16_t) + // health
-            sizeof(float) + // money
+            sizeof(money) + // money
             2 * sizeof(uint16_t) + // kills, deaths
             sizeof(action) + // action
             2 * sizeof(uint16_t) + // pos_shoot_x, pos_shoot_y
@@ -222,7 +222,7 @@ public:
 
     Status get_status() const { return status; }
 
-    float get_money() const { return money; }
+    uint16_t get_money() const { return money; }
 
     uint16_t get_kills() const { return kills; }
 
