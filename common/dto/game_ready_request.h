@@ -24,8 +24,6 @@ public:
         buffer[2] = 0;
     }
 
-    size_t serialized_size() const override { return 3; }
-
     static GameReadyRequest deserialize([[maybe_unused]] const uint8_t* buffer, size_t size) {
         if (size < 1) {
             throw std::runtime_error("");
@@ -34,5 +32,7 @@ public:
     }
 
     MessageType type() const override { return this->message_type; }
+
+    size_t serialized_size() const override { return HEADER_SIZE; }
 };
 #endif

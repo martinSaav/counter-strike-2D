@@ -24,7 +24,7 @@ public:
         buffer[2] = 0;
     }
 
-    size_t serialized_size() const override { return 3; }
+    size_t serialized_size() const override { return HEADER_SIZE; }
 
     static DisconnectRequest deserialize([[maybe_unused]] const uint8_t* buffer, size_t size) {
         if (size < 1) {

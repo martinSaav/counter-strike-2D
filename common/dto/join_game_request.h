@@ -26,25 +26,20 @@ public:
         memcpy(buffer + 3, game_name.data(), game_name.size());
     }
 
-    size_t serialized_size() const override { return 3 + game_name.size(); }
-
-    const std::string& get_game_name() const { return game_name; }
-
-
     static JoinGameRequest deserialize(const uint8_t* buffer, size_t size) {
         if (size < 3) {
             throw std::runtime_error("");
         }
         uint16_t length;
         memcpy(&length, buffer + 1, sizeof(length));
-        size_t expected_size = 3 + static_cast<size_t>(length);
-        if (size < expected_size) {
-            throw std::runtime_error("");
-        }
         const std::string game_name_deserialized(reinterpret_cast<const char*>(buffer + 3), length);
         return JoinGameRequest(game_name_deserialized);
     }
 
     MessageType type() const override { return this->message_type; }
+
+    size_t serialized_size() const override { return HEADER_SIZE + game_name.size(); }
+
+    const std::string& get_game_name() const { return game_name; }
 };
 #endif

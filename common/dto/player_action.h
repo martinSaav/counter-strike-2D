@@ -37,12 +37,6 @@ public:
         std::memcpy(buffer + 6, &pos_mouse_y_be, sizeof(pos_mouse_y_be));
     }
 
-    size_t serialized_size() const override { return 8; }
-
-    Action get_action() const { return action; }
-    uint16_t get_pos_mouse_x() const { return pos_mouse_x; }
-    uint16_t get_pos_mouse_y() const { return pos_mouse_y; }
-
     static PlayerAction deserialize(const uint8_t* buffer, size_t size) {
         if (size < 4) {
             throw std::runtime_error("");
@@ -57,5 +51,15 @@ public:
     }
 
     MessageType type() const override { return this->message_type; }
+
+    size_t serialized_size() const override {
+        return HEADER_SIZE + sizeof(action) + 2 * sizeof(uint16_t);
+    }
+
+    Action get_action() const { return action; }
+
+    uint16_t get_pos_mouse_x() const { return pos_mouse_x; }
+
+    uint16_t get_pos_mouse_y() const { return pos_mouse_y; }
 };
 #endif
