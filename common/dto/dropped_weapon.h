@@ -41,10 +41,12 @@ public:
         return DroppedWeapon(weapon, x, y);
     }
 
-    size_t serialized_size() const { return sizeof(Weapon) + 2 * sizeof(uint16_t); }
+    size_t serialized_size() const { return sizeof(weapon) + 2 * sizeof(uint16_t); }
 
     Weapon get_weapon() const { return weapon; }
+
     uint16_t get_pos_x() const { return pos_x; }
+    
     uint16_t get_pos_y() const { return pos_y; }
 };
 

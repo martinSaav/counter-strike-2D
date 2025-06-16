@@ -26,11 +26,6 @@ public:
         buffer[3] = static_cast<uint8_t>(success);
     }
 
-    size_t serialized_size() const override { return 4; }
-
-    const bool& get_success() const { return success; }
-
-
     static CreateGameResponse deserialize(const uint8_t* buffer, size_t size) {
         if (size < 3) {
             throw std::runtime_error("");
@@ -46,5 +41,13 @@ public:
     }
 
     MessageType type() const override { return this->message_type; }
+
+    size_t serialized_size() const override { 
+        size_t size = HEADER_SIZE; // header
+        size += sizeof(success); // success
+        return size;
+    }
+
+    const bool& get_success() const { return success; }
 };
 #endif

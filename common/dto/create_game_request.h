@@ -23,7 +23,7 @@ public:
 
     void serialize(uint8_t* buffer) const override {
         buffer[0] = static_cast<uint8_t>(message_type);
-        size_t offset = 3;
+        size_t offset = HEADER_SIZE;
         uint16_t game_name_length = htons(static_cast<uint16_t>(game_name.size()));
         memcpy(buffer + offset, &game_name_length, sizeof(game_name_length));
         offset += sizeof(game_name_length);
@@ -39,18 +39,11 @@ public:
         memcpy(buffer + 1, &payload_length, sizeof(payload_length));
     }
 
-    size_t serialized_size() const override {
-        return 3 + game_name.size() + sizeof(uint16_t) + map_name.size() + sizeof(uint16_t);
-    }
-
-    const std::string& get_game_name() const { return game_name; }
-    const std::string& get_map_name() const { return map_name; }
-
     static CreateGameRequest deserialize(const uint8_t* buffer, size_t size) {
         if (size < 3) {
             throw std::runtime_error("");
         }
-        size_t offset = 3;
+        size_t offset = HEADER_SIZE;
 
         uint16_t game_name_length;
         memcpy(&game_name_length, buffer + offset, sizeof(game_name_length));
@@ -72,5 +65,16 @@ public:
     }
 
     MessageType type() const override { return this->message_type; }
+
+    size_t serialized_size() const override {
+        size_t size = HEADER_SIZE; // header
+        size += sizeof(uint16_t) + game_name.size(); // game name
+        size += sizeof(uint16_t) + map_name.size(); // map name
+        return size;
+    }
+    
+    const std::string& get_game_name() const { return game_name; }
+
+    const std::string& get_map_name() const { return map_name; }
 };
 #endif

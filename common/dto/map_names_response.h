@@ -24,7 +24,7 @@ public:
 
     void serialize(uint8_t* buffer) const override {
         buffer[0] = static_cast<uint8_t>(message_type);
-        size_t offset = 3;
+        size_t offset = HEADER_SIZE;
         for (const auto& map_name: map_names) {
             uint16_t map_name_length = htons(static_cast<uint16_t>(map_name.size()));
             std::memcpy(buffer + offset, &map_name_length, sizeof(map_name_length));
@@ -35,19 +35,6 @@ public:
         uint16_t payload_length = htons(static_cast<uint16_t>(offset - 3));
         std::memcpy(buffer + 1, &payload_length, sizeof(payload_length));
     }
-
-    size_t serialized_size() const override {
-        size_t size = 3;
-        size += std::accumulate(map_names.begin(), map_names.end(), 0,
-                                [](int sum, const std::string& str) { return sum + str.size(); });
-        size += map_names.size() * sizeof(uint16_t);
-        //        for (const auto& map_name: map_names) {
-        //            size += sizeof(uint16_t) + map_name.size();
-        //        }
-        return size;
-    }
-
-    MessageType type() const override { return message_type; }
 
     static MapNamesResponse deserialize(const uint8_t* buffer, size_t size) {
         if (size < 3) {
@@ -70,6 +57,16 @@ public:
             offset += map_name_length;
         }
         return MapNamesResponse(map_names_deserialized);
+    }
+    
+    MessageType type() const override { return message_type; }
+
+    size_t serialized_size() const override {
+        size_t size = HEADER_SIZE;
+        size += std::accumulate(map_names.begin(), map_names.end(), 0,
+                                [](int sum, const std::string& str) { return sum + str.size(); });
+        size += map_names.size() * sizeof(uint16_t);
+        return size;
     }
 
     const std::list<std::string>& get_mapGames() const { return map_names; }

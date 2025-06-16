@@ -29,10 +29,6 @@ public:
         buffer[3] = static_cast<uint8_t>(weapon);
     }
 
-    size_t serialized_size() const override { return 4; }
-
-    Weapon get_weapon() const { return weapon; }
-
     static BuyWeaponRequest deserialize(const uint8_t* buffer, size_t size) {
         if (size < 4) {
             throw std::runtime_error("");
@@ -42,5 +38,13 @@ public:
     }
 
     MessageType type() const override { return this->message_type; }
+
+    size_t serialized_size() const override { 
+        size_t size = HEADER_SIZE; // header
+        size += sizeof(weapon); // weapon
+        return size;
+    }
+
+    Weapon get_weapon() const { return weapon; }
 };
 #endif
