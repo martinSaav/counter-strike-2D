@@ -2,7 +2,7 @@
 #define RENDER_H
 #include <string>
 #include <memory>
-
+#include <iostream>
 #include "../../common/protocol.h"
 #include "../../common/action.h"
 #include "textureStore.h"

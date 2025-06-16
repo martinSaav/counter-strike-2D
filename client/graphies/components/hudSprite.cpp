@@ -20,12 +20,21 @@ HudSprite::HudSprite(Renderer* sdlRenderer, Configuracion& configuracion) :
     texturas.loadTexture("shop", "../client/data/maps/shop.png");
 }
 
-void HudSprite::draw(SDL_Rect& mouse, int& health, int& money, int& time, int& round,
-        Weapon& weaponPLayer, int& ammoWeapon){
+void HudSprite::draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlayer){
     Texture& mira = texturas.getTexture("mira");
     Texture& hud_symbols = texturas.getTexture("symbols"); 
     Texture& nums = texturas.getTexture("nums");
     HudType tipo = HEALTH;
+
+    int health = myPlayer.get_health();
+    int money = myPlayer.get_money();
+    Weapon myWeapon = myPlayer.get_active_weapon();
+    int myWeaponAmmo = myPlayer.get_active_weapon_ammo();
+    Weapon bomb = myPlayer.get_bomb();
+    bool haveBomb = false;
+    if (bomb == Weapon::Bomb){
+        haveBomb = true;
+    }
 
     // Aplicamos el color verde
     nums.SetColorMod(100, 200, 100);
@@ -52,8 +61,15 @@ void HudSprite::draw(SDL_Rect& mouse, int& health, int& money, int& time, int& r
 
     if (time < configuracion.tiempoDeCompra){
         // Shop
-        symbolX = weidthWindow * 0.30;
+        symbolX = weidthWindow * 0.28;
         tipo = SHOP;
+        int numTipo = tipo;
+        drawSymbol(numTipo, symbolX, symbolY, hud_symbols);
+    }
+
+    if (haveBomb){
+        symbolX = weidthWindow * 0.34;
+        tipo = BOMB;
         int numTipo = tipo;
         drawSymbol(numTipo, symbolX, symbolY, hud_symbols);
     }
@@ -70,7 +86,7 @@ void HudSprite::draw(SDL_Rect& mouse, int& health, int& money, int& time, int& r
     int weaponTextureX;
 
     // Coordenadas de la textura
-    switch (weaponPLayer)
+    switch (myWeapon)
     {
     case Weapon::AK47:
         anchoWeapon = 45;
@@ -94,7 +110,7 @@ void HudSprite::draw(SDL_Rect& mouse, int& health, int& money, int& time, int& r
         break;
     }
 
-    drawWeapon(symbolX, symbolY, anchoWeapon, weaponTextureX, ammoWeapon, weaponPLayer);
+    drawWeapon(symbolX, symbolY, anchoWeapon, weaponTextureX, myWeaponAmmo, myWeapon);
 
     // money
     symbolX = weidthWindow * 0.80;
@@ -111,7 +127,7 @@ void HudSprite::draw(SDL_Rect& mouse, int& health, int& money, int& time, int& r
     }
 }
 
-void HudSprite::drawHuds(int& num, HudType tipo, int& symbolX, int& symbolY){
+void HudSprite::drawHuds(int num, HudType tipo, int& symbolX, int& symbolY){
     Texture& hud_symbols = texturas.getTexture("symbols"); 
     Texture& nums = texturas.getTexture("nums"); 
 
