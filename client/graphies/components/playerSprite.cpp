@@ -150,7 +150,7 @@ tipoMusic PlayerSprite::castShoot(Weapon& weapon){
     case Weapon::Glock:
         return DISPARO_PISTOL;
     case Weapon::AK47:
-        return DISPARO_PISTOL; //DISPARO_AK47;
+        return DISPARO_AK47;
     }
     return NONE;
 }

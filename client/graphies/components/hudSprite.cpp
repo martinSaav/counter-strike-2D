@@ -283,8 +283,8 @@ void HudSprite::drawShop(){
 
 void HudSprite::drawWeaponDroped(Weapon weapon, int weaponX, int weaponY){
 
-    int anchoWeapon = 40;
-    int altoWeapon = 40;
+    int anchoWeapon = 70;
+    int altoWeapon = 70;
     std::string weaponDropped;
     switch (weapon)
     {
@@ -302,6 +302,8 @@ void HudSprite::drawWeaponDroped(Weapon weapon, int weaponX, int weaponY){
         break;
     case Weapon::Bomb:
         weaponDropped = "bomb_dropped";
+        anchoWeapon = 40;
+        altoWeapon = 40;
         break;
     }
 
