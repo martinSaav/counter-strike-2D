@@ -156,6 +156,9 @@ std::vector<std::shared_ptr<Player>> Map::get_players_near_point(const int x, co
     const std::pair<int, int> chunk_index = get_chunk_index(x, y);
     std::vector<std::shared_ptr<Player>> near_players;
     for (const auto& player: players) {
+        if (player->is_dead()) {
+            continue;
+        }
         if (std::vector<std::pair<int, int>>& player_chunks = player->get_chunk_idxs();
             std::ranges::find(player_chunks, chunk_index) != player_chunks.end()) {
             near_players.emplace_back(player);

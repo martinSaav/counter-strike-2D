@@ -107,7 +107,7 @@ void Player::receive_damage(const GameManager& manager, const int damage) {
     health = std::max(0, health - damage);
     if (health == 0) {
         status = Status::Dead;
-        deaths++;
+        deaths += 1;
         if (bomb != nullptr) {
             manager.drop_bomb(*this, std::move(bomb));
         } else if (equipped_weapon == GunType::Primary) {
@@ -122,7 +122,7 @@ void Player::receive_damage(const GameManager& manager, const int damage) {
 }
 
 void Player::add_kill() {
-    kills++;
+    kills += 1;
     money += money_per_kill;
 }
 
