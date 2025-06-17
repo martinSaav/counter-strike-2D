@@ -18,12 +18,16 @@ void InputHandler::processEvents() {
     SDL_Event event;
 
     Weapon weapon = Weapon::None;
-
+    Weapon lastWeapon = Weapon::None;
     while (!gameOver) {
 
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT)
+            if (event.type == SDL_QUIT){
                 gameOver = true;
+                clientClosed = true;
+                DisconnectRequest disconnect;
+                protocolo.send_message(disconnect);
+            }
         }
 
         Action actionActual;
@@ -91,18 +95,19 @@ void InputHandler::processEvents() {
 
         // Compra independiente
         if (state[SDL_SCANCODE_I]) {
-            Weapon weapon = Weapon::AK47;
+            weapon = Weapon::AK47;
 
         } else if (state[SDL_SCANCODE_O]) {
-            Weapon weapon = Weapon::M3;
+            weapon = Weapon::M3;
 
         } else if (state[SDL_SCANCODE_P]) {
-            Weapon weapon = Weapon::AWP;
+            weapon = Weapon::AWP;
         }
 
-        if (weapon != Weapon::None){
+        if (weapon != Weapon::None && weapon != lastWeapon){
             BuyWeaponRequest buyWeapon(weapon);
             protocolo.send_message(buyWeapon);
+            lastWeapon = weapon;
             weapon = Weapon::None;
         }
         SDL_Delay(33);

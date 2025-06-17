@@ -6,7 +6,7 @@
 
 
 std::map<Stages, double> GameClock::get_stage_duration_map() {
-    std::map<Stages, double> stage_duration_map = {{Stages::BuyStage, 1000},
+    std::map<Stages, double> stage_duration_map = {{Stages::BuyStage, 20000},
                                                    {Stages::PrePlantStage, 0},
                                                    {Stages::PostPlantStage, 90000},
                                                    {Stages::AfterRoundStage, 10000}};
