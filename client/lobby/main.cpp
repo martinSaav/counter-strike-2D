@@ -41,13 +41,8 @@ int main(int argc, char* argv[]) {
         result = cliente.run(estadistics);
 
         if (result == CONTINUAR){
-            std::cout<<"listo"<<std::endl;
-
-            //stadistics* estadisticas = new stadistics(estadistics);
-            //estadisticas->setWindowFlags(Qt::Window);  // esto la hace ventana real
-            //estadisticas->show();
             Estadistics window(estadistics);
-            window.exec();  // Modal: bloquea hasta que se cierre
+            window.exec(); //bloquea hasta que se cierre
         }
     }
     return 0;
