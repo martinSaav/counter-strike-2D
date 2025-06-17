@@ -11,6 +11,8 @@ set(LOBBY_SOURCES
     waitroom.ui
     selectskin.cpp
     selectskin.ui
+    estadistics.cpp
+    estadistics.ui
     recursos.qrc
 )
 

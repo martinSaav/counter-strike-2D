@@ -86,20 +86,16 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
         mousePlayerY = jugador.get_pos_shoot_y();
         anglePlayer = getAnglePlayer(posPlayerX, posPlayerY, mousePlayerX, mousePlayerY);
             
-        if (puntoEnVision(myPlayer->get_pos_x(), myPlayer->get_pos_y(), visionAngle, 70.0f, 60.0f, jugador.get_pos_x(), jugador.get_pos_y())) {
+        if (puntoEnVision(myPlayer->get_pos_x(), myPlayer->get_pos_y(), visionAngle, jugador.get_pos_x(), jugador.get_pos_y())) {
            player.drawPlayer(jugador, anglePlayer);
         }
     }
 
-    int health = myPlayer->get_health();
-    int money = myPlayer->get_money();
     int time = mensaje->get_round_time();
     int round = mensaje->get_round();
-    Weapon myWeapon = myPlayer->get_active_weapon();
-    int myWeaponAmmo = myPlayer->get_active_weapon_ammo();
 
     SDL_Rect mouse = {mouseX, mouseY, 40, 40};
-    hud.draw(mouse, health, money, time, round, myWeapon, myWeaponAmmo);
+    hud.draw(mouse, time, round, *myPlayer);
 
     if (mensaje->is_round_ended()){
         Team team = mensaje->get_round_winner();
@@ -119,6 +115,13 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     if (time >= configuracion.tiempoDeCompra){
         mapa.drawCampField(myAngle, myPlayer->get_pos_x(), myPlayer->get_pos_y());
     }
+
+    std::list<DroppedWeapon> dropped_weapons = mensaje->get_dropped_weapons();
+    for (auto weapon : dropped_weapons){
+        if (puntoEnVision(myPlayer->get_pos_x(), myPlayer->get_pos_y(), visionAngle, weapon.get_pos_x(), weapon.get_pos_y())) {
+            hud.drawWeaponDroped(weapon.get_weapon(), weapon.get_pos_x(), weapon.get_pos_y());
+        }
+    }
     sdlRenderer->Present();
 }
 
@@ -134,7 +137,9 @@ double Render::getAnglePlayer(int jugadorX, int jugadorY, int mousex, int mousey
     return angleDegrees;  // Ajustar para que apunte hacia la dirección del mouse
 }
 
-bool Render::puntoEnVision(int playerX, int playerY, float visionAngleDeg, float fovDeg, float radius, int puntoX, int puntoY) {
+bool Render::puntoEnVision(int playerX, int playerY, float visionAngleDeg, int puntoX, int puntoY) {
+    float fovDeg = 70.0f;
+    float radius = 60.0f;
     float dx = puntoX - playerX;
     float dy = puntoY - playerY;
     float distancia = std::sqrt(dx*dx + dy*dy);

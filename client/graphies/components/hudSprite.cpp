@@ -18,14 +18,30 @@ HudSprite::HudSprite(Renderer* sdlRenderer, Configuracion& configuracion) :
 
     // shop
     texturas.loadTexture("shop", "../client/data/maps/shop.png");
+
+    // weapons dropped
+    texturas.loadTexture("ak47_dropped", "../client/data/weapons/ak47_d.bmp");
+    texturas.loadTexture("glock_dropped", "../client/data/weapons/glock_d.bmp");
+    texturas.loadTexture("awp_dropped", "../client/data/weapons/awp_d.bmp");
+    texturas.loadTexture("m3_dropped", "../client/data/weapons/m3_d.bmp");
+    texturas.loadTexture("bomb_dropped", "../client/data/weapons/bomb_d.bmp");
 }
 
-void HudSprite::draw(SDL_Rect& mouse, int& health, int& money, int& time, int& round,
-        Weapon& weaponPLayer, int& ammoWeapon){
+void HudSprite::draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlayer){
     Texture& mira = texturas.getTexture("mira");
     Texture& hud_symbols = texturas.getTexture("symbols"); 
     Texture& nums = texturas.getTexture("nums");
     HudType tipo = HEALTH;
+
+    int health = myPlayer.get_health();
+    int money = myPlayer.get_money();
+    Weapon myWeapon = myPlayer.get_active_weapon();
+    int myWeaponAmmo = myPlayer.get_active_weapon_ammo();
+    Weapon bomb = myPlayer.get_bomb();
+    bool haveBomb = false;
+    if (bomb == Weapon::Bomb){
+        haveBomb = true;
+    }
 
     // Aplicamos el color verde
     nums.SetColorMod(100, 200, 100);
@@ -52,8 +68,15 @@ void HudSprite::draw(SDL_Rect& mouse, int& health, int& money, int& time, int& r
 
     if (time < configuracion.tiempoDeCompra){
         // Shop
-        symbolX = weidthWindow * 0.30;
+        symbolX = weidthWindow * 0.28;
         tipo = SHOP;
+        int numTipo = tipo;
+        drawSymbol(numTipo, symbolX, symbolY, hud_symbols);
+    }
+
+    if (haveBomb){
+        symbolX = weidthWindow * 0.34;
+        tipo = BOMB;
         int numTipo = tipo;
         drawSymbol(numTipo, symbolX, symbolY, hud_symbols);
     }
@@ -70,7 +93,7 @@ void HudSprite::draw(SDL_Rect& mouse, int& health, int& money, int& time, int& r
     int weaponTextureX;
 
     // Coordenadas de la textura
-    switch (weaponPLayer)
+    switch (myWeapon)
     {
     case Weapon::AK47:
         anchoWeapon = 45;
@@ -94,7 +117,7 @@ void HudSprite::draw(SDL_Rect& mouse, int& health, int& money, int& time, int& r
         break;
     }
 
-    drawWeapon(symbolX, symbolY, anchoWeapon, weaponTextureX, ammoWeapon, weaponPLayer);
+    drawWeapon(symbolX, symbolY, anchoWeapon, weaponTextureX, myWeaponAmmo, myWeapon);
 
     // money
     symbolX = weidthWindow * 0.80;
@@ -111,7 +134,7 @@ void HudSprite::draw(SDL_Rect& mouse, int& health, int& money, int& time, int& r
     }
 }
 
-void HudSprite::drawHuds(int& num, HudType tipo, int& symbolX, int& symbolY){
+void HudSprite::drawHuds(int num, HudType tipo, int& symbolX, int& symbolY){
     Texture& hud_symbols = texturas.getTexture("symbols"); 
     Texture& nums = texturas.getTexture("nums"); 
 
@@ -256,4 +279,39 @@ void HudSprite::drawShop(){
         altoCartelPantalla
     };
     sdlRenderer->Copy(shop, SDL2pp::NullOpt, destRect);
+}
+
+void HudSprite::drawWeaponDroped(Weapon weapon, int weaponX, int weaponY){
+
+    int anchoWeapon = 40;
+    int altoWeapon = 40;
+    std::string weaponDropped;
+    switch (weapon)
+    {
+    case Weapon::AK47:
+        weaponDropped = "ak47_dropped";
+        break;
+    case Weapon::Glock:
+        weaponDropped = "glock_dropped";
+        break;
+    case Weapon::AWP:
+        weaponDropped = "awp_dropped";
+        break;
+    case Weapon::M3:
+        weaponDropped = "m3_dropped";
+        break;
+    case Weapon::Bomb:
+        weaponDropped = "bomb_dropped";
+        break;
+    }
+
+    Texture& textureWeapon = texturas.getTexture(weaponDropped);
+
+    SDL_Rect destRect = {
+        int((weaponX - configuracion.camera.x) * configuracion.zoom),
+        int((weaponY - configuracion.camera.y) * configuracion.zoom),
+        anchoWeapon,
+        altoWeapon
+    };
+    sdlRenderer->Copy(textureWeapon, SDL2pp::NullOpt, destRect);
 }

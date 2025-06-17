@@ -9,9 +9,6 @@
 #include "../common/message.h"
 #include "../common/message_type.h"
 
-#define HEADER_SIZE 3
-
-
 class Protocol {
 private:
     SocketInterface& peer;

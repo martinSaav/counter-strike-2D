@@ -58,11 +58,6 @@ void PlayerSprite::drawPlayer(const PlayerInfo& jugador, double& angle) {
         int cantVeces = 1;
         sounds.loadMusic(music, cantVeces);
     }
-    // else {
-    //    tipoMusic music = STEP;
-    //    int cantVeces = 1;
-    //    sounds.loadMusic(music, cantVeces);
-    //}
 }
 
 void PlayerSprite::drawWeapon(int& jugadorX, int& jugadorY, double& angle, Weapon& weaponPlayer) {

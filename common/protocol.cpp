@@ -8,6 +8,7 @@
 #include "../common/dto/buy_weapon_request.h"
 #include "../common/dto/create_game_request.h"
 #include "../common/dto/create_game_response.h"
+#include "../common/dto/disconnect_request.h"
 #include "../common/dto/game_list_request.h"
 #include "../common/dto/game_list_response.h"
 #include "../common/dto/game_ready_request.h"
@@ -22,7 +23,6 @@
 #include "../common/dto/map_names_response.h"
 #include "../common/dto/player_action.h"
 #include "../common/dto/select_skin_request.h"
-#include "../common/dto/disconnect_request.h"
 
 
 Protocol::Protocol(SocketInterface& peer): peer(peer) {}

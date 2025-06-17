@@ -26,25 +26,20 @@ public:
         buffer[3] = static_cast<uint8_t>(success);
     }
 
-    size_t serialized_size() const override { return 4; }
-
-    const bool& get_success() const { return success; }
-
-
     static JoinGameResponse deserialize(const uint8_t* buffer, size_t size) {
         if (size < 3) {
             throw std::runtime_error("");
         }
         uint16_t length;
         memcpy(&length, buffer + 1, sizeof(length));
-        size_t expected_size = 3 + static_cast<size_t>(length);
-        if (size < expected_size) {
-            throw std::runtime_error("");
-        }
         const bool success_deserialized = static_cast<bool>(buffer[3]);
         return JoinGameResponse(success_deserialized);
     }
 
     MessageType type() const override { return this->message_type; }
+
+    size_t serialized_size() const override { return HEADER_SIZE + sizeof(success); }
+
+    const bool& get_success() const { return success; }
 };
 #endif

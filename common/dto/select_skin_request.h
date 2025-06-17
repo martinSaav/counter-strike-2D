@@ -26,11 +26,6 @@ public:
         memcpy(buffer + 3, skin.data(), skin.size());
     }
 
-    size_t serialized_size() const override { return 3 + skin.size(); }
-
-    const std::string& get_skin() const { return skin; }
-
-
     static SelectSkinRequest deserialize(const uint8_t* buffer, size_t size) {
         if (size < 3) {
             throw std::runtime_error("");
@@ -46,5 +41,9 @@ public:
     }
 
     MessageType type() const override { return this->message_type; }
+
+    size_t serialized_size() const override { return HEADER_SIZE + skin.size(); }
+
+    const std::string& get_skin() const { return skin; }
 };
 #endif

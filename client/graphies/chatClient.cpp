@@ -21,7 +21,7 @@ double getCurrentTime() {
     return (double)SDL_GetPerformanceCounter() / frequency;
 }
 
-void ChatClient::run() {
+int ChatClient::run(std::unique_ptr<GameStateUpdate>& estadistics) {
     SDL sdl(SDL_INIT_VIDEO);
     IMG_Init(IMG_INIT_PNG);
     SDL_ShowCursor(SDL_DISABLE);  // desabilitamos el mouse
@@ -42,7 +42,7 @@ void ChatClient::run() {
     Render render(&renderer, protocolo, namePlayer, configuracion);
 
     // Create input handler
-    InputHandler inputHandler(protocolo, configuracion, gameOver);
+    InputHandler inputHandler(protocolo, configuracion, gameOver, clientClosed);
 
     InputServerHandler inputServerHandler(protocolo, gameOver);
 
@@ -78,4 +78,12 @@ void ChatClient::run() {
     inputThread.join();
     inputServer.join();
     SDL_Quit();
+
+    if (clientClosed){
+        return CLIENTCLOSED;
+    }
+    std::optional<GameStateUpdate> mensaje = inputServerHandler.getMensaje();
+    // Guardamos ultimo mensaje
+    estadistics = std::make_unique<GameStateUpdate>(std::move(mensaje.value()));
+    return CONTINUAR;
 }

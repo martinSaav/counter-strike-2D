@@ -26,25 +26,20 @@ public:
         memcpy(buffer + 3, username.data(), username.size());
     }
 
-    size_t serialized_size() const override { return 3 + username.size(); }
-
-    const std::string& get_username() const { return username; }
-
-
     static LoginRequest deserialize(const uint8_t* buffer, size_t size) {
         if (size < 3) {
             throw std::runtime_error("");
         }
         uint16_t length;
         memcpy(&length, buffer + 1, sizeof(length));
-        size_t expected_size = 3 + static_cast<size_t>(length);
-        if (size < expected_size) {
-            throw std::runtime_error("");
-        }
         const std::string username_deserialized(reinterpret_cast<const char*>(buffer + 3), length);
         return LoginRequest(username_deserialized);
     }
 
     MessageType type() const override { return this->message_type; }
+
+    size_t serialized_size() const override { return HEADER_SIZE + username.size(); }
+
+    const std::string& get_username() const { return username; }
 };
 #endif
