@@ -2,5 +2,10 @@
 ct_amount: 5
 tt_amount: 5
 rounds: 10
-player_health: 100
-max_ammo: 30
+player_max_health: 100
+player_width: 30
+player_height: 30
+max_ammo_glock: 20
+reserve_ammo_glock: 40
+max_ammo_ak: 30
+reserve_ammo_ak: 60

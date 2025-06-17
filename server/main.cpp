@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include <yaml-cpp/yaml.h>
+
 #include "common/catedra/socket.h"
 
 #include "acceptor.h"
