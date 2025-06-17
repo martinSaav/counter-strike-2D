@@ -3,16 +3,18 @@
 #include <string>
 
 #include "render.h"
+const int CONTINUAR = 1;
+const int CLIENTCLOSED = 2;
 
 class ChatClient {
 private:
     Protocol& protocolo;  // Protocolo a usar
     std::string& namePlayer;
-
+    bool clientClosed = false;
     bool gameOver = false;
 
 public:
-    void run();  // loop
+    int run(std::unique_ptr<GameStateUpdate>& estadistics);  // loop
 
     ChatClient(Protocol& protocolo, std::string& namePlayer);  // Constructor
 };

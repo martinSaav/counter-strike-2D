@@ -13,6 +13,7 @@
 class InputHandler {
 private:
     bool& gameOver;
+    bool& clientClosed;
     std::queue<std::string> mensajes;
     std::mutex mtx;
     Protocol& protocolo;
@@ -24,7 +25,7 @@ private:
     int mouse_map_y = 0;
 
 public:
-    InputHandler(Protocol& protocolo, Configuracion& configuracion, bool& gameOver);
+    InputHandler(Protocol& protocolo, Configuracion& configuracion, bool& gameOver, bool& clientClosed);
     ~InputHandler();
 
     void processEvents();

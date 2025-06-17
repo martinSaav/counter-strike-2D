@@ -5,8 +5,8 @@
 #include "../../common/dto/disconnect_request.h"
 #include "../../common/dto/buy_weapon_request.h"
 
-InputHandler::InputHandler(Protocol& protocolo, Configuracion& configuracion, bool& gameOver): 
-protocolo(protocolo), configuracion(configuracion), gameOver(gameOver){
+InputHandler::InputHandler(Protocol& protocolo, Configuracion& configuracion, bool& gameOver, bool& clientClosed): 
+protocolo(protocolo), configuracion(configuracion), gameOver(gameOver), clientClosed(clientClosed){
     SDL_StartTextInput();  // Activa entrada de texto
 }
 
@@ -36,6 +36,7 @@ void InputHandler::processEvents() {
         if (state[SDL_SCANCODE_Q]) {
 
             gameOver = true;
+            clientClosed = true;
             DisconnectRequest disconnect;
             protocolo.send_message(disconnect);
         }

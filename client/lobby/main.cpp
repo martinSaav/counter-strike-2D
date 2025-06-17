@@ -4,6 +4,7 @@
 
 #include "chatClient.h"
 #include "lobbywindow.h"
+#include "estadistics.h"
 
 int main(int argc, char* argv[]) {
     // Comprobamos que la cantidad de argumentos sea correcta
@@ -14,6 +15,7 @@ int main(int argc, char* argv[]) {
     }
 
     std::string namePlayer;
+    std::unique_ptr<GameStateUpdate> estadistics;
 
     QApplication a(argc, argv);
 
@@ -36,7 +38,17 @@ int main(int argc, char* argv[]) {
         // Creamos el juego para el cliente
         ChatClient cliente(protocolo, namePlayer);
 
-        cliente.run();
+        result = cliente.run(estadistics);
+
+        if (result == CONTINUAR){
+            std::cout<<"listo"<<std::endl;
+
+            //stadistics* estadisticas = new stadistics(estadistics);
+            //estadisticas->setWindowFlags(Qt::Window);  // esto la hace ventana real
+            //estadisticas->show();
+            Estadistics window(estadistics);
+            window.exec();  // Modal: bloquea hasta que se cierre
+        }
     }
     return 0;
 }
