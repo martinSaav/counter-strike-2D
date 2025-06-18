@@ -116,7 +116,7 @@ void Player::receive_damage(const GameManager& manager, const int damage) {
             manager.drop_weapon(*this, std::move(secondary_weapon));
         }
         primary_weapon = nullptr;
-        secondary_weapon = std::make_unique<Glock>();
+        secondary_weapon = std::make_unique<Glock>(game_config.glock_config);
         equipped_weapon = GunType::Secondary;
     }
 }

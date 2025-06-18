@@ -5,16 +5,17 @@
 #include "game_clock.h"
 
 
-std::map<Stages, double> GameClock::get_stage_duration_map() {
-    std::map<Stages, double> stage_duration_map = {{Stages::BuyStage, 45000},
-                                                   {Stages::PrePlantStage, 0},
-                                                   {Stages::PostPlantStage, 90000},
-                                                   {Stages::AfterRoundStage, 10000}};
+std::map<Stages, double> GameClock::get_stage_duration_map() const {
+    std::map<Stages, double> stage_duration_map = {
+            {Stages::BuyStage, buy_stage_time},
+            {Stages::PrePlantStage, 0},
+            {Stages::PostPlantStage, post_bomb_stage_time},
+            {Stages::AfterRoundStage, after_round_stage_time}};
     return stage_duration_map;
 }
 
 
-void GameClock::advance(double dt) {
+void GameClock::advance(const double dt) {
     current_time += dt;
     stage_time += dt;
     std::map<Stages, double> stage_duration_map = get_stage_duration_map();

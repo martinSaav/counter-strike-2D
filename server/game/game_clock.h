@@ -7,6 +7,7 @@
 #include <map>
 #include <stdexcept>
 
+#include "game_config.h"
 #include "stages.h"
 
 
@@ -15,15 +16,21 @@ struct RoundAlreadyFinished: public std::runtime_error {
 };
 
 class GameClock {
+    const int buy_stage_time;
+    const int post_bomb_stage_time;
+    const int after_round_stage_time;
     double current_time;
     double stage_time;
     Stages current_stage;
     bool bomb_exploded;
     bool has_round_finished;
-    std::map<Stages, double> get_stage_duration_map();
+    [[nodiscard]] std::map<Stages, double> get_stage_duration_map() const;
 
 public:
-    GameClock():
+    explicit GameClock(const GameConfig& config):
+            buy_stage_time(config.buy_time),
+            post_bomb_stage_time(config.bomb_time),
+            after_round_stage_time(config.after_round_time),
             current_time(0),
             stage_time(0),
             current_stage(Stages::BuyStage),

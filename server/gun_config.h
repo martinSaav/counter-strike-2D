@@ -16,7 +16,7 @@ public:
     const int bullets_per_burst;
     const int shoot_cooldown;
     const int range;
-    const int angle;
+    const double angle;
     GunConfig(int max_ammo, int starting_reserve_ammo, int min_dmg, int max_dmg, int gun_price):
             max_ammo(max_ammo),
             starting_reserve_ammo(starting_reserve_ammo),
@@ -38,7 +38,7 @@ public:
             shoot_cooldown(shoot_cooldown),
             range(0),
             angle(0) {}
-    GunConfig(int min_dmg, int max_dmg, int range, int angle):
+    GunConfig(int min_dmg, int max_dmg, int range, double angle):
             max_ammo(0),
             starting_reserve_ammo(0),
             min_dmg(min_dmg),

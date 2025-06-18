@@ -7,10 +7,6 @@
 #include <list>
 #include <vector>
 
-#include "common/dto/login_request.h"
-#include "common/game_info.h"
-#include "common/message.h"
-#define generic_username "username"
 #include "catedra/liberror.h"
 #include "commands/leave_match_command.h"
 #include "common/dto/create_game_request.h"
@@ -18,7 +14,10 @@
 #include "common/dto/game_list_response.h"
 #include "common/dto/join_game_request.h"
 #include "common/dto/join_game_response.h"
+#include "common/dto/login_request.h"
 #include "common/dto/map_names_response.h"
+#include "common/game_info.h"
+#include "common/message.h"
 
 #include "skin_translator.h"
 

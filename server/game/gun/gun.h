@@ -10,7 +10,6 @@
 #include "gun_type.h"
 #include "position.h"
 #include "shoot_result.h"
-#include "weapon.h"
 #include "weapon_info.h"
 
 #define gun_hitbox_width 30

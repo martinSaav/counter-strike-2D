@@ -6,7 +6,7 @@ GameIdentification Lobby::create_match(const std::string& match_name,
         throw MatchAlreadyExists();
     }
 
-    matches[match_name] = std::make_unique<Match>();
+    matches[match_name] = std::make_unique<Match>(game_config);
     const GameIdentification game_id = matches[match_name]->join_match(player_name);
     matches[match_name]->start();
     return game_id;
