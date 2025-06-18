@@ -6,6 +6,7 @@
 #include "common/catedra/socket.h"
 #include "common/catedra/thread.h"
 
+#include "game_config.h"
 #include "lobby.h"
 
 class Acceptor: public Thread {
@@ -18,7 +19,8 @@ class Acceptor: public Thread {
     void free_clients();
 
 public:
-    explicit Acceptor(Socket&& socket): skt(std::move(socket)) {}
+    explicit Acceptor(Socket&& socket, GameConfig&& game_configuration):
+            skt(std::move(socket)), lobby(std::move(game_configuration)) {}
     void run() override;
     void stop() override;
 };

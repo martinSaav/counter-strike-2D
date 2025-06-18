@@ -18,7 +18,6 @@
 #include "movement_type.h"
 #include "player_credentials.h"
 #include "request_processor.h"
-#define max_number_of_players 10
 #define map_width 155
 #define map_height 285
 
@@ -32,6 +31,11 @@ struct MatchAlreadyStarted: public std::runtime_error {
 
 class Match: public Thread {
     friend class RequestProcessor;
+    const int ct_amount;
+    const int tt_amount;
+    const int tiles_per_movement;
+    const int rate;
+    const double miliseconds_per_iteration;
     std::map<PlayerCredentials, std::shared_ptr<Player>> players;
     Queue<std::shared_ptr<PlayerCommand>> commands_queue;
     std::vector<std::shared_ptr<Queue<std::variant<MatchStatusDTO, GameReadyNotification>>>>
@@ -43,6 +47,7 @@ class Match: public Thread {
     Map map;
     GameClock game_clock;
     GameManager game_manager;
+    GameConfig& game_config;
     std::atomic<bool> has_finished;
 
     MatchStatusDTO get_match_status();
@@ -103,13 +108,20 @@ class Match: public Thread {
     void wait_for_players_to_leave_match();
 
 public:
-    Match():
+    explicit Match(GameConfig& game_config):
+            ct_amount(game_config.ct_amount),
+            tt_amount(game_config.tt_amount),
+            tiles_per_movement(game_config.tiles_per_movement),
+            rate(game_config.game_rate),
+            miliseconds_per_iteration(static_cast<double>(1000) / rate),
             commands_queue(Queue<std::shared_ptr<PlayerCommand>>()),
             match_started(false),
             player_count(0),
-            max_player_count(max_number_of_players),
+            max_player_count(ct_amount + tt_amount),
             map(map_width, map_height),
-            game_manager(map, game_clock) {}
+            game_clock(game_config),
+            game_manager(map, game_clock, game_config),
+            game_config(game_config) {}
     GameIdentification join_match(const std::string& username);
     void run() override;
     void stop() override;

@@ -21,13 +21,13 @@ class BombEncapsulator: public Gun {
     void reset_shoots() override;
 
 public:
-    BombEncapsulator(): has_to_fire(false) {}
-    bool has_finished_planting(float current_time) const;
+    explicit BombEncapsulator(const GameConfig& config): bomb(config), has_to_fire(false) {}
+    [[nodiscard]] bool has_finished_planting(float current_time) const;
     GunType get_gun_type() override { return type; }
     void reload_gun() override;
     void shoot_gun(Position final_position) override;
     int get_gun_price() override { return 0; }
-    bool is_planting();
+    bool is_planting() const;
     WeaponInfo get_weapon_name() override { return WeaponInfo{Weapon::Bomb, 0}; }
 };
 

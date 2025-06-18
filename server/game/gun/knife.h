@@ -4,12 +4,16 @@
 
 #ifndef KNIFE_H
 #define KNIFE_H
-#include <cmath>
 #include <utility>
 
 #include "gun.h"
+#include "gun_config.h"
 
 class Knife: public Gun {
+    const double max_degree;
+    const int knife_range;
+    const int min_dmg;
+    const int max_dmg;
     GunType type = GunType::Knife;
     std::pair<int, int> next_shoot;
     bool has_to_fire;
@@ -19,10 +23,15 @@ class Knife: public Gun {
                          Position& current_position) override;
     void reset_shoots() override;
 
-    int calculate_damage(double distance);
+    [[nodiscard]] int calculate_damage(double distance) const;
 
 public:
-    Knife(): has_to_fire(false) {}
+    explicit Knife(const GunConfig& knife_config):
+            max_degree(knife_config.angle),
+            knife_range(knife_config.range),
+            min_dmg(knife_config.min_dmg),
+            max_dmg(knife_config.max_dmg),
+            has_to_fire(false) {}
     GunType get_gun_type() override { return type; }
     void reload_gun() override;
     void shoot_gun(Position final_position) override;

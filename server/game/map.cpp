@@ -202,7 +202,7 @@ ImpactInfo Map::get_nearest_colliding_player(int ini_x, int ini_y, double curren
     std::pair<int, int> nearest_player_pos;
     std::shared_ptr<Player> nearest_player = nullptr;
     for (auto players = get_players_near_point(current_x, current_y); const auto& player: players) {
-        if (*player == gun_owner) {
+        if (player->get_username() == gun_owner.get_username()) {
             continue;
         }
         if (auto [x, y] = player->get_location();

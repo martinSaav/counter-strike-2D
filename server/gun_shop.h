@@ -9,13 +9,15 @@
 
 #include "gun/gun.h"
 
+#include "game_config.h"
+
 struct CantBuyWeapon: public std::runtime_error {
     CantBuyWeapon(): std::runtime_error("Cant buy weapon") {}
 };
 
 class GunShop {
 public:
-    static std::unique_ptr<Gun> get_gun(Weapon weapon);
+    static std::unique_ptr<Gun> get_gun(Weapon weapon, const GameConfig& config);
 };
 
 

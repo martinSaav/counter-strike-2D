@@ -5,13 +5,14 @@
 #include "game_manager.h"
 
 #include <algorithm>
+#include <cmath>
 #include <utility>
 
 #include "map.h"
 
 void GameManager::attack_player(const std::shared_ptr<Player>& attacked, Player& attacker,
-                                const int damage) {
-    if (attacked->current_team == attacker.current_team) {
+                                const int damage) const {
+    if (attacked->current_team == attacker.current_team || attacked->is_dead()) {
         return;
     }
     attacked->receive_damage(*this, damage);
@@ -21,14 +22,14 @@ void GameManager::attack_player(const std::shared_ptr<Player>& attacked, Player&
 }
 
 
-bool GameManager::can_player_buy() {
+bool GameManager::can_player_buy() const {
     if (clock.getCurrentStage() != Stages::BuyStage) {
         return false;
     }
     return true;
 }
 
-bool GameManager::can_player_move_or_shoot(const std::shared_ptr<Player>& player) {
+bool GameManager::can_player_move_or_shoot(const std::shared_ptr<Player>& player) const {
     if (clock.getCurrentStage() == Stages::BuyStage || player->is_dead()) {
         return false;
     }
@@ -123,7 +124,7 @@ void GameManager::plant_bomb(const int x, const int y) {
 }
 
 
-void GameManager::explode_bomb(const std::vector<std::shared_ptr<Player>>& players) {
+void GameManager::explode_bomb(const std::vector<std::shared_ptr<Player>>& players) const {
     for (auto& player: players) {
         if (!player->is_dead()) {
             auto [p_x, p_y] = player->get_location();
@@ -176,7 +177,7 @@ void GameManager::drop_weapon(Player& player, std::unique_ptr<Gun> gun) const {
 }
 
 
-void GameManager::pick_weapon(const std::shared_ptr<Player>& player) {
+void GameManager::pick_weapon(const std::shared_ptr<Player>& player) const {
     if (player->is_dead()) {
         return;
     }
@@ -210,17 +211,18 @@ bool GameManager::has_ended() const {
 }
 
 
-void GameManager::give_bomb_to_random_player(const std::vector<std::shared_ptr<Player>>& players) {
-    const int amount_of_tt = std::count_if(players.begin(), players.end(),
-                                           [](const std::shared_ptr<Player>& player) {
-                                               return player->current_team == Team::Terrorists;
-                                           });
+void GameManager::give_bomb_to_random_player(
+        const std::vector<std::shared_ptr<Player>>& players) const {
+    const int amount_of_tt =
+            std::ranges::count_if(players, [](const std::shared_ptr<Player>& player) {
+                return player->current_team == Team::Terrorists;
+            });
     const int bomb_player = std::rand() % (amount_of_tt + 1);
     int current_tt = 1;
     for (auto& player: players) {
         if (player->current_team == Team::Terrorists) {
             if (current_tt == bomb_player) {
-                player->equip_bomb(std::make_unique<BombEncapsulator>());
+                player->equip_bomb(std::make_unique<BombEncapsulator>(config));
                 return;
             }
             current_tt++;

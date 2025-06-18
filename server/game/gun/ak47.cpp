@@ -9,16 +9,17 @@
 
 #include "map.h"
 #include "player.h"
-#define miliseconds_per_shoot 2500
-#define max_ammo 30
-#define max_reserve_ammo 60
-#define bullets_per_burst 3
-#define ak_price 600
-#define max_dmg 30
-#define min_dmg 10
-#define max_range 300
 
-Ak47::Ak47(): current_ammo(max_ammo), reserve_ammo(max_reserve_ammo), time_since_last_shot(0) {}
+Ak47::Ak47(const GunConfig& ak_config):
+        max_ammo(ak_config.max_ammo),
+        bullets_per_burst(ak_config.bullets_per_burst),
+        max_dmg(ak_config.max_dmg),
+        min_dmg(ak_config.min_dmg),
+        gun_price(ak_config.gun_price),
+        miliseconds_per_shoot(ak_config.shoot_cooldown),
+        current_ammo(ak_config.max_ammo),
+        reserve_ammo(ak_config.starting_reserve_ammo),
+        time_since_last_shot(0) {}
 
 
 bool Ak47::has_to_shoot(const float current_time) {
@@ -61,7 +62,7 @@ void Ak47::shoot_gun(const Position final_position) {
 }
 
 
-int Ak47::get_gun_price() { return ak_price; }
+int Ak47::get_gun_price() { return gun_price; }
 
 
 ShootResult Ak47::fire_gun(Map& map, Player& owner, const float current_time,

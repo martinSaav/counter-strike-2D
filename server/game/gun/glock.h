@@ -8,8 +8,13 @@
 #include <utility>
 
 #include "gun.h"
+#include "gun_config.h"
 
 class Glock: public Gun {
+    const int max_ammo;
+    const int gun_price;
+    const int min_dmg;
+    const int max_dmg;
     int current_ammo;
     int reserve_ammo;
     GunType type = GunType::Secondary;
@@ -22,7 +27,7 @@ class Glock: public Gun {
     void reset_shoots() override;
 
 public:
-    Glock();
+    explicit Glock(const GunConfig& glock_config);
     GunType get_gun_type() override { return type; }
     void reload_gun() override;
     void shoot_gun(Position final_position) override;

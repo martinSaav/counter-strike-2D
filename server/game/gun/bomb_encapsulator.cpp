@@ -10,7 +10,7 @@
 bool BombEncapsulator::has_to_shoot(float current_time) { return has_to_fire; }
 
 
-ShootResult BombEncapsulator::fire_gun(Map& map, Player& owner, float current_time,
+ShootResult BombEncapsulator::fire_gun(Map& map, Player& owner, const float current_time,
                                        Position& current_position) {
     bomb.start_planting(current_time);
     owner.start_planting();
@@ -35,4 +35,4 @@ bool BombEncapsulator::has_finished_planting(const float current_time) const {
 }
 
 
-bool BombEncapsulator::is_planting() { return bomb.is_currently_planting(); }
+bool BombEncapsulator::is_planting() const { return bomb.is_currently_planting(); }
