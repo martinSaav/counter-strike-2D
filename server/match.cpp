@@ -359,6 +359,7 @@ void Match::setup_round_start() {
         for (const auto& player: players | std::views::values) {
             player->switch_team();
         }
+        game_manager.switch_sides();
     }
     if (game_manager.has_ended() || player_count == 0) {
         has_finished = true;

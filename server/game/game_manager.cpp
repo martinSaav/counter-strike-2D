@@ -240,3 +240,10 @@ Team GameManager::get_match_winner() const {
     }
     return Team::Terrorists;
 }
+
+
+void GameManager::switch_sides() {
+    const int temp = ct_rounds;
+    ct_rounds = tt_rounds;
+    tt_rounds = temp;
+}
