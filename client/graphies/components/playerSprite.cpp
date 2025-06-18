@@ -64,7 +64,6 @@ void PlayerSprite::drawWeapon(int& jugadorX, int& jugadorY, double& angle, Weapo
 
     std::string weaponName = castWeapon(weaponPlayer);
     Texture& weaponTexture = texturas.getTexture(weaponName);
-
     // Offset desde el centro del personaje hacia la mano, sin rotar
     float desvioX = 0.0f;   // derecha
     float desvioY = -2.2f;

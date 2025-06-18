@@ -14,9 +14,10 @@ enum class Action : uint8_t {
     SetKnife = 0x08,
     SetPrimaryWeapon = 0x09,
     SetSecondaryWeapon = 0x0A,
-    PlantBomb = 0x0B,
-    DefuseBomb = 0x0C,
-    Idle = 0x0D
+    SetBomb = 0x0B,
+    PlantBomb = 0x0C,
+    DefuseBomb = 0x0D,
+    Idle = 0x0E
 };
 
 #endif

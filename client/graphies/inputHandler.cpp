@@ -77,6 +77,10 @@ void InputHandler::processEvents() {
             actionActual = Action::Reload;
             action = &actionActual;
 
+        } else if (state[SDL_SCANCODE_E]) {
+            actionActual = Action::EquipWeapon;
+            action = &actionActual;
+
         }
 
         if (action) {

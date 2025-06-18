@@ -228,6 +228,10 @@ void HudSprite::drawWeapon(int& symbolX, int& symbolY, int& anchoWeapon,
     SDL_Rect destRect = {symbolX, symbolY, anchoSlotPantalla, altoSymbolPantalla};
     sdlRenderer->Copy(slot, SDL2pp::NullOpt, destRect);
 
+    if (weaponPLayer == Weapon::Bomb){
+        return;
+    }
+
     // Weapon
     SDL_Rect srcRect = {weaponTextureX, 0, anchoWeapon, alturaWeapons};
     destRect = {symbolX + 5, symbolY + 5, anchoWeaponsPantalla, alturaWeaponsPantalla};
@@ -283,7 +287,7 @@ void HudSprite::drawShop(){
 
 void HudSprite::drawWeaponDroped(Weapon weapon, int weaponX, int weaponY){
 
-    int anchoWeapon = 70;
+    int anchoWeapon = 90;
     int altoWeapon = 70;
     std::string weaponDropped;
     switch (weapon)
@@ -293,6 +297,7 @@ void HudSprite::drawWeaponDroped(Weapon weapon, int weaponX, int weaponY){
         break;
     case Weapon::Glock:
         weaponDropped = "glock_dropped";
+        anchoWeapon = 70;
         break;
     case Weapon::AWP:
         weaponDropped = "awp_dropped";
