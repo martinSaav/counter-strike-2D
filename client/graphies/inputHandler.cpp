@@ -4,6 +4,7 @@
 #include "../../common/dto/player_action.h"
 #include "../../common/dto/disconnect_request.h"
 #include "../../common/dto/buy_weapon_request.h"
+#include "../../common/dto/buy_ammo_request.h"
 
 InputHandler::InputHandler(Protocol& protocolo, Configuracion& configuracion, bool& gameOver, bool& clientClosed): 
 protocolo(protocolo), configuracion(configuracion), gameOver(gameOver), clientClosed(clientClosed){
@@ -18,6 +19,7 @@ void InputHandler::processEvents() {
     SDL_Event event;
 
     Weapon weapon = Weapon::None;
+    WeaponType weaponType = WeaponType::Knife;
     Weapon lastWeapon = Weapon::None;
     while (!gameOver) {
 
@@ -126,6 +128,19 @@ void InputHandler::processEvents() {
             protocolo.send_message(buyWeapon);
             lastWeapon = weapon;
             weapon = Weapon::None;
+        }
+
+        if (state[SDL_SCANCODE_K]) {
+            weaponType = WeaponType::Primary;
+
+        } else if (state[SDL_SCANCODE_L]) {
+            weaponType = WeaponType::Secondary;
+        }
+
+        if (weaponType != WeaponType::Knife){
+            BuyAmmoRequest buyAmmo(weaponType);
+            protocolo.send_message(buyAmmo);
+            weaponType = WeaponType::Knife;
         }
         SDL_Delay(33);
     }
