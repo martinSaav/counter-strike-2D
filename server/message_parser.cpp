@@ -89,6 +89,9 @@ std::shared_ptr<PlayerCommand> MessageParser::parse_action(
         case Action::SetPrimaryWeapon: {
             return std::make_shared<SwitchWeaponCommand>(credentials, GunType::Primary);
         }
+        case Action::SetBomb: {
+            return std::make_shared<SwitchWeaponCommand>(credentials, GunType::Bomb);
+        }
         default: {
             throw InvalidActionType();
         }

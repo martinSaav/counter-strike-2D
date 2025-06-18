@@ -12,12 +12,8 @@ std::pair<int, int> Player::get_location() { return std::make_pair(position_x, p
 
 
 void Player::set_location(const Position position, std::vector<std::pair<int, int>>&& chunks_idxs) {
-    if (is_planting) {
-        is_planting = false;
-    }
-    if (is_defusing) {
-        is_defusing = false;
-    }
+    is_defusing = false;
+    is_planting = false;
     auto [new_x, new_y] = position.get_position();
     position_x = new_x;
     position_y = new_y;
@@ -173,9 +169,8 @@ void Player::switch_weapon(GunType gun_type) {
 
 
 void Player::reload() {
-    if (is_planting) {
-        is_planting = false;
-    }
+    is_defusing = false;
+    is_planting = false;
     try {
         if (equipped_weapon == GunType::Primary) {
             primary_weapon->reload_gun();
@@ -196,12 +191,8 @@ void Player::switch_team() {
 
 
 void Player::shoot(const Position& pos) {
-    if (is_defusing) {
-        is_defusing = false;
-    }
-    if (is_planting) {
-        is_planting = false;
-    }
+    is_defusing = false;
+    is_planting = false;
     try {
         if (equipped_weapon == GunType::Primary) {
             primary_weapon->shoot_gun(pos);
@@ -282,12 +273,8 @@ void Player::start_planting() { is_planting = true; }
 
 
 void Player::equip_weapon(std::unique_ptr<Gun> gun) {
-    if (is_defusing) {
-        is_defusing = false;
-    }
-    if (is_planting) {
-        is_planting = false;
-    }
+    is_defusing = false;
+    is_planting = false;
     const GunType type = gun->get_gun_type();
     if (type == GunType::Primary) {
         primary_weapon = std::move(gun);
