@@ -107,6 +107,7 @@ std::optional<GameIdentification> ClientHandler::pick_match() {
                     } catch (const MatchAlreadyExists&) {
                         protocol.send_message(CreateGameResponse(false));
                     }
+                    break;
                 }
                 case MessageType::JoinGameRequest: {
                     try {
@@ -116,6 +117,7 @@ std::optional<GameIdentification> ClientHandler::pick_match() {
                     } catch (const MatchNotFound&) {
                         protocol.send_message(JoinGameResponse(false));
                     }
+                    break;
                 }
                 case MessageType::DisconnectRequest: {
                     return std::nullopt;
