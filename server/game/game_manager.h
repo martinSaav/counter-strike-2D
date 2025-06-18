@@ -70,6 +70,7 @@ public:
     [[nodiscard]] bool has_ended() const;
     [[nodiscard]] Team get_match_winner() const;
     void give_bomb_to_random_player(const std::vector<std::shared_ptr<Player>>& players) const;
+    void switch_sides();
 };
 
 
