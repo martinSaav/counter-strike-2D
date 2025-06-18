@@ -304,7 +304,7 @@ void Match::process_game_ready_request() { process_game_ready(); }
 
 
 void Match::wait_for_match_to_start() {
-    while (!match_started) {
+    while (!match_started && !has_finished) {
         std::shared_ptr<PlayerCommand> command = commands_queue.pop();
         command->process_command(this);
     }
@@ -451,6 +451,9 @@ void Match::wait_for_players_to_leave_match() {
 
 void Match::run() {
     wait_for_match_to_start();
+    if (has_finished) {
+        return;
+    }
     try {
         setup_round_start();
         run_game_loop();
