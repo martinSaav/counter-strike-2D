@@ -11,7 +11,7 @@
 #include "player.h"
 
 
-void Knife::shoot_gun(Position final_position) {
+void Knife::shoot_gun(Position final_position, float current_time) {
     const auto pos = final_position.get_position();
     next_shoot = pos;
     has_to_fire = true;

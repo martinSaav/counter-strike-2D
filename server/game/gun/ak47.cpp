@@ -44,7 +44,7 @@ void Ak47::reset_shoots() {
 }
 
 
-void Ak47::shoot_gun(const Position final_position) {
+void Ak47::shoot_gun(const Position final_position, float current_time) {
     if (current_ammo == 0 || shoots.size() == current_ammo) {
         throw NoAmmo();
     }
@@ -74,6 +74,7 @@ ShootResult Ak47::fire_gun(Map& map, Player& owner, const float current_time,
     auto [final_x, final_y] = shoots.front();
     shoots.pop();
     current_ammo--;
+    time_since_last_shot = current_time;
     const ImpactInfo impact = map.trace_bullet_path(x, y, Position(final_x, final_y), owner);
     if (impact.impacted_player.has_value()) {
         const auto& player_hit = impact.impacted_player.value();

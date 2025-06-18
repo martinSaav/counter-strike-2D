@@ -22,7 +22,7 @@ Glock::Glock(const GunConfig& glock_config):
 
 int Glock::get_gun_price() { return gun_price; }
 
-void Glock::shoot_gun(Position final_position) {
+void Glock::shoot_gun(Position final_position, float current_time) {
     if (current_ammo == 0) {
         throw NoAmmo();
     }

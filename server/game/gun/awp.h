@@ -1,25 +1,27 @@
 //
-// Created by matias on 03/06/25.
+// Created by matias on 18/06/25.
 //
 
-#ifndef GLOCK_H
-#define GLOCK_H
-
+#ifndef AWP_H
+#define AWP_H
+#include <queue>
 #include <utility>
 
 #include "gun.h"
 #include "gun_config.h"
 
-class Glock: public Gun {
+
+class Awp: public Gun {
     const int max_ammo;
-    const int gun_price;
-    const int min_dmg;
     const int max_dmg;
+    const int min_dmg;
+    const int gun_price;
+    const int shoot_cooldown;
     int current_ammo;
     int reserve_ammo;
-    GunType type = GunType::Secondary;
-    std::pair<int, int> next_shoot;
-    bool has_to_fire;
+    float time_since_last_shot;
+    std::queue<std::pair<int, int>> shoots;
+    GunType type = GunType::Primary;
 
     [[nodiscard]] bool has_to_shoot(float current_time) override;
     ShootResult fire_gun(Map& map, Player& owner, float current_time,
@@ -27,13 +29,13 @@ class Glock: public Gun {
     void reset_shoots() override;
 
 public:
-    explicit Glock(const GunConfig& glock_config);
+    explicit Awp(const GunConfig& awp_config);
     GunType get_gun_type() override { return type; }
     void reload_gun() override;
     void shoot_gun(Position final_position, float current_time) override;
     int get_gun_price() override;
-    WeaponInfo get_weapon_name() override { return WeaponInfo{Weapon::Glock, current_ammo}; }
+    WeaponInfo get_weapon_name() override { return WeaponInfo{Weapon::AWP, current_ammo}; }
 };
 
 
-#endif  // GLOCK_H
+#endif  // AWP_H

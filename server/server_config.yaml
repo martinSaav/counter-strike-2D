@@ -34,3 +34,10 @@ ak:
   gun_price: 600
   bullets_per_burst: 3
   shoot_cooldown: 2500
+awp:
+  max_ammo: 10
+  starting_reserve_ammo: 20
+  min_dmg: 70
+  max_dmg: 120
+  gun_price: 2500
+  shoot_cooldown: 3000

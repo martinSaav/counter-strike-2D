@@ -34,7 +34,7 @@ public:
             has_to_fire(false) {}
     GunType get_gun_type() override { return type; }
     void reload_gun() override;
-    void shoot_gun(Position final_position) override;
+    void shoot_gun(Position final_position, float current_time) override;
     int get_gun_price() override { return 0; }
     WeaponInfo get_weapon_name() override { return WeaponInfo{Weapon::Knife, 0}; }
 };
