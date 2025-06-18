@@ -27,7 +27,7 @@ public:
     void reload_gun() override;
     void shoot_gun(Position final_position) override;
     int get_gun_price() override { return 0; }
-    bool is_planting();
+    bool is_planting() const;
     WeaponInfo get_weapon_name() override { return WeaponInfo{Weapon::Bomb, 0}; }
 };
 
