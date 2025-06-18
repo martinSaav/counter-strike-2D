@@ -14,6 +14,7 @@ enum tipoMusic{
     CAMINANDO,
     STEP,
     TIMER,
+    AMBIENTE,
     NONE
 };
 
@@ -23,7 +24,9 @@ class MusicManager{
     Mix_Music* musicaActual = nullptr;
 
     std::map <tipoMusic,Mix_Music*> ficheroDeMusica;
-    
+    std::map<tipoMusic, Mix_Chunk*> ficheroDeChunks;
+    std::map <tipoMusic,std::string> ficheroDeUbicaciones;
+
     public:
 
     MusicManager();
@@ -35,5 +38,11 @@ class MusicManager{
     void setVolume(int volume);
 
     void stopMusic();
+
+    void loadSong(tipoMusic music);
+
+    void stopAllSongs();
+
+    void stopSongs(int canal);
 };
 #endif

@@ -22,6 +22,19 @@ Estadistics::Estadistics(std::unique_ptr<GameStateUpdate>& gameState, QWidget *p
     std::list<PlayerInfo> players = gameState->get_players();
     int contadorCounter = 0;
     int contadorTerrorist = 0;
+    
+    //Terrorists = 0x01,
+    //CounterTerrorists = 0x02,
+    ui->labelWinner->setStyleSheet("color: white;");
+    Team teamWinner = gameState->get_game_winner();
+    std::string winner;
+    if (teamWinner == Team::Terrorists){
+        winner = "Terrorist wins";
+    } else {
+        winner = "CounterTerrorists wins";
+    }
+    QString qtexto = QString::fromStdString(winner);
+    ui->labelWinner->setText(qtexto);
 
     for (PlayerInfo& jugador: players) {
 

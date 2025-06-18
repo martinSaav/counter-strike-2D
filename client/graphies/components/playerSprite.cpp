@@ -56,7 +56,7 @@ void PlayerSprite::drawPlayer(const PlayerInfo& jugador, double& angle) {
 
         tipoMusic music = castShoot(weaponPlayer);
         int cantVeces = 1;
-        sounds.loadMusic(music, cantVeces);
+        sounds.loadSong(music);
     }
 }
 

@@ -27,6 +27,15 @@ void InputHandler::processEvents() {
                 clientClosed = true;
                 DisconnectRequest disconnect;
                 protocolo.send_message(disconnect);
+            } 
+            if (event.type == SDL_WINDOWEVENT) {
+                if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
+                    int newWidth = event.window.data1;
+                    int newHeight = event.window.data2;
+
+                    configuracion.heightWindow = newHeight;
+                    configuracion.widthWindow = newWidth;
+                }
             }
         }
 
@@ -71,6 +80,10 @@ void InputHandler::processEvents() {
 
         } else if (state[SDL_SCANCODE_3]) {
             actionActual = Action::SetSecondaryWeapon;
+            action = &actionActual;
+
+        } else if (state[SDL_SCANCODE_4]) {
+            actionActual = Action::SetBomb;
             action = &actionActual;
 
         } else if (state[SDL_SCANCODE_R]) {

@@ -31,7 +31,7 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& estadistics) {
     int heightWindow = 1000;
 
     Window window("Counter Strike 1.6", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        widthWindow, heightWindow, SDL_WINDOW_SHOWN);  // pantalla completa
+        widthWindow, heightWindow, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);  // pantalla completa
 
     // Create accelerated video renderer with default driver
     Renderer renderer(window, -1, SDL_RENDERER_ACCELERATED);

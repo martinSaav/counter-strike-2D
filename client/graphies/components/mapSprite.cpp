@@ -14,6 +14,10 @@ MapSprite::MapSprite(Renderer* sdlRenderer, Configuracion& configuracion)
 
     // camp field
     texturas.loadTexture("field", "../client/data/maps/field.png");
+
+    tipoMusic music = AMBIENTE;
+    int cantVeces = 4;
+    sounds.loadMusic(music, cantVeces);
 }
 
 void MapSprite::draw(){
@@ -23,7 +27,14 @@ void MapSprite::draw(){
     int camHeight = configuracion.heightWindow / configuracion.zoom;
 
     SDL_Rect srcRect = {configuracion.camera.x, configuracion.camera.y, camWidth, camHeight};
-    sdlRenderer->Copy(map, srcRect, destRectMap);
+
+    SDL_Rect destRect = {
+        0, 0,
+        configuracion.widthWindow,
+        configuracion.heightWindow
+    };
+
+    sdlRenderer->Copy(map, srcRect, destRect);
 }
 
 int MapSprite::getWidth(){
@@ -79,12 +90,12 @@ void MapSprite::activateBomb(){
     tipoMusic music = TIMER;
     // Dura 2 segundos
     int cantVeces = 8;
-    sounds.loadMusic(music, cantVeces);
+    sounds.loadSong(music);
 }
 
 void MapSprite::desactivateBomb(){
     this->is_bomb_activated = false;
-    sounds.stopMusic();
+    sounds.stopAllSongs();
 }
 
 void MapSprite::drawBomb(int bomb_x, int bomb_y){

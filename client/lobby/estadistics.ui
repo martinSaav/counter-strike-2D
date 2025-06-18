@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>708</width>
-    <height>500</height>
+    <height>548</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>120</x>
-     <y>30</y>
+     <y>90</y>
      <width>521</width>
      <height>201</height>
     </rect>
@@ -113,7 +113,7 @@ QTableWidget::item:selected {
    <property name="geometry">
     <rect>
      <x>120</x>
-     <y>260</y>
+     <y>320</y>
      <width>521</width>
      <height>201</height>
     </rect>
@@ -186,7 +186,7 @@ QTableWidget::item:selected {
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>90</y>
+     <y>150</y>
      <width>81</width>
      <height>61</height>
     </rect>
@@ -205,7 +205,7 @@ QTableWidget::item:selected {
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>310</y>
+     <y>370</y>
      <width>81</width>
      <height>61</height>
     </rect>
@@ -223,10 +223,10 @@ QTableWidget::item:selected {
   <widget class="QLabel" name="fondo">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>0</y>
+     <x>-10</x>
+     <y>10</y>
      <width>721</width>
-     <height>501</height>
+     <height>581</height>
     </rect>
    </property>
    <property name="text">
@@ -239,11 +239,32 @@ QTableWidget::item:selected {
     <bool>false</bool>
    </property>
   </widget>
+  <widget class="QLabel" name="labelWinner">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>20</y>
+     <width>341</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>20</pointsize>
+     <italic>true</italic>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
   <zorder>fondo</zorder>
   <zorder>tableTeam1</zorder>
   <zorder>tableTeam2</zorder>
   <zorder>copaAzul</zorder>
   <zorder>copaNaranja</zorder>
+  <zorder>labelWinner</zorder>
  </widget>
  <resources>
   <include location="Desktop/merge con server/counter-strike-2D/client/lobby/recursos.qrc"/>
