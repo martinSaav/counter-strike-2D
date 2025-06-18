@@ -19,6 +19,8 @@ target_sources(taller_server
         request_processor.cpp
         gun_shop.cpp
         message_parser.cpp
+        game_config.cpp
+        configuration_loader.cpp
         main.cpp
     PUBLIC
         client_handler.h
@@ -47,6 +49,9 @@ target_sources(taller_server
         commands/equip_weapon_command.h
         request_processor.h
         gun_shop.h
+        gun_config.h
+        game_config.h
+        configuration_loader.h
         message_parser.h
 )
 

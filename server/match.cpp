@@ -7,11 +7,8 @@
 #include "game/collision_detector.h"
 
 #include "gun_shop.h"
-#define rate 30
-#define miliseconds_per_iteration (1000 / rate)
 #define starting_position_x 0
 #define starting_position_y 0
-#define tiles_per_movement 5
 
 GameIdentification Match::join_match(const std::string& username) {
     std::lock_guard<std::mutex> lck(mtx);
@@ -28,7 +25,8 @@ GameIdentification Match::join_match(const std::string& username) {
     } else {
         player_team = Team::Terrorists;
     }
-    auto player = std::make_shared<Player>(username, starting_position_x + 35 * (player_count - 1),
+    auto player = std::make_shared<Player>(username, game_config,
+                                           starting_position_x + 35 * (player_count - 1),
                                            starting_position_y, player_team);
     PlayerCredentials credentials(player_count);
     players.insert(std::pair{credentials, player});
@@ -317,7 +315,7 @@ void Match::process_buy_weapon(const std::shared_ptr<Player>& player, const Weap
         return;
     }
     try {
-        std::unique_ptr<Gun> gun = GunShop::get_gun(weapon);
+        std::unique_ptr<Gun> gun = GunShop::get_gun(weapon, game_config);
         player->buy_weapon(std::move(gun));
     } catch (const CantBuyWeapon&) {}
 }
@@ -426,10 +424,12 @@ void Match::run_game_loop() {
         auto rest = miliseconds_per_iteration - elapsed;
         if (rest >=
             0) {  // Si esta adelantado duerme, si no pasa directamente a la proxima iteracion
-            std::this_thread::sleep_for(std::chrono::milliseconds(rest));
+            std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::duration<double, std::milli>(rest)));
         }
-        start += std::chrono::milliseconds(
-                miliseconds_per_iteration);  // Sumandole el tiempo exacto que debe
+        start += std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::duration<double, std::milli>(
+                        miliseconds_per_iteration));  // Sumandole el tiempo exacto que debe
         // tardar me aseguro que si duerme de mas, cuando se calcule end se entara que esta
         // atrasado y no dormira.
     }

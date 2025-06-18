@@ -19,9 +19,6 @@
 #include "weapon_info.h"
 #define player_hitbox_height 3
 #define player_hitbox_width 3
-#define starting_money 500
-#define max_health 100
-#define money_per_kill 300
 
 class GameManager;
 
@@ -30,6 +27,9 @@ class Bomb;
 class Player {
     friend class GameManager;
     friend class Bomb;
+    const int max_health;
+    const int money_per_kill;
+    GameConfig& game_config;
     const std::string username;
     PlayerSkin terrorist_skin;
     PlayerSkin ct_skin;
@@ -60,10 +60,14 @@ class Player {
     std::unique_ptr<Gun>& get_equipped_gun();
 
 public:
-    Player(std::string username, const int position_x, const int position_y, const Team team):
+    Player(std::string username, GameConfig& config, const int position_x, const int position_y,
+           const Team team):
+            max_health(config.player_health),
+            money_per_kill(config.money_per_kill),
+            game_config(config),
             username(std::move(username)),
-            health(max_health),
-            money(starting_money),
+            health(config.player_health),
+            money(config.starting_money),
             current_angle(0),
             position_x(position_x),
             position_y(position_y),
@@ -80,9 +84,9 @@ public:
         terrorist_skin = PlayerSkin::T1;
         ct_skin = PlayerSkin::C1;
         chunks_idxs.emplace_back(0, 0);
-        secondary_weapon = std::make_unique<Glock>();
+        secondary_weapon = std::make_unique<Glock>(config.glock_config);
         equipped_weapon = GunType::Secondary;
-        knife = std::make_unique<Knife>();
+        knife = std::make_unique<Knife>(config.knife_config);
     }
     std::pair<int, int> get_location();
     void set_location(Position position, std::vector<std::pair<int, int>>&& chunks_idxs);
@@ -109,12 +113,14 @@ public:
     [[nodiscard]] bool is_currently_defusing() const { return is_defusing; }
     void start_defusing() { is_defusing = true; }
     void reload();
-    bool operator==(const Player& player) const = default;
+    bool operator==(const Player& player) const = delete;
     WeaponInfo get_primary_weapon_info();
     WeaponInfo get_secondary_weapon_info();
     [[nodiscard]] bool has_bomb() const { return bomb != nullptr; }
     void switch_team();
     void switch_weapon(GunType gun_type);
     void buy_weapon(std::unique_ptr<Gun> gun);
+
+    [[nodiscard]] std::string get_username() const { return username; }
 };
 #endif  // PLAYER_H

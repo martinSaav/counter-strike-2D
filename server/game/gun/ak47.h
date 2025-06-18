@@ -7,10 +7,19 @@
 #include <queue>
 #include <utility>
 
+#include "game_config.h"
 #include "gun.h"
 
 
+class GameConfig;
+
 class Ak47: public Gun {
+    const int max_ammo;
+    const int bullets_per_burst;
+    const int max_dmg;
+    const int min_dmg;
+    const int gun_price;
+    const int miliseconds_per_shoot;
     int current_ammo;
     int reserve_ammo;
     float time_since_last_shot;
@@ -23,7 +32,7 @@ class Ak47: public Gun {
     void reset_shoots() override;
 
 public:
-    Ak47();
+    explicit Ak47(const GunConfig& ak_config);
     GunType get_gun_type() override { return type; }
     void reload_gun() override;
     void shoot_gun(Position final_position) override;

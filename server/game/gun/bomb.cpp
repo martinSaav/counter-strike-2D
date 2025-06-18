@@ -4,7 +4,7 @@
 
 #include "bomb.h"
 
-void Bomb::start_planting(float time) {
+void Bomb::start_planting(const float time) {
     is_planting = true;
     time_when_started_to_plant = time;
 }
