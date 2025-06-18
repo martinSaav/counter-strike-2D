@@ -38,7 +38,7 @@ public:
 
     virtual GunType get_gun_type() = 0;
     virtual void reload_gun() = 0;
-    virtual void shoot_gun(Position final_position) = 0;
+    virtual void shoot_gun(Position final_position, float current_time) = 0;
     virtual int get_gun_price() = 0;
     virtual WeaponInfo get_weapon_name() = 0;
 };

@@ -39,6 +39,17 @@ GunConfig ConfigurationLoader::get_ak_config(YAML::Node& ak_config) {
 }
 
 
+GunConfig ConfigurationLoader::get_awp_config(YAML::Node& awp_config) {
+    const int max_ammo = awp_config["max_ammo"].as<int>();
+    const int starting_reserve_ammo = awp_config["starting_reserve_ammo"].as<int>();
+    const int min_dmg = awp_config["min_dmg"].as<int>();
+    const int max_dmg = awp_config["max_dmg"].as<int>();
+    const int gun_price = awp_config["gun_price"].as<int>();
+    const int shoot_cooldown = awp_config["shoot_cooldown"].as<int>();
+    return GunConfig{max_ammo, starting_reserve_ammo, min_dmg, max_dmg, gun_price, shoot_cooldown};
+}
+
+
 GameConfig ConfigurationLoader::load_configuration() const {
     YAML::Node config = YAML::LoadFile(filename);
     int player_health = config["player_health"].as<int>();
@@ -60,12 +71,15 @@ GameConfig ConfigurationLoader::load_configuration() const {
     YAML::Node knife_config = config["knife"];
     YAML::Node ak_config = config["ak"];
     YAML::Node glock_config = config["glock"];
+    YAML::Node awp_config = config["awp"];
     GunConfig knife = get_knife_config(knife_config);
     GunConfig glock = get_glock_config(glock_config);
     GunConfig ak = get_ak_config(ak_config);
-    return GameConfig{player_health,     number_of_rounds,   starting_money,   ct_amount,
-                      tt_amount,         std::move(knife),   std::move(glock), std::move(ak),
-                      defuse_time,       time_to_plant,      bomb_dmg,         round_winner_money,
-                      round_loser_money, buy_time,           bomb_time,        after_round_time,
-                      money_per_kill,    tiles_per_movement, game_rate};
+    GunConfig awp = get_awp_config(awp_config);
+
+    return GameConfig{player_health,      number_of_rounds,  starting_money,     ct_amount,
+                      tt_amount,          std::move(knife),  std::move(glock),   std::move(ak),
+                      std::move(awp),     defuse_time,       time_to_plant,      bomb_dmg,
+                      round_winner_money, round_loser_money, buy_time,           bomb_time,
+                      after_round_time,   money_per_kill,    tiles_per_movement, game_rate};
 }

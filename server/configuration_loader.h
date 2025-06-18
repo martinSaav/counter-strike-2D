@@ -21,6 +21,8 @@ class ConfigurationLoader {
 
     static GunConfig get_ak_config(YAML::Node& ak_config);
 
+    static GunConfig get_awp_config(YAML::Node& awp_config);
+
 public:
     explicit ConfigurationLoader(std::string&& filename): filename(std::move(filename)) {}
     [[nodiscard]] GameConfig load_configuration() const;
