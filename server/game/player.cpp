@@ -190,18 +190,18 @@ void Player::switch_team() {
 }
 
 
-void Player::shoot(const Position& pos) {
+void Player::shoot(const Position& pos, float time) {
     is_defusing = false;
     is_planting = false;
     try {
         if (equipped_weapon == GunType::Primary) {
-            primary_weapon->shoot_gun(pos);
+            primary_weapon->shoot_gun(pos, time);
         } else if (equipped_weapon == GunType::Secondary) {
-            secondary_weapon->shoot_gun(pos);
+            secondary_weapon->shoot_gun(pos, time);
         } else if (equipped_weapon == GunType::Knife) {
-            knife->shoot_gun(pos);
+            knife->shoot_gun(pos, time);
         } else if (equipped_weapon == GunType::Bomb) {
-            bomb->shoot_gun(pos);
+            bomb->shoot_gun(pos, time);
         }
     } catch (const NoAmmo&) {}
 }

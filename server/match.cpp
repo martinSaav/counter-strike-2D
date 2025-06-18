@@ -108,7 +108,7 @@ void Match::process_shoot(const std::shared_ptr<Player>& player, const Position&
         return;
     }
     if (auto [x, y] = position.get_position(); map.check_if_position_is_in_range(x, y)) {
-        player->shoot(position);
+        player->shoot(position, game_clock.get_time());
     }
 }
 

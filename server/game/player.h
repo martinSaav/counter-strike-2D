@@ -97,7 +97,7 @@ public:
     void set_skin(PlayerSkin skin);
     [[nodiscard]] PlayerDTO get_player_info();
     [[nodiscard]] bool is_dead() const;
-    void shoot(const Position& pos);
+    void shoot(const Position& pos, float time);
     std::vector<std::pair<int, int>>& get_chunk_idxs() { return chunks_idxs; }
     void update(GameManager& game_manager);
     [[nodiscard]] std::pair<double, double> get_center_coordinates() const;

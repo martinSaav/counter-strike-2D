@@ -6,6 +6,7 @@ target_sources(game
         shoot_result.cpp
         bomb.cpp
         bomb_encapsulator.cpp
+        awp.cpp
         PUBLIC
         gun.h
         shoot_result.h
@@ -15,4 +16,5 @@ target_sources(game
         glock.h
         bomb.h
         bomb_encapsulator.h
+        awp.h
         )

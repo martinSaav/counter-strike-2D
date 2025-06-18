@@ -25,7 +25,7 @@ public:
     [[nodiscard]] bool has_finished_planting(float current_time) const;
     GunType get_gun_type() override { return type; }
     void reload_gun() override;
-    void shoot_gun(Position final_position) override;
+    void shoot_gun(Position final_position, float time) override;
     int get_gun_price() override { return 0; }
     bool is_planting() const;
     WeaponInfo get_weapon_name() override { return WeaponInfo{Weapon::Bomb, 0}; }
