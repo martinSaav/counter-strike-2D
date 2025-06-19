@@ -48,10 +48,6 @@ class HudSprite : public Component{
     
     void drawHuds(int num, HudType tipo, int& symbolX, int& symbolY);
 
-    void drawHud(SDL_Rect srcRect, SDL_Rect destRect, std::string& textureName);
-
-    void drawHud2(SDL_Rect destRect, std::string& textureName);
-
     void drawWeapon(int symbolX, int symbolY, int& anchoWeapon, int& weaponTextureX,
         int& ammoWeapon, Weapon& weaponPLayer);
 

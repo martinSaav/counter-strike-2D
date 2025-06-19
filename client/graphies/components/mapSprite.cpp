@@ -21,8 +21,7 @@ MapSprite::MapSprite(Renderer* sdlRenderer, Configuracion& configuracion)
 }
 
 void MapSprite::draw(){
-
-    Texture& map = texturas.getTexture("map");
+    std::string textureName = "map";
     int camWidth = configuracion.widthWindow / configuracion.zoom;
     int camHeight = configuracion.heightWindow / configuracion.zoom;
 
@@ -33,35 +32,28 @@ void MapSprite::draw(){
         configuracion.widthWindow,
         configuracion.heightWindow
     };
-
-    sdlRenderer->Copy(map, srcRect, destRect);
+    drawHud( srcRect, destRect, textureName);
 }
 
 int MapSprite::getWidth(){
     Texture& map = texturas.getTexture("map");
-
     int worldWidth = map.GetWidth();
+
     return worldWidth;
 }
 
 int MapSprite::getHeight(){
     Texture& map = texturas.getTexture("map");
-    
     int worldHeight = map.GetHeight();
+
     return worldHeight;
 }
 
 void MapSprite::drawEndRound(Team& team, int zoom){
-    Texture& terroristWins = texturas.getTexture("terroristWins");
-    Texture& counterterroristWins = texturas.getTexture("counterterroristWins");
-
-    int anchoCartel = 210;
-    int altoCartel = 50;
+    std::string textureName;
     int anchoCartelPantalla = anchoCartel * zoom / 8;
     int symbolX = (configuracion.widthWindow * 0.5) - anchoCartelPantalla / 2;
     int symbolY = configuracion.heightWindow * 0.2;
-
-    SDL_Rect srcRect = {0, 0, anchoCartel, 50};
 
     SDL_Rect destRect = {
         symbolX,
@@ -72,12 +64,13 @@ void MapSprite::drawEndRound(Team& team, int zoom){
 
     switch (team){
     case Team::Terrorists:
-        sdlRenderer->Copy(terroristWins, srcRect, destRect);
+        textureName = "terroristWins";
         break;
     case Team::CounterTerrorists:
-        sdlRenderer->Copy(counterterroristWins, srcRect, destRect);
+        textureName = "counterterroristWins";
         break;
     }
+    drawHud2(destRect, textureName);
 }
 
 bool MapSprite::isBombActivated(){
@@ -100,15 +93,13 @@ void MapSprite::desactivateBomb(){
 
 void MapSprite::drawBomb(int bomb_x, int bomb_y){
 
-    Texture& bomb = texturas.getTexture("bomb");
-
     SDL_Rect destRectBomb = {
-    int((bomb_x - configuracion.camera.x) * configuracion.zoom),
-    int((bomb_y - configuracion.camera.y) * configuracion.zoom),
-    int(32 * configuracion.zoom / 8), int(32 * configuracion.zoom / 8)
+        int((bomb_x - configuracion.camera.x) * configuracion.zoom),
+        int((bomb_y - configuracion.camera.y) * configuracion.zoom),
+        int(32 * configuracion.zoom / 8), int(32 * configuracion.zoom / 8)
     };
-
-    sdlRenderer->Copy(bomb, SDL2pp::NullOpt, destRectBomb);
+    std::string textureName = "bomb";
+    drawHud2(destRectBomb, textureName);
 }
 
 void MapSprite::drawCampField(int angle, int playerX, int playerY){
@@ -116,32 +107,22 @@ void MapSprite::drawCampField(int angle, int playerX, int playerY){
 
     // coregimos el anglo por la imagen
     angle -= 90;
-    
-    int altoCartel = 100;
-    int anchoCartel = 100;
 
     // Dimensiones reales de la textura de campo de visión
-    int anchoField = 2300;
-    int altoField = 2300;
-
     int playerCenterX = playerX + int(30 / 8) / 2;
     int playerCenterY = playerY + int(30 / 8) / 2;
-
 
     // Posición del jugador en la pantalla (en píxeles)
     int playerScreenX = int((playerCenterX - configuracion.camera.x) * configuracion.zoom);
     int playerScreenY = int((playerCenterY - configuracion.camera.y) * configuracion.zoom);
 
-    // Mover la textura para que su centro esté donde está el jugador
-    SDL_Rect srcRect = {0, 0, anchoCartel, altoCartel}; // Si estás usando toda la imagen, podrías usar NULL
     SDL_Rect destRect = {
         playerScreenX - anchoField / 2,
         playerScreenY - altoField / 2,
         anchoField,
         altoField
     };
-
-    SDL_Point center = {anchoField / 2, altoField / 2}; // Centro de la textura
-
-    sdlRenderer->Copy(field, srcRect, destRect, angle, center);
+    // Centro de la textura
+    SDL_Point center = {anchoField / 2, altoField / 2};
+    sdlRenderer->Copy(field, SDL2pp::NullOpt, destRect, angle, center);
 }

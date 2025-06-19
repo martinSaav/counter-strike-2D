@@ -14,12 +14,19 @@ class Component{
     Renderer* sdlRenderer;
     Configuracion& configuracion;
 
+    void Component::drawHud(SDL_Rect srcRect, SDL_Rect destRect, std::string& textureName){
+        Texture& texture = texturas.getTexture(textureName);
+        sdlRenderer->Copy(texture, srcRect, destRect);
+    }
+
+    void Component::drawHud2(SDL_Rect destRect, std::string& textureName){
+        Texture& texture = texturas.getTexture(textureName);
+        sdlRenderer->Copy(texture, SDL2pp::NullOpt, destRect);
+    }
+
     public:
     // Crea el junto con sus medidas
     Component(Renderer* sdlRenderer, Configuracion& configuracion) : texturas(sdlRenderer),
         sdlRenderer(sdlRenderer), configuracion(configuracion){};
-
-    // Dibuja el componente
-    //virtual void draw();
 };
 #endif

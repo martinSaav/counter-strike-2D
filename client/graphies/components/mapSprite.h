@@ -7,6 +7,12 @@
 class MapSprite : public Component{
 
     private:
+    int anchoField = 2300;
+    int altoField = 2300;
+
+    int anchoCartel = 210;
+    int altoCartel = 50;
+
     SDL_Rect destRectMap = {0, 0, 1000, 1000};
 
     bool is_bomb_activated = false;

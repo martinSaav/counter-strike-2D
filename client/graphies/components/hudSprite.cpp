@@ -28,7 +28,6 @@ HudSprite::HudSprite(Renderer* sdlRenderer, Configuracion& configuracion) :
 }
 
 void HudSprite::draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlayer){
-    Texture& mira = texturas.getTexture("mira");
     Texture& hud_symbols = texturas.getTexture("symbols"); 
     Texture& nums = texturas.getTexture("nums");
     HudType tipo = HEALTH;
@@ -115,8 +114,8 @@ void HudSprite::draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlaye
         destRect = {symbolX, symbolY, anchoSymbolPantalla, altoSymbolPantalla};
         drawHud(srcRect, destRect, textureName);
 
-        int symbolX = (configuracion.widthWindow * 0.5) - anchoShopPantalla / 2;
-        int symbolY = configuracion.heightWindow * 0.2;
+        symbolX = (configuracion.widthWindow * 0.5) - anchoShopPantalla / 2;
+        symbolY = configuracion.heightWindow * 0.2;
         destRect = {
             symbolX,
             symbolY,
@@ -177,21 +176,10 @@ void HudSprite::drawHuds(int num, HudType tipo, int& symbolX, int& symbolY){
     }
 }
 
-void HudSprite::drawHud(SDL_Rect srcRect, SDL_Rect destRect, std::string& textureName){
-    Texture& texture = texturas.getTexture(textureName);
-    sdlRenderer->Copy(texture, srcRect, destRect);
-}
-
-void HudSprite::drawHud2(SDL_Rect destRect, std::string& textureName){
-    Texture& texture = texturas.getTexture(textureName);
-    sdlRenderer->Copy(texture, SDL2pp::NullOpt, destRect);
-}
-
 void HudSprite::drawWeapon(int symbolX, int symbolY, int& anchoWeapon,
         int& weaponTextureX, int& ammoWeapon, Weapon& weaponPLayer){
     Texture& weapon = texturas.getTexture("weapons");
     Texture& slot = texturas.getTexture("slot");
-    Texture& bullets = texturas.getTexture("bullets");
     Texture& numsBullets = texturas.getTexture("nums2");
 
     // Aplicamos el color naranja

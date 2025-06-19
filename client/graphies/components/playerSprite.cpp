@@ -71,8 +71,7 @@ void PlayerSprite::drawWeapon(int& jugadorX, int& jugadorY, double& angle, Weapo
         desvioY = -3.0f;  // hacia arriba
     }
     
-
-    // Convertir el ángulo a radianes
+    // angulo a radianes
     float radians = angle * M_PI / 180.0f;
 
     // Rotar el offset
@@ -85,7 +84,7 @@ void PlayerSprite::drawWeapon(int& jugadorX, int& jugadorY, double& angle, Weapo
         int(32 * configuracion.zoom / 8),
         int(32 * configuracion.zoom / 8)
     };
-
+    
     sdlRenderer->Copy(weaponTexture, SDL2pp::NullOpt, destRect, angle);
 }
 
@@ -97,13 +96,13 @@ void PlayerSprite::drawBullet(int& shootX, int& shootY, double& angle) {
     int(2 * configuracion.zoom),
     int(2 * configuracion.zoom)
     };
-    
-    Texture& tiro = texturas.getTexture("tiro");
-    sdlRenderer->Copy(tiro, SDL2pp::NullOpt, destRect);
+    std::string textureName = "tiro";
+    drawHud2(destRect, textureName);
 }
 
 void PlayerSprite::drawPlayerDeath(int jugadorX, int jugadorY) {
     Texture& hud_symbols = texturas.getTexture("hud_symbols");
+    std::string textureName = "hud_symbols";
     hud_symbols.SetColorMod(255, 0, 0);
 
     int posSymbolDeath = 12; 
@@ -115,8 +114,7 @@ void PlayerSprite::drawPlayerDeath(int jugadorX, int jugadorY) {
     int(32 * configuracion.zoom / 8),
     int(32 * configuracion.zoom / 8)
     };
-    
-    sdlRenderer->Copy(hud_symbols, srcRectDeath, destRect);
+    drawHud( srcRectDeath, destRect, textureName);
 }
 
 
