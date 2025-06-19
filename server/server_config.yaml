@@ -1,7 +1,7 @@
 ---
 ct_amount: 5
 tt_amount: 5
-number_of_rounds: 10
+number_of_rounds: 3
 starting_money: 500
 player_health: 100
 defuse_time: 2500
@@ -41,3 +41,77 @@ awp:
   max_dmg: 120
   gun_price: 2500
   shoot_cooldown: 3000
+map_config:
+  map_name: "test_map"
+  map_height: 200
+  map_width: 200
+  structures:
+    - x: 75
+      y: 62
+      width: 25
+      height: 12
+    - x: 125
+      y: 50
+      width: 50
+      height: 25
+    - x: 12
+      y: 75
+      width: 50
+      height: 12
+    - x: 25
+      y: 125
+      width: 25
+      height: 25
+    - x: 75
+      y: 137
+      width: 37
+      height: 12
+    - x: 137
+      y: 100
+      width: 25
+      height: 37
+    - x: 100
+      y: 112
+      width: 12
+      height: 12
+    - x: 87
+      y: 87
+      width: 12
+      height: 12
+  bomb_site:
+    x: 75
+    y: 75
+    height: 50
+    width: 50
+  tt_site:
+    x: 0
+    y: 0
+    width: 50
+    height: 50
+    spawns:
+      - x: 12
+        y: 12
+      - x: 25
+        y: 12
+      - x: 37
+        y: 12
+      - x: 25
+        y: 25
+      - x: 37
+        y: 25
+  ct_site:
+    x: 150
+    y: 150
+    width: 50
+    height: 50
+    spawns:
+      - x: 162
+        y: 175
+      - x: 175
+        y: 175
+      - x: 162
+        y: 187
+      - x: 175
+        y: 187
+      - x: 187
+        y: 187

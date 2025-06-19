@@ -6,6 +6,22 @@
 
 #include "collision_detector.h"
 
+
+Map::Map(const MapConfig& config):
+        dropped_bomb({Position(0, 0), nullptr}),
+        max_x(config.map_width),
+        max_y(config.map_height),
+        ct_site(config.ct_site),
+        tt_site(config.tt_site) {
+    for (const auto structure: config.structures) {
+        try {
+            add_structure(structure);
+        } catch (...) {}
+    }
+    add_bombsite(config.bombsite);
+}
+
+
 std::pair<int, int> Map::get_chunk_index(int x, int y) {
     int idx_x = std::floor(x / CHUNK_SIZE);
     int idx_y = std::floor(y / CHUNK_SIZE);
@@ -115,8 +131,8 @@ std::vector<std::shared_ptr<Player>> Map::get_near_players(
 }
 
 
-std::pair<double, double> Map::calculate_bullet_velocity(std::pair<int, int> starting_pos,
-                                                         std::pair<int, int> ending_pos) {
+std::pair<double, double> Map::calculate_bullet_velocity(const std::pair<int, int>& starting_pos,
+                                                         const std::pair<int, int>& ending_pos) {
     int dx = ending_pos.first - starting_pos.first;
     int dy = ending_pos.second - starting_pos.second;
     double mod = std::sqrt(dx * dx + dy * dy);
@@ -196,7 +212,7 @@ ImpactInfo Map::get_nearest_colliding_structure(const Chunk& chunk, int ini_x, i
 ImpactInfo Map::get_nearest_colliding_player(int ini_x, int ini_y, double current_x,
                                              double current_y, const Player& gun_owner,
                                              const Position& final_pos,
-                                             std::pair<double, double> velocity) {
+                                             const std::pair<double, double>& velocity) {
     auto [final_x, final_y] = final_pos.get_position();
     int nearest_player_distance = -1;
     std::pair<int, int> nearest_player_pos;

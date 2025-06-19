@@ -5,6 +5,7 @@
 #ifndef GAMECONFIG_H
 #define GAMECONFIG_H
 #include "gun_config.h"
+#include "map_config.h"
 
 
 class GameConfig {
@@ -29,12 +30,13 @@ public:
     const int money_per_kill;
     const int tiles_per_movement;
     const int game_rate;
+    const MapConfig map_config;
     GameConfig(int player_health, int number_of_rounds, int starting_money, int ct_amount,
                int tt_amount, GunConfig&& knife_config, GunConfig&& glock_config,
                GunConfig&& ak_config, GunConfig&& awp_config, int defuse_time, int time_to_plant,
                int bomb_dmg, int round_winner_money, int round_loser_money, int buy_time,
                int bomb_time, int after_round_time, int money_per_kill, int tiles_per_movement,
-               int game_rate);
+               int game_rate, MapConfig&& map_config);
 };
 
 
