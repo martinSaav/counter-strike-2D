@@ -18,23 +18,46 @@ class HudSprite : public Component{
     private:
     int alturaSymbols = 64;
     int anchoSymbols = 64;
-    int anchoNum = 50;
-    int alturaNum = 66;
     int anchoSymbolPantalla = 40;
     int altoSymbolPantalla = 50;
+
+    int anchoNum = 50;
+    int alturaNum = 66;
+
+    int alturaWeapons = 17;
+    int anchoSlotPantalla = 200;
+
+    // Balas
+    int alturaBullets = 50;
+    int anchoBullets = 50;
+    int alturaBulletsPantalla = 40;
+    int anchoBulletsPantalla = 40;
+
+    int anchoBulletNum = 38;
+    int anchoBulletNumPantalla = 20;
+    int altoBulletNumPantalla = 20;
+
+    // Shop
+    int altoShopPantalla = 600;
+    int anchoShopPantalla = 600;
+
+    SDL_Rect srcRect;
+    SDL_Rect destRect;
+
+    std::string textureName;
     
     void drawHuds(int num, HudType tipo, int& symbolX, int& symbolY);
 
-    void drawSymbol(int& posSymbol, int& symbolX, int& symbolY, Texture& hud_symbols);
+    void drawHud(SDL_Rect srcRect, SDL_Rect destRect, std::string& textureName);
 
-    void drawNum(int& num, int& symbolX, int& symbolY, Texture& nums);
+    void drawHud2(SDL_Rect destRect, std::string& textureName);
 
-    void drawNumRound(int& round, int& symbolX, int& symbolY);
-
-    void drawWeapon(int& symbolX, int& symbolY, int& anchoWeapon, int& weaponTextureX,
+    void drawWeapon(int symbolX, int symbolY, int& anchoWeapon, int& weaponTextureX,
         int& ammoWeapon, Weapon& weaponPLayer);
 
-    void drawShop();
+    void castCordinates(Weapon& myWeapon, int& anchoWeapon, int& weaponTextureX);
+
+    void castSizesWeapon(Weapon& myWeapon, int& anchoWeapon, int& altoWeapon, std::string& textureName);
 
     public:
     HudSprite(Renderer* sdlRenderer, Configuracion& configuracion);
