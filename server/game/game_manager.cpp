@@ -101,7 +101,7 @@ TimeInformation GameManager::get_time_information() const {
         return TimeInformation{current_round, static_cast<float>(clock.get_time() / 1000),
                                !round_won,    round_won,
                                bomb_planted,  bomb_x,
-                               bomb_y,        static_cast<float>(clock.get_bomb_timer()),
+                               bomb_y,        static_cast<float>(clock.get_bomb_timer() / 1000),
                                last_winner};
     }
     return TimeInformation{current_round,
