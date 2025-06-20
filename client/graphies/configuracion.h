@@ -8,6 +8,7 @@ struct Configuracion{
     float zoom = 20.0f;
     int widthWindow, heightWindow;
     int tiempoDeCompra = 20;
+    int opacidadVision = 150;
 
     // Constructor
     Configuracion(int width, int height) {

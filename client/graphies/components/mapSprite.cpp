@@ -13,7 +13,7 @@ MapSprite::MapSprite(Renderer* sdlRenderer, Configuracion& configuracion)
     texturas.loadTexture("bomb", "../client/data/weapons/bomb.bmp");
 
     // camp field
-    texturas.loadTexture("field", "../client/data/maps/field.png");
+    texturas.loadTexture("field", "../client/data/maps/field.png", false);
 
     tipoMusic music = AMBIENTE;
     int cantVeces = 4;
@@ -105,6 +105,9 @@ void MapSprite::drawBomb(int bomb_x, int bomb_y){
 void MapSprite::drawCampField(int angle, int playerX, int playerY){
     Texture& field = texturas.getTexture("field");
 
+    field.SetBlendMode(SDL_BLENDMODE_BLEND);  // Habilita la mezcla alfa
+    field.SetAlphaMod(configuracion.opacidadVision); // Cambia la opacidad (0-255)
+
     // coregimos el anglo por la imagen
     angle -= 90;
 
@@ -124,5 +127,6 @@ void MapSprite::drawCampField(int angle, int playerX, int playerY){
     };
     // Centro de la textura
     SDL_Point center = {anchoField / 2, altoField / 2};
+
     sdlRenderer->Copy(field, SDL2pp::NullOpt, destRect, angle, center);
 }

@@ -9,10 +9,14 @@ TextureStore::TextureStore(Renderer* sdlRenderer):
 {
 }
 
-void TextureStore::loadTexture(const std::string& name, const std::string& path){
+void TextureStore::loadTexture(const std::string& name, const std::string& path, bool setColorKey){
 
     auto imagen = IMG_Load(path.c_str());
-    Texture texture(*sdlRenderer, Surface(imagen).SetColorKey(true, 0));
+    auto surfaceImagen = Surface(imagen);
+    if (setColorKey){
+        surfaceImagen.SetColorKey(true, 0);
+    }
+    Texture texture(*sdlRenderer, surfaceImagen);
 
     textures.emplace(name, std::move(texture));
 }
