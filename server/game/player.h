@@ -17,8 +17,8 @@
 #include "player_skin.h"
 #include "position.h"
 #include "weapon_info.h"
-#define player_hitbox_height 3
-#define player_hitbox_width 3
+#define player_hitbox_height 2
+#define player_hitbox_width 2
 
 class GameManager;
 

@@ -57,6 +57,7 @@ void GameManager::advance_round(const std::vector<std::shared_ptr<Player>>& play
     current_round++;
     round_won = false;
     bomb_defused = false;
+    bomb_planted = false;
     bomb_x = 0;
     bomb_y = 0;
 }
@@ -213,14 +214,10 @@ bool GameManager::has_ended() const {
 
 void GameManager::give_bomb_to_random_player(
         const std::vector<std::shared_ptr<Player>>& players) const {
-    const int amount_of_tt =
-            std::ranges::count_if(players, [](const std::shared_ptr<Player>& player) {
-                return player->current_team == Team::Terrorists;
-            });
-    if (amount_of_tt == 0) {
+    if (tt_count == 0) {
         return;
     }
-    const int bomb_player = std::rand() % (amount_of_tt);
+    const int bomb_player = std::rand() % (tt_count);
     int current_tt = 0;
     for (auto& player: players) {
         if (player->current_team == Team::Terrorists) {
@@ -249,6 +246,12 @@ void GameManager::switch_sides() {
     const int temp = ct_rounds;
     ct_rounds = tt_rounds;
     tt_rounds = temp;
+    const int temp_amount = ct_amount;
+    ct_amount = tt_amount;
+    tt_amount = temp_amount;
+    const int temp_count = ct_count;
+    ct_count = tt_count;
+    tt_count = temp_count;
 }
 
 
@@ -264,6 +267,38 @@ void GameManager::set_players_spawn(const std::vector<std::shared_ptr<Player>>& 
     }
     const Site& ct_site = map.get_ct_site();
     const Site& tt_site = map.get_tt_site();
-    ct_site.assign_spawns_to_players(counter_terrorists);
-    tt_site.assign_spawns_to_players(terrorists);
+    ct_site.assign_spawns_to_players(map, counter_terrorists);
+    tt_site.assign_spawns_to_players(map, terrorists);
+}
+
+
+Team GameManager::get_next_player_team() const {
+    if (ct_amount == ct_count && tt_amount == tt_count) {
+        throw TeamsAreFull();
+    }
+    if (ct_count == ct_amount) {
+        return Team::Terrorists;
+    }
+    if (ct_count < tt_count) {
+        return Team::CounterTerrorists;
+    }
+    return Team::Terrorists;
+}
+
+
+void GameManager::add_player_to_team(const std::shared_ptr<Player>& player) {
+    if (player->current_team == Team::Terrorists) {
+        tt_count++;
+    } else {
+        ct_count++;
+    }
+}
+
+
+void GameManager::remove_player_from_team(const std::shared_ptr<Player>& player) {
+    if (player->current_team == Team::Terrorists) {
+        tt_count--;
+    } else {
+        ct_count--;
+    }
 }

@@ -29,8 +29,6 @@ struct MatchAlreadyStarted: public std::runtime_error {
 
 class Match: public Thread {
     friend class RequestProcessor;
-    const int ct_amount;
-    const int tt_amount;
     const int tiles_per_movement;
     const int rate;
     const double miliseconds_per_iteration;
@@ -107,15 +105,13 @@ class Match: public Thread {
 
 public:
     explicit Match(GameConfig& game_config):
-            ct_amount(game_config.ct_amount),
-            tt_amount(game_config.tt_amount),
             tiles_per_movement(game_config.tiles_per_movement),
             rate(game_config.game_rate),
             miliseconds_per_iteration(static_cast<double>(1000) / rate),
             commands_queue(Queue<std::shared_ptr<PlayerCommand>>()),
             match_started(false),
             player_count(0),
-            max_player_count(ct_amount + tt_amount),
+            max_player_count(game_config.ct_amount + game_config.tt_amount),
             map(game_config.map_config),
             game_clock(game_config),
             game_manager(map, game_clock, game_config),

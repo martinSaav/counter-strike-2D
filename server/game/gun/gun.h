@@ -12,8 +12,8 @@
 #include "shoot_result.h"
 #include "weapon_info.h"
 
-#define gun_hitbox_width 30
-#define gun_hitbox_height 30
+#define gun_hitbox_width 3
+#define gun_hitbox_height 3
 
 struct NoAmmo: public std::runtime_error {
     NoAmmo(): std::runtime_error("There is no ammunition") {}

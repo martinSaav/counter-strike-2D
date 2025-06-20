@@ -17,12 +17,7 @@ GameIdentification Match::join_match(const std::string& username) {
         throw MatchAlreadyStarted();
     }
     player_count++;
-    Team player_team;
-    if (player_count % 2 == 0) {
-        player_team = Team::CounterTerrorists;
-    } else {
-        player_team = Team::Terrorists;
-    }
+    Team player_team = game_manager.get_next_player_team();
     auto player = std::make_shared<Player>(username, game_config, 0, 0, player_team);
     PlayerCredentials credentials(player_count);
     players.insert(std::pair{credentials, player});
@@ -31,6 +26,7 @@ GameIdentification Match::join_match(const std::string& username) {
     GameIdentification game_identification(commands_queue, sender_queue, credentials);
     senders_queues.push_back(std::move(sender_queue));
     map.add_player(player);
+    game_manager.add_player_to_team(player);
     return game_identification;
 }
 
@@ -43,27 +39,25 @@ void Match::process_move_player(const std::shared_ptr<Player>& player, const int
     auto [old_x, old_y] = player->get_location();
     const int new_x = old_x + x_mov;
     const int new_y = old_y + y_mov;
-    if (!map.check_if_position_is_in_range(new_x, new_y)) {
-        return;
-    }
-    for (const std::vector<Structure> structures = map.get_structures_near_player(player);
-         const auto& structure: structures) {
-        if (CollisionDetector::check_collision_between_player_and_structure(new_x, new_y,
-                                                                            structure)) {
+    try {
+        auto new_chunks = map.calculate_player_chunks(new_x, new_y);
+        for (const std::vector<Structure> structures = map.get_structures_near_player(player);
+             const auto& structure: structures) {
+            if (CollisionDetector::check_collision_between_player_and_structure(new_x, new_y,
+                                                                                structure)) {
+                return;
+            }
+        }
+        if (const auto& near_players = map.get_near_players(player);
+            std::ranges::any_of(near_players, [&](const auto& p) {
+                return CollisionDetector::check_collision_between_players(new_x, new_y, *p);
+            })) {
             return;
         }
-    }
-    if (const auto& near_players = map.get_near_players(player);
-        std::ranges::any_of(near_players, [&](const auto& p) {
-            return CollisionDetector::check_collision_between_players(new_x, new_y, *p);
-        })) {
-        return;
-    }
-    try {
         const Position new_pos(new_x, new_y);
-        auto new_chunks = Map::calculate_player_chunks(new_x, new_y);
         player->set_location(new_pos, std::move(new_chunks));
-    } catch (const InvalidPosition&) {}
+    } catch (const InvalidPosition&) {
+    } catch (const PositionOutOfRange&) {}
 }
 
 
@@ -182,6 +176,7 @@ void Match::process_pick_weapon_request(const PlayerCredentials credentials) {
 
 void Match::process_leave_match(const std::shared_ptr<Player>& player) {
     map.remove_player(player);
+    game_manager.remove_player_from_team(player);
     auto it = players.begin();
     while (it != players.end()) {
         if (it->second == nullptr) {
@@ -441,6 +436,8 @@ void Match::run() {
         run_game_loop();
     } catch (const ClosedQueue&) {
         return;
+    } catch (...) {
+        has_finished = true;
     }
     wait_for_players_to_leave_match();
 }
