@@ -8,11 +8,11 @@
 
 
 Map::Map(const MapConfig& config):
+        ct_site(config.ct_site),
+        tt_site(config.tt_site),
         dropped_bomb({Position(0, 0), nullptr}),
         max_x(config.map_width),
-        max_y(config.map_height),
-        ct_site(config.ct_site),
-        tt_site(config.tt_site) {
+        max_y(config.map_height) {
     for (const auto structure: config.structures) {
         try {
             add_structure(structure);
@@ -212,7 +212,7 @@ ImpactInfo Map::get_nearest_colliding_structure(const Chunk& chunk, int ini_x, i
 ImpactInfo Map::get_nearest_colliding_player(int ini_x, int ini_y, double current_x,
                                              double current_y, const Player& gun_owner,
                                              const Position& final_pos,
-                                             const std::pair<double, double>& velocity) {
+                                             const std::pair<double, double>& velocity) const {
     auto [final_x, final_y] = final_pos.get_position();
     int nearest_player_distance = -1;
     std::pair<int, int> nearest_player_pos;
