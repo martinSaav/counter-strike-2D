@@ -115,7 +115,7 @@ std::vector<std::shared_ptr<Player>> Map::get_near_players(
         const std::shared_ptr<Player>& player) const {
     std::vector<std::shared_ptr<Player>> near_players;
     for (const auto& other_player: players) {
-        if (other_player == player) {
+        if (other_player == player || other_player->is_dead()) {
             continue;
         }
         std::vector<std::pair<int, int>>& other_player_chunks = other_player->get_chunk_idxs();
