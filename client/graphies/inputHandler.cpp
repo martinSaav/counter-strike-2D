@@ -96,6 +96,9 @@ void InputHandler::processEvents() {
             actionActual = Action::EquipWeapon;
             action = &actionActual;
 
+        } else if (state[SDL_SCANCODE_F]) {
+            actionActual = Action::DefuseBomb;
+            action = &actionActual;
         }
 
         if (action) {

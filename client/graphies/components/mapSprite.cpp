@@ -80,15 +80,15 @@ bool MapSprite::isBombActivated(){
 void MapSprite::activateBomb(){
     this->is_bomb_activated = true;
 
-    tipoMusic music = TIMER;
+    //tipoMusic music = TIMER;
     // Dura 2 segundos
-    int cantVeces = 8;
-    sounds.loadSong(music);
+    //int cantVeces = 8;
+    //sounds.loadSong(music);
 }
 
 void MapSprite::desactivateBomb(){
     this->is_bomb_activated = false;
-    sounds.stopAllSongs();
+    //sounds.stopAllSongs();
 }
 
 void MapSprite::drawBomb(int bomb_x, int bomb_y){

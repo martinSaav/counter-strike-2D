@@ -47,9 +47,17 @@ void PlayerSprite::drawPlayer(const PlayerInfo& jugador, double& angle) {
     sdlRenderer->Copy(personaje, srcRect, destRect, angle);
 
     Weapon weaponPlayer = jugador.get_active_weapon();
+
+    if (weaponPlayer == Weapon::None){
+        return; // No tiene arma
+    }
     this->drawWeapon(jugadorX, jugadorY, angle, weaponPlayer);
 
     if (jugador.get_action() == Action::Shoot){
+
+        if (weaponPlayer == Weapon::Bomb){
+            return;
+        }
         int shootX = jugador.get_pos_shoot_x();
         int shootY = jugador.get_pos_shoot_y();
         drawBullet(shootX, shootY, angle);
@@ -134,7 +142,6 @@ std::string PlayerSprite::castWeapon(Weapon& weapon){
     case Weapon::AWP:
         return "awp";
     default:
-        // None
         return "None";
     }
 }
