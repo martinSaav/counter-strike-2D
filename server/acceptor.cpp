@@ -32,6 +32,7 @@ void Acceptor::accept_clients() {
     Thread* c = new ClientHandler(lobby, std::move(peer));
     clients.push_back(c);
     c->start();
+    reap_dead();
 }
 
 
@@ -52,6 +53,7 @@ void Acceptor::reap_dead() {
             ++clients_iterator;
         }
     }
+    lobby.remove_finished_matches();
 }
 
 
