@@ -82,6 +82,7 @@ void GameManager::check_winning_cond(const std::vector<std::shared_ptr<Player>>&
         tt_rounds++;
         last_winner = Team::Terrorists;
         round_won = true;
+        explode_bomb(players);
     } else if (bomb_defused || (alive_terrorists == 0 && !bomb_planted)) {
         ct_rounds++;
         last_winner = Team::CounterTerrorists;
