@@ -13,12 +13,12 @@ buy_time: 20000
 bomb_time: 90000
 after_round_time: 10000
 money_per_kill: 600
-tiles_per_movement: 5
+tiles_per_movement: 2
 game_rate: 30
 knife:
   min_dmg: 40
   max_dmg: 80
-  range: 3
+  range: 5
   angle: 0.39269908169872414 # pi / 8
 glock:
   max_ammo: 20

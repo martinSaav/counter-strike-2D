@@ -35,15 +35,21 @@ class Map {
     int max_x;
     int max_y;
 
-    static std::pair<int, int> get_chunk_index(int x, int y);
+    [[nodiscard]] std::pair<int, int> get_chunk_index(int x, int y) const;
 
     static std::pair<double, double> calculate_bullet_velocity(
             const std::pair<int, int>& starting_pos, const std::pair<int, int>& ending_pos);
 
-    static std::pair<std::pair<int, int>, std::pair<double, double>> calculate_new_bullet_position(
-            const std::pair<double, double>& starting_pos,
-            const std::pair<double, double>& velocity);
+    [[nodiscard]] std::pair<std::pair<int, int>, std::pair<double, double>>
+            calculate_new_bullet_position(const std::pair<double, double>& starting_pos,
+                                          const std::pair<double, double>& velocity) const;
     [[nodiscard]] std::vector<std::shared_ptr<Player>> get_players_near_point(int x, int y) const;
+
+    std::optional<ImpactInfo> get_impacted_element(const std::pair<int, int>& chunk_idx, int ini_x,
+                                                   int ini_y, double current_x, double current_y,
+                                                   const Position& final_pos,
+                                                   const std::pair<double, double>& velocity,
+                                                   const Player& gun_owner);
 
     static ImpactInfo get_nearest_colliding_structure(const Chunk& chunk, int ini_x, int ini_y,
                                                       const Position& final_pos,
@@ -59,7 +65,8 @@ public:
     void add_bombsite(BombSite site);
     void add_player(const std::shared_ptr<Player>& player);
     std::vector<Structure> get_structures_near_player(const std::shared_ptr<Player>& player);
-    static std::vector<std::pair<int, int>> calculate_player_chunks(int bottom_x, int bottom_y);
+    [[nodiscard]] std::vector<std::pair<int, int>> calculate_player_chunks(int bottom_x,
+                                                                           int bottom_y) const;
     [[nodiscard]] std::vector<std::shared_ptr<Player>> get_near_players(
             const std::shared_ptr<Player>& player) const;
     [[nodiscard]] bool check_if_position_is_in_range(int x, int y) const;

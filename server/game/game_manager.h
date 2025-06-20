@@ -5,12 +5,18 @@
 #ifndef GAME_MANAGER_H
 #define GAME_MANAGER_H
 #include <memory>
+#include <stdexcept>
 #include <vector>
 
 #include "game_clock.h"
 #include "player.h"
 #include "time_information.h"
 
+
+class TeamsAreFull: public std::runtime_error {
+public:
+    TeamsAreFull(): std::runtime_error("Teams are already full") {}
+};
 
 class GameManager {
     Map& map;
@@ -21,6 +27,10 @@ class GameManager {
     const int round_loser_money;
     const int bomb_dmg;
     const int number_of_rounds;
+    int ct_amount;
+    int tt_amount;
+    int ct_count;
+    int tt_count;
     bool bomb_planted;
     int bomb_x;
     int bomb_y;
@@ -41,6 +51,10 @@ public:
             round_loser_money(config.round_loser_money),
             bomb_dmg(config.bomb_dmg),
             number_of_rounds(config.number_of_rounds),
+            ct_amount(config.ct_amount),
+            tt_amount(config.tt_amount),
+            ct_count(0),
+            tt_count(0),
             bomb_planted(false),
             bomb_x(0),
             bomb_y(0),
@@ -74,6 +88,9 @@ public:
     void give_bomb_to_random_player(const std::vector<std::shared_ptr<Player>>& players) const;
     void switch_sides();
     void set_players_spawn(const std::vector<std::shared_ptr<Player>>& players) const;
+    [[nodiscard]] Team get_next_player_team() const;
+    void add_player_to_team(const std::shared_ptr<Player>& player);
+    void remove_player_from_team(const std::shared_ptr<Player>& player);
 };
 
 

@@ -15,7 +15,8 @@ Site::Site(const int x, const int y, const int width, const int height,
         x(x), y(y), site_width(width), site_height(height), spawns(std::move(spawns)) {}
 
 
-void Site::assign_spawns_to_players(const std::vector<std::shared_ptr<Player> >& players) const {
+void Site::assign_spawns_to_players(const Map& map,
+                                    const std::vector<std::shared_ptr<Player> >& players) const {
     auto shuffled_spawns = spawns;
     const unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     std::default_random_engine rng(seed);
@@ -23,6 +24,6 @@ void Site::assign_spawns_to_players(const std::vector<std::shared_ptr<Player> >&
     for (size_t i = 0; i < players.size() && i < shuffled_spawns.size(); ++i) {
         auto [x, y] = shuffled_spawns[i];
         const Position new_pos(x, y);
-        players[i]->set_location(new_pos, Map::calculate_player_chunks(x, y));
+        players[i]->set_location(new_pos, map.calculate_player_chunks(x, y));
     }
 }
