@@ -253,6 +253,8 @@ void Player::update(GameManager& game_manager) {
     }
     if (is_planting && bomb->has_finished_planting(time)) {
         game_manager.plant_bomb(position_x, position_y);
+        equipped_weapon = GunType::Secondary;
+        is_planting = false;
         bomb = nullptr;
     }
 }
