@@ -22,7 +22,10 @@ Map::Map(const MapConfig& config):
 }
 
 
-std::pair<int, int> Map::get_chunk_index(int x, int y) {
+std::pair<int, int> Map::get_chunk_index(int x, int y) const {
+    if (!check_if_position_is_in_range(x, y)) {
+        throw PositionOutOfRange();
+    }
     int idx_x = std::floor(x / CHUNK_SIZE);
     int idx_y = std::floor(y / CHUNK_SIZE);
     return {idx_x, idx_y};
@@ -65,7 +68,7 @@ void Map::add_player(const std::shared_ptr<Player>& player) { players.emplace_ba
 
 
 bool Map::check_if_position_is_in_range(const int x, const int y) const {
-    return x >= 0 && x < max_x && y >= 0 && y < max_y;
+    return x >= 0 && x <= max_x && y >= 0 && y <= max_y;
 }
 
 
@@ -95,7 +98,7 @@ std::vector<Structure> Map::get_structures_near_player(const std::shared_ptr<Pla
 }
 
 
-std::vector<std::pair<int, int>> Map::calculate_player_chunks(int bottom_x, int bottom_y) {
+std::vector<std::pair<int, int>> Map::calculate_player_chunks(int bottom_x, int bottom_y) const {
     std::set<std::pair<int, int>> chunks_indexes;
     const auto chunk_index_1 = get_chunk_index(bottom_x, bottom_y);
     const auto chunk_index_2 = get_chunk_index(bottom_x + player_hitbox_width, bottom_y);
@@ -157,9 +160,10 @@ std::pair<double, double> Map::calculate_bullet_velocity(const std::pair<int, in
 
 
 std::pair<std::pair<int, int>, std::pair<double, double>> Map::calculate_new_bullet_position(
-        const std::pair<double, double>& starting_pos, const std::pair<double, double>& velocity) {
-    double ini_x = starting_pos.first;
-    double ini_y = starting_pos.second;
+        const std::pair<double, double>& starting_pos,
+        const std::pair<double, double>& velocity) const {
+    const double ini_x = starting_pos.first;
+    const double ini_y = starting_pos.second;
     double new_x = ini_x + velocity.first;
     double new_y = ini_y + velocity.second;
     std::pair<int, int> new_chunk =
@@ -241,6 +245,38 @@ ImpactInfo Map::get_nearest_colliding_player(int ini_x, int ini_y, double curren
 }
 
 
+std::optional<ImpactInfo> Map::get_impacted_element(const std::pair<int, int>& chunk_idx, int ini_x,
+                                                    int ini_y, double current_x, double current_y,
+                                                    const Position& final_pos,
+                                                    const std::pair<double, double>& velocity,
+                                                    const Player& gun_owner) {
+    int nearest_structure_distance = -1;
+    std::pair<int, int> nearest_structure_pos;
+    if (auto chunk_p = structure_chunks.find(chunk_idx); chunk_p != structure_chunks.end()) {
+        Chunk& chunk = chunk_p->second;
+        ImpactInfo structure_hit =
+                get_nearest_colliding_structure(chunk, ini_x, ini_y, final_pos, velocity);
+        if (structure_hit.hit) {
+            nearest_structure_distance = structure_hit.distance;
+            nearest_structure_pos = structure_hit.impact_position;
+        }
+    }
+    ImpactInfo player_impacted = get_nearest_colliding_player(ini_x, ini_y, current_x, current_y,
+                                                              gun_owner, final_pos, velocity);
+    if (player_impacted.hit) {
+        if (player_impacted.distance < nearest_structure_distance ||
+            nearest_structure_distance == -1) {
+            return player_impacted;
+        }
+        return ImpactInfo{nearest_structure_distance, nearest_structure_pos};
+    }
+    if (nearest_structure_distance != -1) {
+        return ImpactInfo{nearest_structure_distance, nearest_structure_pos};
+    }
+    return std::nullopt;
+}
+
+
 ImpactInfo Map::trace_bullet_path(int ini_x, int ini_y, const Position final_pos,
                                   const Player& gun_owner) {
     double current_x = ini_x;
@@ -251,40 +287,31 @@ ImpactInfo Map::trace_bullet_path(int ini_x, int ini_y, const Position final_pos
     const std::pair<int, int> final_chunk = get_chunk_index(final_x, final_y);
     const std::pair<double, double> velocity =
             calculate_bullet_velocity({ini_x, ini_y}, final_pos_v);
-    while (true) {
-        int nearest_structure_distance = -1;
-        std::pair<int, int> nearest_structure_pos;
-        if (auto chunk_p = structure_chunks.find(chunk_idx); chunk_p != structure_chunks.end()) {
-            Chunk& chunk = chunk_p->second;
-            ImpactInfo structure_hit =
-                    get_nearest_colliding_structure(chunk, ini_x, ini_y, final_pos, velocity);
-            if (structure_hit.hit) {
-                nearest_structure_distance = structure_hit.distance;
-                nearest_structure_pos = structure_hit.impact_position;
+    const int final_pos_distance = sqrt(pow(final_x - ini_x, 2) + pow(final_y - ini_y, 2));
+    int current_distance = 0;
+    while (current_distance < final_pos_distance) {
+        try {
+            auto impacted = get_impacted_element(chunk_idx, ini_x, ini_y, current_x, current_y,
+                                                 final_pos, velocity, gun_owner);
+            if (impacted.has_value()) {
+                return impacted.value();
             }
+            auto [new_chunk_idx, new_pos] =
+                    calculate_new_bullet_position(std::make_pair(current_x, current_y), velocity);
+            chunk_idx = new_chunk_idx;
+            current_x = new_pos.first;
+            current_y = new_pos.second;
+            current_distance = sqrt(pow(current_x - ini_x, 2) + pow(current_y - ini_y, 2));
+        } catch (const PositionOutOfRange&) {
+            break;
         }
-        ImpactInfo player_impacted = get_nearest_colliding_player(
-                ini_x, ini_y, current_x, current_y, gun_owner, final_pos, velocity);
-        if (player_impacted.hit) {
-            if (player_impacted.distance < nearest_structure_distance ||
-                nearest_structure_distance == -1) {
-                return player_impacted;
-            }
-            return ImpactInfo{nearest_structure_distance, nearest_structure_pos};
-        }
-        if (nearest_structure_distance != -1) {
-            return ImpactInfo{nearest_structure_distance, nearest_structure_pos};
-        }
-        if (chunk_idx == final_chunk) {
-            const int final_pos_distance = sqrt(pow(final_x - ini_x, 2) + pow(final_y - ini_y, 2));
-            return ImpactInfo{final_pos_distance, final_pos.get_position()};
-        }
-        auto [new_chunk_idx, new_pos] =
-                calculate_new_bullet_position(std::make_pair(current_x, current_y), velocity);
-        chunk_idx = new_chunk_idx;
-        current_x = new_pos.first;
-        current_y = new_pos.second;
     }
+    auto impacted = get_impacted_element(final_chunk, ini_x, ini_y, final_x, final_y, final_pos,
+                                         velocity, gun_owner);
+    if (impacted.has_value()) {
+        return impacted.value();
+    }
+    return ImpactInfo{final_pos_distance, final_pos.get_position()};
 }
 
 

@@ -10,6 +10,7 @@
 #include <vector>
 
 class Player;
+class Map;
 
 class Site {
     const int x;
@@ -20,7 +21,8 @@ class Site {
 
 public:
     Site(int x, int y, int width, int height, std::vector<std::pair<int, int>>&& spawns);
-    void assign_spawns_to_players(const std::vector<std::shared_ptr<Player>>& players) const;
+    void assign_spawns_to_players(const Map& map,
+                                  const std::vector<std::shared_ptr<Player>>& players) const;
 };
 
 

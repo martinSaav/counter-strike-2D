@@ -4,8 +4,8 @@
 
 #ifndef BOMB_H
 #define BOMB_H
-#define bomb_hitbox_height 30
-#define bomb_hitbox_width 30
+#define bomb_hitbox_height 3
+#define bomb_hitbox_width 3
 #include "game_config.h"
 
 class Bomb {
