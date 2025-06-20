@@ -8,6 +8,7 @@
 #include <random>
 
 #include "map.h"
+#include "player.h"
 
 Site::Site(const int x, const int y, const int width, const int height,
            std::vector<std::pair<int, int> >&& spawns):

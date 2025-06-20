@@ -412,3 +412,9 @@ void Map::remove_player(const std::shared_ptr<Player>& player) {
         ++it;
     }
 }
+
+
+Site& Map::get_ct_site() { return ct_site; }
+
+
+Site& Map::get_tt_site() { return tt_site; }

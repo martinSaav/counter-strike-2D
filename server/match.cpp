@@ -7,8 +7,6 @@
 #include "game/collision_detector.h"
 
 #include "gun_shop.h"
-#define starting_position_x 0
-#define starting_position_y 0
 
 GameIdentification Match::join_match(const std::string& username) {
     std::lock_guard<std::mutex> lck(mtx);
@@ -25,9 +23,7 @@ GameIdentification Match::join_match(const std::string& username) {
     } else {
         player_team = Team::Terrorists;
     }
-    auto player = std::make_shared<Player>(username, game_config,
-                                           starting_position_x + 35 * (player_count - 1),
-                                           starting_position_y, player_team);
+    auto player = std::make_shared<Player>(username, game_config, 0, 0, player_team);
     PlayerCredentials credentials(player_count);
     players.insert(std::pair{credentials, player});
     auto sender_queue =
@@ -108,7 +104,7 @@ void Match::process_shoot(const std::shared_ptr<Player>& player, const Position&
         return;
     }
     if (auto [x, y] = position.get_position(); map.check_if_position_is_in_range(x, y)) {
-        player->shoot(position, game_clock.get_time());
+        player->shoot(position, static_cast<float>(game_clock.get_time()));
     }
 }
 
@@ -364,26 +360,12 @@ void Match::setup_round_start() {
     if (game_manager.has_ended() || player_count == 0) {
         has_finished = true;
     }
-    int terorrist_spawn_x = player_hitbox_width;
-    int counter_spawn_x = map_width - player_hitbox_width;
     std::vector<std::shared_ptr<Player>> players_vector;
     for (const auto& player: players | std::views::values) {
         player->restore();
         players_vector.push_back(player);
-        if (player->get_team() == Team::Terrorists) {
-            constexpr int terorrist_spawn_y = 0 + player_hitbox_height;
-            const Position new_pos(terorrist_spawn_x, terorrist_spawn_y);
-            player->set_location(
-                    new_pos, Map::calculate_player_chunks(terorrist_spawn_x, terorrist_spawn_y));
-            terorrist_spawn_x += player_hitbox_width;
-        } else {
-            constexpr int counter_spawn_y = map_height - player_hitbox_height;
-            const Position new_pos(counter_spawn_x, counter_spawn_y);
-            player->set_location(new_pos,
-                                 Map::calculate_player_chunks(counter_spawn_x, counter_spawn_y));
-            counter_spawn_x -= player_hitbox_width;
-        }
     }
+    game_manager.set_players_spawn(players_vector);
     map.clear_bomb();
     game_manager.give_bomb_to_random_player(players_vector);
 }
@@ -422,9 +404,9 @@ void Match::run_game_loop() {
         auto end = std::chrono::system_clock::now();
         const auto elapsed =
                 std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-        auto rest = miliseconds_per_iteration - elapsed;
+        auto rest = miliseconds_per_iteration - static_cast<double>(elapsed);
         if (rest >=
-            0) {  // Si esta adelantado duerme, si no pasa directamente a la proxima iteracion
+            0) {  // Si está adelantado duerme, si no pasa directamente a la proxima iteracion
             std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::milliseconds>(
                     std::chrono::duration<double, std::milli>(rest)));
         }

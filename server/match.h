@@ -18,8 +18,6 @@
 #include "movement_type.h"
 #include "player_credentials.h"
 #include "request_processor.h"
-#define map_width 155
-#define map_height 285
 
 struct MatchFull: public std::runtime_error {
     MatchFull(): std::runtime_error("Match is full") {}
@@ -118,7 +116,7 @@ public:
             match_started(false),
             player_count(0),
             max_player_count(ct_amount + tt_amount),
-            map(map_width, map_height),
+            map(game_config.map_config),
             game_clock(game_config),
             game_manager(map, game_clock, game_config),
             game_config(game_config) {}

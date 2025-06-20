@@ -53,6 +53,7 @@ target_sources(taller_server
         game_config.h
         configuration_loader.h
         message_parser.h
+        map_config.h
 )
 
 add_subdirectory(game)

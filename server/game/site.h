@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 
-#include "player.h"
+class Player;
 
 class Site {
     const int x;

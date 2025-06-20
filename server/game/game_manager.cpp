@@ -204,7 +204,7 @@ bool GameManager::has_ended() const {
     if (ct_rounds >= 6) {
         return true;
     }
-    if (current_round == 10) {
+    if (current_round > number_of_rounds) {
         return true;
     }
     return false;
@@ -235,10 +235,10 @@ void GameManager::give_bomb_to_random_player(
 
 
 Team GameManager::get_match_winner() const {
-    if (tt_rounds >= 6) {
+    if (tt_rounds > ct_rounds) {
         return Team::Terrorists;
     }
-    if (ct_rounds >= 6) {
+    if (ct_rounds > tt_rounds) {
         return Team::CounterTerrorists;
     }
     return Team::Terrorists;
@@ -249,4 +249,21 @@ void GameManager::switch_sides() {
     const int temp = ct_rounds;
     ct_rounds = tt_rounds;
     tt_rounds = temp;
+}
+
+
+void GameManager::set_players_spawn(const std::vector<std::shared_ptr<Player>>& players) const {
+    std::vector<std::shared_ptr<Player>> terrorists;
+    std::vector<std::shared_ptr<Player>> counter_terrorists;
+    for (auto& player: players) {
+        if (player->current_team == Team::Terrorists) {
+            terrorists.push_back(player);
+        } else {
+            counter_terrorists.push_back(player);
+        }
+    }
+    const Site& ct_site = map.get_ct_site();
+    const Site& tt_site = map.get_tt_site();
+    ct_site.assign_spawns_to_players(counter_terrorists);
+    tt_site.assign_spawns_to_players(terrorists);
 }

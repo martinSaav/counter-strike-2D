@@ -6,6 +6,7 @@ add_library(game
         position.cpp
         structure.cpp
         game_manager.cpp
+        site.cpp
         player.h
         chunk.h
         collision_detector.h
@@ -20,6 +21,9 @@ add_library(game
         time_information.h
         bomb_site.h
         weapon_info.h
+        site.h
+        stages.h
+        impact_info.h
 )
 
 target_include_directories(game

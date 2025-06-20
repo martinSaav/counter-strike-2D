@@ -54,7 +54,6 @@ class Map {
 
 
 public:
-    Map(const int x, const int y): dropped_bomb({Position(0, 0), nullptr}), max_x(x), max_y(y) {}
     explicit Map(const MapConfig& config);
     void add_structure(Structure structure);
     void add_bombsite(BombSite site);
@@ -77,6 +76,8 @@ public:
     std::unique_ptr<BombEncapsulator> pick_bomb(int x, int y);
     void remove_player(const std::shared_ptr<Player>& player);
     std::list<DroppedWeapon> get_dropped_weapons();
+    Site& get_ct_site();
+    Site& get_tt_site();
 };
 
 

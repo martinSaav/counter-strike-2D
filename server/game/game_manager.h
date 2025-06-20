@@ -20,6 +20,7 @@ class GameManager {
     const int round_winner_money;
     const int round_loser_money;
     const int bomb_dmg;
+    const int number_of_rounds;
     bool bomb_planted;
     int bomb_x;
     int bomb_y;
@@ -39,6 +40,7 @@ public:
             round_winner_money(config.round_winner_money),
             round_loser_money(config.round_loser_money),
             bomb_dmg(config.bomb_dmg),
+            number_of_rounds(config.number_of_rounds),
             bomb_planted(false),
             bomb_x(0),
             bomb_y(0),
@@ -50,8 +52,8 @@ public:
             tt_rounds(0) {}
 
     void attack_player(const std::shared_ptr<Player>& attacked, Player& attacker, int damage) const;
-    bool can_player_buy() const;
-    bool can_player_move_or_shoot(const std::shared_ptr<Player>& player) const;
+    [[nodiscard]] bool can_player_buy() const;
+    [[nodiscard]] bool can_player_move_or_shoot(const std::shared_ptr<Player>& player) const;
     void advance_round(const std::vector<std::shared_ptr<Player>>& players);
     void check_winning_cond(const std::vector<std::shared_ptr<Player>>& players);
     [[nodiscard]] double get_time() const { return clock.get_time(); }
@@ -71,6 +73,7 @@ public:
     [[nodiscard]] Team get_match_winner() const;
     void give_bomb_to_random_player(const std::vector<std::shared_ptr<Player>>& players) const;
     void switch_sides();
+    void set_players_spawn(const std::vector<std::shared_ptr<Player>>& players) const;
 };
 
 
