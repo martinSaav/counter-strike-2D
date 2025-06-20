@@ -57,7 +57,7 @@ class Player {
             chunks_idxs;  // indices de los chunks en los que se encuentra el jugador
     void add_kill();
     void receive_damage(const GameManager& manager, int damage);
-    std::unique_ptr<Gun>& get_equipped_gun();
+    [[nodiscard]] Gun& get_equipped_gun() const;
 
 public:
     Player(std::string username, GameConfig& config, const int position_x, const int position_y,

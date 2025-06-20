@@ -207,16 +207,22 @@ void Player::shoot(const Position& pos, float time) {
 }
 
 
-std::unique_ptr<Gun>& Player::get_equipped_gun() {
+Gun& Player::get_equipped_gun() const {
     switch (equipped_weapon) {
         case GunType::Primary: {
-            return primary_weapon;
+            return *primary_weapon;
         }
         case GunType::Secondary: {
-            return secondary_weapon;
+            return *secondary_weapon;
+        }
+        case GunType::Knife: {
+            return *knife;
+        }
+        case GunType::Bomb: {
+            return *bomb;
         }
         default: {
-            return knife;
+            return *knife;
         }
     }
 }
@@ -230,15 +236,14 @@ void Player::update(GameManager& game_manager) {
     Map& map = game_manager.get_map();
     const double time = game_manager.get_time();
     Position pos(this->position_x, this->position_y);
-    if (const std::unique_ptr<Gun>& gun_to_shoot = get_equipped_gun();
-        gun_to_shoot->has_to_shoot(time)) {
-        if (gun_to_shoot->get_gun_type() == GunType::Bomb) {
+    if (Gun& gun_to_shoot = get_equipped_gun(); gun_to_shoot.has_to_shoot(time)) {
+        if (gun_to_shoot.get_gun_type() == GunType::Bomb) {
             if (game_manager.can_plant_bomb(position_x, position_y)) {
-                gun_to_shoot->fire_gun(map, *this, time, pos);
+                gun_to_shoot.fire_gun(map, *this, time, pos);
             }
         }
-        const ShootResult shoot = gun_to_shoot->fire_gun(map, *this, time, pos);
-        if (!shoot.miss) {
+        const ShootResult shoot = gun_to_shoot.fire_gun(map, *this, time, pos);
+        if (!shoot.miss && shoot.type != ShootType::PlantingBomb) {
             game_manager.attack_player(shoot.player_hit.value(), *this, shoot.dmg);
         }
         auto [x, y] = shoot.position;
