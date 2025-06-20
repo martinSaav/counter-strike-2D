@@ -53,13 +53,9 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& estadistics) {
 
     const double FPS = 30.0;
     const double FRAME_TIME = 1.0 / FPS;  // en segundos
-
-    // double lastTime = getCurrentTime();
     // Main loop
     while (!gameOver) {
         double current = getCurrentTime();
-        // double elapsed = current - lastTime;
-        // lastTime = current;
 
         auto mensaje = inputServerHandler.getMensaje();
         if (mensaje) {
@@ -69,11 +65,22 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& estadistics) {
         // Sleep si el frame fue más rápido de lo esperado
         double frameTime = getCurrentTime() - current;
         double delay = FRAME_TIME - frameTime;
+
         if (delay > 0) {
             SDL_Delay((Uint32)(delay * 1000.0));  // convertir a milisegundos
+
+        } else if (delay < 0){
+
+            while (delay < 0){
+                auto mensaje = inputServerHandler.getMensaje();
+                if (!mensaje) {
+                    break;  // no hay más mensajes para descartar
+                }
+                delay += FRAME_TIME;
+            }
         }
-        // SDL_Delay(33);
     }
+
     protocolo.kill();
     inputThread.join();
     inputServer.join();

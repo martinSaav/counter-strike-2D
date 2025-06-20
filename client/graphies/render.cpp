@@ -45,11 +45,6 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
 
     sdlRenderer-> Clear();
 
-    // Reset bomb
-    if (mapa.isBombActivated() && mensaje->is_round_ended()){
-        mapa.desactivateBomb();
-    }
-
     mapa.draw(); //Dibujo el mapa
 
     // Obtengo mi angulo
@@ -94,18 +89,27 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     int time = mensaje->get_round_time();
     int round = mensaje->get_round();
 
+    if (mensaje->is_bomb_planted()){
+        time = mensaje->get_bomb_timer();
+    }
+
     SDL_Rect mouse = {mouseX, mouseY, 40, 40};
     hud.draw(mouse, time, round, *myPlayer);
 
     if (mensaje->is_round_ended()){
         Team team = mensaje->get_round_winner();
         mapa.drawEndRound(team, zoom);
+
+        // Reset bomb
+        if (mapa.isBombActivated()){
+            mapa.desactivateBomb();
+        }
     }
     
     if (mensaje->is_bomb_planted() && !mensaje->is_round_ended()){
         int bomb_x = mensaje->get_bomb_x();
         int bomb_y = mensaje->get_bomb_y();
-        mapa.drawBomb(20, 20);
+        mapa.drawBomb(bomb_x, bomb_y);
 
         if (!mapa.isBombActivated()){
             mapa.activateBomb();
