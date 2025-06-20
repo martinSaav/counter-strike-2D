@@ -10,7 +10,9 @@
 #include "bomb_site.h"
 #include "chunk.h"
 #include "impact_info.h"
+#include "map_config.h"
 #include "player.h"
+#include "site.h"
 #include "structure.h"
 
 struct StructureInPosition: public std::runtime_error {
@@ -25,6 +27,8 @@ class Map {
     std::map<std::pair<int, int>, Chunk> structure_chunks;
     std::vector<std::shared_ptr<Player>> players;
     std::vector<BombSite> bomb_sites;
+    Site ct_site;
+    Site tt_site;
     std::vector<std::pair<Position, std::unique_ptr<Gun>>> dropped_guns;
     std::pair<Position, std::unique_ptr<BombEncapsulator>> dropped_bomb;
     std::optional<std::pair<int, int>> bomb_position;
@@ -33,8 +37,8 @@ class Map {
 
     static std::pair<int, int> get_chunk_index(int x, int y);
 
-    static std::pair<double, double> calculate_bullet_velocity(std::pair<int, int> starting_pos,
-                                                               std::pair<int, int> ending_pos);
+    static std::pair<double, double> calculate_bullet_velocity(
+            const std::pair<int, int>& starting_pos, const std::pair<int, int>& ending_pos);
 
     static std::pair<std::pair<int, int>, std::pair<double, double>> calculate_new_bullet_position(
             const std::pair<double, double>& starting_pos,
@@ -46,11 +50,11 @@ class Map {
     ImpactInfo get_nearest_colliding_player(int ini_x, int ini_y, double current_x,
                                             double current_y, const Player& gun_owner,
                                             const Position& final_pos,
-                                            std::pair<double, double> velocity);
+                                            const std::pair<double, double>& velocity);
 
 
 public:
-    Map(const int x, const int y): dropped_bomb({Position(0, 0), nullptr}), max_x(x), max_y(y) {}
+    explicit Map(const MapConfig& config);
     void add_structure(Structure structure);
     void add_bombsite(BombSite site);
     void add_player(const std::shared_ptr<Player>& player);
@@ -72,6 +76,8 @@ public:
     std::unique_ptr<BombEncapsulator> pick_bomb(int x, int y);
     void remove_player(const std::shared_ptr<Player>& player);
     std::list<DroppedWeapon> get_dropped_weapons();
+    Site& get_ct_site();
+    Site& get_tt_site();
 };
 
 

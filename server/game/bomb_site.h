@@ -5,15 +5,16 @@
 #ifndef BOMB_SITE_H
 #define BOMB_SITE_H
 
-#define bomb_site_height 50
-#define bomb_site_width 50
 
 class BombSite {
-    int x;
-    int y;
+    const int bomb_site_height;
+    const int bomb_site_width;
+    const int x;
+    const int y;
 
 public:
-    BombSite(const int x, const int y): x(x), y(y) {}
+    BombSite(const int bomb_site_height, const int bomb_site_width, const int x, const int y):
+            bomb_site_height(bomb_site_height), bomb_site_width(bomb_site_width), x(x), y(y) {}
     [[nodiscard]] bool is_position_inside(const int pos_x, const int pos_y) const {
         return pos_x >= x && pos_x <= x + bomb_site_width && pos_y >= y &&
                pos_y <= y + bomb_site_height;

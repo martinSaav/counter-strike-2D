@@ -4,8 +4,9 @@
 
 #include "configuration_loader.h"
 
-#include <yaml-cpp/yaml.h>
+#include <vector>
 
+#include <yaml-cpp/yaml.h>
 
 GunConfig ConfigurationLoader::get_knife_config(YAML::Node& knife_config) {
     const int min_dmg = knife_config["min_dmg"].as<int>();
@@ -50,6 +51,51 @@ GunConfig ConfigurationLoader::get_awp_config(YAML::Node& awp_config) {
 }
 
 
+Site ConfigurationLoader::get_site_config(YAML::Node& site_config) {
+    int x = site_config["x"].as<int>();
+    int y = site_config["y"].as<int>();
+    int height = site_config["height"].as<int>();
+    int width = site_config["width"].as<int>();
+    YAML::Node spawns = site_config["spawns"];
+    std::vector<std::pair<int, int>> spawn_positions;
+    for (auto spawn: spawns) {
+        int spawn_x = spawn["x"].as<int>();
+        int spawn_y = spawn["y"].as<int>();
+        spawn_positions.emplace_back(spawn_x, spawn_y);
+    }
+    return Site{x, y, width, height, (std::move(spawn_positions))};
+}
+
+
+MapConfig ConfigurationLoader::get_map_config(YAML::Node& map_config) {
+    auto map_name = map_config["map_name"].as<std::string>();
+    auto map_height = map_config["map_height"].as<int>();
+    auto map_width = map_config["map_width"].as<int>();
+    YAML::Node structures = map_config["structures"];
+    std::vector<Structure> structures_v;
+    for (auto structure: structures) {
+        int x = structure["x"].as<int>();
+        int y = structure["y"].as<int>();
+        int width = structure["width"].as<int>();
+        int height = structure["height"].as<int>();
+        Structure structure_v(height, width, Position{x, y});
+        structures_v.push_back(structure_v);
+    }
+    YAML::Node bomb_site = map_config["bomb_site"];
+    YAML::Node tt_site = map_config["tt_site"];
+    YAML::Node ct_site = map_config["ct_site"];
+    int bomb_site_x = bomb_site["x"].as<int>();
+    int bomb_site_y = bomb_site["y"].as<int>();
+    int bomb_site_height = bomb_site["height"].as<int>();
+    int bomb_site_width = bomb_site["width"].as<int>();
+    BombSite bombsite(bomb_site_height, bomb_site_width, bomb_site_x, bomb_site_y);
+    Site tt = get_site_config(tt_site);
+    Site ct = get_site_config(ct_site);
+    return MapConfig{std::move(map_name), map_width,    map_height, structures_v, bombsite,
+                     std::move(ct),       std::move(tt)};
+}
+
+
 GameConfig ConfigurationLoader::load_configuration() const {
     YAML::Node config = YAML::LoadFile(filename);
     int player_health = config["player_health"].as<int>();
@@ -76,10 +122,12 @@ GameConfig ConfigurationLoader::load_configuration() const {
     GunConfig glock = get_glock_config(glock_config);
     GunConfig ak = get_ak_config(ak_config);
     GunConfig awp = get_awp_config(awp_config);
-
+    YAML::Node map_config = config["map_config"];
+    MapConfig map = get_map_config(map_config);
     return GameConfig{player_health,      number_of_rounds,  starting_money,     ct_amount,
                       tt_amount,          std::move(knife),  std::move(glock),   std::move(ak),
                       std::move(awp),     defuse_time,       time_to_plant,      bomb_dmg,
                       round_winner_money, round_loser_money, buy_time,           bomb_time,
-                      after_round_time,   money_per_kill,    tiles_per_movement, game_rate};
+                      after_round_time,   money_per_kill,    tiles_per_movement, game_rate,
+                      std::move(map)};
 }

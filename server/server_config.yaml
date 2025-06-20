@@ -1,7 +1,7 @@
 ---
 ct_amount: 5
 tt_amount: 5
-number_of_rounds: 10
+number_of_rounds: 3
 starting_money: 500
 player_health: 100
 defuse_time: 2500
@@ -18,7 +18,7 @@ game_rate: 30
 knife:
   min_dmg: 40
   max_dmg: 80
-  range: 30
+  range: 3
   angle: 0.39269908169872414 # pi / 8
 glock:
   max_ammo: 20
@@ -41,3 +41,81 @@ awp:
   max_dmg: 120
   gun_price: 2500
   shoot_cooldown: 3000
+map_config:
+  map_name: "test_map"
+  map_height: 275
+  map_width: 150
+  structures:
+    - x: 62
+      y: 125
+      width: 12
+      height: 12
+    - x: 75
+      y: 150
+      width: 12
+      height: 12
+    - x: 50
+      y: 175
+      width: 37
+      height: 12
+    - x: 12
+      y: 137
+      width: 25
+      height: 25
+    - x: 112
+      y: 112
+      width: 12
+      height: 37
+    - x: 112
+      y: 187
+      width: 25
+      height: 12
+    - x: 50
+      y: 87
+      width: 25
+      height: 12
+    - x: 100
+      y: 75
+      width: 37
+      height: 25
+    - x: 25
+      y: 62
+      width: 37
+      height: 25
+  bomb_site:
+    x: 50
+    y: 112
+    height: 50
+    width: 50
+  tt_site:
+    x: 0
+    y: 0
+    width: 50
+    height: 50
+    spawns:
+      - x: 12
+        y: 12
+      - x: 37
+        y: 12
+      - x: 25
+        y: 25
+      - x: 12
+        y: 37
+      - x: 37
+        y: 37
+  ct_site:
+    x: 100
+    y: 225
+    width: 50
+    height: 50
+    spawns:
+      - x: 112
+        y: 237
+      - x: 137
+        y: 237
+      - x: 125
+        y: 250
+      - x: 112
+        y: 262
+      - x: 137
+        y: 262
