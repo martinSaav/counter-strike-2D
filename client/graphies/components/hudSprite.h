@@ -58,7 +58,7 @@ class HudSprite : public Component{
     public:
     HudSprite(Renderer* sdlRenderer, Configuracion& configuracion);
 
-    void draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlayer);
+    void draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlayer, bool& is_bomb_planted);
 
     void drawWeaponDroped(Weapon weapon, int weaponX, int weaponY);
 };

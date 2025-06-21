@@ -46,6 +46,22 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     sdlRenderer-> Clear();
 
     mapa.draw(); //Dibujo el mapa
+    
+    bool is_bomb_planted = mensaje->is_bomb_planted();
+    // Draw bomb
+    if (is_bomb_planted && !mensaje->is_round_ended()){
+        int bomb_x = mensaje->get_bomb_x();
+        int bomb_y = mensaje->get_bomb_y();
+        mapa.drawBomb(bomb_x, bomb_y);
+
+        if (!mapa.isBombActivated()){
+            mapa.activateBomb();
+        }
+    } else if (is_bomb_planted && mensaje->is_round_ended()){
+        if (mapa.isBombActivated()){
+            mapa.exploitBomb();
+        }
+    }
 
     // Obtengo mi angulo
     SDL_GetMouseState(&mouseX, &mouseY);
@@ -86,15 +102,18 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
         }
     }
 
-    int time = mensaje->get_round_time();
+    int time;
+    int tiempoPartida = mensaje->get_round_time();
     int round = mensaje->get_round();
 
-    if (mensaje->is_bomb_planted()){
+    if (is_bomb_planted){
         time = mensaje->get_bomb_timer();
+    } else {
+        time = tiempoPartida;
     }
 
     SDL_Rect mouse = {mouseX, mouseY, 40, 40};
-    hud.draw(mouse, time, round, *myPlayer);
+    hud.draw(mouse, time, round, *myPlayer, is_bomb_planted);
 
     if (mensaje->is_round_ended()){
         Team team = mensaje->get_round_winner();
@@ -106,18 +125,10 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
         }
     }
     
-    if (mensaje->is_bomb_planted() && !mensaje->is_round_ended()){
-        int bomb_x = mensaje->get_bomb_x();
-        int bomb_y = mensaje->get_bomb_y();
-        mapa.drawBomb(bomb_x, bomb_y);
-
-        if (!mapa.isBombActivated()){
-            mapa.activateBomb();
-        }
-    }
-    
-    if (time >= configuracion.tiempoDeCompra){
+    if (tiempoPartida >= configuracion.tiempoDeCompra){
         mapa.drawCampField(myAngle, myPlayer->get_pos_x(), myPlayer->get_pos_y());
+    } else {
+        mapa.drawShop();
     }
 
     std::list<DroppedWeapon> dropped_weapons = mensaje->get_dropped_weapons();

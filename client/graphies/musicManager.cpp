@@ -13,12 +13,13 @@ MusicManager::MusicManager(){
     std::string ubicacionStep = "../client/data/sounds/step.wav";
     std::string ubicacionTimer = "../client/data/sounds/timer.wav";
     std::string ubicacionAmbienceGame = "../client/data/sounds/ambienceGame.mp3";
-
+    std::string ubicacionExploit = "../client/data/sounds/explosion.mp3";
 
     ficheroDeUbicaciones[tipoMusic::DISPARO_PISTOL] = ubicacionPistol;
     ficheroDeUbicaciones[tipoMusic::DISPARO_AK47] = ubicacionAk47;
     ficheroDeUbicaciones[tipoMusic::KNIFE] = ubicacionKnife;
     ficheroDeUbicaciones[tipoMusic::TIMER] = ubicacionTimer;
+    ficheroDeUbicaciones[tipoMusic::EXPLOIT] = ubicacionExploit;
 
     Mix_Music *musica; musica = Mix_LoadMUS(ubicacionAmbienceGame.c_str());
     ficheroDeMusica[tipoMusic::AMBIENTE] = musica;
@@ -29,6 +30,7 @@ MusicManager::MusicManager(){
     ficheroDeChunks[tipoMusic::DISPARO_AK47] = Mix_LoadWAV(ficheroDeUbicaciones[tipoMusic::DISPARO_AK47].c_str());
     ficheroDeChunks[tipoMusic::KNIFE] = Mix_LoadWAV(ficheroDeUbicaciones[tipoMusic::KNIFE].c_str());
     ficheroDeChunks[tipoMusic::TIMER] = Mix_LoadWAV(ficheroDeUbicaciones[tipoMusic::TIMER].c_str());
+    ficheroDeChunks[tipoMusic::EXPLOIT] = Mix_LoadWAV(ficheroDeUbicaciones[tipoMusic::EXPLOIT].c_str());
 }
 
 MusicManager::~MusicManager(){
@@ -62,7 +64,7 @@ void MusicManager::loadMusic(tipoMusic music, int cantVeces){
     musicaActual = musica;
 }
 
-void MusicManager::loadSong(tipoMusic music){
+void MusicManager::loadSong(tipoMusic music, int loops){
 
     auto it = ficheroDeChunks.find(music);
     if (it == ficheroDeChunks.end()) {
@@ -70,7 +72,7 @@ void MusicManager::loadSong(tipoMusic music){
     }
 
     Mix_Chunk* chunk = it->second;
-    int canal = Mix_PlayChannel(-1, chunk, 0);
+    int canal = Mix_PlayChannel(-1, chunk, loops);
     Mix_Volume(canal, MIX_MAX_VOLUME / 2);
 }
 

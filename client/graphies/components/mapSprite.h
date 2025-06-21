@@ -13,6 +13,10 @@ class MapSprite : public Component{
     int anchoCartel = 210;
     int altoCartel = 50;
 
+    // Shop
+    int altoShopPantalla = 600;
+    int anchoShopPantalla = 600;
+
     SDL_Rect destRectMap = {0, 0, 1000, 1000};
 
     bool is_bomb_activated = false;
@@ -34,8 +38,12 @@ class MapSprite : public Component{
 
     void activateBomb();
 
+    void exploitBomb();
+
     void desactivateBomb();
 
     void drawCampField(int angle, int playerX, int playerY);
+
+    void drawShop();
 };
 #endif

@@ -15,6 +15,9 @@ MapSprite::MapSprite(Renderer* sdlRenderer, Configuracion& configuracion)
     // camp field
     texturas.loadTexture("field", "../client/data/maps/field.png", false);
 
+    // shop
+    texturas.loadTexture("shop", "../client/data/maps/shop.png");
+
     tipoMusic music = AMBIENTE;
     int cantVeces = 4;
     sounds.loadMusic(music, cantVeces);
@@ -80,15 +83,21 @@ bool MapSprite::isBombActivated(){
 void MapSprite::activateBomb(){
     this->is_bomb_activated = true;
 
-    //tipoMusic music = TIMER;
+    tipoMusic music = TIMER;
     // Dura 2 segundos
-    //int cantVeces = 8;
-    //sounds.loadSong(music);
+    int cantVeces = 47;
+    sounds.loadSong(music, cantVeces);
 }
 
 void MapSprite::desactivateBomb(){
     this->is_bomb_activated = false;
-    //sounds.stopAllSongs();
+    sounds.stopAllSongs();
+}
+
+void MapSprite::exploitBomb(){
+    this->is_bomb_activated = false;
+    tipoMusic music = EXPLOIT;
+    sounds.loadSong(music);
 }
 
 void MapSprite::drawBomb(int bomb_x, int bomb_y){
@@ -129,4 +138,18 @@ void MapSprite::drawCampField(int angle, int playerX, int playerY){
     SDL_Point center = {anchoField / 2, altoField / 2};
 
     sdlRenderer->Copy(field, SDL2pp::NullOpt, destRect, angle, center);
+}
+
+void MapSprite::drawShop(){
+    // Shop
+    int symbolX = (configuracion.widthWindow * 0.5) - anchoShopPantalla / 2;
+    int symbolY = configuracion.heightWindow * 0.2;
+    SDL_Rect destRect = {
+        symbolX,
+        symbolY,
+        anchoShopPantalla,
+        altoShopPantalla
+    };
+    std::string textureName = "shop";
+    drawHud2(destRect, textureName);
 }

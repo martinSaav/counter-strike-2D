@@ -15,6 +15,7 @@ enum tipoMusic{
     STEP,
     TIMER,
     AMBIENTE,
+    EXPLOIT,
     NONE
 };
 
@@ -39,7 +40,7 @@ class MusicManager{
 
     void stopMusic();
 
-    void loadSong(tipoMusic music);
+    void loadSong(tipoMusic music, int loops = 0);
 
     void stopAllSongs();
 

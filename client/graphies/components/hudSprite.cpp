@@ -16,9 +16,6 @@ HudSprite::HudSprite(Renderer* sdlRenderer, Configuracion& configuracion) :
     // slot
     texturas.loadTexture("slot", "../client/data/weapons/hud_slot.png");
 
-    // shop
-    texturas.loadTexture("shop", "../client/data/maps/shop.png");
-
     // weapons dropped
     texturas.loadTexture("ak47_dropped", "../client/data/weapons/ak47_d.bmp");
     texturas.loadTexture("glock_dropped", "../client/data/weapons/glock_d.bmp");
@@ -27,7 +24,7 @@ HudSprite::HudSprite(Renderer* sdlRenderer, Configuracion& configuracion) :
     texturas.loadTexture("bomb_dropped", "../client/data/weapons/bomb_d.bmp");
 }
 
-void HudSprite::draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlayer){
+void HudSprite::draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlayer, bool& is_bomb_planted){
     Texture& hud_symbols = texturas.getTexture("symbols"); 
     Texture& nums = texturas.getTexture("nums");
     HudType tipo = HEALTH;
@@ -100,11 +97,8 @@ void HudSprite::draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlaye
     tipo = MONEY;
     drawHuds(money, tipo, symbolX, symbolY);
 
-    // mira
-    textureName = "mira";
-    drawHud2(mouse, textureName);
-
-    if (time < configuracion.tiempoDeCompra){
+    if (time < configuracion.tiempoDeCompra && !is_bomb_planted){
+        textureName = "symbols";
         // Shop
         symbolY = heightWindow * 0.92;
         symbolX = weidthWindow * 0.28;
@@ -113,18 +107,10 @@ void HudSprite::draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlaye
         srcRect = {anchoSymbols * numTipo, 0, anchoSymbols, alturaSymbols};
         destRect = {symbolX, symbolY, anchoSymbolPantalla, altoSymbolPantalla};
         drawHud(srcRect, destRect, textureName);
-
-        symbolX = (configuracion.widthWindow * 0.5) - anchoShopPantalla / 2;
-        symbolY = configuracion.heightWindow * 0.2;
-        destRect = {
-            symbolX,
-            symbolY,
-            anchoShopPantalla,
-            altoShopPantalla
-        };
-        textureName = "shop";
-        drawHud2(destRect, textureName);
     }
+    // mira
+    textureName = "mira";
+    drawHud2(mouse, textureName);
 }
 
 void HudSprite::drawHuds(int num, HudType tipo, int& symbolX, int& symbolY){
@@ -138,7 +124,7 @@ void HudSprite::drawHuds(int num, HudType tipo, int& symbolX, int& symbolY){
 
     // Numbers
     textureName = "nums";
-    if (tipo == 2){
+    if (tipo == TIME){
 
         int minutos = num / 60;
         int segundos = num % 60;
@@ -161,6 +147,14 @@ void HudSprite::drawHuds(int num, HudType tipo, int& symbolX, int& symbolY){
         int correcionEspacio = 20;
         symbolX -= correcionEspacio;
         num = segundos;
+
+        if (num < 10){
+            int digito = 0;
+            symbolX += anchoSymbolPantalla;
+            srcRect = {anchoNum * digito, 0, anchoNum, alturaNum};
+            destRect = {symbolX, symbolY, anchoSymbolPantalla, altoSymbolPantalla};
+            drawHud(srcRect, destRect, textureName);
+        }
     }
 
     std::string numStr = std::to_string(num);
