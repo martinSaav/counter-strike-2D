@@ -103,6 +103,7 @@ GameConfig ConfigurationLoader::load_configuration() const {
     int starting_money = config["starting_money"].as<int>();
     int ct_amount = config["ct_amount"].as<int>();
     int tt_amount = config["tt_amount"].as<int>();
+    int ammo_price = config["ammo_price"].as<int>();
     int defuse_time = config["defuse_time"].as<int>();
     int time_to_plant = config["time_to_plant"].as<int>();
     int bomb_dmg = config["bomb_dmg"].as<int>();
@@ -124,10 +125,10 @@ GameConfig ConfigurationLoader::load_configuration() const {
     GunConfig awp = get_awp_config(awp_config);
     YAML::Node map_config = config["map_config"];
     MapConfig map = get_map_config(map_config);
-    return GameConfig{player_health,      number_of_rounds,  starting_money,     ct_amount,
-                      tt_amount,          std::move(knife),  std::move(glock),   std::move(ak),
-                      std::move(awp),     defuse_time,       time_to_plant,      bomb_dmg,
-                      round_winner_money, round_loser_money, buy_time,           bomb_time,
-                      after_round_time,   money_per_kill,    tiles_per_movement, game_rate,
-                      std::move(map)};
+    return GameConfig{player_health, number_of_rounds,   starting_money,    ct_amount,
+                      tt_amount,     ammo_price,         std::move(knife),  std::move(glock),
+                      std::move(ak), std::move(awp),     defuse_time,       time_to_plant,
+                      bomb_dmg,      round_winner_money, round_loser_money, buy_time,
+                      bomb_time,     after_round_time,   money_per_kill,    tiles_per_movement,
+                      game_rate,     std::move(map)};
 }

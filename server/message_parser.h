@@ -27,6 +27,7 @@ class MessageParser {
     std::shared_ptr<PlayerCommand> parse_select_skin(const std::unique_ptr<Message>& message);
     std::shared_ptr<PlayerCommand> parse_disconnect();
     std::shared_ptr<PlayerCommand> parse_action(const std::unique_ptr<Message>& message);
+    std::shared_ptr<PlayerCommand> parse_buy_ammo(const std::unique_ptr<Message>& message);
 
 public:
     explicit MessageParser(const PlayerCredentials& credentials);

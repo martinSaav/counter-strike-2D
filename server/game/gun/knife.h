@@ -37,6 +37,7 @@ public:
     void shoot_gun(Position final_position, float current_time) override;
     int get_gun_price() override { return 0; }
     WeaponInfo get_weapon_name() override { return WeaponInfo{Weapon::Knife, 0}; }
+    void add_magazine() override {}
 };
 
 

@@ -344,6 +344,26 @@ void Match::process_switch_weapon_request(PlayerCredentials credentials, GunType
 }
 
 
+void Match::process_buy_ammo(const std::shared_ptr<Player>& player, GunType gun_type) const {
+    if (!game_manager.can_player_buy()) {
+        return;
+    }
+    player->buy_ammo(gun_type);
+}
+
+
+void Match::process_buy_ammo_request(const PlayerCredentials credentials, const GunType gun_type) {
+    std::lock_guard<std::mutex> lck(mtx);
+    const PlayerCredentials player_credentials = credentials;
+    const auto player_p = players.find(player_credentials);
+    if (player_p == players.end()) {
+        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
+    }
+    const std::shared_ptr<Player>& player = player_p->second;
+    process_buy_ammo(player, gun_type);
+}
+
+
 void Match::setup_round_start() {
     game_clock.reset();
     if (game_manager.has_to_switch_sides()) {

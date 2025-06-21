@@ -62,3 +62,9 @@ void RequestProcessor::process_pick_weapon_request(const PlayerCredentials crede
 void RequestProcessor::process_defuse_request(const PlayerCredentials credentials, Match* match) {
     match->process_defuse_request(credentials);
 }
+
+
+void RequestProcessor::process_buy_ammo_request(const PlayerCredentials credentials,
+                                                const GunType gun_type, Match* match) {
+    match->process_buy_ammo_request(credentials, gun_type);
+}
