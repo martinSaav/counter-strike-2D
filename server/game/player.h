@@ -29,6 +29,7 @@ class Player {
     friend class Bomb;
     const int max_health;
     const int money_per_kill;
+    const int ammo_price;
     GameConfig& game_config;
     const std::string username;
     PlayerSkin terrorist_skin;
@@ -64,6 +65,7 @@ public:
            const Team team):
             max_health(config.player_health),
             money_per_kill(config.money_per_kill),
+            ammo_price(config.ammo_price),
             game_config(config),
             username(std::move(username)),
             health(config.player_health),
@@ -120,6 +122,7 @@ public:
     void switch_team();
     void switch_weapon(GunType gun_type);
     void buy_weapon(std::unique_ptr<Gun> gun);
+    void buy_ammo(GunType gun_type);
 
     [[nodiscard]] std::string get_username() const { return username; }
 };

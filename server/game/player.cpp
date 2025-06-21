@@ -135,6 +135,19 @@ void Player::buy_weapon(std::unique_ptr<Gun> gun) {
 }
 
 
+void Player::buy_ammo(const GunType gun_type) {
+    if (money >= ammo_price) {
+        if (gun_type == GunType::Primary && primary_weapon != nullptr) {
+            primary_weapon->add_magazine();
+            money -= ammo_price;
+        } else if (gun_type == GunType::Secondary && secondary_weapon != nullptr) {
+            secondary_weapon->add_magazine();
+            money -= ammo_price;
+        }
+    }
+}
+
+
 void Player::switch_weapon(GunType gun_type) {
     is_planting = false;
     is_defusing = false;

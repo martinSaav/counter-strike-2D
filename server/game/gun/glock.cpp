@@ -68,3 +68,6 @@ void Glock::reload_gun() {
         current_ammo += ammo_to_reload;
     }
 }
+
+
+void Glock::add_magazine() { reserve_ammo += max_ammo; }

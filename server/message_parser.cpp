@@ -4,6 +4,7 @@
 
 #include "message_parser.h"
 
+#include "commands/buy_ammo_command.h"
 #include "commands/buy_weapon_command.h"
 #include "commands/change_skin_command.h"
 #include "commands/defuse_bomb_command.h"
@@ -14,6 +15,7 @@
 #include "commands/reload_weapon_command.h"
 #include "commands/shoot_command.h"
 #include "commands/switch_weapon_command.h"
+#include "dto/buy_ammo_request.h"
 #include "dto/buy_weapon_request.h"
 #include "dto/player_action.h"
 #include "dto/select_skin_request.h"
@@ -49,6 +51,26 @@ std::shared_ptr<PlayerCommand> MessageParser::parse_disconnect() {
     return std::make_shared<LeaveMatchCommand>(credentials);
 }
 
+
+std::shared_ptr<PlayerCommand> MessageParser::parse_buy_ammo(
+        const std::unique_ptr<Message>& message) {
+    auto buy_ammo_msg = dynamic_cast<BuyAmmoRequest*>(message.get());
+    switch (buy_ammo_msg->get_weapon_type()) {
+        case WeaponType::Bomb: {
+            return std::make_shared<BuyAmmoCommand>(credentials, GunType::Bomb);
+        }
+        case WeaponType::Knife: {
+            return std::make_shared<BuyAmmoCommand>(credentials, GunType::Knife);
+        }
+        case WeaponType::Primary: {
+            return std::make_shared<BuyAmmoCommand>(credentials, GunType::Primary);
+        }
+        case WeaponType::Secondary: {
+            return std::make_shared<BuyAmmoCommand>(credentials, GunType::Secondary);
+        }
+    }
+    return std::make_shared<BuyAmmoCommand>(credentials, GunType::Secondary);
+}
 
 std::shared_ptr<PlayerCommand> MessageParser::parse_action(
         const std::unique_ptr<Message>& message) {
@@ -116,6 +138,9 @@ std::shared_ptr<PlayerCommand> MessageParser::parse_message(
         }
         case MessageType::PlayerAction: {
             return parse_action(message);
+        }
+        case MessageType::BuyAmmoRequest: {
+            return parse_buy_ammo(message);
         }
         default: {
             throw InvalidMessageType();

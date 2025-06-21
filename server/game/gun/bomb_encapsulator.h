@@ -27,8 +27,9 @@ public:
     void reload_gun() override;
     void shoot_gun(Position final_position, float time) override;
     int get_gun_price() override { return 0; }
-    bool is_planting() const;
+    [[nodiscard]] bool is_planting() const;
     WeaponInfo get_weapon_name() override { return WeaponInfo{Weapon::Bomb, 0}; }
+    void add_magazine() override {}
 };
 
 

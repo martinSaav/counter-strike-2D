@@ -86,3 +86,6 @@ ShootResult Ak47::fire_gun(Map& map, Player& owner, const float current_time,
     }
     return ShootResult{impact.impact_position};
 }
+
+
+void Ak47::add_magazine() { reserve_ammo += max_ammo; }

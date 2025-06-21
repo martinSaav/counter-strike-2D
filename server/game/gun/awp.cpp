@@ -74,3 +74,6 @@ ShootResult Awp::fire_gun(Map& map, Player& owner, const float current_time,
     }
     return ShootResult{impact.impact_position};
 }
+
+
+void Awp::add_magazine() { reserve_ammo += max_ammo; }

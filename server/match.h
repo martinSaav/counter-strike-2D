@@ -91,6 +91,10 @@ class Match: public Thread {
 
     void process_switch_weapon_request(PlayerCredentials credentials, GunType gun_type);
 
+    void process_buy_ammo(const std::shared_ptr<Player>& player, GunType gun_type) const;
+
+    void process_buy_ammo_request(PlayerCredentials credentials, GunType gun_type);
+
     void broadcast_match_start();
 
     void wait_for_match_to_start();

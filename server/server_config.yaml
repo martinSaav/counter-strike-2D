@@ -15,6 +15,7 @@ after_round_time: 10000
 money_per_kill: 600
 tiles_per_movement: 2
 game_rate: 30
+ammo_price: 200
 knife:
   min_dmg: 40
   max_dmg: 80

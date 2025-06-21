@@ -15,6 +15,7 @@ public:
     const int starting_money;
     const int ct_amount;
     const int tt_amount;
+    const int ammo_price;
     const GunConfig knife_config;
     const GunConfig glock_config;
     const GunConfig ak_config;
@@ -32,7 +33,7 @@ public:
     const int game_rate;
     const MapConfig map_config;
     GameConfig(int player_health, int number_of_rounds, int starting_money, int ct_amount,
-               int tt_amount, GunConfig&& knife_config, GunConfig&& glock_config,
+               int tt_amount, int ammo_price, GunConfig&& knife_config, GunConfig&& glock_config,
                GunConfig&& ak_config, GunConfig&& awp_config, int defuse_time, int time_to_plant,
                int bomb_dmg, int round_winner_money, int round_loser_money, int buy_time,
                int bomb_time, int after_round_time, int money_per_kill, int tiles_per_movement,
