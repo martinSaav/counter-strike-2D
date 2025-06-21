@@ -112,7 +112,7 @@ TimeInformation GameManager::get_time_information() const {
                            bomb_planted,
                            0,
                            0,
-                           0,
+                           static_cast<float>(clock.get_bomb_timer() / 1000),
                            last_winner};
 }
 

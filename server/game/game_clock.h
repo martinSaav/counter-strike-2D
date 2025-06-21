@@ -43,7 +43,7 @@ public:
     void set_post_plant_stage();
     void set_after_round_stage();
     [[nodiscard]] double get_time() const { return current_time; }
-    [[nodiscard]] double get_bomb_timer() const { return stage_time; }
+    [[nodiscard]] double get_bomb_timer() const;
 };
 
 

@@ -4,6 +4,7 @@
 
 #include "game_clock.h"
 
+#include <algorithm>
 
 std::map<Stages, double> GameClock::get_stage_duration_map() const {
     std::map<Stages, double> stage_duration_map = {
@@ -52,4 +53,12 @@ void GameClock::set_post_plant_stage() {
 void GameClock::set_after_round_stage() {
     stage_time = 0;
     current_stage = Stages::AfterRoundStage;
+}
+
+
+double GameClock::get_bomb_timer() const {
+    if (current_stage == Stages::PostPlantStage) {
+        return std::max(post_bomb_stage_time - stage_time, static_cast<double>(0));
+    }
+    return 0;
 }
