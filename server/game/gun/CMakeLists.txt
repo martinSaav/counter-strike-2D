@@ -7,6 +7,7 @@ target_sources(game
         bomb.cpp
         bomb_encapsulator.cpp
         awp.cpp
+        m3.cpp
         PUBLIC
         gun.h
         shoot_result.h
@@ -17,4 +18,6 @@ target_sources(game
         bomb.h
         bomb_encapsulator.h
         awp.h
+        m3.h
+        shoot_info.h
         )

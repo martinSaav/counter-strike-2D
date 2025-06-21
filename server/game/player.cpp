@@ -217,6 +217,9 @@ void Player::shoot(const Position& pos, float time) {
             bomb->shoot_gun(pos, time);
         }
     } catch (const NoAmmo&) {}
+    auto [x, y] = pos.get_position();
+    aim_x = x;
+    aim_y = y;
 }
 
 
@@ -255,13 +258,21 @@ void Player::update(GameManager& game_manager) {
                 gun_to_shoot.fire_gun(map, *this, time, pos);
             }
         }
-        const ShootResult shoot = gun_to_shoot.fire_gun(map, *this, time, pos);
-        if (!shoot.miss && shoot.type != ShootType::PlantingBomb) {
-            game_manager.attack_player(shoot.player_hit.value(), *this, shoot.dmg);
+        const ShootInfo shoots = gun_to_shoot.fire_gun(map, *this, time, pos);
+        int x = 0;
+        int y = 0;
+
+        for (auto& shoot: shoots.results) {
+            if (!shoot.miss && shoot.type != ShootType::PlantingBomb) {
+                game_manager.attack_player(shoot.player_hit.value(), *this, shoot.dmg);
+            }
+            x = shoot.position.first;
+            y = shoot.position.second;
         }
-        auto [x, y] = shoot.position;
-        aim_x = x;
-        aim_y = y;
+        if (shoots.results.size() == 1) {
+            aim_x = x;
+            aim_y = y;
+        }
         is_shooting = true;
     }
     if (is_planting && bomb->has_finished_planting(time)) {

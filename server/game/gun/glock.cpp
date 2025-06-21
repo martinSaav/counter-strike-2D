@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <vector>
 
 #include "map.h"
 #include "player.h"
@@ -37,8 +38,7 @@ void Glock::reset_shoots() { has_to_fire = false; }
 bool Glock::has_to_shoot(float current_time) { return has_to_fire; }
 
 
-ShootResult Glock::fire_gun(Map& map, Player& owner, float current_time,
-                            Position& current_position) {
+ShootInfo Glock::fire_gun(Map& map, Player& owner, float current_time, Position& current_position) {
     if (!has_to_shoot(current_time)) {
         throw DontHaveToShoot();
     }
@@ -47,15 +47,18 @@ ShootResult Glock::fire_gun(Map& map, Player& owner, float current_time,
     current_ammo--;
     has_to_fire = false;
     const ImpactInfo impact = map.trace_bullet_path(x, y, Position(final_x, final_y), owner);
+    std::vector<ShootResult> result;
     if (impact.impacted_player.has_value()) {
         const auto& player_hit = impact.impacted_player.value();
         auto [player_hit_x, player_hit_y] = player_hit->get_location();
         const double distance = std::sqrt(pow(x - player_hit_x, 2) + pow(y - player_hit_y, 2));
         const int damage_before_distance = min_dmg + std::rand() % (max_dmg - min_dmg + 1);
         const double damage = static_cast<double>(damage_before_distance) / (1 + distance / 10);
-        return ShootResult{static_cast<int>(damage), impact.impact_position, player_hit};
+        result.emplace_back(static_cast<int>(damage), impact.impact_position, player_hit);
+    } else {
+        result.emplace_back(impact.impact_position);
     }
-    return ShootResult{impact.impact_position};
+    return ShootInfo{std::move(result)};
 }
 
 void Glock::reload_gun() {

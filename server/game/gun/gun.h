@@ -9,7 +9,7 @@
 
 #include "gun_type.h"
 #include "position.h"
-#include "shoot_result.h"
+#include "shoot_info.h"
 #include "weapon_info.h"
 
 #define gun_hitbox_width 3
@@ -29,8 +29,8 @@ class Map;
 class Gun {
     friend class Player;
     virtual bool has_to_shoot(float current_time) = 0;
-    virtual ShootResult fire_gun(Map& map, Player& owner, float current_time,
-                                 Position& current_position) = 0;
+    virtual ShootInfo fire_gun(Map& map, Player& owner, float current_time,
+                               Position& current_position) = 0;
     virtual void reset_shoots() = 0;
 
 public:

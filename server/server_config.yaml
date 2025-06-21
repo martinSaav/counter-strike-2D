@@ -18,7 +18,7 @@ game_rate: 30
 ammo_price: 200
 knife:
   min_dmg: 40
-  max_dmg: 80
+  max_dmg: 70
   range: 5
   angle: 0.39269908169872414 # pi / 8
 glock:
@@ -42,6 +42,14 @@ awp:
   max_dmg: 120
   gun_price: 2500
   shoot_cooldown: 3000
+m3:
+  max_ammo: 10
+  starting_reserve_ammo: 20
+  min_dmg: 60
+  max_dmg: 90
+  gun_price: 2000
+  range: 15
+  angle: 0.39269908169872414 # pi / 8
 map_config:
   map_name: "test_map"
   map_height: 275

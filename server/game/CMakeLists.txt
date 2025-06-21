@@ -24,6 +24,7 @@ add_library(game
         site.h
         stages.h
         impact_info.h
+        gun/shoot_info.h
 )
 
 target_include_directories(game

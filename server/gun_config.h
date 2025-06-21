@@ -62,6 +62,18 @@ public:
             shoot_cooldown(0),
             range(range),
             angle(angle) {}
+
+    GunConfig(int max_ammo, int starting_reserve_ammo, int min_dmg, int max_dmg, int gun_price,
+              int range, double angle):
+            max_ammo(max_ammo),
+            starting_reserve_ammo(starting_reserve_ammo),
+            min_dmg(min_dmg),
+            max_dmg(max_dmg),
+            gun_price(gun_price),
+            bullets_per_burst(0),
+            shoot_cooldown(0),
+            range(range),
+            angle(angle) {}
 };
 
 

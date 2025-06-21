@@ -320,6 +320,9 @@ std::vector<std::shared_ptr<Player>> Map::get_players_near_radio(const double x,
     std::vector<std::shared_ptr<Player>> resultado;
 
     for (const auto& player: players) {
+        if (player->is_dead()) {
+            continue;
+        }
         auto [center_x, center_y] = player->get_center_coordinates();
         const double dis_x = center_x - x;
         const double dis_y = center_y - y;
