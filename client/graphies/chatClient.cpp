@@ -57,6 +57,8 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& estadistics) {
     while (!gameOver) {
         double current = getCurrentTime();
 
+        render.clearScreen();
+
         auto mensaje = inputServerHandler.getMensaje();
         if (mensaje) {
             render.renderFrame(mensaje);

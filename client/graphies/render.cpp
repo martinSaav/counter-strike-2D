@@ -137,6 +137,21 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
             hud.drawWeaponDroped(weapon.get_weapon(), weapon.get_pos_x(), weapon.get_pos_y());
         }
     }
+
+    int currentHealth = myPlayer->get_health();
+    if (lastHealth != -1 && currentHealth < lastHealth) {
+        damageFlashTimer = 10; 
+    }
+    lastHealth = currentHealth;
+
+    if (damageFlashTimer > 0) {
+        SDL_Rect screen = {0, 0, configuracion.widthWindow, configuracion.heightWindow};
+        sdlRenderer->SetDrawBlendMode(SDL_BLENDMODE_BLEND);
+        sdlRenderer->SetDrawColor(255, 0, 0, 120);  // Rojo semi-transparente
+        sdlRenderer->FillRect(screen);
+        damageFlashTimer--;
+    }
+
     sdlRenderer->Present();
 }
 
@@ -185,4 +200,9 @@ float Render::normalizarAngulo(float angulo) {
     while (angulo < 0) angulo += 360;
     while (angulo >= 360) angulo -= 360;
     return angulo;
+}
+
+void Render::clearScreen() {
+    sdlRenderer->SetDrawColor(0, 0, 0, 255);
+    sdlRenderer->Clear();
 }
