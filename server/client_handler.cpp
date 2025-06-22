@@ -84,10 +84,11 @@ void ClientHandler::handle_game_config_request() {
             config.player_health, config.number_of_rounds, config.starting_money, config.ct_amount,
             config.tt_amount, config.ammo_price, config.knife_config.get_info(),
             config.glock_config.get_info(), config.ak_config.get_info(),
-            config.awp_config.get_info(), config.defuse_time, config.time_to_plant, config.bomb_dmg,
-            config.round_winner_money, config.round_loser_money, config.buy_time, config.bomb_time,
-            config.after_round_time, config.money_per_kill, config.tiles_per_movement,
-            config.game_rate, std::move(map_config));
+            config.awp_config.get_info(), config.m3_config.get_info(), config.defuse_time,
+            config.time_to_plant, config.bomb_dmg, config.round_winner_money,
+            config.round_loser_money, config.buy_time, config.bomb_time, config.after_round_time,
+            config.money_per_kill, config.tiles_per_movement, config.game_rate,
+            std::move(map_config));
     protocol.send_message(game_cfg_message);
 }
 
