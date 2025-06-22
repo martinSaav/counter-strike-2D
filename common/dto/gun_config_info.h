@@ -4,95 +4,154 @@
 #include <cstdint>
 #include <cstring>
 #include <stdexcept>
-#include <netinet/in.h>
+#include <arpa/inet.h>
 
 class GunConfigInfo {
 private:
-    uint16_t max_ammo;
-    uint16_t starting_reserve_ammo;
-    uint16_t min_dmg;
-    uint16_t max_dmg;
-    uint16_t gun_price;
-    uint16_t bullets_per_burst;
-    uint16_t shoot_cooldown;
-    uint16_t range;
+    int32_t max_ammo;
+    int32_t starting_reserve_ammo;
+    int32_t min_dmg;
+    int32_t max_dmg;
+    int32_t gun_price;
+    int32_t bullets_per_burst;
+    int32_t shoot_cooldown;
+    int32_t range;
     float angle;
 
 public:
-    GunConfigInfo(uint16_t max_ammo, uint16_t starting_reserve_ammo,
-              uint16_t min_dmg, uint16_t max_dmg, uint16_t gun_price,
-              uint16_t bullets_per_burst, uint16_t shoot_cooldown,
-              uint16_t range, float angle)
+    GunConfigInfo(int32_t max_ammo, int32_t starting_reserve_ammo,
+                  int32_t min_dmg, int32_t max_dmg, int32_t gun_price,
+                  int32_t bullets_per_burst, int32_t shoot_cooldown,
+                  int32_t range, float angle)
         : max_ammo(max_ammo), starting_reserve_ammo(starting_reserve_ammo),
           min_dmg(min_dmg), max_dmg(max_dmg), gun_price(gun_price),
           bullets_per_burst(bullets_per_burst), shoot_cooldown(shoot_cooldown),
           range(range), angle(angle) {}
 
     void serialize(uint8_t* buffer) const {
-        uint16_t net_max_ammo = htons(max_ammo);
-        uint16_t net_starting_reserve_ammo = htons(starting_reserve_ammo);
-        uint16_t net_min_dmg = htons(min_dmg);
-        uint16_t net_max_dmg = htons(max_dmg);
-        uint16_t net_gun_price = htons(gun_price);
-        uint16_t net_bullets_per_burst = htons(bullets_per_burst);
-        uint16_t net_shoot_cooldown = htons(shoot_cooldown);
-        uint16_t net_range = htons(range);
+        size_t offset = 0;
+        
+        int32_t max_ammo_net = htonl(max_ammo);
+        memcpy(buffer + offset, &max_ammo_net, sizeof(max_ammo_net));
+        offset += sizeof(max_ammo_net);
 
-        std::memcpy(buffer, &net_max_ammo, sizeof(net_max_ammo));
-        std::memcpy(buffer + 2, &net_starting_reserve_ammo, sizeof(net_starting_reserve_ammo));
-        std::memcpy(buffer + 4, &net_min_dmg, sizeof(net_min_dmg));
-        std::memcpy(buffer + 6, &net_max_dmg, sizeof(net_max_dmg));
-        std::memcpy(buffer + 8, &net_gun_price, sizeof(net_gun_price));
-        std::memcpy(buffer + 10, &net_bullets_per_burst, sizeof(net_bullets_per_burst));
-        std::memcpy(buffer + 12, &net_shoot_cooldown, sizeof(net_shoot_cooldown));
-        std::memcpy(buffer + 14, &net_range, sizeof(net_range));
-        std::memcpy(buffer + 16, &angle, sizeof(angle));
+        int32_t starting_reserve_ammo_net = htonl(starting_reserve_ammo);
+        memcpy(buffer + offset, &starting_reserve_ammo_net, sizeof(starting_reserve_ammo_net));
+        offset += sizeof(starting_reserve_ammo_net);
+
+        int32_t min_dmg_net = htonl(min_dmg);
+        memcpy(buffer + offset, &min_dmg_net, sizeof(min_dmg_net));
+        offset += sizeof(min_dmg_net);
+
+        int32_t max_dmg_net = htonl(max_dmg);
+        memcpy(buffer + offset, &max_dmg_net, sizeof(max_dmg_net));
+        offset += sizeof(max_dmg_net);
+
+        int32_t gun_price_net = htonl(gun_price);
+        memcpy(buffer + offset, &gun_price_net, sizeof(gun_price_net));
+        offset += sizeof(gun_price_net);
+
+        int32_t bullets_per_burst_net = htonl(bullets_per_burst);
+        memcpy(buffer + offset, &bullets_per_burst_net, sizeof(bullets_per_burst_net));
+        offset += sizeof(bullets_per_burst_net);    
+
+        int32_t shoot_cooldown_net = htonl(shoot_cooldown);
+        memcpy(buffer + offset, &shoot_cooldown_net, sizeof(shoot_cooldown_net));
+        offset += sizeof(shoot_cooldown_net);
+
+        int32_t range_net = htonl(range);
+        memcpy(buffer + offset, &range_net, sizeof(range_net));
+        offset += sizeof(range_net);
+
+        float angle_net = htonl(*reinterpret_cast<const uint32_t*>(&angle));
+        memcpy(buffer + offset, &angle_net, sizeof(angle_net));
+        offset += sizeof(angle_net);    
     }
 
     static GunConfigInfo deserialize(const uint8_t* buffer, size_t size) {
-        if (size < 3) {
+       if (size < 3) {
             throw std::runtime_error("");
         }
 
-        uint16_t max_ammo, starting_reserve_ammo, min_dmg, max_dmg, gun_price;
-        uint16_t bullets_per_burst, shoot_cooldown, range;
+        size_t offset = 0;
+
+        int32_t max_ammo;
+        memcpy(&max_ammo, buffer + offset, sizeof(max_ammo));
+        max_ammo = ntohl(max_ammo);
+        offset += sizeof(max_ammo);
+
+        int32_t starting_reserve_ammo;
+        memcpy(&starting_reserve_ammo, buffer + offset, sizeof(starting_reserve_ammo));
+        starting_reserve_ammo = ntohl(starting_reserve_ammo);
+        offset += sizeof(starting_reserve_ammo);
+
+        int32_t min_dmg;
+        memcpy(&min_dmg, buffer + offset, sizeof(min_dmg));
+        min_dmg = ntohl(min_dmg);
+        offset += sizeof(min_dmg);
+
+        int32_t max_dmg;
+        memcpy(&max_dmg, buffer + offset, sizeof(max_dmg));
+        max_dmg = ntohl(max_dmg);
+        offset += sizeof(max_dmg);
+
+        int32_t gun_price;
+        memcpy(&gun_price, buffer + offset, sizeof(gun_price));
+        gun_price = ntohl(gun_price);
+        offset += sizeof(gun_price);
+
+        int32_t bullets_per_burst;
+        memcpy(&bullets_per_burst, buffer + offset, sizeof(bullets_per_burst));
+        bullets_per_burst = ntohl(bullets_per_burst);
+        offset += sizeof(bullets_per_burst);
+
+        int32_t shoot_cooldown;
+        memcpy(&shoot_cooldown, buffer + offset, sizeof(shoot_cooldown));
+        shoot_cooldown = ntohl(shoot_cooldown);
+        offset += sizeof(shoot_cooldown);
+
+        int32_t range;
+        memcpy(&range, buffer + offset, sizeof(range));
+        range = ntohl(range);
+        offset += sizeof(range);
+
         float angle;
-
-        std::memcpy(&max_ammo, buffer, sizeof(max_ammo));
-        std::memcpy(&starting_reserve_ammo, buffer + 2, sizeof(starting_reserve_ammo));
-        std::memcpy(&min_dmg, buffer + 4, sizeof(min_dmg));
-        std::memcpy(&max_dmg, buffer + 6, sizeof(max_dmg));
-        std::memcpy(&gun_price, buffer + 8, sizeof(gun_price));
-        std::memcpy(&bullets_per_burst, buffer + 10, sizeof(bullets_per_burst));
-        std::memcpy(&shoot_cooldown, buffer + 12, sizeof(shoot_cooldown));
-        std::memcpy(&range, buffer + 14, sizeof(range));
-        std::memcpy(&angle, buffer + 16, sizeof(angle));
-
-        return GunConfigInfo(ntohs(max_ammo), ntohs(starting_reserve_ammo),
-                         ntohs(min_dmg), ntohs(max_dmg), ntohs(gun_price),
-                         ntohs(bullets_per_burst), ntohs(shoot_cooldown),
-                         ntohs(range), angle);
+        memcpy(&angle, buffer + offset, sizeof(angle));
+        
+        return GunConfigInfo(max_ammo, starting_reserve_ammo,
+                             min_dmg, max_dmg, gun_price,
+                             bullets_per_burst, shoot_cooldown,
+                             range, angle);
+        
     }
 
     size_t serialized_size() const {
-        return 16 + sizeof(angle);
+        return sizeof(max_ammo) +
+               sizeof(starting_reserve_ammo) +
+               sizeof(min_dmg) +
+               sizeof(max_dmg) +
+               sizeof(gun_price) +
+               sizeof(bullets_per_burst) +
+               sizeof(shoot_cooldown) +
+               sizeof(range) +
+               sizeof(angle);
     }
 
-    uint16_t get_max_ammo() const { return max_ammo; }
+    int32_t get_max_ammo() const { return max_ammo; }
 
-    uint16_t get_starting_reserve_ammo() const { return starting_reserve_ammo; }
+    int32_t get_starting_reserve_ammo() const { return starting_reserve_ammo; }
 
-    uint16_t get_min_dmg() const { return min_dmg; }
+    int32_t get_min_dmg() const { return min_dmg; }
 
-    uint16_t get_max_dmg() const { return max_dmg; }
+    int32_t get_max_dmg() const { return max_dmg; }
 
-    uint16_t get_gun_price() const { return gun_price; }
+    int32_t get_gun_price() const { return gun_price; }
 
-    uint16_t get_bullets_per_burst() const { return bullets_per_burst; }
+    int32_t get_bullets_per_burst() const { return bullets_per_burst; }
 
-    uint16_t get_shoot_cooldown() const { return shoot_cooldown; }
+    int32_t get_shoot_cooldown() const { return shoot_cooldown; }
 
-    uint16_t get_range() const { return range; }
+    int32_t get_range() const { return range; }
 
     float get_angle() const { return angle; }
 };
