@@ -24,6 +24,7 @@
 #include "../common/dto/player_action.h"
 #include "../common/dto/select_skin_request.h"
 #include "../common/dto/buy_ammo_request.h"
+#include "../common/dto/game_config_info.h"
 
 
 Protocol::Protocol(SocketInterface& peer): peer(peer) {}
@@ -48,6 +49,10 @@ std::unique_ptr<Message> Protocol::recv_message() {
 
 
     switch (message_type) {
+        case MessageType::GameConfig: {
+            return std::make_unique<GameConfigInfo>(
+                    GameConfigInfo::deserialize(buffer.data(), buffer.size()));
+        }
         case MessageType::LoginRequest: {
             return std::make_unique<LoginRequest>(
                     LoginRequest::deserialize(buffer.data(), buffer.size()));
