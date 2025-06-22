@@ -38,6 +38,12 @@ target_sources(taller_common
         dto/disconnect_request.h
         dto/player_info.h
         dto/dropped_weapon.h
+        dto/site_info.h
+        dto/structure_info.h
+        dto/bomb_site_info.h
+        dto/gun_config_info.h
+        dto/map_config_info.h
+        dto/game_config_info.h
         action.h
         message_type.h
         message.h

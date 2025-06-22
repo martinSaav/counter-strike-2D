@@ -22,6 +22,7 @@ enum class MessageType : uint8_t {
 
 
     // Server -> Client
+    GameConfig = 0x20,
     LoginResponse = 0x60,
     MapNamesResponse = 0x61,
     GameListResponse = 0x62,
