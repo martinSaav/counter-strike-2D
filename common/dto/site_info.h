@@ -103,6 +103,17 @@ public:
         }
     }
 
+    size_t serialized_size() const {
+        size_t size = 0;
+        size += sizeof(int32_t); // x
+        size += sizeof(int32_t); // y
+        size += sizeof(int32_t); // site_width
+        size += sizeof(int32_t); // site_height
+        size += sizeof(int32_t); // num_spawns
+        size += spawns.size() * (sizeof(int32_t) * 2); // spawn coordinates
+        return size;
+    }
+
 
     int32_t get_x() const { return x; }
 
