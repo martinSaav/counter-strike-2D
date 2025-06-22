@@ -4,6 +4,7 @@
 
 #ifndef GUNCONFIG_H
 #define GUNCONFIG_H
+#include "dto/gun_config_info.h"
 
 
 class GunConfig {
@@ -74,6 +75,17 @@ public:
             shoot_cooldown(0),
             range(range),
             angle(angle) {}
+    [[nodiscard]] GunConfigInfo get_info() const {
+        return GunConfigInfo{max_ammo,
+                             starting_reserve_ammo,
+                             min_dmg,
+                             max_dmg,
+                             gun_price,
+                             bullets_per_burst,
+                             shoot_cooldown,
+                             range,
+                             static_cast<float>(angle)};
+    }
 };
 
 

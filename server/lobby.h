@@ -4,7 +4,6 @@
 #include <memory>
 #include <mutex>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "game_config.h"
@@ -22,11 +21,11 @@ struct MatchAlreadyExists: public std::runtime_error {
 
 class Lobby {
     std::map<std::string, std::unique_ptr<Match>> matches;
-    GameConfig game_config;
+    GameConfig& game_config;
     std::mutex mutex;
 
 public:
-    explicit Lobby(GameConfig&& game_config): game_config(std::move(game_config)) {}
+    explicit Lobby(GameConfig& game_config): game_config(game_config) {}
     GameIdentification create_match(const std::string& match_name, const std::string& player_name);
     GameIdentification join_match(const std::string& match_name, const std::string& player_name);
     std::vector<MatchDTO> list_matches();

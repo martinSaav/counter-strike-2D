@@ -18,6 +18,7 @@
 #include "common/dto/map_names_response.h"
 #include "common/game_info.h"
 #include "common/message.h"
+#include "dto/game_config_info.h"
 
 #include "skin_translator.h"
 
@@ -50,6 +51,46 @@ void ClientHandler::handle_list_matches_request() {
     const GameListResponse message(games);
     protocol.send_message(message);
 }
+
+
+void ClientHandler::handle_game_config_request() {
+    std::vector<StructureInfo> structures_info;
+    const MapConfig& map_cfg = config.map_config;
+    const BombSite& bomb_site_cfg = map_cfg.bombsite;
+    const Site& ct_site = map_cfg.ct_site;
+    const Site& tt_site = map_cfg.tt_site;
+    for (auto& structure: map_cfg) {
+        auto [x, y] = structure.get_position();
+        structures_info.emplace_back(structure.height, structure.width, x, y);
+    }
+    std::vector<std::pair<int32_t, int32_t>> ct_spawns;
+    std::vector<std::pair<int32_t, int32_t>> tt_spawns;
+    for (const auto& [x, y]: ct_site.spawns) {
+        ct_spawns.emplace_back(x, y);
+    }
+    for (const auto& [x, y]: tt_site.spawns) {
+        tt_spawns.emplace_back(x, y);
+    }
+    MapConfigInfo map_config(
+            config.map_config.map_name, config.map_config.map_width, config.map_config.map_height,
+            std::move(structures_info),
+            BombSiteInfo{bomb_site_cfg.bomb_site_height, bomb_site_cfg.bomb_site_width,
+                         bomb_site_cfg.x, bomb_site_cfg.y},
+            SiteInfo{ct_site.x, ct_site.y, ct_site.site_width, ct_site.site_height,
+                     std::move(ct_spawns)},
+            SiteInfo{tt_site.x, tt_site.y, tt_site.site_width, tt_site.site_height,
+                     std::move(tt_spawns)});
+    GameConfigInfo game_cfg_message(
+            config.player_health, config.number_of_rounds, config.starting_money, config.ct_amount,
+            config.tt_amount, config.ammo_price, config.knife_config.get_info(),
+            config.glock_config.get_info(), config.ak_config.get_info(),
+            config.awp_config.get_info(), config.defuse_time, config.time_to_plant, config.bomb_dmg,
+            config.round_winner_money, config.round_loser_money, config.buy_time, config.bomb_time,
+            config.after_round_time, config.money_per_kill, config.tiles_per_movement,
+            config.game_rate, std::move(map_config));
+    protocol.send_message(game_cfg_message);
+}
+
 
 void ClientHandler::handle_map_names_request() {
     while (true) {

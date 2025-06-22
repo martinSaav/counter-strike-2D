@@ -7,12 +7,11 @@
 
 
 class BombSite {
+public:
     const int bomb_site_height;
     const int bomb_site_width;
     const int x;
     const int y;
-
-public:
     BombSite(const int bomb_site_height, const int bomb_site_width, const int x, const int y):
             bomb_site_height(bomb_site_height), bomb_site_width(bomb_site_width), x(x), y(y) {}
     [[nodiscard]] bool is_position_inside(const int pos_x, const int pos_y) const {

@@ -29,7 +29,7 @@ void Acceptor::run() {
 
 void Acceptor::accept_clients() {
     Socket peer = skt.accept();
-    Thread* c = new ClientHandler(lobby, std::move(peer));
+    Thread* c = new ClientHandler(lobby, std::move(peer), config);
     clients.push_back(c);
     c->start();
     reap_dead();

@@ -22,10 +22,13 @@ class ClientHandler: public Thread {
     Socket skt;
     Protocol protocol;
     std::optional<std::unique_ptr<Sender>> sender;
+    GameConfig& config;
     std::string username;
     std::string match_name;
 
     std::string handle_login();
+
+    void handle_game_config_request();
 
     void handle_map_names_request();
 
@@ -43,8 +46,8 @@ class ClientHandler: public Thread {
                      const PlayerCredentials& credentials);
 
 public:
-    explicit ClientHandler(Lobby& lobby, Socket&& skt):
-            lobby(lobby), skt(std::move(skt)), protocol(Protocol(this->skt)) {}
+    explicit ClientHandler(Lobby& lobby, Socket&& skt, GameConfig& config):
+            lobby(lobby), skt(std::move(skt)), protocol(Protocol(this->skt)), config(config) {}
 
     void run() override;
     void stop() override;

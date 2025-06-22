@@ -11,6 +11,7 @@
 
 class Acceptor: public Thread {
     Socket skt;
+    GameConfig config;
     Lobby lobby;
     std::vector<Thread*> clients;
 
@@ -20,7 +21,7 @@ class Acceptor: public Thread {
 
 public:
     explicit Acceptor(Socket&& socket, GameConfig&& game_configuration):
-            skt(std::move(socket)), lobby(std::move(game_configuration)) {}
+            skt(std::move(socket)), config(std::move(game_configuration)), lobby(config) {}
     void run() override;
     void stop() override;
 };
