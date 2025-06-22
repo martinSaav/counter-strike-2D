@@ -1,0 +1,9 @@
+services:
+  cs2d:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cs2d
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
