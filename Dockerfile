@@ -24,6 +24,6 @@ RUN cmake -S . -B build
 
 RUN cmake --build build --target taller_server
 
-EXPOSE 8080
+EXPOSE 50000
 
-CMD ["./build/taller_server", "8080", "/app/server/server_config.yaml"]
+CMD ["./build/taller_server", "50000", "/app/server/server_config.yaml"]
