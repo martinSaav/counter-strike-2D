@@ -59,7 +59,7 @@ void ClientHandler::handle_game_config_request() {
     const BombSite& bomb_site_cfg = map_cfg.bombsite;
     const Site& ct_site = map_cfg.ct_site;
     const Site& tt_site = map_cfg.tt_site;
-    for (auto& structure: map_cfg) {
+    for (auto& structure : map_cfg.structures) {
         auto [x, y] = structure.get_position();
         structures_info.emplace_back(structure.height, structure.width, x, y);
     }
