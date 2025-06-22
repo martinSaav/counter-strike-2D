@@ -17,7 +17,7 @@ project(taller_tp
     )
 
 option(TALLER_TESTS "Enable / disable tests." OFF)
-option(TALLER_CLIENT "Enable / disable client program." ON)
+option(TALLER_CLIENT "Enable / disable client program." OFF)
 option(TALLER_SERVER "Enable / disable server program." ON)
 option(TALLER_EDITOR "Enable / disable editor program." OFF)
 option(TALLER_MAKE_WARNINGS_AS_ERRORS "Enable / disable warnings as errors." OFF)

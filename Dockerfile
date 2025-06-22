@@ -18,14 +18,12 @@ WORKDIR /app
 # Copiar el código al contenedor
 COPY . .
 
-# Crear carpeta de compilación
-RUN mkdir -p build
+RUN rm -rf build && mkdir build
 
-# Configurar y compilar solo el servidor
-RUN cmake --build build/ --target taller_server
+RUN cmake -S . -B build
 
-# Exponer el puerto del servidor
+RUN cmake --build build --target taller_server
+
 EXPOSE 8080
 
-# El contenedor no hace nada al correr
-CMD ["bash"]
+CMD ["./build/taller_server", "8080", "/app/server/server_config.yaml"]
