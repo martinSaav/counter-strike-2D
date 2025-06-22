@@ -1,12 +1,12 @@
-#ifndef GUN_CONFIG_DTO_H
-#define GUN_CONFIG_DTO_H
+#ifndef GUN_CONFIG_INFO_H
+#define GUN_CONFIG_INFO_H
 
 #include <cstdint>
 #include <cstring>
 #include <stdexcept>
 #include <netinet/in.h>
 
-class GunConfig {
+class GunConfigInfo {
 private:
     uint16_t max_ammo;
     uint16_t starting_reserve_ammo;
@@ -19,7 +19,7 @@ private:
     float angle;
 
 public:
-    GunConfig(uint16_t max_ammo, uint16_t starting_reserve_ammo,
+    GunConfigInfo(uint16_t max_ammo, uint16_t starting_reserve_ammo,
               uint16_t min_dmg, uint16_t max_dmg, uint16_t gun_price,
               uint16_t bullets_per_burst, uint16_t shoot_cooldown,
               uint16_t range, float angle)
@@ -49,7 +49,7 @@ public:
         std::memcpy(buffer + 16, &angle, sizeof(angle));
     }
 
-    static GunConfig deserialize(const uint8_t* buffer, size_t size) {
+    static GunConfigInfo deserialize(const uint8_t* buffer, size_t size) {
         if (size < 3) {
             throw std::runtime_error("");
         }
@@ -68,7 +68,7 @@ public:
         std::memcpy(&range, buffer + 14, sizeof(range));
         std::memcpy(&angle, buffer + 16, sizeof(angle));
 
-        return GunConfig(ntohs(max_ammo), ntohs(starting_reserve_ammo),
+        return GunConfigInfo(ntohs(max_ammo), ntohs(starting_reserve_ammo),
                          ntohs(min_dmg), ntohs(max_dmg), ntohs(gun_price),
                          ntohs(bullets_per_burst), ntohs(shoot_cooldown),
                          ntohs(range), angle);
