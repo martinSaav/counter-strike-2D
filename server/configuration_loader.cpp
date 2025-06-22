@@ -51,6 +51,18 @@ GunConfig ConfigurationLoader::get_awp_config(YAML::Node& awp_config) {
 }
 
 
+GunConfig ConfigurationLoader::get_m3_config(YAML::Node& m3_config) {
+    const int max_ammo = m3_config["max_ammo"].as<int>();
+    const int starting_reserve_ammo = m3_config["starting_reserve_ammo"].as<int>();
+    const int min_dmg = m3_config["min_dmg"].as<int>();
+    const int max_dmg = m3_config["max_dmg"].as<int>();
+    const int gun_price = m3_config["gun_price"].as<int>();
+    const int range = m3_config["range"].as<int>();
+    const auto angle = m3_config["angle"].as<double>();
+    return GunConfig{max_ammo, starting_reserve_ammo, min_dmg, max_dmg, gun_price, range, angle};
+}
+
+
 Site ConfigurationLoader::get_site_config(YAML::Node& site_config) {
     int x = site_config["x"].as<int>();
     int y = site_config["y"].as<int>();
@@ -119,16 +131,18 @@ GameConfig ConfigurationLoader::load_configuration() const {
     YAML::Node ak_config = config["ak"];
     YAML::Node glock_config = config["glock"];
     YAML::Node awp_config = config["awp"];
+    YAML::Node m3_config = config["m3"];
     GunConfig knife = get_knife_config(knife_config);
     GunConfig glock = get_glock_config(glock_config);
     GunConfig ak = get_ak_config(ak_config);
     GunConfig awp = get_awp_config(awp_config);
+    GunConfig m3 = get_m3_config(m3_config);
     YAML::Node map_config = config["map_config"];
     MapConfig map = get_map_config(map_config);
-    return GameConfig{player_health, number_of_rounds,   starting_money,    ct_amount,
-                      tt_amount,     ammo_price,         std::move(knife),  std::move(glock),
-                      std::move(ak), std::move(awp),     defuse_time,       time_to_plant,
-                      bomb_dmg,      round_winner_money, round_loser_money, buy_time,
-                      bomb_time,     after_round_time,   money_per_kill,    tiles_per_movement,
-                      game_rate,     std::move(map)};
+    return GameConfig{player_health,      number_of_rounds, starting_money,     ct_amount,
+                      tt_amount,          ammo_price,       std::move(knife),   std::move(glock),
+                      std::move(ak),      std::move(awp),   std::move(m3),      defuse_time,
+                      time_to_plant,      bomb_dmg,         round_winner_money, round_loser_money,
+                      buy_time,           bomb_time,        after_round_time,   money_per_kill,
+                      tiles_per_movement, game_rate,        std::move(map)};
 }

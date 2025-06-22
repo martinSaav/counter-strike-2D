@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <vector>
 
 #include "impact_info.h"
 #include "map.h"
@@ -45,7 +46,7 @@ void Awp::shoot_gun(const Position final_position, float current_time) {
     if (current_ammo == 0 || shoots.size() == current_ammo) {
         throw NoAmmo();
     }
-    if (current_time - time_since_last_shot < shoot_cooldown) {
+    if (current_time - time_since_last_shot < static_cast<float>(shoot_cooldown)) {
         return;
     }
     const auto pos = final_position.get_position();
@@ -56,8 +57,8 @@ void Awp::shoot_gun(const Position final_position, float current_time) {
 int Awp::get_gun_price() { return gun_price; }
 
 
-ShootResult Awp::fire_gun(Map& map, Player& owner, const float current_time,
-                          Position& current_position) {
+ShootInfo Awp::fire_gun(Map& map, Player& owner, const float current_time,
+                        Position& current_position) {
     if (!has_to_shoot(current_time)) {
         throw DontHaveToShoot();
     }
@@ -67,12 +68,15 @@ ShootResult Awp::fire_gun(Map& map, Player& owner, const float current_time,
     current_ammo--;
     time_since_last_shot = current_time;
     const ImpactInfo impact = map.trace_bullet_path(x, y, Position(final_x, final_y), owner);
+    std::vector<ShootResult> result;
     if (impact.impacted_player.has_value()) {
         const auto& player_hit = impact.impacted_player.value();
         const int damage = min_dmg + std::rand() % (max_dmg - min_dmg + 1);
-        return ShootResult{damage, impact.impact_position, player_hit};
+        result.emplace_back(damage, impact.impact_position, player_hit);
+    } else {
+        result.emplace_back(impact.impact_position);
     }
-    return ShootResult{impact.impact_position};
+    return ShootInfo{std::move(result)};
 }
 
 

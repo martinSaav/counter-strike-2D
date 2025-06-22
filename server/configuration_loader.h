@@ -23,6 +23,8 @@ class ConfigurationLoader {
 
     static GunConfig get_awp_config(YAML::Node& awp_config);
 
+    static GunConfig get_m3_config(YAML::Node& m3_config);
+
     static Site get_site_config(YAML::Node& site_config);
 
     static MapConfig get_map_config(YAML::Node& map_config);

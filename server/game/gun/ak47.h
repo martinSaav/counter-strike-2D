@@ -27,8 +27,8 @@ class Ak47: public Gun {
     GunType type = GunType::Primary;
 
     [[nodiscard]] bool has_to_shoot(float current_time) override;
-    ShootResult fire_gun(Map& map, Player& owner, float current_time,
-                         Position& current_position) override;
+    ShootInfo fire_gun(Map& map, Player& owner, float current_time,
+                       Position& current_position) override;
     void reset_shoots() override;
 
 public:

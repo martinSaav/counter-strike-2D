@@ -7,6 +7,7 @@
 #include "gun/ak47.h"
 #include "gun/awp.h"
 #include "gun/glock.h"
+#include "gun/m3.h"
 
 std::unique_ptr<Gun> GunShop::get_gun(const Weapon weapon, const GameConfig& config) {
     switch (weapon) {
@@ -18,6 +19,9 @@ std::unique_ptr<Gun> GunShop::get_gun(const Weapon weapon, const GameConfig& con
         }
         case Weapon::AWP: {
             return std::make_unique<Awp>(config.awp_config);
+        }
+        case Weapon::M3: {
+            return std::make_unique<M3>(config.m3_config);
         }
         default: {
             throw CantBuyWeapon();

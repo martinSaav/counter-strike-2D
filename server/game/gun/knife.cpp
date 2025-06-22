@@ -6,6 +6,7 @@
 
 #include <cmath>
 #include <memory>
+#include <vector>
 
 #include "map.h"
 #include "player.h"
@@ -30,8 +31,7 @@ int Knife::calculate_damage(const double distance) const {
 }
 
 
-ShootResult Knife::fire_gun(Map& map, Player& owner, float current_time,
-                            Position& current_position) {
+ShootInfo Knife::fire_gun(Map& map, Player& owner, float current_time, Position& current_position) {
     if (!has_to_shoot(current_time)) {
         throw DontHaveToShoot();
     }
@@ -47,6 +47,7 @@ ShootResult Knife::fire_gun(Map& map, Player& owner, float current_time,
     const auto near_players = map.get_players_near_radio(x_center, y_center, knife_range);
     double nearest_player_distance = -1;
     std::shared_ptr<Player> nearest_player = nullptr;
+    std::vector<ShootResult> result;
     for (auto& player: near_players) {
         if (player->get_username() == owner.get_username()) {
             continue;
@@ -56,7 +57,8 @@ ShootResult Knife::fire_gun(Map& map, Player& owner, float current_time,
         const double mod =
                 sqrt(attack_x * attack_x + attack_y * attack_y);  // tambien es la distancia
         if (mod == 0) {
-            return ShootResult{calculate_damage(0), direction, player};
+            result.emplace_back(calculate_damage(mod), direction, player);
+            return ShootInfo{std::move(result)};
         }
         const double cos = (attack_x * direction_x + attack_y * direction_y) / mod;
         if (double angle = acos(cos); angle < max_degree) {
@@ -67,9 +69,11 @@ ShootResult Knife::fire_gun(Map& map, Player& owner, float current_time,
         }
     }
     if (nearest_player != nullptr) {
-        return ShootResult{calculate_damage(nearest_player_distance), direction, nearest_player};
+        result.emplace_back(calculate_damage(nearest_player_distance), direction, nearest_player);
+    } else {
+        result.emplace_back(direction);
     }
-    return ShootResult{direction};
+    return ShootInfo{std::move(result)};
 }
 
 void Knife::reload_gun() {}
