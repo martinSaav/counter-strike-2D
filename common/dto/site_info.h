@@ -101,6 +101,7 @@ public:
 
             spawns.emplace_back(spawn_x_net, spawn_y_net);
         }
+        return SiteInfo(x_net, y_net, site_width_net, site_height_net, std::move(spawns));
     }
 
     size_t serialized_size() const {
