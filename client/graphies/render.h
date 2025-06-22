@@ -39,6 +39,9 @@ private:
     int mouseX = 0, mouseY = 0;
     unsigned int prev_ticks = SDL_GetTicks();
 
+    int damageFlashTimer = 0;
+    int lastHealth = -1;
+
     // Function to calculate the angle between the player and the mouse
     double getAnglePlayer(int jugadorX, int jugadorY, int mousex, int mousey);
 
@@ -48,5 +51,6 @@ public:
     Render(Renderer* renderer, Protocol& protocolo, std::string& namePlayer, Configuracion& configuracion);
     void renderFrame(std::optional<GameStateUpdate> mensaje);
     bool puntoEnVision(int playerX, int playerY, float visionAngleDeg, int puntoX, int puntoY);
+    void clearScreen();
 };
 #endif
