@@ -27,6 +27,12 @@ class MapSprite : public Component{
     int last_bomb_x = 0;
     int last_bomb_y = 0;
 
+    bool is_shaking = false;
+    Uint32 shake_start_time = 0;
+    int shake_duration_ms = 900; // duración del efecto
+    int shake_magnitude = 6; // magnitud del efecto
+
+
     int canalBomb;
 
     SDL_Rect destRectMap = {0, 0, 1000, 1000};
@@ -62,6 +68,15 @@ class MapSprite : public Component{
     
     void drawExplosion();
 
+    bool isShaking() const;
+
+    int getShakeMagnitude() const;
+
+    int getShakeDuration() const;
+
+    Uint32 getShakeStartTime() const;
+
+    void stopShake();
 
     void desactivateBomb();
 

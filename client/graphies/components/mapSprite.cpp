@@ -190,6 +190,9 @@ void MapSprite::exploitBomb(){
 
     explosion_x = last_bomb_x;
     explosion_y = last_bomb_y;
+
+    is_shaking = true;
+    shake_start_time = SDL_GetTicks();
 }
 
 void MapSprite::drawBomb(int bomb_x, int bomb_y){
@@ -291,3 +294,13 @@ void MapSprite::drawShop(){
     std::string textureName = "shop";
     drawHud2(destRect, textureName);
 }
+
+bool MapSprite::isShaking() const { return is_shaking; }
+
+int MapSprite::getShakeMagnitude() const { return shake_magnitude; }
+
+int MapSprite::getShakeDuration() const { return shake_duration_ms; }
+
+Uint32 MapSprite::getShakeStartTime() const { return shake_start_time; }
+
+void MapSprite::stopShake() { is_shaking = false; }

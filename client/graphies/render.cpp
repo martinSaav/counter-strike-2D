@@ -45,6 +45,18 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
 
     sdlRenderer-> Clear();
 
+    if (mapa.isShaking()) {
+        int elapsed = SDL_GetTicks() - mapa.getShakeStartTime();
+        if (elapsed < mapa.getShakeDuration()) {
+            int offset_x = (rand() % (2 * mapa.getShakeMagnitude() + 1)) - mapa.getShakeMagnitude();
+            int offset_y = (rand() % (2 * mapa.getShakeMagnitude() + 1)) - mapa.getShakeMagnitude();
+            camera.x += offset_x;
+            camera.y += offset_y;
+        } else {
+            mapa.stopShake();
+        }
+    }
+    
     mapa.draw(); //Dibujo el mapa
     
     bool is_bomb_planted = mensaje->is_bomb_planted();
