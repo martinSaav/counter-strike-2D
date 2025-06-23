@@ -36,7 +36,7 @@ ak:
   starting_reserve_ammo: 60
   min_dmg: 20
   max_dmg: 45
-  gun_price: 600
+  gun_price: 2700
   bullets_per_burst: 3
   shoot_cooldown: 2500
   base_precision: 0.9
@@ -46,7 +46,7 @@ awp:
   starting_reserve_ammo: 20
   min_dmg: 70
   max_dmg: 120
-  gun_price: 2500
+  gun_price: 4750
   shoot_cooldown: 6000
   base_precision: 0.99
   distance_precision_modifier: 0.01
@@ -55,7 +55,7 @@ m3:
   starting_reserve_ammo: 20
   min_dmg: 60
   max_dmg: 90
-  gun_price: 200
+  gun_price: 1700
   range: 15
   angle: 0.39269908169872414 # pi / 8
   shoot_cooldown: 3000
