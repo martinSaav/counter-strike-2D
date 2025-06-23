@@ -3,13 +3,15 @@
 
 #include <cstdint>
 #include <cstring>
+
 #include <arpa/inet.h>
+
+#include "../message.h"
+#include "../message_type.h"
+#include "../weapon.h"
+
 #include "gun_config_info.h"
 #include "map_config_info.h"
-
-#include "../message_type.h"
-#include "../message.h"
-#include "../weapon.h"
 
 class GameConfigInfo: public Message {
 private:
@@ -41,23 +43,35 @@ private:
 public:
     GameConfigInfo(int32_t player_health, int32_t number_of_rounds, int32_t starting_money,
                    int32_t ct_amount, int32_t tt_amount, int32_t ammo_price,
-                   GunConfigInfo knife_config, GunConfigInfo glock_config,
-                   GunConfigInfo ak_config, GunConfigInfo awp_config, GunConfigInfo m3_config,
-                   int32_t defuse_time, int32_t time_to_plant, int32_t bomb_dmg,
-                   int32_t round_winner_money, int32_t round_loser_money,
-                   int32_t buy_time, int32_t bomb_time, int32_t after_round_time,
-                   int32_t money_per_kill, int32_t tiles_per_movement, int32_t game_rate,
-                   MapConfigInfo map_config)
-        : player_health(player_health), number_of_rounds(number_of_rounds),
-          starting_money(starting_money), ct_amount(ct_amount), tt_amount(tt_amount),
-          ammo_price(ammo_price), knife_config(std::move(knife_config)),
-          glock_config(std::move(glock_config)), ak_config(std::move(ak_config)),
-          awp_config(std::move(awp_config)), m3_config(m3_config), defuse_time(defuse_time),
-          time_to_plant(time_to_plant), bomb_dmg(bomb_dmg),
-          round_winner_money(round_winner_money), round_loser_money(round_loser_money),
-          buy_time(buy_time), bomb_time(bomb_time), after_round_time(after_round_time),
-          money_per_kill(money_per_kill), tiles_per_movement(tiles_per_movement),
-          game_rate(game_rate), map_config(std::move(map_config)) {}
+                   GunConfigInfo knife_config, GunConfigInfo glock_config, GunConfigInfo ak_config,
+                   GunConfigInfo awp_config, GunConfigInfo m3_config, int32_t defuse_time,
+                   int32_t time_to_plant, int32_t bomb_dmg, int32_t round_winner_money,
+                   int32_t round_loser_money, int32_t buy_time, int32_t bomb_time,
+                   int32_t after_round_time, int32_t money_per_kill, int32_t tiles_per_movement,
+                   int32_t game_rate, MapConfigInfo map_config):
+            player_health(player_health),
+            number_of_rounds(number_of_rounds),
+            starting_money(starting_money),
+            ct_amount(ct_amount),
+            tt_amount(tt_amount),
+            ammo_price(ammo_price),
+            knife_config(std::move(knife_config)),
+            glock_config(std::move(glock_config)),
+            ak_config(std::move(ak_config)),
+            awp_config(std::move(awp_config)),
+            m3_config(m3_config),
+            defuse_time(defuse_time),
+            time_to_plant(time_to_plant),
+            bomb_dmg(bomb_dmg),
+            round_winner_money(round_winner_money),
+            round_loser_money(round_loser_money),
+            buy_time(buy_time),
+            bomb_time(bomb_time),
+            after_round_time(after_round_time),
+            money_per_kill(money_per_kill),
+            tiles_per_movement(tiles_per_movement),
+            game_rate(game_rate),
+            map_config(std::move(map_config)) {}
 
     void serialize(uint8_t* buffer) const override {
         buffer[0] = static_cast<uint8_t>(message_type);
@@ -148,6 +162,8 @@ public:
 
         map_config.serialize(buffer + offset);
         offset += map_config.serialized_size();
+        uint16_t payload_length = htons(static_cast<uint16_t>(offset - 3));
+        std::memcpy(buffer + 1, &payload_length, sizeof(payload_length));
     }
 
     static GameConfigInfo deserialize(const uint8_t* buffer, size_t size) {
@@ -187,7 +203,7 @@ public:
         offset += knife_config.serialized_size();
 
         GunConfigInfo glock_config = GunConfigInfo::deserialize(buffer + offset, size - offset);
-        offset += glock_config.serialized_size();   
+        offset += glock_config.serialized_size();
 
         GunConfigInfo ak_config = GunConfigInfo::deserialize(buffer + offset, size - offset);
         offset += ak_config.serialized_size();
@@ -231,7 +247,7 @@ public:
         int32_t bomb_time;
         std::memcpy(&bomb_time, buffer + offset, sizeof(bomb_time));
         bomb_time = ntohl(bomb_time);
-        offset += sizeof(bomb_time);    
+        offset += sizeof(bomb_time);
 
         int32_t after_round_time;
         std::memcpy(&after_round_time, buffer + offset, sizeof(after_round_time));
@@ -255,16 +271,12 @@ public:
 
         MapConfigInfo map_config = MapConfigInfo::deserialize(buffer + offset, size - offset);
 
-        return GameConfigInfo(player_health, number_of_rounds, starting_money,
-                              ct_amount, tt_amount, ammo_price,
-                              std::move(knife_config), std::move(glock_config),
+        return GameConfigInfo(player_health, number_of_rounds, starting_money, ct_amount, tt_amount,
+                              ammo_price, std::move(knife_config), std::move(glock_config),
                               std::move(ak_config), std::move(awp_config), std::move(m3_config),
-                              defuse_time, time_to_plant, bomb_dmg,
-                              round_winner_money, round_loser_money,
-                              buy_time, bomb_time, after_round_time,
-                              money_per_kill, tiles_per_movement, game_rate,
-                              std::move(map_config));
-        
+                              defuse_time, time_to_plant, bomb_dmg, round_winner_money,
+                              round_loser_money, buy_time, bomb_time, after_round_time,
+                              money_per_kill, tiles_per_movement, game_rate, std::move(map_config));
     }
 
     MessageType type() const override { return message_type; }

@@ -78,7 +78,7 @@ public:
     [[nodiscard]] bool can_plant_bomb(int x, int y) const;
     void explode_bomb(const std::vector<std::shared_ptr<Player>>& players) const;
     void start_defusing(const std::shared_ptr<Player>& player) const;
-    void has_finished_defusing(const std::shared_ptr<Player>& player);
+    void has_finished_defusing(Player& player);
     void drop_bomb(Player& player, std::unique_ptr<BombEncapsulator> bomb) const;
     void drop_weapon(Player& player, std::unique_ptr<Gun> gun) const;
     void pick_weapon(const std::shared_ptr<Player>& player) const;

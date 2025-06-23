@@ -13,7 +13,8 @@ GunConfig ConfigurationLoader::get_knife_config(YAML::Node& knife_config) {
     const int max_dmg = knife_config["max_dmg"].as<int>();
     const int range = knife_config["range"].as<int>();
     const auto angle = knife_config["angle"].as<double>();
-    return GunConfig{min_dmg, max_dmg, range, angle};
+    const int shoot_cooldown = knife_config["shoot_cooldown"].as<int>();
+    return GunConfig{0, 0, min_dmg, max_dmg, 0, range, angle, shoot_cooldown, 0, 0, 0};
 }
 
 
@@ -23,7 +24,21 @@ GunConfig ConfigurationLoader::get_glock_config(YAML::Node& glock_config) {
     const int min_dmg = glock_config["min_dmg"].as<int>();
     const int max_dmg = glock_config["max_dmg"].as<int>();
     const int gun_price = glock_config["gun_price"].as<int>();
-    return GunConfig{max_ammo, starting_reserve_ammo, min_dmg, max_dmg, gun_price};
+    const int shoot_cooldown = glock_config["shoot_cooldown"].as<int>();
+    const auto base_precision = glock_config["base_precision"].as<double>();
+    const auto distance_precision_modifier =
+            glock_config["distance_precision_modifier"].as<double>();
+    return GunConfig{max_ammo,
+                     starting_reserve_ammo,
+                     min_dmg,
+                     max_dmg,
+                     gun_price,
+                     0,
+                     0,
+                     shoot_cooldown,
+                     0,
+                     base_precision,
+                     distance_precision_modifier};
 }
 
 
@@ -35,8 +50,19 @@ GunConfig ConfigurationLoader::get_ak_config(YAML::Node& ak_config) {
     const int gun_price = ak_config["gun_price"].as<int>();
     const int bullets_per_burst = ak_config["bullets_per_burst"].as<int>();
     const int shoot_cooldown = ak_config["shoot_cooldown"].as<int>();
-    return GunConfig{max_ammo,  starting_reserve_ammo, min_dmg,       max_dmg,
-                     gun_price, bullets_per_burst,     shoot_cooldown};
+    const auto base_precision = ak_config["base_precision"].as<double>();
+    const auto distance_precision_modifier = ak_config["distance_precision_modifier"].as<double>();
+    return GunConfig{max_ammo,
+                     starting_reserve_ammo,
+                     min_dmg,
+                     max_dmg,
+                     gun_price,
+                     0,
+                     0,
+                     shoot_cooldown,
+                     bullets_per_burst,
+                     base_precision,
+                     distance_precision_modifier};
 }
 
 
@@ -47,7 +73,19 @@ GunConfig ConfigurationLoader::get_awp_config(YAML::Node& awp_config) {
     const int max_dmg = awp_config["max_dmg"].as<int>();
     const int gun_price = awp_config["gun_price"].as<int>();
     const int shoot_cooldown = awp_config["shoot_cooldown"].as<int>();
-    return GunConfig{max_ammo, starting_reserve_ammo, min_dmg, max_dmg, gun_price, shoot_cooldown};
+    const auto base_precision = awp_config["base_precision"].as<double>();
+    const auto distance_precision_modifier = awp_config["distance_precision_modifier"].as<double>();
+    return GunConfig{max_ammo,
+                     starting_reserve_ammo,
+                     min_dmg,
+                     max_dmg,
+                     gun_price,
+                     0,
+                     0,
+                     shoot_cooldown,
+                     0,
+                     base_precision,
+                     distance_precision_modifier};
 }
 
 
@@ -59,7 +97,20 @@ GunConfig ConfigurationLoader::get_m3_config(YAML::Node& m3_config) {
     const int gun_price = m3_config["gun_price"].as<int>();
     const int range = m3_config["range"].as<int>();
     const auto angle = m3_config["angle"].as<double>();
-    return GunConfig{max_ammo, starting_reserve_ammo, min_dmg, max_dmg, gun_price, range, angle};
+    const int shoot_cooldown = m3_config["shoot_cooldown"].as<int>();
+    const auto base_precision = m3_config["base_precision"].as<double>();
+    const auto distance_precision_modifier = m3_config["distance_precision_modifier"].as<double>();
+    return GunConfig{max_ammo,
+                     starting_reserve_ammo,
+                     min_dmg,
+                     max_dmg,
+                     gun_price,
+                     range,
+                     angle,
+                     shoot_cooldown,
+                     0,
+                     base_precision,
+                     distance_precision_modifier};
 }
 
 

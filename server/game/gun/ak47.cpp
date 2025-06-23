@@ -20,11 +20,14 @@ Ak47::Ak47(const GunConfig& ak_config):
         miliseconds_per_shoot(ak_config.shoot_cooldown),
         current_ammo(ak_config.max_ammo),
         reserve_ammo(ak_config.starting_reserve_ammo),
-        time_since_last_shot(0) {}
+        time_since_last_shot(0),
+        base_precision(ak_config.base_precision),
+        distance_precision_modifier(ak_config.distance_precision_modifier) {}
 
 
 bool Ak47::has_to_shoot(const float current_time) {
-    return !shoots.empty() && (current_time - time_since_last_shot > miliseconds_per_shoot);
+    return !shoots.empty() &&
+           (current_time - time_since_last_shot > static_cast<float>(miliseconds_per_shoot));
 }
 
 void Ak47::reload_gun() {
@@ -66,6 +69,14 @@ void Ak47::shoot_gun(const Position final_position, float current_time) {
 int Ak47::get_gun_price() { return gun_price; }
 
 
+bool Ak47::calculate_if_bullet_hit(double distance) const {
+    const double shoot_precision =
+            std::max(0.0, base_precision * (1 - distance * distance_precision_modifier));
+    const double roll = generate_random_number(0, 1);
+    return roll < shoot_precision;
+}
+
+
 ShootInfo Ak47::fire_gun(Map& map, Player& owner, const float current_time,
                          Position& current_position) {
     if (!has_to_shoot(current_time)) {
@@ -82,9 +93,14 @@ ShootInfo Ak47::fire_gun(Map& map, Player& owner, const float current_time,
         const auto& player_hit = impact.impacted_player.value();
         auto [player_hit_x, player_hit_y] = player_hit->get_location();
         const double distance = std::sqrt(pow(x - player_hit_x, 2) + pow(y - player_hit_y, 2));
-        const int damage_before_distance = min_dmg + std::rand() % (max_dmg - min_dmg + 1);
+        const int damage_before_distance =
+                static_cast<int>(generate_random_number(min_dmg, max_dmg));
         const double damage = static_cast<double>(damage_before_distance) / (1 + distance / 10);
-        result.emplace_back(static_cast<int>(damage), impact.impact_position, player_hit);
+        if (calculate_if_bullet_hit(distance)) {
+            result.emplace_back(static_cast<int>(damage), impact.impact_position, player_hit);
+        } else {
+            result.emplace_back(impact.impact_position);
+        }
     } else {
         result.emplace_back(impact.impact_position);
     }

@@ -155,12 +155,12 @@ void GameManager::start_defusing(const std::shared_ptr<Player>& player) const {
 }
 
 
-void GameManager::has_finished_defusing(const std::shared_ptr<Player>& player) {
-    if (!player->is_defusing) {
+void GameManager::has_finished_defusing(Player& player) {
+    if (!player.is_defusing || player.is_dead()) {
         return;
     }
-    if (clock.get_time() - player->defuse_time - time_to_defuse >= 0) {
-        player->is_defusing = false;
+    if (clock.get_time() - player.defuse_time - time_to_defuse >= 0) {
+        player.is_defusing = false;
         bomb_defused = true;
         clock.set_after_round_stage();
     }
@@ -187,8 +187,8 @@ void GameManager::pick_weapon(const std::shared_ptr<Player>& player) const {
     if (player->current_team != Team::CounterTerrorists) {
         if (std::unique_ptr<BombEncapsulator> bomb = map.pick_bomb(x, y); bomb != nullptr) {
             player->equip_bomb(std::move(bomb));
+            return;
         }
-        return;
     }
     if (std::unique_ptr<Gun> gun = map.pick_weapon(x, y); gun != nullptr) {
         player->equip_weapon(std::move(gun));

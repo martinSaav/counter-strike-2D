@@ -18,9 +18,6 @@
 #include "common/dto/map_names_response.h"
 #include "common/game_info.h"
 #include "common/message.h"
-#include "dto/game_config_info.h"
-
-#include "skin_translator.h"
 
 std::string ClientHandler::handle_login() {
     while (true) {
@@ -53,67 +50,6 @@ void ClientHandler::handle_list_matches_request() {
 }
 
 
-void ClientHandler::handle_game_config_request() {
-    std::vector<StructureInfo> structures_info;
-    const MapConfig& map_cfg = config.map_config;
-    const BombSite& bomb_site_cfg = map_cfg.bombsite;
-    const Site& ct_site = map_cfg.ct_site;
-    const Site& tt_site = map_cfg.tt_site;
-    for (auto& structure : map_cfg.structures) {
-        auto [x, y] = structure.get_position();
-        structures_info.emplace_back(structure.height, structure.width, x, y);
-    }
-    std::vector<std::pair<int32_t, int32_t>> ct_spawns;
-    std::vector<std::pair<int32_t, int32_t>> tt_spawns;
-    for (const auto& [x, y]: ct_site.spawns) {
-        ct_spawns.emplace_back(x, y);
-    }
-    for (const auto& [x, y]: tt_site.spawns) {
-        tt_spawns.emplace_back(x, y);
-    }
-    MapConfigInfo map_config(
-            config.map_config.map_name, config.map_config.map_width, config.map_config.map_height,
-            std::move(structures_info),
-            BombSiteInfo{bomb_site_cfg.bomb_site_height, bomb_site_cfg.bomb_site_width,
-                         bomb_site_cfg.x, bomb_site_cfg.y},
-            SiteInfo{ct_site.x, ct_site.y, ct_site.site_width, ct_site.site_height,
-                     std::move(ct_spawns)},
-            SiteInfo{tt_site.x, tt_site.y, tt_site.site_width, tt_site.site_height,
-                     std::move(tt_spawns)});
-    GameConfigInfo game_cfg_message(
-            config.player_health, config.number_of_rounds, config.starting_money, config.ct_amount,
-            config.tt_amount, config.ammo_price, config.knife_config.get_info(),
-            config.glock_config.get_info(), config.ak_config.get_info(),
-            config.awp_config.get_info(), config.m3_config.get_info(), config.defuse_time,
-            config.time_to_plant, config.bomb_dmg, config.round_winner_money,
-            config.round_loser_money, config.buy_time, config.bomb_time, config.after_round_time,
-            config.money_per_kill, config.tiles_per_movement, config.game_rate,
-            std::move(map_config));
-    protocol.send_message(game_cfg_message);
-}
-
-
-void ClientHandler::handle_map_names_request() {
-    while (true) {
-        const auto message = protocol.recv_message();
-        switch (message->type()) {
-            case MessageType::MapNamesRequest: {
-                std::list<std::string> map_names;
-                map_names.emplace_back(generic_map_name);
-
-                const MapNamesResponse response(std::move(map_names));
-                protocol.send_message(response);
-                return;
-            }
-            default:  // Mientras no reciba el mensaje de pedido de mapas continuo recibiendo
-                      // mensajes hasta
-                // recibirlo.
-                break;
-        }
-    }
-}
-
-
 GameIdentification ClientHandler::handle_create_game_request(std::unique_ptr<Message>&& message) {
     const auto create_message = dynamic_cast<CreateGameRequest*>(message.get());
     const std::string game_name = create_message->get_game_name();
@@ -123,6 +59,7 @@ GameIdentification ClientHandler::handle_create_game_request(std::unique_ptr<Mes
     protocol.send_message(response);
     return id;
 }
+
 
 GameIdentification ClientHandler::handle_join_game_request(std::unique_ptr<Message>&& message) {
     const auto join_message = dynamic_cast<JoinGameRequest*>(message.get());
@@ -164,6 +101,13 @@ std::optional<GameIdentification> ClientHandler::pick_match() {
                 case MessageType::DisconnectRequest: {
                     return std::nullopt;
                 }
+                case MessageType::MapNamesRequest: {
+                    std::list<std::string> map_names;
+                    map_names.emplace_back(config.map_config.map_name);
+                    const MapNamesResponse response(std::move(map_names));
+                    protocol.send_message(response);
+                    break;
+                }
                 default:
                     break;
             }
@@ -192,13 +136,15 @@ void ClientHandler::handle_game(MessageParser parser,
             return command_queue.push(std::make_shared<LeaveMatchCommand>(credentials));
         }
     }
+    if (!sender.value()->is_running()) {
+        return command_queue.push(std::make_shared<LeaveMatchCommand>(credentials));
+    }
 }
 
 
 void ClientHandler::run() {
     try {
         username = handle_login();
-        handle_map_names_request();
     } catch (const std::exception& e) {
         if (!should_keep_running()) {
             return;
@@ -211,7 +157,7 @@ void ClientHandler::run() {
         return;
     }
     GameIdentification match_id = match_id_o.value();
-    sender = std::make_unique<Sender>(protocol, match_id.sender_queue);
+    sender = std::make_unique<Sender>(protocol, config, match_id.sender_queue);
     sender.value()->start();
     MessageParser parser(match_id.credentials);
     try {
