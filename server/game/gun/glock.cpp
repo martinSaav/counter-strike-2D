@@ -22,9 +22,7 @@ Glock::Glock(const GunConfig& glock_config):
         current_ammo(glock_config.max_ammo),
         reserve_ammo(glock_config.starting_reserve_ammo),
         time_since_last_shot(0),
-        has_to_fire(false),
-        base_precision(glock_config.base_precision),
-        distance_precision_modifier(glock_config.distance_precision_modifier) {}
+        has_to_fire(false) {}
 
 
 int Glock::get_gun_price() { return gun_price; }
