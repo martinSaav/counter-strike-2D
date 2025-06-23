@@ -21,12 +21,14 @@ knife:
   max_dmg: 70
   range: 5
   angle: 0.39269908169872414 # pi / 8
+  shoot_cooldown: 500
 glock:
   max_ammo: 20
   starting_reserve_ammo: 40
   min_dmg: 30
   max_dmg: 50
   gun_price: 200
+  shoot_cooldown: 3000
 ak:
   max_ammo: 30
   starting_reserve_ammo: 60
@@ -41,7 +43,7 @@ awp:
   min_dmg: 70
   max_dmg: 120
   gun_price: 2500
-  shoot_cooldown: 3000
+  shoot_cooldown: 6000
 m3:
   max_ammo: 10
   starting_reserve_ammo: 20
@@ -50,6 +52,7 @@ m3:
   gun_price: 2000
   range: 15
   angle: 0.39269908169872414 # pi / 8
+  shoot_cooldown: 3000
 map_config:
   map_name: "test_map"
   map_height: 275
