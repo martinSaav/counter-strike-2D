@@ -53,11 +53,9 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
         int bomb_x = mensaje->get_bomb_x();
         int bomb_y = mensaje->get_bomb_y();
         mapa.drawBomb(bomb_x, bomb_y);
+    } 
 
-        if (!mapa.isBombActivated()){
-            mapa.activateBomb();
-        }
-    } else if (is_bomb_planted && mensaje->is_round_ended()){
+    if (is_bomb_planted && mensaje->is_round_ended() && mensaje->get_bomb_timer() == 0){
         if (mapa.isBombActivated()){
             mapa.exploitBomb();
         }
@@ -130,7 +128,7 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     } else {
         mapa.drawShop();
     }
-
+    
     mapa.drawExplosion();
 
     std::list<DroppedWeapon> dropped_weapons = mensaje->get_dropped_weapons();

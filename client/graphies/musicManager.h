@@ -40,7 +40,7 @@ class MusicManager{
 
     void stopMusic();
 
-    void loadSong(tipoMusic music, int loops = 0);
+    int loadSong(tipoMusic music, int loops = 0);
 
     void stopAllSongs();
 

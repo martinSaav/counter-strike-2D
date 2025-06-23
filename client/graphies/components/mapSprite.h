@@ -27,6 +27,7 @@ class MapSprite : public Component{
     int last_bomb_x = 0;
     int last_bomb_y = 0;
 
+    int canalBomb;
 
     SDL_Rect destRectMap = {0, 0, 1000, 1000};
 

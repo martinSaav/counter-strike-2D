@@ -170,17 +170,17 @@ void MapSprite::activateBomb(){
 
     tipoMusic music = TIMER;
     // Dura 2 segundos
-    int cantVeces = 47;
-    sounds.loadSong(music, cantVeces);
+    int cantVeces = 48;
+    canalBomb = sounds.loadSong(music, cantVeces);
+    std::cout<<"canal"<<canalBomb<<std::endl;
 }
 
 void MapSprite::desactivateBomb(){
     this->is_bomb_activated = false;
-    sounds.stopAllSongs();
+    sounds.stopSongs(canalBomb);
 }
 
 void MapSprite::exploitBomb(){
-    this->is_bomb_activated = false;
     tipoMusic music = EXPLOIT;
     sounds.loadSong(music);
 
@@ -205,6 +205,10 @@ void MapSprite::drawBomb(int bomb_x, int bomb_y){
 
     std::string textureName = "bomb";
     drawHud2(destRectBomb, textureName);
+
+    if (!is_bomb_activated){
+        activateBomb();
+    }
 }
 
 void MapSprite::drawExplosion() {

@@ -64,7 +64,7 @@ void MusicManager::loadMusic(tipoMusic music, int cantVeces){
     musicaActual = musica;
 }
 
-void MusicManager::loadSong(tipoMusic music, int loops){
+int MusicManager::loadSong(tipoMusic music, int loops){
 
     auto it = ficheroDeChunks.find(music);
     if (it == ficheroDeChunks.end()) {
@@ -74,6 +74,7 @@ void MusicManager::loadSong(tipoMusic music, int loops){
     Mix_Chunk* chunk = it->second;
     int canal = Mix_PlayChannel(-1, chunk, loops);
     Mix_Volume(canal, MIX_MAX_VOLUME / 2);
+    return canal;
 }
 
 void MusicManager::stopMusic(){
