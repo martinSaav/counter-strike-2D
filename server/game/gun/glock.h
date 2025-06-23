@@ -16,6 +16,8 @@ class Glock: public Gun {
     const int min_dmg;
     const int max_dmg;
     const int shoot_cooldown;
+    const double base_precision;
+    const double distance_precision_modifier;
     int current_ammo;
     int reserve_ammo;
     float time_since_last_shot;
@@ -27,6 +29,7 @@ class Glock: public Gun {
     ShootInfo fire_gun(Map& map, Player& owner, float current_time,
                        Position& current_position) override;
     void reset_shoots() override;
+    [[nodiscard]] bool calculate_if_bullet_hit(double distance) const;
 
 public:
     explicit Glock(const GunConfig& glock_config);

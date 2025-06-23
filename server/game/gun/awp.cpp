@@ -17,6 +17,8 @@ Awp::Awp(const GunConfig& awp_config):
         min_dmg(awp_config.min_dmg),
         gun_price(awp_config.gun_price),
         shoot_cooldown(awp_config.shoot_cooldown),
+        base_precision(awp_config.base_precision),
+        distance_precision_modifier(awp_config.distance_precision_modifier),
         current_ammo(awp_config.max_ammo),
         reserve_ammo(awp_config.starting_reserve_ammo),
         time_since_last_shot(0) {}
@@ -57,6 +59,14 @@ void Awp::shoot_gun(const Position final_position, float current_time) {
 int Awp::get_gun_price() { return gun_price; }
 
 
+bool Awp::calculate_if_bullet_hit(double distance) const {
+    const double shoot_precision =
+            std::max(0.0, base_precision * (1 - distance * distance_precision_modifier));
+    const double roll = generate_random_number(0, 1);
+    return roll < shoot_precision;
+}
+
+
 ShootInfo Awp::fire_gun(Map& map, Player& owner, const float current_time,
                         Position& current_position) {
     if (!has_to_shoot(current_time)) {
@@ -71,8 +81,14 @@ ShootInfo Awp::fire_gun(Map& map, Player& owner, const float current_time,
     std::vector<ShootResult> result;
     if (impact.impacted_player.has_value()) {
         const auto& player_hit = impact.impacted_player.value();
-        const int damage = min_dmg + std::rand() % (max_dmg - min_dmg + 1);
-        result.emplace_back(damage, impact.impact_position, player_hit);
+        const int damage = static_cast<int>(generate_random_number(min_dmg, max_dmg));
+        auto [player_hit_x, player_hit_y] = player_hit->get_location();
+        const double distance = std::sqrt(pow(x - player_hit_x, 2) + pow(y - player_hit_y, 2));
+        if (calculate_if_bullet_hit(distance)) {
+            result.emplace_back(damage, impact.impact_position, player_hit);
+        } else {
+            result.emplace_back(impact.impact_position);
+        }
     } else {
         result.emplace_back(impact.impact_position);
     }

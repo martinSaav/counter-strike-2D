@@ -1,5 +1,6 @@
 target_sources(game
     PRIVATE
+        gun.cpp
         ak47.cpp
         glock.cpp
         knife.cpp

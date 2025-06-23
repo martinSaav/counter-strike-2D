@@ -20,6 +20,8 @@ M3::M3(const GunConfig& m3_config):
         degree(m3_config.angle),
         range(m3_config.range),
         shoot_cooldown(m3_config.shoot_cooldown),
+        base_precision(m3_config.base_precision),
+        distance_precision_modifier(m3_config.distance_precision_modifier),
         time_since_last_shot(0),
         current_ammo(max_ammo),
         reserve_ammo(m3_config.starting_reserve_ammo),
@@ -52,9 +54,17 @@ WeaponInfo M3::get_weapon_name() { return WeaponInfo{Weapon::M3, current_ammo}; 
 
 
 int M3::calculate_damage(const double distance) const {
-    const int damage_before_distance = min_dmg + std::rand() % (max_dmg - min_dmg + 1);
+    const int damage_before_distance = generate_random_number(min_dmg, max_dmg);
     const double damage = static_cast<double>(damage_before_distance) / (1 + distance / 2);
     return static_cast<int>(damage);
+}
+
+
+bool M3::calculate_if_bullet_hit(double distance) const {
+    const double shoot_precision =
+            std::max(0.0, base_precision * (1 - distance * distance_precision_modifier));
+    const double roll = generate_random_number(0, 1);
+    return roll < shoot_precision;
 }
 
 
@@ -87,7 +97,7 @@ ShootInfo M3::fire_gun(Map& map, Player& owner, float current_time, Position& cu
             continue;
         }
         const double cos = (attack_x * direction_x + attack_y * direction_y) / mod;
-        if (double angle = acos(cos); angle < degree) {
+        if (double angle = acos(cos); angle < degree && calculate_if_bullet_hit(mod)) {
             results.emplace_back(calculate_damage(mod), direction, player);
         }
     }
