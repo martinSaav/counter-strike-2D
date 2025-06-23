@@ -12,9 +12,6 @@ using SDL2pp::Window;
 
 ChatClient::ChatClient(Protocol& protocolo, std::string& namePlayer):
         protocolo(protocolo), namePlayer(namePlayer) {
-    
-    const std::unique_ptr<Message> gameConfig = protocolo.recv_message();
-    const auto game = dynamic_cast<GameConfigInfo*>(gameConfig.get());
 }
 
 // Definición
@@ -28,6 +25,11 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& estadistics) {
     IMG_Init(IMG_INIT_PNG);
     SDL_ShowCursor(SDL_DISABLE);  // desabilitamos el mouse
 
+
+    // Recibimos la configuracion
+    const std::unique_ptr<Message> gameConfigRequest = protocolo.recv_message();
+    auto gameConfig = dynamic_cast<GameConfigInfo*>(gameConfigRequest.get());
+
     // Create main window
     int widthWindow = 1000;
     int heightWindow = 1000;
@@ -39,7 +41,7 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& estadistics) {
     Renderer renderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     // Create render object
-    Configuracion configuracion(widthWindow, heightWindow);
+    Configuracion configuracion(widthWindow, heightWindow, gameConfig);
     
     Render render(&renderer, protocolo, namePlayer, configuracion);
 

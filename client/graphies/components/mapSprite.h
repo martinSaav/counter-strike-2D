@@ -32,10 +32,18 @@ class MapSprite : public Component{
 
     bool is_bomb_activated = false;
 
+    const MapConfigInfo& mapConfig;
+
     public:
     MapSprite(Renderer* sdlRenderer, Configuracion& configuracion);
 
     void draw();
+
+    void drawObstacles();
+
+    void drawBombsite();
+
+    void drawSite(const SiteInfo& site, const std::string& nameSite);
 
     int getWidth();
 

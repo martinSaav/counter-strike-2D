@@ -1,9 +1,19 @@
 #include "mapSprite.h"
 
 MapSprite::MapSprite(Renderer* sdlRenderer, Configuracion& configuracion)
-    : Component(sdlRenderer, configuracion){
+    : Component(sdlRenderer, configuracion), mapConfig(configuracion.gameConfig->get_map_config()){
 
+    // map
     texturas.loadTexture("map", "../client/data/maps/default_aztec.png");
+
+    // map obstacles
+    texturas.loadTexture("mapObstacles", "../client/data/maps/aztec.bmp");
+
+    // map sites
+    texturas.loadTexture("bspot_a", "../client/data/maps/bspot_a.png");
+    texturas.loadTexture("bspot_b", "../client/data/maps/bspot_b.png");
+
+    texturas.loadTexture("cross", "../client/data/maps/cross.png");
 
     // round
     texturas.loadTexture("terroristWins", "../client/data/hud/terroristWins.png");
@@ -38,7 +48,79 @@ void MapSprite::draw(){
         configuracion.widthWindow,
         configuracion.heightWindow
     };
-    drawHud( srcRect, destRect, textureName);
+    drawHud(srcRect, destRect, textureName);
+
+    // Draw bombSite
+    drawBombsite();
+
+    // Draw sites
+    drawSite(mapConfig.get_ct_site(),"bspot_a");
+    drawSite(mapConfig.get_tt_site(),"bspot_b");
+
+    // Draw obstaculos
+    drawObstacles();
+}
+
+void MapSprite::drawObstacles(){
+    std::string textureName = "mapObstacles";
+    SDL_Rect srcRect = {480, 64, 32, 32};
+    SDL_Rect destRect;
+    auto obstacles = mapConfig.get_structures();
+
+    for(auto obstacle : obstacles){
+       int posX = obstacle.get_x() + 1;
+       int posY = obstacle.get_y();
+       int height = obstacle.get_height();
+       int width = obstacle.get_width();
+
+       destRect = {
+        int((posX - configuracion.camera.x) * configuracion.zoom),
+        int((posY - configuracion.camera.y) * configuracion.zoom),
+        int(width * configuracion.zoom),
+        int(height * configuracion.zoom)
+       };
+       drawHud(srcRect, destRect, textureName);
+    }
+}
+
+void MapSprite::drawBombsite(){
+    std::string textureName = "cross";
+    SDL_Rect srcRect = {192, 32, 32, 32};
+    auto bombsite = mapConfig.get_bombsite();
+
+    int bomb_site_height = bombsite.get_height();
+    int bomb_site_width = bombsite.get_width();
+    int posX = bombsite.get_x();
+    int posY = bombsite.get_y(); 
+
+    SDL_Rect destRect = {
+        int((posX - configuracion.camera.x) * configuracion.zoom),
+        int((posY - configuracion.camera.y) * configuracion.zoom),
+        int(bomb_site_width * configuracion.zoom),
+        int(bomb_site_height * configuracion.zoom)
+    };
+    drawHud2(destRect, textureName);
+}
+
+void MapSprite::drawSite(const SiteInfo& site, const std::string& nameSite){
+    std::string textureName = nameSite;
+    Texture& texture = texturas.getTexture(nameSite);
+
+    // Aplicamos el color rojo
+    texture.SetColorMod(255, 0, 0);
+
+    int site_height = site.get_height();
+    int site_width = site.get_width();
+    int posX = site.get_x();
+    int posY = site.get_y(); 
+
+    SDL_Rect destRect = {
+        int((posX - configuracion.camera.x) * configuracion.zoom),
+        int((posY - configuracion.camera.y) * configuracion.zoom),
+        int(site_width * configuracion.zoom / 2),
+        int(site_height * configuracion.zoom / 2)
+    };
+    drawHud2(destRect, textureName);
 }
 
 int MapSprite::getWidth(){
