@@ -389,7 +389,9 @@ std::unique_ptr<Gun> Map::pick_weapon(int x, int y) {
         }
         if (const Structure gun_hitbox(gun_hitbox_height, gun_hitbox_width, it->first);
             CollisionDetector::check_collision_between_player_and_structure(x, y, gun_hitbox)) {
-            return std::move(it->second);
+            std::unique_ptr<Gun> gun = std::move(it->second);
+            dropped_guns.erase(it);
+            return std::move(gun);
         }
         ++it;
     }
@@ -403,7 +405,9 @@ std::unique_ptr<BombEncapsulator> Map::pick_bomb(const int x, const int y) {
     }
     if (const Structure bomb_hitbox(bomb_hitbox_height, bomb_hitbox_width, dropped_bomb.first);
         CollisionDetector::check_collision_between_player_and_structure(x, y, bomb_hitbox)) {
-        return std::move(dropped_bomb.second);
+        std::unique_ptr<BombEncapsulator> bomb = std::move(dropped_bomb.second);
+        dropped_bomb.second = nullptr;
+        return std::move(bomb);
     }
     return nullptr;
 }

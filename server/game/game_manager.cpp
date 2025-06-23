@@ -187,8 +187,8 @@ void GameManager::pick_weapon(const std::shared_ptr<Player>& player) const {
     if (player->current_team != Team::CounterTerrorists) {
         if (std::unique_ptr<BombEncapsulator> bomb = map.pick_bomb(x, y); bomb != nullptr) {
             player->equip_bomb(std::move(bomb));
+            return;
         }
-        return;
     }
     if (std::unique_ptr<Gun> gun = map.pick_weapon(x, y); gun != nullptr) {
         player->equip_weapon(std::move(gun));

@@ -28,8 +28,6 @@ class ClientHandler: public Thread {
 
     std::string handle_login();
 
-    void send_game_config();
-
     void handle_list_matches_request();
 
     GameIdentification handle_create_game_request(std::unique_ptr<Message>&& message);
