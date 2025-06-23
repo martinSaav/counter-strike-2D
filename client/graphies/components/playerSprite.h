@@ -22,5 +22,7 @@ class PlayerSprite : public Component{
     void drawPlayer(const PlayerInfo& jugador, double& angle);
 
     void drawPlayerDeath(int jugadorX, int jugadorY);
+
+    void drawBlood(int x, int y);
 };
 #endif

@@ -30,6 +30,8 @@ PlayerSprite::PlayerSprite(Renderer* sdlRenderer, Configuracion& configuracion):
     // Death
     texturas.loadTexture("hud_symbols", "../client/data/hud/hud_symbols.png");
 
+    // Blood
+    texturas.loadTexture("blood", "../client/data/maps/blood.png");
 }
 
 void PlayerSprite::drawPlayer(const PlayerInfo& jugador, double& angle) {
@@ -159,4 +161,17 @@ tipoMusic PlayerSprite::castShoot(Weapon& weapon){
         return DISPARO_AK47;
     }
     return DISPARO_PISTOL;
+}
+
+void PlayerSprite::drawBlood(int x, int y) {
+    Texture& blood = texturas.getTexture("blood");
+
+    SDL_Rect destRect = {
+        int((x - configuracion.camera.x) * configuracion.zoom),
+        int((y - configuracion.camera.y) * configuracion.zoom),
+        int(32 * configuracion.zoom / 8),  // ajustá tamaño según la textura
+        int(32 * configuracion.zoom / 8)
+    };
+
+    sdlRenderer->Copy(blood, SDL2pp::NullOpt, destRect);
 }
