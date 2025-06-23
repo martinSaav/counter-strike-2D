@@ -33,6 +33,9 @@ class Gun {
                                Position& current_position) = 0;
     virtual void reset_shoots() = 0;
 
+protected:
+    static double generate_random_number(double a, double b);
+
 public:
     virtual ~Gun() = default;
 

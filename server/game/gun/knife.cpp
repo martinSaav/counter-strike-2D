@@ -28,7 +28,7 @@ bool Knife::has_to_shoot(float current_time) { return has_to_fire; }
 
 
 int Knife::calculate_damage(const double distance) const {
-    const int damage_before_distance = min_dmg + std::rand() % (max_dmg - min_dmg + 1);
+    const int damage_before_distance = static_cast<int>(generate_random_number(min_dmg, max_dmg));
     const double damage = static_cast<double>(damage_before_distance) / (1 + distance / 10);
     return static_cast<int>(damage);
 }

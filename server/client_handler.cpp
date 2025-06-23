@@ -179,6 +179,9 @@ void ClientHandler::handle_game(MessageParser parser,
             return command_queue.push(std::make_shared<LeaveMatchCommand>(credentials));
         }
     }
+    if (!sender.value()->is_running()) {
+        return command_queue.push(std::make_shared<LeaveMatchCommand>(credentials));
+    }
 }
 
 

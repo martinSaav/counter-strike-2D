@@ -18,9 +18,12 @@ public:
     const int shoot_cooldown;
     const int range;
     const double angle;
+    const double base_precision;
+    const double distance_precision_modifier;
 
     GunConfig(int max_ammo, int starting_reserve_ammo, int min_dmg, int max_dmg, int gun_price,
-              int range, double angle, int shoot_cooldown, int bullets_per_burst):
+              int range, double angle, int shoot_cooldown, int bullets_per_burst,
+              double base_precision, double distance_precision_modifier):
             max_ammo(max_ammo),
             starting_reserve_ammo(starting_reserve_ammo),
             min_dmg(min_dmg),
@@ -29,7 +32,9 @@ public:
             bullets_per_burst(bullets_per_burst),
             shoot_cooldown(shoot_cooldown),
             range(range),
-            angle(angle) {}
+            angle(angle),
+            base_precision(base_precision),
+            distance_precision_modifier(distance_precision_modifier) {}
     [[nodiscard]] GunConfigInfo get_info() const {
         return GunConfigInfo{max_ammo,
                              starting_reserve_ammo,

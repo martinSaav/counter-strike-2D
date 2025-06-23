@@ -18,6 +18,8 @@ class M3: public Gun {
     const double degree;
     const int range;
     const int shoot_cooldown;
+    const double base_precision;
+    const double distance_precision_modifier;
     float time_since_last_shot;
     int current_ammo;
     int reserve_ammo;
@@ -29,6 +31,7 @@ class M3: public Gun {
                        Position& current_position) override;
     void reset_shoots() override;
     [[nodiscard]] int calculate_damage(double distance) const;
+    [[nodiscard]] bool calculate_if_bullet_hit(double distance) const;
 
 public:
     explicit M3(const GunConfig& m3_config);
