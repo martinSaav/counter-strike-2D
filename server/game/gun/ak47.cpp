@@ -109,3 +109,6 @@ ShootInfo Ak47::fire_gun(Map& map, Player& owner, const float current_time,
 
 
 void Ak47::add_magazine() { reserve_ammo += max_ammo; }
+
+
+void Ak47::reset_time() { time_since_last_shot = 0; }

@@ -55,7 +55,7 @@ m3:
   starting_reserve_ammo: 20
   min_dmg: 60
   max_dmg: 90
-  gun_price: 2000
+  gun_price: 200
   range: 15
   angle: 0.39269908169872414 # pi / 8
   shoot_cooldown: 3000

@@ -24,6 +24,7 @@ class Knife: public Gun {
     ShootInfo fire_gun(Map& map, Player& owner, float current_time,
                        Position& current_position) override;
     void reset_shoots() override;
+    void reset_time() override;
 
     [[nodiscard]] int calculate_damage(double distance) const;
 

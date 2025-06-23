@@ -33,6 +33,7 @@ class Ak47: public Gun {
                        Position& current_position) override;
     void reset_shoots() override;
     [[nodiscard]] bool calculate_if_bullet_hit(double distance) const;
+    void reset_time() override;
 
 public:
     explicit Ak47(const GunConfig& ak_config);

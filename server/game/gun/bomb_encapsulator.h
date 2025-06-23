@@ -19,6 +19,7 @@ class BombEncapsulator: public Gun {
     ShootInfo fire_gun(Map& map, Player& owner, float current_time,
                        Position& current_position) override;
     void reset_shoots() override;
+    void reset_time() override {}
 
 public:
     explicit BombEncapsulator(const GameConfig& config): bomb(config), has_to_fire(false) {}

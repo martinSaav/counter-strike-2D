@@ -95,3 +95,6 @@ void Glock::reload_gun() {
 
 
 void Glock::add_magazine() { reserve_ammo += max_ammo; }
+
+
+void Glock::reset_time() { time_since_last_shot = 0; }

@@ -97,3 +97,6 @@ ShootInfo Awp::fire_gun(Map& map, Player& owner, const float current_time,
 
 
 void Awp::add_magazine() { reserve_ammo += max_ammo; }
+
+
+void Awp::reset_time() { time_since_last_shot = 0; }

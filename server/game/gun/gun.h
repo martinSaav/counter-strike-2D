@@ -32,6 +32,7 @@ class Gun {
     virtual ShootInfo fire_gun(Map& map, Player& owner, float current_time,
                                Position& current_position) = 0;
     virtual void reset_shoots() = 0;
+    virtual void reset_time() = 0;
 
 protected:
     static double generate_random_number(double a, double b);
