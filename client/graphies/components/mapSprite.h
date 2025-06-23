@@ -17,6 +17,17 @@ class MapSprite : public Component{
     int altoShopPantalla = 600;
     int anchoShopPantalla = 600;
 
+    bool is_exploding = false;
+    int explosion_frame = 0;
+    Uint32 explosion_start_time = 0;
+    const int explosion_total_frames = 25;
+    const int explosion_frame_duration = 100; // milisegundos por frame
+    int explosion_x = 0;
+    int explosion_y = 0;
+    int last_bomb_x = 0;
+    int last_bomb_y = 0;
+
+
     SDL_Rect destRectMap = {0, 0, 1000, 1000};
 
     bool is_bomb_activated = false;
@@ -39,6 +50,9 @@ class MapSprite : public Component{
     void activateBomb();
 
     void exploitBomb();
+    
+    void drawExplosion();
+
 
     void desactivateBomb();
 

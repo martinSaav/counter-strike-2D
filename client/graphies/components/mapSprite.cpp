@@ -18,6 +18,9 @@ MapSprite::MapSprite(Renderer* sdlRenderer, Configuracion& configuracion)
     // shop
     texturas.loadTexture("shop", "../client/data/maps/shop.png");
 
+    // explosion
+    texturas.loadTexture("explosion", "../client/data/hud/bomb_explotion.png", false);
+
     tipoMusic music = AMBIENTE;
     int cantVeces = 4;
     sounds.loadMusic(music, cantVeces);
@@ -98,6 +101,13 @@ void MapSprite::exploitBomb(){
     this->is_bomb_activated = false;
     tipoMusic music = EXPLOIT;
     sounds.loadSong(music);
+
+    is_exploding = true;
+    explosion_frame = 0;
+    explosion_start_time = SDL_GetTicks();
+
+    explosion_x = last_bomb_x;
+    explosion_y = last_bomb_y;
 }
 
 void MapSprite::drawBomb(int bomb_x, int bomb_y){
@@ -107,9 +117,51 @@ void MapSprite::drawBomb(int bomb_x, int bomb_y){
         int((bomb_y - configuracion.camera.y) * configuracion.zoom),
         int(32 * configuracion.zoom / 8), int(32 * configuracion.zoom / 8)
     };
+
+    this->last_bomb_x = bomb_x;
+    this->last_bomb_y = bomb_y;
+
     std::string textureName = "bomb";
     drawHud2(destRectBomb, textureName);
 }
+
+void MapSprite::drawExplosion() {
+    if (!is_exploding) return;
+
+    Uint32 now = SDL_GetTicks();
+    Uint32 elapsed = now - explosion_start_time;
+
+    explosion_frame = elapsed / explosion_frame_duration;
+
+    if (explosion_frame >= explosion_total_frames) {
+        is_exploding = false;
+        return;
+    }
+
+    Texture& explosion = texturas.getTexture("explosion");
+
+    int frame_width = 64;
+    int frame_height = 64;
+    int columns = 5;
+    float scale = 3.5f;
+
+    int src_x = (explosion_frame % columns) * frame_width;
+    int src_y = (explosion_frame / columns) * frame_height;
+
+    SDL_Rect srcRect = { src_x, src_y, frame_width, frame_height };
+
+    SDL_Rect destRect = {
+        int((explosion_x - configuracion.camera.x) * configuracion.zoom),
+        int((explosion_y - configuracion.camera.y) * configuracion.zoom),
+        int(frame_width * configuracion.zoom * scale / 8),
+        int(frame_height * configuracion.zoom * scale / 8)
+    };
+
+    explosion.SetBlendMode(SDL_BLENDMODE_BLEND);
+    sdlRenderer->Copy(explosion, srcRect, destRect);
+}
+
+
 
 void MapSprite::drawCampField(int angle, int playerX, int playerY){
     Texture& field = texturas.getTexture("field");

@@ -131,6 +131,8 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
         mapa.drawShop();
     }
 
+    mapa.drawExplosion();
+
     std::list<DroppedWeapon> dropped_weapons = mensaje->get_dropped_weapons();
     for (auto weapon : dropped_weapons){
         if (puntoEnVision(myPlayer->get_pos_x(), myPlayer->get_pos_y(), visionAngle, weapon.get_pos_x(), weapon.get_pos_y())) {
