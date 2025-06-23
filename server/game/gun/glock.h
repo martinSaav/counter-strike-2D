@@ -15,8 +15,10 @@ class Glock: public Gun {
     const int gun_price;
     const int min_dmg;
     const int max_dmg;
+    const int shoot_cooldown;
     int current_ammo;
     int reserve_ammo;
+    float time_since_last_shot;
     GunType type = GunType::Secondary;
     std::pair<int, int> next_shoot;
     bool has_to_fire;

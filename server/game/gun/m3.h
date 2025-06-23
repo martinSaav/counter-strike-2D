@@ -17,6 +17,8 @@ class M3: public Gun {
     const int max_dmg;
     const double degree;
     const int range;
+    const int shoot_cooldown;
+    float time_since_last_shot;
     int current_ammo;
     int reserve_ammo;
     GunType type = GunType::Primary;
@@ -26,7 +28,7 @@ class M3: public Gun {
     ShootInfo fire_gun(Map& map, Player& owner, float current_time,
                        Position& current_position) override;
     void reset_shoots() override;
-    int calculate_damage(double distance) const;
+    [[nodiscard]] int calculate_damage(double distance) const;
 
 public:
     explicit M3(const GunConfig& m3_config);
