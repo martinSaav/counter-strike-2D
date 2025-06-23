@@ -32,6 +32,7 @@ class M3: public Gun {
     void reset_shoots() override;
     [[nodiscard]] int calculate_damage(double distance) const;
     [[nodiscard]] bool calculate_if_bullet_hit(double distance) const;
+    void reset_time() override;
 
 public:
     explicit M3(const GunConfig& m3_config);

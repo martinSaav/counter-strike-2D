@@ -81,3 +81,6 @@ ShootInfo Knife::fire_gun(Map& map, Player& owner, float current_time, Position&
 }
 
 void Knife::reload_gun() {}
+
+
+void Knife::reset_time() { time_since_last_shot = 0; }

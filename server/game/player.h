@@ -107,7 +107,19 @@ public:
     void restore() {
         status = Status::Alive;
         bomb = nullptr;
+        is_planting = false;
+        is_defusing = false;
         health = max_health;
+        if (primary_weapon != nullptr) {
+            primary_weapon->reset_time();
+            primary_weapon->reset_shoots();
+        }
+        if (secondary_weapon != nullptr) {
+            secondary_weapon->reset_time();
+            secondary_weapon->reset_shoots();
+        }
+        knife->reset_time();
+        knife->reset_shoots();
     }
     void start_planting();
     void equip_bomb(std::unique_ptr<BombEncapsulator> bomb) { this->bomb = std::move(bomb); }

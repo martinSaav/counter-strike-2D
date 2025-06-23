@@ -54,8 +54,8 @@ WeaponInfo M3::get_weapon_name() { return WeaponInfo{Weapon::M3, current_ammo}; 
 
 
 int M3::calculate_damage(const double distance) const {
-    const int damage_before_distance = generate_random_number(min_dmg, max_dmg);
-    const double damage = static_cast<double>(damage_before_distance) / (1 + distance / 2);
+    const int damage_before_distance = static_cast<int>(generate_random_number(min_dmg, max_dmg));
+    const double damage = static_cast<double>(damage_before_distance) / (1 + distance / 4);
     return static_cast<int>(damage);
 }
 
@@ -74,6 +74,7 @@ ShootInfo M3::fire_gun(Map& map, Player& owner, float current_time, Position& cu
     }
     time_since_last_shot = current_time;
     has_to_fire = false;
+    current_ammo--;
     auto [x_center, y_center] = owner.get_center_coordinates();
     auto [final_x, final_y] = next_shoot;
     double direction_x = final_x - x_center;
@@ -118,3 +119,6 @@ void M3::reload_gun() {
 
 
 void M3::add_magazine() { reserve_ammo += max_ammo; }
+
+
+void M3::reset_time() { time_since_last_shot = 0; }

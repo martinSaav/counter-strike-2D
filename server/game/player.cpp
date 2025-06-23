@@ -107,8 +107,12 @@ void Player::receive_damage(const GameManager& manager, const int damage) {
         if (bomb != nullptr) {
             manager.drop_bomb(*this, std::move(bomb));
         } else if (equipped_weapon == GunType::Primary) {
+            primary_weapon->reset_shoots();
+            primary_weapon->reset_time();
             manager.drop_weapon(*this, std::move(primary_weapon));
         } else if (equipped_weapon == GunType::Secondary) {
+            secondary_weapon->reset_shoots();
+            secondary_weapon->reset_time();
             manager.drop_weapon(*this, std::move(secondary_weapon));
         }
         primary_weapon = nullptr;
