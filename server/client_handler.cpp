@@ -20,8 +20,6 @@
 #include "common/message.h"
 #include "dto/game_config_info.h"
 
-#include "skin_translator.h"
-
 std::string ClientHandler::handle_login() {
     while (true) {
         const auto message = protocol.recv_message();
@@ -53,7 +51,7 @@ void ClientHandler::handle_list_matches_request() {
 }
 
 
-void ClientHandler::handle_game_config_request() {
+void ClientHandler::send_game_config() {
     std::vector<StructureInfo> structures_info;
     const MapConfig& map_cfg = config.map_config;
     const BombSite& bomb_site_cfg = map_cfg.bombsite;
@@ -95,27 +93,6 @@ void ClientHandler::handle_game_config_request() {
 }
 
 
-void ClientHandler::handle_map_names_request() {
-    while (true) {
-        const auto message = protocol.recv_message();
-        switch (message->type()) {
-            case MessageType::MapNamesRequest: {
-                std::list<std::string> map_names;
-                map_names.emplace_back(generic_map_name);
-
-                const MapNamesResponse response(std::move(map_names));
-                protocol.send_message(response);
-                return;
-            }
-            default:  // Mientras no reciba el mensaje de pedido de mapas continuo recibiendo
-                      // mensajes hasta
-                // recibirlo.
-                break;
-        }
-    }
-}
-
-
 GameIdentification ClientHandler::handle_create_game_request(std::unique_ptr<Message>&& message) {
     const auto create_message = dynamic_cast<CreateGameRequest*>(message.get());
     const std::string game_name = create_message->get_game_name();
@@ -125,6 +102,7 @@ GameIdentification ClientHandler::handle_create_game_request(std::unique_ptr<Mes
     protocol.send_message(response);
     return id;
 }
+
 
 GameIdentification ClientHandler::handle_join_game_request(std::unique_ptr<Message>&& message) {
     const auto join_message = dynamic_cast<JoinGameRequest*>(message.get());
@@ -166,6 +144,13 @@ std::optional<GameIdentification> ClientHandler::pick_match() {
                 case MessageType::DisconnectRequest: {
                     return std::nullopt;
                 }
+                case MessageType::MapNamesRequest: {
+                    std::list<std::string> map_names;
+                    map_names.emplace_back(config.map_config.map_name);
+                    const MapNamesResponse response(std::move(map_names));
+                    protocol.send_message(response);
+                    break;
+                }
                 default:
                     break;
             }
@@ -200,7 +185,6 @@ void ClientHandler::handle_game(MessageParser parser,
 void ClientHandler::run() {
     try {
         username = handle_login();
-        handle_map_names_request();
     } catch (const std::exception& e) {
         if (!should_keep_running()) {
             return;
@@ -213,6 +197,7 @@ void ClientHandler::run() {
         return;
     }
     GameIdentification match_id = match_id_o.value();
+    send_game_config();
     sender = std::make_unique<Sender>(protocol, match_id.sender_queue);
     sender.value()->start();
     MessageParser parser(match_id.credentials);
