@@ -18,6 +18,8 @@ Glock::Glock(const GunConfig& glock_config):
         max_dmg(glock_config.max_dmg),
         current_ammo(glock_config.max_ammo),
         reserve_ammo(glock_config.starting_reserve_ammo),
+        time_since_last_shot(0),
+        shoot_cooldown(glock_config.shoot_cooldown),
         has_to_fire(false) {}
 
 
@@ -26,6 +28,9 @@ int Glock::get_gun_price() { return gun_price; }
 void Glock::shoot_gun(Position final_position, float current_time) {
     if (current_ammo == 0) {
         throw NoAmmo();
+    }
+    if (current_time - time_since_last_shot < static_cast<float>(shoot_cooldown)) {
+        return;
     }
     const auto pos = final_position.get_position();
     next_shoot = pos;
@@ -42,6 +47,7 @@ ShootInfo Glock::fire_gun(Map& map, Player& owner, float current_time, Position&
     if (!has_to_shoot(current_time)) {
         throw DontHaveToShoot();
     }
+    time_since_last_shot = current_time;
     auto [x, y] = current_position.get_position();
     auto [final_x, final_y] = next_shoot;
     current_ammo--;

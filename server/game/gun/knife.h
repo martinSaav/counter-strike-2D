@@ -14,6 +14,8 @@ class Knife: public Gun {
     const int knife_range;
     const int min_dmg;
     const int max_dmg;
+    const int shoot_cooldown;
+    float time_since_last_shot;
     GunType type = GunType::Knife;
     std::pair<int, int> next_shoot;
     bool has_to_fire;
@@ -31,6 +33,8 @@ public:
             knife_range(knife_config.range),
             min_dmg(knife_config.min_dmg),
             max_dmg(knife_config.max_dmg),
+            shoot_cooldown(knife_config.shoot_cooldown),
+            time_since_last_shot(0),
             has_to_fire(false) {}
     GunType get_gun_type() override { return type; }
     void reload_gun() override;

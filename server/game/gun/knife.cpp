@@ -13,6 +13,9 @@
 
 
 void Knife::shoot_gun(Position final_position, float current_time) {
+    if (current_time - time_since_last_shot < static_cast<float>(shoot_cooldown)) {
+        return;
+    }
     const auto pos = final_position.get_position();
     next_shoot = pos;
     has_to_fire = true;
@@ -35,6 +38,7 @@ ShootInfo Knife::fire_gun(Map& map, Player& owner, float current_time, Position&
     if (!has_to_shoot(current_time)) {
         throw DontHaveToShoot();
     }
+    time_since_last_shot = current_time;
     has_to_fire = false;
     auto [x_center, y_center] = owner.get_center_coordinates();
     auto [final_x, final_y] = next_shoot;

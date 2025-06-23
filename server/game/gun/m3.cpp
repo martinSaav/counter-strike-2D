@@ -19,6 +19,8 @@ M3::M3(const GunConfig& m3_config):
         max_dmg(m3_config.max_dmg),
         degree(m3_config.angle),
         range(m3_config.range),
+        shoot_cooldown(m3_config.shoot_cooldown),
+        time_since_last_shot(0),
         current_ammo(max_ammo),
         reserve_ammo(m3_config.starting_reserve_ammo),
         has_to_fire(false) {}
@@ -28,6 +30,9 @@ int M3::get_gun_price() { return gun_price; }
 void M3::shoot_gun(const Position final_position, float current_time) {
     if (current_ammo == 0) {
         throw NoAmmo();
+    }
+    if (current_time - time_since_last_shot < static_cast<float>(shoot_cooldown)) {
+        return;
     }
     const auto pos = final_position.get_position();
     next_shoot = pos;
@@ -57,6 +62,7 @@ ShootInfo M3::fire_gun(Map& map, Player& owner, float current_time, Position& cu
     if (!has_to_shoot(current_time)) {
         throw DontHaveToShoot();
     }
+    time_since_last_shot = current_time;
     has_to_fire = false;
     auto [x_center, y_center] = owner.get_center_coordinates();
     auto [final_x, final_y] = next_shoot;
