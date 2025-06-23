@@ -19,6 +19,9 @@ std::map<Stages, double> GameClock::get_stage_duration_map() const {
 void GameClock::advance(const double dt) {
     current_time += dt;
     stage_time += dt;
+    if (bomb_planted && !bomb_exploded && !bomb_defused) {
+        bomb_timer += dt;
+    }
     std::map<Stages, double> stage_duration_map = get_stage_duration_map();
     double duration = stage_duration_map[current_stage];
     if (stage_time >= duration && duration >= 0) {
@@ -27,11 +30,16 @@ void GameClock::advance(const double dt) {
             stage_time -= duration;
         } else if (current_stage == Stages::PostPlantStage) {
             bomb_exploded = true;
+            bomb_timer = duration;
             current_stage = Stages::AfterRoundStage;
             stage_time -= duration;
         } else if (current_stage == Stages::AfterRoundStage) {
             throw RoundAlreadyFinished();
         }
+    }
+    if (bomb_timer > stage_duration_map[Stages::PostPlantStage] &&
+        current_stage != Stages::PostPlantStage) {
+        bomb_exploded = true;
     }
 }
 
@@ -40,6 +48,8 @@ void GameClock::reset() {
     current_stage = Stages::BuyStage;
     stage_time = 0;
     current_time = 0;
+    bomb_timer = 0;
+    bomb_planted = false;
     bomb_exploded = false;
     has_round_finished = false;
 }
@@ -48,6 +58,7 @@ void GameClock::reset() {
 void GameClock::set_post_plant_stage() {
     stage_time = 0;
     current_stage = Stages::PostPlantStage;
+    bomb_planted = true;
 }
 
 void GameClock::set_after_round_stage() {
@@ -56,9 +67,16 @@ void GameClock::set_after_round_stage() {
 }
 
 
+void GameClock::defuse_bomb() {
+    stage_time = 0;
+    current_stage = Stages::AfterRoundStage;
+    bomb_defused = true;
+}
+
+
 double GameClock::get_bomb_timer() const {
-    if (current_stage == Stages::PostPlantStage) {
-        return std::max(post_bomb_stage_time - stage_time, static_cast<double>(0));
+    if (bomb_timer != 0) {
+        return std::max(post_bomb_stage_time - bomb_timer, static_cast<double>(0));
     }
     return 0;
 }

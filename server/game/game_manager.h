@@ -40,6 +40,7 @@ class GameManager {
     int current_round;
     int ct_rounds;
     int tt_rounds;
+    bool has_exploded_bomb;
 
 public:
     explicit GameManager(Map& map, GameClock& clock, GameConfig& config):
@@ -63,7 +64,8 @@ public:
             last_winner(Team::Terrorists),
             current_round(1),
             ct_rounds(0),
-            tt_rounds(0) {}
+            tt_rounds(0),
+            has_exploded_bomb(false) {}
 
     void attack_player(const std::shared_ptr<Player>& attacked, Player& attacker, int damage) const;
     [[nodiscard]] bool can_player_buy() const;
@@ -76,7 +78,7 @@ public:
     void plant_bomb(int x, int y);
     [[nodiscard]] bool is_bomb_planted() const { return bomb_planted; }
     [[nodiscard]] bool can_plant_bomb(int x, int y) const;
-    void explode_bomb(const std::vector<std::shared_ptr<Player>>& players) const;
+    void explode_bomb(const std::vector<std::shared_ptr<Player>>& players);
     void start_defusing(const std::shared_ptr<Player>& player) const;
     void has_finished_defusing(Player& player);
     void drop_bomb(Player& player, std::unique_ptr<BombEncapsulator> bomb) const;
@@ -91,6 +93,7 @@ public:
     [[nodiscard]] Team get_next_player_team() const;
     void add_player_to_team(const std::shared_ptr<Player>& player);
     void remove_player_from_team(const std::shared_ptr<Player>& player);
+    [[nodiscard]] bool exploded_bomb() const;
 };
 
 
