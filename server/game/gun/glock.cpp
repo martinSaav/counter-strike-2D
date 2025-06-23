@@ -16,10 +16,10 @@ Glock::Glock(const GunConfig& glock_config):
         gun_price(glock_config.gun_price),
         min_dmg(glock_config.min_dmg),
         max_dmg(glock_config.max_dmg),
-        shoot_cooldown(glock_config.shoot_cooldown),
         current_ammo(glock_config.max_ammo),
         reserve_ammo(glock_config.starting_reserve_ammo),
         time_since_last_shot(0),
+        shoot_cooldown(glock_config.shoot_cooldown),
         has_to_fire(false) {}
 
 
