@@ -112,6 +112,8 @@ void Player::receive_damage(const GameManager& manager, const int damage) {
             manager.drop_weapon(*this, std::move(secondary_weapon));
         }
         primary_weapon = nullptr;
+        is_defusing = false;
+        is_planting = false;
         secondary_weapon = std::make_unique<Glock>(game_config.glock_config);
         equipped_weapon = GunType::Secondary;
     }
@@ -280,6 +282,9 @@ void Player::update(GameManager& game_manager) {
         equipped_weapon = GunType::Secondary;
         is_planting = false;
         bomb = nullptr;
+    }
+    if (is_defusing) {
+        game_manager.has_finished_defusing(*this);
     }
 }
 

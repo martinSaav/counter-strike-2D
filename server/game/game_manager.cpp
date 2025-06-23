@@ -155,12 +155,12 @@ void GameManager::start_defusing(const std::shared_ptr<Player>& player) const {
 }
 
 
-void GameManager::has_finished_defusing(const std::shared_ptr<Player>& player) {
-    if (!player->is_defusing) {
+void GameManager::has_finished_defusing(Player& player) {
+    if (!player.is_defusing || player.is_dead()) {
         return;
     }
-    if (clock.get_time() - player->defuse_time - time_to_defuse >= 0) {
-        player->is_defusing = false;
+    if (clock.get_time() - player.defuse_time - time_to_defuse >= 0) {
+        player.is_defusing = false;
         bomb_defused = true;
         clock.set_after_round_stage();
     }
