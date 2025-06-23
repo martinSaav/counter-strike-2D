@@ -403,8 +403,10 @@ void Match::update_game() {
         player->update(game_manager);
         players_vector.push_back(player);
     }
-
     game_manager.check_winning_cond(players_vector);
+    if (game_clock.has_bomb_exploded() && !game_manager.exploded_bomb()) {
+        game_manager.explode_bomb(players_vector);
+    }
 }
 
 
@@ -429,7 +431,9 @@ void Match::run_game_loop() {
         duration_ms elapsed = end - start;
 
         if (elapsed < frame_duration) {
-            std::this_thread::sleep_for(frame_duration - elapsed); // Si está adelantado duerme, si no pasa directamente a la proxima iteracion
+            std::this_thread::sleep_for(frame_duration -
+                                        elapsed);  // Si está adelantado duerme, si no pasa
+                                                   // directamente a la proxima iteracion
         }
     }
 }

@@ -58,6 +58,7 @@ void GameManager::advance_round(const std::vector<std::shared_ptr<Player>>& play
     round_won = false;
     bomb_defused = false;
     bomb_planted = false;
+    has_exploded_bomb = false;
     bomb_x = 0;
     bomb_y = 0;
 }
@@ -86,7 +87,11 @@ void GameManager::check_winning_cond(const std::vector<std::shared_ptr<Player>>&
     } else if (bomb_defused || (alive_terrorists == 0 && !bomb_planted)) {
         ct_rounds++;
         last_winner = Team::CounterTerrorists;
-        clock.set_after_round_stage();
+        if (bomb_defused) {
+            clock.defuse_bomb();
+        } else {
+            clock.set_after_round_stage();
+        }
         round_won = true;
     } else if (alive_counter_terrorists == 0) {
         tt_rounds++;
@@ -126,7 +131,8 @@ void GameManager::plant_bomb(const int x, const int y) {
 }
 
 
-void GameManager::explode_bomb(const std::vector<std::shared_ptr<Player>>& players) const {
+void GameManager::explode_bomb(const std::vector<std::shared_ptr<Player>>& players) {
+    has_exploded_bomb = true;
     for (auto& player: players) {
         if (!player->is_dead()) {
             auto [p_x, p_y] = player->get_location();
@@ -162,7 +168,7 @@ void GameManager::has_finished_defusing(Player& player) {
     if (clock.get_time() - player.defuse_time - time_to_defuse >= 0) {
         player.is_defusing = false;
         bomb_defused = true;
-        clock.set_after_round_stage();
+        clock.defuse_bomb();
     }
 }
 
@@ -303,3 +309,6 @@ void GameManager::remove_player_from_team(const std::shared_ptr<Player>& player)
         ct_count--;
     }
 }
+
+
+bool GameManager::exploded_bomb() const { return has_exploded_bomb; }
