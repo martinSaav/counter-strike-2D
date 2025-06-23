@@ -54,8 +54,8 @@ WeaponInfo M3::get_weapon_name() { return WeaponInfo{Weapon::M3, current_ammo}; 
 
 
 int M3::calculate_damage(const double distance) const {
-    const int damage_before_distance = generate_random_number(min_dmg, max_dmg);
-    const double damage = static_cast<double>(damage_before_distance) / (1 + distance / 2);
+    const int damage_before_distance = static_cast<int>(generate_random_number(min_dmg, max_dmg));
+    const double damage = static_cast<double>(damage_before_distance) / (1 + distance / 4);
     return static_cast<int>(damage);
 }
 
