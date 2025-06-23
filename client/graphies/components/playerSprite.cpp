@@ -29,6 +29,7 @@ PlayerSprite::PlayerSprite(Renderer* sdlRenderer, Configuracion& configuracion):
 
     // Death
     texturas.loadTexture("hud_symbols", "../client/data/hud/hud_symbols.png");
+
 }
 
 void PlayerSprite::drawPlayer(const PlayerInfo& jugador, double& angle) {
@@ -60,6 +61,7 @@ void PlayerSprite::drawPlayer(const PlayerInfo& jugador, double& angle) {
         }
         int shootX = jugador.get_pos_shoot_x();
         int shootY = jugador.get_pos_shoot_y();
+
         drawBullet(shootX, shootY, angle);
 
         tipoMusic music = castShoot(weaponPlayer);
@@ -99,10 +101,10 @@ void PlayerSprite::drawWeapon(int& jugadorX, int& jugadorY, double& angle, Weapo
 void PlayerSprite::drawBullet(int& shootX, int& shootY, double& angle) {
 
     SDL_Rect destRect = {
-    int((shootX - configuracion.camera.x) * configuracion.zoom),
-    int((shootY - configuracion.camera.y) * configuracion.zoom),
-    int(2 * configuracion.zoom),
-    int(2 * configuracion.zoom)
+        int((shootX - configuracion.camera.x) * configuracion.zoom),
+        int((shootY - configuracion.camera.y) * configuracion.zoom),
+        int(2 * configuracion.zoom),
+        int(2 * configuracion.zoom)
     };
     std::string textureName = "tiro";
     drawHud2(destRect, textureName);
@@ -156,5 +158,5 @@ tipoMusic PlayerSprite::castShoot(Weapon& weapon){
     case Weapon::AK47:
         return DISPARO_AK47;
     }
-    return NONE;
+    return DISPARO_PISTOL;
 }

@@ -19,9 +19,9 @@ class Component{
         sdlRenderer->Copy(texture, srcRect, destRect);
     }
 
-    void drawHud2(SDL_Rect destRect, std::string& textureName){
+    void drawHud2(SDL_Rect destRect, std::string& textureName, double angle = 0){
         Texture& texture = texturas.getTexture(textureName);
-        sdlRenderer->Copy(texture, SDL2pp::NullOpt, destRect);
+        sdlRenderer->Copy(texture, SDL2pp::NullOpt, destRect, angle);
     }
 
     public:

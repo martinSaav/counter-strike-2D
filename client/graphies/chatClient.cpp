@@ -12,7 +12,9 @@ using SDL2pp::Window;
 
 ChatClient::ChatClient(Protocol& protocolo, std::string& namePlayer):
         protocolo(protocolo), namePlayer(namePlayer) {
-    // Constructor
+    
+    const std::unique_ptr<Message> gameConfig = protocolo.recv_message();
+    const auto game = dynamic_cast<GameConfigInfo*>(gameConfig.get());
 }
 
 // Definición
