@@ -139,3 +139,34 @@ map_config:
         y: 262
       - x: 137
         y: 262
+  weapon_drops:
+    - name: "ak-47"   #1
+      x: 12
+      y: 62
+    - name: "awp"     #2
+      x: 112
+      y: 37
+    - name: "m3"      #3
+      x: 62
+      y: 62
+    - name: "ak-47"   #4
+      x: 76
+      y: 125
+    - name: "m3"      #5
+      x: 50
+      y: 150
+    - name: "awp"     #6
+      x: 12
+      y: 225
+    - name: "ak-47"   #7
+      x: 75
+      y: 200
+    - name: "m3"      #8
+      x: 100
+      y: 212
+    - name: "ak-47"   #9
+      x: 75
+      y: 225
+    - name: "awp"     #10
+      x: 12
+      y: 100

@@ -4,9 +4,9 @@
 
 #include "configuration_loader.h"
 
-#include <vector>
-
 #include <yaml-cpp/yaml.h>
+
+#include "weapon_translator.h"
 
 GunConfig ConfigurationLoader::get_knife_config(YAML::Node& knife_config) {
     const int min_dmg = knife_config["min_dmg"].as<int>();
@@ -130,6 +130,22 @@ Site ConfigurationLoader::get_site_config(YAML::Node& site_config) {
 }
 
 
+std::vector<std::pair<Position, Weapon>> ConfigurationLoader::get_dropped_weapons(
+        const YAML::Node& dropped_weapons_config) {
+    std::vector<std::pair<Position, Weapon>> dropped_weapons;
+    for (auto drop: dropped_weapons_config) {
+        try {
+            Weapon weapon = WeaponTranslator::string_to_code(drop["name"].as<std::string>());
+            int x = drop["x"].as<int>();
+            int y = drop["y"].as<int>();
+            Position pos(x, y);
+            dropped_weapons.emplace_back(pos, weapon);
+        } catch (const std::exception&) {}
+    }
+    return dropped_weapons;
+}
+
+
 MapConfig ConfigurationLoader::get_map_config(YAML::Node& map_config) {
     auto map_name = map_config["map_name"].as<std::string>();
     auto map_height = map_config["map_height"].as<int>();
@@ -147,6 +163,7 @@ MapConfig ConfigurationLoader::get_map_config(YAML::Node& map_config) {
     YAML::Node bomb_site = map_config["bomb_site"];
     YAML::Node tt_site = map_config["tt_site"];
     YAML::Node ct_site = map_config["ct_site"];
+    YAML::Node dropped_weapons_cfg = map_config["weapon_drops"];
     int bomb_site_x = bomb_site["x"].as<int>();
     int bomb_site_y = bomb_site["y"].as<int>();
     int bomb_site_height = bomb_site["height"].as<int>();
@@ -154,8 +171,15 @@ MapConfig ConfigurationLoader::get_map_config(YAML::Node& map_config) {
     BombSite bombsite(bomb_site_height, bomb_site_width, bomb_site_x, bomb_site_y);
     Site tt = get_site_config(tt_site);
     Site ct = get_site_config(ct_site);
-    return MapConfig{std::move(map_name), map_width,    map_height, structures_v, bombsite,
-                     std::move(ct),       std::move(tt)};
+    auto dropped_weapons = get_dropped_weapons(dropped_weapons_cfg);
+    return MapConfig{std::move(map_name),
+                     map_width,
+                     map_height,
+                     structures_v,
+                     bombsite,
+                     std::move(ct),
+                     std::move(tt),
+                     std::move(dropped_weapons)};
 }
 
 

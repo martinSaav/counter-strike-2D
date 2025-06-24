@@ -6,6 +6,7 @@
 #define CONFIGURATION_LOADER_H
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "yaml-cpp/node/node.h"
 
@@ -28,6 +29,9 @@ class ConfigurationLoader {
     static Site get_site_config(YAML::Node& site_config);
 
     static MapConfig get_map_config(YAML::Node& map_config);
+
+    static std::vector<std::pair<Position, Weapon>> get_dropped_weapons(
+            const YAML::Node& dropped_weapons_config);
 
 public:
     explicit ConfigurationLoader(std::string&& filename): filename(std::move(filename)) {}
