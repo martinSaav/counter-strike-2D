@@ -33,12 +33,15 @@ public:
     const int tiles_per_movement;
     const int game_rate;
     const MapConfig map_config;
+    const float cone_angle;
+    const int cone_opacity;
     GameConfig(int player_health, int number_of_rounds, int starting_money, int ct_amount,
                int tt_amount, int ammo_price, GunConfig&& knife_config, GunConfig&& glock_config,
                GunConfig&& ak_config, GunConfig&& awp_config, GunConfig&& m3_config,
                int defuse_time, int time_to_plant, int bomb_dmg, int round_winner_money,
                int round_loser_money, int buy_time, int bomb_time, int after_round_time,
-               int money_per_kill, int tiles_per_movement, int game_rate, MapConfig&& map_config);
+               int money_per_kill, int tiles_per_movement, int game_rate, MapConfig&& map_config,
+               float cone_angle, int cone_opacity);
 };
 
 
