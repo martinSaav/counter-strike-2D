@@ -59,6 +59,11 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     
     mapa.draw(); //Dibujo el mapa
     
+    // Reset bomb
+    if (mensaje->get_round_time() == 0){
+        mapa.desactivateBomb();
+    }
+
     bool is_bomb_planted = mensaje->is_bomb_planted();
     // Draw bomb
     if (is_bomb_planted && !mensaje->is_round_ended()){
@@ -145,11 +150,6 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     if (mensaje->is_round_ended()){
         Team team = mensaje->get_round_winner();
         mapa.drawEndRound(team, zoom);
-
-        // Reset bomb
-        if (mapa.isBombActivated()){
-            mapa.desactivateBomb();
-        }
 
         bloodStains.clear();
         lastHealths.clear();

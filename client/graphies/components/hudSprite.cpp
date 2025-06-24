@@ -16,12 +16,22 @@ HudSprite::HudSprite(Renderer* sdlRenderer, Configuracion& configuracion) :
     // slot
     texturas.loadTexture("slot", "../client/data/weapons/hud_slot.png");
 
+    // posters player
+    texturas.loadTexture("counterTerroristPost", "../client/data/hud/counterTerroristPost.png");
+    texturas.loadTexture("terroristPost", "../client/data/hud/terroristPost.png");
+
     // weapons dropped
     texturas.loadTexture("ak47_dropped", "../client/data/weapons/ak47_d.bmp");
     texturas.loadTexture("glock_dropped", "../client/data/weapons/glock_d.bmp");
     texturas.loadTexture("awp_dropped", "../client/data/weapons/awp_d.bmp");
     texturas.loadTexture("m3_dropped", "../client/data/weapons/m3_d.bmp");
     texturas.loadTexture("bomb_dropped", "../client/data/weapons/bomb_d.bmp");
+
+    //Aplico colores
+    Texture& counterPost = texturas.getTexture("counterTerroristPost");
+    Texture& terroristPost = texturas.getTexture("terroristPost");
+    counterPost.SetColorMod(255, 165, 0);
+    terroristPost.SetColorMod(255, 165, 0);
 }
 
 void HudSprite::draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlayer, bool& is_bomb_planted){
@@ -108,6 +118,22 @@ void HudSprite::draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlaye
         destRect = {symbolX, symbolY, anchoSymbolPantalla, altoSymbolPantalla};
         drawHud(srcRect, destRect, textureName);
     }
+
+    symbolX = weidthWindow * 0.05;
+    symbolY = heightWindow * 0.02;
+    int anchoCartel = 100;
+    // team poster
+    char team = myPlayer.get_skin()[0];
+    if (team == 'C'){
+        textureName = "counterTerroristPost";
+        anchoCartel = 150;
+    } else {
+        textureName = "terroristPost";
+    }
+
+    destRect = {symbolX, symbolY, anchoCartel, 70};
+    drawHud2(destRect, textureName);
+
     // mira
     textureName = "mira";
     drawHud2(mouse, textureName);
