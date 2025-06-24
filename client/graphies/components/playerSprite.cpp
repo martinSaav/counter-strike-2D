@@ -58,8 +58,12 @@ void PlayerSprite::drawPlayer(const PlayerInfo& jugador, double& angle) {
 
     if (jugador.get_action() == Action::Shoot){
 
+        int volume = 64;
+
         if (weaponPlayer == Weapon::Bomb){
             return;
+        } else if (weaponPlayer == Weapon::Knife){
+            volume = 90;
         }
         int shootX = jugador.get_pos_shoot_x();
         int shootY = jugador.get_pos_shoot_y();
@@ -68,7 +72,7 @@ void PlayerSprite::drawPlayer(const PlayerInfo& jugador, double& angle) {
 
         tipoMusic music = castShoot(weaponPlayer);
         int cantVeces = 1;
-        sounds.loadSong(music);
+        sounds.loadSong(music, 0, volume);
     }
 }
 

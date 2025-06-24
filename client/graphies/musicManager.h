@@ -16,6 +16,10 @@ enum tipoMusic{
     TIMER,
     AMBIENTE,
     EXPLOIT,
+    PISTOLRELOAD,
+    RIFLERELOAD,
+    BUY,
+    ITEMEQUIP,
     NONE
 };
 
@@ -40,7 +44,7 @@ class MusicManager{
 
     void stopMusic();
 
-    int loadSong(tipoMusic music, int loops = 0);
+    int loadSong(tipoMusic music, int loops = 0, int volume = MIX_MAX_VOLUME / 2);
 
     void stopAllSongs();
 

@@ -58,25 +58,6 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     }
     
     mapa.draw(); //Dibujo el mapa
-    
-    // Reset bomb
-    if (mensaje->get_round_time() == 0){
-        mapa.desactivateBomb();
-    }
-
-    bool is_bomb_planted = mensaje->is_bomb_planted();
-    // Draw bomb
-    if (is_bomb_planted && !mensaje->is_round_ended()){
-        int bomb_x = mensaje->get_bomb_x();
-        int bomb_y = mensaje->get_bomb_y();
-        mapa.drawBomb(bomb_x, bomb_y);
-    } 
-
-    if (is_bomb_planted && mensaje->is_round_ended() && mensaje->get_bomb_timer() == 0 && mensaje->get_round_winner() == Team::Terrorists) {
-        if (mapa.isBombActivated()) {
-            mapa.exploitBomb();
-        }
-    }
 
     // Obtengo mi angulo
     SDL_GetMouseState(&mouseX, &mouseY);
@@ -93,6 +74,28 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     myAngle = getAnglePlayer(myPlayer->get_pos_x(), myPlayer->get_pos_y(), mouse_map_x, mouse_map_y);
     float visionAngle = myAngle;
     if (visionAngle < 0) visionAngle += 360.0;
+
+        // Reset bomb
+    if (mensaje->get_round_time() == 0){
+        mapa.desactivateBomb();
+    }
+
+    bool is_bomb_planted = mensaje->is_bomb_planted();
+    // Draw bomb
+    if (is_bomb_planted && !mensaje->is_round_ended()){
+        int bomb_x = mensaje->get_bomb_x();
+        int bomb_y = mensaje->get_bomb_y();
+
+        if (puntoEnVision(myPlayer->get_pos_x(), myPlayer->get_pos_y(), visionAngle, bomb_x, bomb_y)) {
+            mapa.drawBomb(bomb_x, bomb_y);
+        }
+    } 
+
+    if (is_bomb_planted && mensaje->is_round_ended() && mensaje->get_bomb_timer() == 0 && mensaje->get_round_winner() == Team::Terrorists) {
+        if (mapa.isBombActivated()) {
+            mapa.exploitBomb();
+        }
+    }
 
     for (const auto& stain : bloodStains) {
         player.drawBlood(stain.x, stain.y);

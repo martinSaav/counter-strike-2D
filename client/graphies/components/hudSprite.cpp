@@ -137,6 +137,8 @@ void HudSprite::draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlaye
     // mira
     textureName = "mira";
     drawHud2(mouse, textureName);
+
+    drawSounds(myPlayer);
 }
 
 void HudSprite::drawHuds(int num, HudType tipo, int& symbolX, int& symbolY){
@@ -317,4 +319,50 @@ void HudSprite::castSizesWeapon(Weapon& weapon, int& anchoWeapon, int& altoWeapo
         altoWeapon = 40;
         break;
     }
+}
+
+void HudSprite::drawSounds(PlayerInfo& myPlayer){
+    Action actionActual = myPlayer.get_action();
+
+    if (ultimaAction == actionActual) return;
+
+    Weapon weapon = myPlayer.get_active_weapon();
+    tipoMusic music;
+    int volume = 64;
+    switch (actionActual)
+    {
+    case Action::Reload:
+        
+        volume = 50;
+        switch (weapon)
+        {
+        case Weapon::Knife:
+            return;
+        case Weapon::Glock:
+            music = PISTOLRELOAD;
+            break;
+        default:
+            // Rifles
+            music = RIFLERELOAD;
+            break;
+        }
+        break;
+    case Action::BuyingWeapon:
+        music = BUY;
+        break;
+    case Action::BuyingAmmo:
+        music = BUY;
+        break;
+    case Action::Shoot:
+        ultimaAction = actionActual;
+        return;
+    case Action::EquipWeapon:
+        volume = 75;
+        music = ITEMEQUIP;
+        break;
+    default:
+        return;
+    }
+    sounds.loadSong(music, 0, volume);
+    ultimaAction = actionActual;
 }

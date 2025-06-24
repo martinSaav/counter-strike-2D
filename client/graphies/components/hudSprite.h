@@ -45,6 +45,9 @@ class HudSprite : public Component{
     SDL_Rect destRect;
 
     std::string textureName;
+
+    // Default
+    Action ultimaAction;
     
     void drawHuds(int num, HudType tipo, int& symbolX, int& symbolY);
 
@@ -54,6 +57,8 @@ class HudSprite : public Component{
     void castCordinates(Weapon& myWeapon, int& anchoWeapon, int& weaponTextureX);
 
     void castSizesWeapon(Weapon& myWeapon, int& anchoWeapon, int& altoWeapon, std::string& textureName);
+
+    void drawSounds(PlayerInfo& myPlayer);
 
     public:
     HudSprite(Renderer* sdlRenderer, Configuracion& configuracion);
