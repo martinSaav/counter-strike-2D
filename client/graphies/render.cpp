@@ -161,7 +161,7 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     }
     if (tiempoPartida >= configuracion.tiempoDeCompra && myPlayer->get_status() == Status::Alive){
         mapa.drawCampField(myAngle, myPlayer->get_pos_x(), myPlayer->get_pos_y());
-    } else {
+    } else if (tiempoPartida < configuracion.tiempoDeCompra){
         mapa.drawShop();
     }
     

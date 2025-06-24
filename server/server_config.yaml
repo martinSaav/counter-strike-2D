@@ -65,8 +65,8 @@ m3:
   distance_precision_modifier: 0.06666666
 map_config:
   map_name: "test_map"
-  map_height: 275
-  map_width: 150
+  map_height: 280
+  map_width: 155
   structures:
     - x: 62
       y: 125

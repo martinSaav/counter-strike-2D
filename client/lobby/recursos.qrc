@@ -2,12 +2,8 @@
     <qresource prefix="/imagenes">
         <file>imagenes/fondo.jpg</file>
         <file>imagenes/user.png</file>
-        <file>imagenes/logo.png</file>
         <file>imagenes/estadistics/azul.png</file>
         <file>imagenes/estadistics/naranja.png</file>
-        <file>imagenes/fondos/fondo1.jpg</file>
-        <file>imagenes/fondos/fondo2.jpg</file>
-        <file>imagenes/fondos/fondo3.jpg</file>
         <file>imagenes/fondos/fondo4.jpg</file>
         <file>imagenes/fondos/fondo5.jpg</file>
         <file>imagenes/fondos/staticsImage.png</file>
