@@ -114,19 +114,6 @@
     <string>Contraterrorista</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="aleatorioButton">
-   <property name="geometry">
-    <rect>
-     <x>320</x>
-     <y>230</y>
-     <width>81</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Aleatorio</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="empezarButton">
    <property name="geometry">
     <rect>
@@ -221,7 +208,6 @@
   <zorder>labelContraterrorista</zorder>
   <zorder>terroristaButton</zorder>
   <zorder>contraterroristaButton</zorder>
-  <zorder>aleatorioButton</zorder>
   <zorder>empezarButton</zorder>
   <zorder>label</zorder>
   <zorder>labelT</zorder>

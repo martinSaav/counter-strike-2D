@@ -28,8 +28,6 @@ private slots:
 
     void on_contraterroristaButton_clicked();
 
-    void on_aleatorioButton_clicked();
-
     void on_empezarButton_clicked();
 
 signals:
