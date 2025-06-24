@@ -14,6 +14,11 @@
 using SDL2pp::Renderer;
 using SDL2pp::Texture;
 
+struct BloodStain {
+    int x;
+    int y;
+};
+
 class Render {
 private:
     Renderer* sdlRenderer;
@@ -41,6 +46,10 @@ private:
 
     int damageFlashTimer = 0;
     int lastHealth = -1;
+
+    std::vector<BloodStain> bloodStains;
+    std::unordered_map<std::string, int> lastHealths;
+    
 
     // Function to calculate the angle between the player and the mouse
     double getAnglePlayer(int jugadorX, int jugadorY, int mousex, int mousey);

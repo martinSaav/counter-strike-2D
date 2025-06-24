@@ -45,6 +45,18 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
 
     sdlRenderer-> Clear();
 
+    if (mapa.isShaking()) {
+        int elapsed = SDL_GetTicks() - mapa.getShakeStartTime();
+        if (elapsed < mapa.getShakeDuration()) {
+            int offset_x = (rand() % (2 * mapa.getShakeMagnitude() + 1)) - mapa.getShakeMagnitude();
+            int offset_y = (rand() % (2 * mapa.getShakeMagnitude() + 1)) - mapa.getShakeMagnitude();
+            camera.x += offset_x;
+            camera.y += offset_y;
+        } else {
+            mapa.stopShake();
+        }
+    }
+    
     mapa.draw(); //Dibujo el mapa
     
     // Reset bomb
@@ -82,7 +94,24 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     float visionAngle = myAngle;
     if (visionAngle < 0) visionAngle += 360.0;
 
+    for (const auto& stain : bloodStains) {
+        player.drawBlood(stain.x, stain.y);
+    }
+
     for (auto const& jugador : jugadores){
+
+        std::string nombre = jugador.get_user_name();
+        int vida_actual = jugador.get_health();
+    
+        if (lastHealths.find(nombre) == lastHealths.end()) {
+            lastHealths[nombre] = vida_actual;
+        }
+    
+        if (vida_actual < lastHealths[nombre]) {
+            bloodStains.push_back({jugador.get_pos_x(), jugador.get_pos_y()});
+        }
+    
+        lastHealths[nombre] = vida_actual;
 
         if (jugador.get_health() == 0){
             player.drawPlayerDeath(jugador.get_pos_x(), jugador.get_pos_y());
@@ -121,6 +150,9 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     if (mensaje->is_round_ended()){
         Team team = mensaje->get_round_winner();
         mapa.drawEndRound(team, zoom);
+
+        bloodStains.clear();
+        lastHealths.clear();
     }
     
     if (tiempoPartida >= configuracion.tiempoDeCompra){
