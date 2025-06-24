@@ -192,7 +192,7 @@ void MapSprite::exploitBomb(){
     explosion_y = last_bomb_y;
 
     is_shaking = true;
-    shake_start_time = SDL_GetTicks();
+    shake_start_time = SDL_GetTicks() + 2000; // retraso para que la explosión se vea antes de que empiece el temblor
 }
 
 void MapSprite::drawBomb(int bomb_x, int bomb_y){

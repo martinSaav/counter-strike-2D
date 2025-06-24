@@ -29,8 +29,8 @@ class MapSprite : public Component{
 
     bool is_shaking = false;
     Uint32 shake_start_time = 0;
-    int shake_duration_ms = 900; // duración del efecto
-    int shake_magnitude = 6; // magnitud del efecto
+    int shake_duration_ms = 600; // duración del efecto
+    int shake_magnitude = 4; // magnitud del efecto
 
 
     int canalBomb;

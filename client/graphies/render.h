@@ -61,6 +61,5 @@ public:
     void renderFrame(std::optional<GameStateUpdate> mensaje);
     bool puntoEnVision(int playerX, int playerY, float visionAngleDeg, int puntoX, int puntoY);
     void clearScreen();
-    void clearBloodStains();
 };
 #endif
