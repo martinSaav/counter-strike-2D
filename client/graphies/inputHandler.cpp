@@ -29,8 +29,7 @@ void InputHandler::processEvents() {
                     int newWidth = event.window.data1;
                     int newHeight = event.window.data2;
 
-                    configuracion.heightWindow = newHeight;
-                    configuracion.widthWindow = newWidth;
+                    configuracion.reSizeWindow(newWidth, newHeight);
                 }
             }
         }

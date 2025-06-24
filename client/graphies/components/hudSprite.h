@@ -45,9 +45,6 @@ class HudSprite : public Component{
     SDL_Rect destRect;
 
     std::string textureName;
-
-    // Default
-    Action ultimaAction;
     
     void drawHuds(int num, HudType tipo, int& symbolX, int& symbolY);
 

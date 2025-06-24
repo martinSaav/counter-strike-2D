@@ -34,8 +34,8 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
 
     SDL_Rect& camera = configuracion.camera;
 
-    camera.x = myPlayer->get_pos_x() - camWidth / 2;
-    camera.y = myPlayer->get_pos_y() - camHeight / 2;
+    camera.x = myPlayer->get_pos_x() - camWidth / 1.5;
+    camera.y = myPlayer->get_pos_y() - camHeight / 1.5;
 
     // Limitar bordes
     if (camera.x < 0) camera.x = 0;

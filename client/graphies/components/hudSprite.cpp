@@ -324,8 +324,6 @@ void HudSprite::castSizesWeapon(Weapon& weapon, int& anchoWeapon, int& altoWeapo
 void HudSprite::drawSounds(PlayerInfo& myPlayer){
     Action actionActual = myPlayer.get_action();
 
-    if (ultimaAction == actionActual) return;
-
     Weapon weapon = myPlayer.get_active_weapon();
     tipoMusic music;
     int volume = 64;
@@ -353,11 +351,8 @@ void HudSprite::drawSounds(PlayerInfo& myPlayer){
     case Action::BuyingAmmo:
         music = BUY;
         break;
-    case Action::Shoot:
-        ultimaAction = actionActual;
-        return;
     case Action::EquipWeapon:
-        volume = 75;
+        volume = 80;
         music = ITEMEQUIP;
         break;
     case Action::PlantBomb:
@@ -367,5 +362,4 @@ void HudSprite::drawSounds(PlayerInfo& myPlayer){
         return;
     }
     sounds.loadSong(music, 0, volume);
-    ultimaAction = actionActual;
 }
