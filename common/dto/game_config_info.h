@@ -39,6 +39,8 @@ private:
     int32_t tiles_per_movement;
     int32_t game_rate;
     MapConfigInfo map_config;
+    float cone_angle;
+    int32_t opacity;
 
 public:
     GameConfigInfo(int32_t player_health, int32_t number_of_rounds, int32_t starting_money,
@@ -48,7 +50,7 @@ public:
                    int32_t time_to_plant, int32_t bomb_dmg, int32_t round_winner_money,
                    int32_t round_loser_money, int32_t buy_time, int32_t bomb_time,
                    int32_t after_round_time, int32_t money_per_kill, int32_t tiles_per_movement,
-                   int32_t game_rate, MapConfigInfo map_config):
+                   int32_t game_rate, MapConfigInfo map_config, float cone_angle, int32_t opacity):
             player_health(player_health),
             number_of_rounds(number_of_rounds),
             starting_money(starting_money),
@@ -71,7 +73,9 @@ public:
             money_per_kill(money_per_kill),
             tiles_per_movement(tiles_per_movement),
             game_rate(game_rate),
-            map_config(std::move(map_config)) {}
+            map_config(std::move(map_config)),
+            cone_angle(cone_angle),
+            opacity(opacity) {}
 
     void serialize(uint8_t* buffer) const override {
         buffer[0] = static_cast<uint8_t>(message_type);
@@ -162,6 +166,14 @@ public:
 
         map_config.serialize(buffer + offset);
         offset += map_config.serialized_size();
+
+        memcpy(buffer + offset, &cone_angle, sizeof(cone_angle));
+        offset += sizeof(cone_angle);
+
+        int32_t opacity_net = htonl(opacity);
+        memcpy(buffer + offset, &opacity_net, sizeof(opacity_net));
+        offset += sizeof(opacity_net);
+
         uint16_t payload_length = htons(static_cast<uint16_t>(offset - 3));
         std::memcpy(buffer + 1, &payload_length, sizeof(payload_length));
     }
@@ -271,12 +283,21 @@ public:
 
         MapConfigInfo map_config = MapConfigInfo::deserialize(buffer + offset, size - offset);
 
+        float cone_angle;
+        memcpy(&cone_angle, buffer + offset, sizeof(cone_angle));
+        offset += sizeof(cone_angle);
+
+        int32_t opacity;
+        memcpy(&opacity, buffer + offset, sizeof(opacity));
+        opacity = ntohl(opacity);
+
         return GameConfigInfo(player_health, number_of_rounds, starting_money, ct_amount, tt_amount,
                               ammo_price, std::move(knife_config), std::move(glock_config),
                               std::move(ak_config), std::move(awp_config), std::move(m3_config),
                               defuse_time, time_to_plant, bomb_dmg, round_winner_money,
                               round_loser_money, buy_time, bomb_time, after_round_time,
-                              money_per_kill, tiles_per_movement, game_rate, std::move(map_config));
+                              money_per_kill, tiles_per_movement, game_rate, std::move(map_config),
+                              cone_angle, opacity);
     }
 
     MessageType type() const override { return message_type; }
@@ -306,6 +327,8 @@ public:
         size += sizeof(tiles_per_movement);
         size += sizeof(game_rate);
         size += map_config.serialized_size();
+        size += sizeof(cone_angle);
+        size += sizeof(opacity);
         return size;
     }
 
@@ -354,6 +377,10 @@ public:
     int32_t get_game_rate() const { return game_rate; }
 
     const MapConfigInfo& get_map_config() const { return map_config; }
+
+    float get_cone_angle() const { return cone_angle; }
+
+    int32_t get_opacity() const { return opacity; }
 };
 
 #endif

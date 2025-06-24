@@ -1,6 +1,7 @@
 #include "sender.h"
 
 #include <list>
+#include <vector>
 
 #include "catedra/liberror.h"
 #include "common/dto/game_ready_response.h"
@@ -71,7 +72,7 @@ void Sender::send_game_config() const {
             config.time_to_plant, config.bomb_dmg, config.round_winner_money,
             config.round_loser_money, config.buy_time, config.bomb_time, config.after_round_time,
             config.money_per_kill, config.tiles_per_movement, config.game_rate,
-            std::move(map_config));
+            std::move(map_config), config.cone_angle, config.cone_opacity);
     protocol.send_message(game_cfg_message);
 }
 
