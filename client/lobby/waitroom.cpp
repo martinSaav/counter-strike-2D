@@ -52,6 +52,18 @@ void waitRoom::crearVentanaSeleccionSkin(team& teamPlayer){
         SelectSkinRequest requestSkin(this->skinSeleccionada);
         protocolo.send_message(requestSkin);
 
+        std::string ubicacionImagen = ":/imagenes/imagenes/skins/skin" + skinSeleccionada + ".png";
+        QString ubicacion = QString::fromStdString(ubicacionImagen);
+        QPixmap imagen(ubicacion);
+        char team = skinSeleccionada[0];
+
+        if (team == 'C'){
+            ui->labelC->setPixmap(imagen);
+            ui->labelC->setScaledContents(true);
+        } else {
+            ui->labelT->setPixmap(imagen);
+            ui->labelT->setScaledContents(true);
+        }
     });
     windowSkin->exec();
 }

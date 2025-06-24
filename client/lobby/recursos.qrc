@@ -15,5 +15,6 @@
         <file>imagenes/skins/skinT2.png</file>
         <file>imagenes/skins/skinT3.png</file>
         <file>imagenes/skins/skinT4.png</file>
+        <file>imagenes/skins/noSkin.png</file>
     </qresource>
 </RCC>

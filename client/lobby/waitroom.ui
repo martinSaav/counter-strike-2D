@@ -18,7 +18,7 @@
     <rect>
      <x>240</x>
      <y>20</y>
-     <width>261</width>
+     <width>291</width>
      <height>41</height>
     </rect>
    </property>
@@ -45,7 +45,7 @@
     <rect>
      <x>90</x>
      <y>80</y>
-     <width>121</width>
+     <width>171</width>
      <height>31</height>
     </rect>
    </property>
@@ -69,7 +69,7 @@
     <rect>
      <x>490</x>
      <y>87</y>
-     <width>191</width>
+     <width>221</width>
      <height>21</height>
     </rect>
    </property>
@@ -86,26 +86,6 @@
    </property>
    <property name="text">
     <string>Contraterrorista</string>
-   </property>
-  </widget>
-  <widget class="QTableWidget" name="tableTerrorista">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>150</y>
-     <width>256</width>
-     <height>192</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QTableWidget" name="tableContraterrorista">
-   <property name="geometry">
-    <rect>
-     <x>450</x>
-     <y>150</y>
-     <width>256</width>
-     <height>192</height>
-    </rect>
    </property>
   </widget>
   <widget class="QPushButton" name="terroristaButton">
@@ -203,17 +183,49 @@
     <bool>false</bool>
    </property>
   </widget>
+  <widget class="QLabel" name="labelT">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>210</y>
+     <width>101</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="recursos.qrc">:/imagenes/imagenes/skins/noSkin.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelC">
+   <property name="geometry">
+    <rect>
+     <x>530</x>
+     <y>210</y>
+     <width>101</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap resource="recursos.qrc">:/imagenes/imagenes/skins/noSkin.png</pixmap>
+   </property>
+  </widget>
   <zorder>label_2</zorder>
   <zorder>labelSeleccion</zorder>
   <zorder>labelTerrorista</zorder>
   <zorder>labelContraterrorista</zorder>
-  <zorder>tableTerrorista</zorder>
-  <zorder>tableContraterrorista</zorder>
   <zorder>terroristaButton</zorder>
   <zorder>contraterroristaButton</zorder>
   <zorder>aleatorioButton</zorder>
   <zorder>empezarButton</zorder>
   <zorder>label</zorder>
+  <zorder>labelT</zorder>
+  <zorder>labelC</zorder>
  </widget>
  <resources>
   <include location="recursos.qrc"/>
