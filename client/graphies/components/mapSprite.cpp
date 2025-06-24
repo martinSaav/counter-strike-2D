@@ -34,6 +34,12 @@ MapSprite::MapSprite(Renderer* sdlRenderer, Configuracion& configuracion)
     tipoMusic music = AMBIENTE;
     int cantVeces = 4;
     sounds.loadMusic(music, cantVeces);
+
+    //Aplico colores
+    Texture& counterWins = texturas.getTexture("terroristWins");
+    Texture& terroristWins = texturas.getTexture("counterterroristWins");
+    counterWins.SetColorMod(255, 165, 0);
+    terroristWins.SetColorMod(255, 165, 0);
 }
 
 void MapSprite::draw(){
@@ -147,7 +153,7 @@ void MapSprite::drawEndRound(Team& team, int zoom){
         symbolX,
         symbolY,
         anchoCartelPantalla,
-        int(altoCartel * zoom / 8)
+        int(altoCartel * zoom / 4)
     };
 
     switch (team){
@@ -172,7 +178,6 @@ void MapSprite::activateBomb(){
     // Dura 2 segundos
     int cantVeces = 48;
     canalBomb = sounds.loadSong(music, cantVeces);
-    std::cout<<"canal"<<canalBomb<<std::endl;
 }
 
 void MapSprite::desactivateBomb(){
@@ -190,6 +195,7 @@ void MapSprite::exploitBomb(){
 
     explosion_x = last_bomb_x;
     explosion_y = last_bomb_y;
+    this->is_bomb_activated = false;
 }
 
 void MapSprite::drawBomb(int bomb_x, int bomb_y){
