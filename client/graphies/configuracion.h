@@ -2,9 +2,10 @@
 #define CONFIGURACION_H
 
 #include <SDL.h>
+
 #include "../../common/dto/game_config_info.h"
 
-struct Configuracion{
+struct Configuracion {
 
     GameConfigInfo* gameConfig;
     SDL_Rect camera = {0, 0, 0, 0};
@@ -12,10 +13,10 @@ struct Configuracion{
     int widthWindow, heightWindow;
     float tiempoDeCompra;
     int opacidadVision;
-    float conoVision = 70.0f;
+    int conoVision = 70;
 
     // Constructor
-    Configuracion(int width, int height, GameConfigInfo* gameConfig) : gameConfig(gameConfig){
+    Configuracion(int width, int height, GameConfigInfo* gameConfig): gameConfig(gameConfig) {
         widthWindow = width;
         heightWindow = height;
 
@@ -25,14 +26,14 @@ struct Configuracion{
 
         tiempoDeCompra = gameConfig->get_buy_time() / 1000.0f;
         opacidadVision = gameConfig->get_opacity();
-        //conoVision = gameConfig->get_cone_angle();
+        conoVision = gameConfig->get_cone_angle();
     }
 
-    void reSizeWindow(int width, int height){
+    void reSizeWindow(int width, int height) {
         widthWindow = width;
         heightWindow = height;
 
-        if (width > 1200 || height > 1200){
+        if (width > 1200 || height > 1200) {
             zoom = 20.0f;
         } else {
             zoom = 15.0f;

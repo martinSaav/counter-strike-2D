@@ -39,7 +39,7 @@ private:
     int32_t tiles_per_movement;
     int32_t game_rate;
     MapConfigInfo map_config;
-    float cone_angle;
+    int32_t cone_angle;
     int32_t opacity;
 
 public:
@@ -50,7 +50,8 @@ public:
                    int32_t time_to_plant, int32_t bomb_dmg, int32_t round_winner_money,
                    int32_t round_loser_money, int32_t buy_time, int32_t bomb_time,
                    int32_t after_round_time, int32_t money_per_kill, int32_t tiles_per_movement,
-                   int32_t game_rate, MapConfigInfo map_config, float cone_angle, int32_t opacity):
+                   int32_t game_rate, MapConfigInfo map_config, int32_t cone_angle,
+                   int32_t opacity):
             player_health(player_health),
             number_of_rounds(number_of_rounds),
             starting_money(starting_money),
@@ -167,8 +168,9 @@ public:
         map_config.serialize(buffer + offset);
         offset += map_config.serialized_size();
 
-        memcpy(buffer + offset, &cone_angle, sizeof(cone_angle));
-        offset += sizeof(cone_angle);
+        int32_t cone_angle_net = htonl(cone_angle);
+        memcpy(buffer + offset, &cone_angle_net, sizeof(cone_angle_net));
+        offset += sizeof(cone_angle_net);
 
         int32_t opacity_net = htonl(opacity);
         memcpy(buffer + offset, &opacity_net, sizeof(opacity_net));
@@ -282,9 +284,11 @@ public:
         offset += sizeof(game_rate);
 
         MapConfigInfo map_config = MapConfigInfo::deserialize(buffer + offset, size - offset);
+        offset += map_config.serialized_size();
 
-        float cone_angle;
+        int32_t cone_angle;
         memcpy(&cone_angle, buffer + offset, sizeof(cone_angle));
+        cone_angle = ntohl(cone_angle);
         offset += sizeof(cone_angle);
 
         int32_t opacity;
@@ -378,7 +382,7 @@ public:
 
     const MapConfigInfo& get_map_config() const { return map_config; }
 
-    float get_cone_angle() const { return cone_angle; }
+    int32_t get_cone_angle() const { return cone_angle; }
 
     int32_t get_opacity() const { return opacity; }
 };

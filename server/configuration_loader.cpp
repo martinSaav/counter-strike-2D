@@ -202,7 +202,7 @@ GameConfig ConfigurationLoader::load_configuration() const {
     int money_per_kill = config["money_per_kill"].as<int>();
     int tiles_per_movement = config["tiles_per_movement"].as<int>();
     int game_rate = config["game_rate"].as<int>();
-    auto cone_angle = config["cone_angle"].as<float>();
+    int cone_angle = config["cone_angle"].as<int>();
     int cone_opacity = config["cone_opacity"].as<int>();
     YAML::Node knife_config = config["knife"];
     YAML::Node ak_config = config["ak"];
