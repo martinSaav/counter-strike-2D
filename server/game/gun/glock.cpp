@@ -82,6 +82,10 @@ ShootInfo Glock::fire_gun(Map& map, Player& owner, float current_time, Position&
     return ShootInfo{std::move(result)};
 }
 
+
+bool Glock::can_reload() { return reserve_ammo != 0 && current_ammo < max_ammo; }
+
+
 void Glock::reload_gun() {
     if (current_ammo == 0 && reserve_ammo == 0) {
         throw NoAmmo();

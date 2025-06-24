@@ -26,6 +26,10 @@ Awp::Awp(const GunConfig& awp_config):
 
 bool Awp::has_to_shoot(const float current_time) { return !shoots.empty(); }
 
+
+bool Awp::can_reload() { return reserve_ammo != 0 && current_ammo < max_ammo; }
+
+
 void Awp::reload_gun() {
     if (current_ammo == 0 && reserve_ammo == 0) {
         throw NoAmmo();

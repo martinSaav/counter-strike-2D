@@ -106,6 +106,9 @@ ShootInfo M3::fire_gun(Map& map, Player& owner, float current_time, Position& cu
 }
 
 
+bool M3::can_reload() { return reserve_ammo != 0 && current_ammo < max_ammo; }
+
+
 void M3::reload_gun() {
     if (current_ammo == 0 && reserve_ammo == 0) {
         throw NoAmmo();

@@ -38,6 +38,7 @@ class Ak47: public Gun {
 public:
     explicit Ak47(const GunConfig& ak_config);
     GunType get_gun_type() override { return type; }
+    bool can_reload() override;
     void reload_gun() override;
     void shoot_gun(Position final_position, float current_time) override;
     int get_gun_price() override;

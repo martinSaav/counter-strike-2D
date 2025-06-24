@@ -37,6 +37,7 @@ class M3: public Gun {
 public:
     explicit M3(const GunConfig& m3_config);
     GunType get_gun_type() override;
+    bool can_reload() override;
     void reload_gun() override;
     void shoot_gun(Position final_position, float current_time) override;
     int get_gun_price() override;

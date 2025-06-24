@@ -30,6 +30,9 @@ bool Ak47::has_to_shoot(const float current_time) {
            (current_time - time_since_last_shot > static_cast<float>(miliseconds_per_shoot));
 }
 
+bool Ak47::can_reload() { return reserve_ammo != 0 && current_ammo < max_ammo; }
+
+
 void Ak47::reload_gun() {
     if (current_ammo == 0 && reserve_ammo == 0) {
         throw NoAmmo();

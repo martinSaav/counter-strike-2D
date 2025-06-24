@@ -189,12 +189,13 @@ void Player::reload() {
     is_defusing = false;
     is_planting = false;
     try {
-        if (equipped_weapon == GunType::Primary) {
+        if (equipped_weapon == GunType::Primary && primary_weapon->can_reload()) {
             primary_weapon->reload_gun();
-        } else if (equipped_weapon == GunType::Secondary) {
+            last_action = Action::Reload;
+        } else if (equipped_weapon == GunType::Secondary && secondary_weapon->can_reload()) {
             secondary_weapon->reload_gun();
+            last_action = Action::Reload;
         }
-        last_action = Action::Reload;
     } catch (const NoAmmo&) {}
 }
 
