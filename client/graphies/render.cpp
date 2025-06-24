@@ -75,7 +75,7 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     float visionAngle = myAngle;
     if (visionAngle < 0) visionAngle += 360.0;
 
-        // Reset bomb
+    // Reset bomb
     if (mensaje->get_round_time() == 0){
         mapa.desactivateBomb();
     }
@@ -152,7 +152,7 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
 
     if (mensaje->is_round_ended()){
         Team team = mensaje->get_round_winner();
-        mapa.drawEndRound(team, zoom);
+        mapa.drawEndRound(team, mensaje->is_bomb_planted());
 
         bloodStains.clear();
         lastHealths.clear();

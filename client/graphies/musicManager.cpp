@@ -19,6 +19,12 @@ MusicManager::MusicManager(){
     std::string ubicacionBuy = "../client/data/sounds/buy.mp3";
     std::string ubicacionItemEquip = "../client/data/sounds/itemEquip.mp3";
 
+    std::string ubicacionBombHasBeenDefused = "../client/data/sounds/BombHasBeenDefusedCounterTerroristsWin.mp3";
+    std::string ubicacionBombHasBeenPlanted = "../client/data/sounds/BombHasBeenPlanted.mp3";
+    std::string ubicacionCounterTerroristWin = "../client/data/sounds/CounterTerroristWin.mp3";
+    std::string ubicacionTerroristWin = "../client/data/sounds/TerroristsWin.mp3";
+    std::string ubicacionPlantingBomb = "../client/data/sounds/PlantingC4Bomb.mp3";
+
     ficheroDeUbicaciones[tipoMusic::DISPARO_PISTOL] = ubicacionPistol;
     ficheroDeUbicaciones[tipoMusic::DISPARO_AK47] = ubicacionAk47;
     ficheroDeUbicaciones[tipoMusic::KNIFE] = ubicacionKnife;
@@ -28,21 +34,38 @@ MusicManager::MusicManager(){
     ficheroDeUbicaciones[tipoMusic::RIFLERELOAD] = ubicacionReload2;
     ficheroDeUbicaciones[tipoMusic::BUY] = ubicacionBuy;
     ficheroDeUbicaciones[tipoMusic::ITEMEQUIP] = ubicacionItemEquip;
+    
+    ficheroDeUbicaciones[tipoMusic::BOMBHASBEENDEFUSED] = ubicacionBombHasBeenDefused;
+    ficheroDeUbicaciones[tipoMusic::BOMBHASBEENPLANTED] = ubicacionBombHasBeenPlanted;
+    ficheroDeUbicaciones[tipoMusic::COUNTERTERRORISTWIN] = ubicacionCounterTerroristWin;
+    ficheroDeUbicaciones[tipoMusic::TERRORISTWIN] = ubicacionTerroristWin;
+    ficheroDeUbicaciones[tipoMusic::PLANTINGBOMB] = ubicacionPlantingBomb;
 
     Mix_Music *musica; musica = Mix_LoadMUS(ubicacionAmbienceGame.c_str());
     ficheroDeMusica[tipoMusic::AMBIENTE] = musica;
     ficheroDeUbicaciones[tipoMusic::AMBIENTE] = ubicacionAmbienceGame;
 
     // Sonidos cortos
-    ficheroDeChunks[tipoMusic::DISPARO_PISTOL] = Mix_LoadWAV(ficheroDeUbicaciones[tipoMusic::DISPARO_PISTOL].c_str());
-    ficheroDeChunks[tipoMusic::DISPARO_AK47] = Mix_LoadWAV(ficheroDeUbicaciones[tipoMusic::DISPARO_AK47].c_str());
-    ficheroDeChunks[tipoMusic::KNIFE] = Mix_LoadWAV(ficheroDeUbicaciones[tipoMusic::KNIFE].c_str());
-    ficheroDeChunks[tipoMusic::TIMER] = Mix_LoadWAV(ficheroDeUbicaciones[tipoMusic::TIMER].c_str());
-    ficheroDeChunks[tipoMusic::EXPLOIT] = Mix_LoadWAV(ficheroDeUbicaciones[tipoMusic::EXPLOIT].c_str());
-    ficheroDeChunks[tipoMusic::PISTOLRELOAD] = Mix_LoadWAV(ficheroDeUbicaciones[tipoMusic::PISTOLRELOAD].c_str());
-    ficheroDeChunks[tipoMusic::RIFLERELOAD] = Mix_LoadWAV(ficheroDeUbicaciones[tipoMusic::RIFLERELOAD].c_str());
-    ficheroDeChunks[tipoMusic::BUY] = Mix_LoadWAV(ficheroDeUbicaciones[tipoMusic::BUY].c_str());
-    ficheroDeChunks[tipoMusic::ITEMEQUIP] = Mix_LoadWAV(ficheroDeUbicaciones[tipoMusic::ITEMEQUIP].c_str());
+    std::vector<tipoMusic> sonidos = {
+        tipoMusic::DISPARO_PISTOL,
+        tipoMusic::DISPARO_AK47,
+        tipoMusic::KNIFE,
+        tipoMusic::TIMER,
+        tipoMusic::EXPLOIT,
+        tipoMusic::PISTOLRELOAD,
+        tipoMusic::RIFLERELOAD,
+        tipoMusic::BUY,
+        tipoMusic::ITEMEQUIP,
+        tipoMusic::BOMBHASBEENDEFUSED,
+        tipoMusic::BOMBHASBEENPLANTED,
+        tipoMusic::COUNTERTERRORISTWIN,
+        tipoMusic::TERRORISTWIN,
+        tipoMusic::PLANTINGBOMB
+    };
+
+    for (auto tipo : sonidos) {
+        ficheroDeChunks[tipo] = Mix_LoadWAV(ficheroDeUbicaciones[tipo].c_str());
+    }
 }
 
 MusicManager::~MusicManager(){

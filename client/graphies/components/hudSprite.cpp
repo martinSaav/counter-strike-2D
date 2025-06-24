@@ -360,6 +360,9 @@ void HudSprite::drawSounds(PlayerInfo& myPlayer){
         volume = 75;
         music = ITEMEQUIP;
         break;
+    case Action::PlantBomb:
+        music = PLANTINGBOMB;
+        break;
     default:
         return;
     }

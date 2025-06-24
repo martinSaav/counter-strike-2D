@@ -39,6 +39,8 @@ class MapSprite : public Component{
 
     bool is_bomb_activated = false;
 
+    bool is_finish_sound_round = false;
+
     const MapConfigInfo& mapConfig;
 
     public:
@@ -56,7 +58,7 @@ class MapSprite : public Component{
 
     int getHeight();
 
-    void drawEndRound(Team& team, int zoom);
+    void drawEndRound(Team& team, bool is_bomb_planted);
 
     void drawBomb(int bomb_x, int bomb_y);
 

@@ -143,9 +143,10 @@ int MapSprite::getHeight(){
     return worldHeight;
 }
 
-void MapSprite::drawEndRound(Team& team, int zoom){
+void MapSprite::drawEndRound(Team& team, bool is_bomb_planted){
     std::string textureName;
-    int anchoCartelPantalla = anchoCartel * zoom / 8;
+    tipoMusic music;
+    int anchoCartelPantalla = anchoCartel * configuracion.zoom / 8;
     int symbolX = (configuracion.widthWindow * 0.5) - anchoCartelPantalla / 2;
     int symbolY = configuracion.heightWindow * 0.2;
 
@@ -153,18 +154,29 @@ void MapSprite::drawEndRound(Team& team, int zoom){
         symbolX,
         symbolY,
         anchoCartelPantalla,
-        int(altoCartel * zoom / 4)
+        int(altoCartel * configuracion.zoom / 4)
     };
 
     switch (team){
     case Team::Terrorists:
         textureName = "terroristWins";
+        music = TERRORISTWIN;
         break;
     case Team::CounterTerrorists:
         textureName = "counterterroristWins";
+        music = COUNTERTERRORISTWIN;
         break;
     }
     drawHud2(destRect, textureName);
+
+
+    if (!is_bomb_planted && is_bomb_activated){
+        music = BOMBHASBEENDEFUSED;
+    }
+    if (!is_finish_sound_round){
+        sounds.loadSong(music);
+        this->is_finish_sound_round = true;
+    }
 }
 
 bool MapSprite::isBombActivated(){
@@ -174,7 +186,11 @@ bool MapSprite::isBombActivated(){
 void MapSprite::activateBomb(){
     this->is_bomb_activated = true;
 
-    tipoMusic music = TIMER;
+    tipoMusic music = BOMBHASBEENPLANTED;
+
+    sounds.loadSong(music);
+
+    music = TIMER;
     // Dura 2 segundos
     int cantVeces = 48;
     canalBomb = sounds.loadSong(music, cantVeces);
@@ -182,6 +198,7 @@ void MapSprite::activateBomb(){
 
 void MapSprite::desactivateBomb(){
     this->is_bomb_activated = false;
+    this->is_finish_sound_round = false;
     sounds.stopSongs(canalBomb);
 }
 
