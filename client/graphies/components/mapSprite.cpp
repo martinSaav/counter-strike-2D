@@ -143,7 +143,7 @@ int MapSprite::getHeight(){
     return worldHeight;
 }
 
-void MapSprite::drawEndRound(Team& team, bool is_bomb_planted){
+void MapSprite::drawEndRound(Team& teamWiner, bool is_bomb_planted){
     std::string textureName;
     tipoMusic music;
     int anchoCartelPantalla = anchoCartel * configuracion.zoom / 8;
@@ -157,7 +157,7 @@ void MapSprite::drawEndRound(Team& team, bool is_bomb_planted){
         int(altoCartel * configuracion.zoom / 4)
     };
 
-    switch (team){
+    switch (teamWiner){
     case Team::Terrorists:
         textureName = "terroristWins";
         music = TERRORISTWIN;
@@ -170,7 +170,7 @@ void MapSprite::drawEndRound(Team& team, bool is_bomb_planted){
     drawHud2(destRect, textureName);
 
 
-    if (!is_bomb_planted && is_bomb_activated){
+    if (teamWiner == Team::CounterTerrorists && is_bomb_activated){
         music = BOMBHASBEENDEFUSED;
     }
     if (!is_finish_sound_round){
@@ -184,6 +184,8 @@ bool MapSprite::isBombActivated(){
 }
 
 void MapSprite::activateBomb(){
+
+    if (is_bomb_activated) return;
     this->is_bomb_activated = true;
 
     tipoMusic music = BOMBHASBEENPLANTED;
@@ -230,10 +232,6 @@ void MapSprite::drawBomb(int bomb_x, int bomb_y){
 
     std::string textureName = "bomb";
     drawHud2(destRectBomb, textureName);
-
-    if (!is_bomb_activated){
-        activateBomb();
-    }
 }
 
 void MapSprite::drawExplosion() {
@@ -287,9 +285,17 @@ void MapSprite::drawCampField(int angle, int playerX, int playerY){
     int playerCenterX = playerX + int(30 / 8) / 2;
     int playerCenterY = playerY + int(30 / 8) / 2;
 
-    // Posición del jugador en la pantalla (en píxeles)
+    // Posición del jugador en la pantalla
     int playerScreenX = int((playerCenterX - configuracion.camera.x) * configuracion.zoom);
     int playerScreenY = int((playerCenterY - configuracion.camera.y) * configuracion.zoom);
+
+    if (configuracion.heightWindow > 1000 || configuracion.widthWindow > 1000){
+        anchoField = 3700;
+        altoField = 3700;
+    } else {
+        anchoField = 2300;
+        altoField = 2300;
+    }
 
     SDL_Rect destRect = {
         playerScreenX - anchoField / 2,

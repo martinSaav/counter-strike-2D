@@ -29,9 +29,9 @@ Estadistics::Estadistics(std::unique_ptr<GameStateUpdate>& gameState, QWidget *p
     Team teamWinner = gameState->get_game_winner();
     std::string winner;
     if (teamWinner == Team::Terrorists){
-        winner = "Terrorist wins";
+        winner = "Orange team wins";
     } else {
-        winner = "CounterTerrorists wins";
+        winner = "Blue team wins";
     }
     QString qtexto = QString::fromStdString(winner);
     ui->labelWinner->setText(qtexto);

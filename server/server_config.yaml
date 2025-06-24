@@ -16,8 +16,8 @@ money_per_kill: 600
 tiles_per_movement: 2
 game_rate: 30
 ammo_price: 200
-cone_angle: 0.39269908169872414 # pi / 8
-cone_opacity: 110
+cone_angle: 70.0
+cone_opacity: 150
 knife:
   min_dmg: 40
   max_dmg: 70

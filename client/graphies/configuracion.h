@@ -10,8 +10,9 @@ struct Configuracion{
     SDL_Rect camera = {0, 0, 0, 0};
     float zoom = 20.0f;
     int widthWindow, heightWindow;
-    int tiempoDeCompra = 20;
-    int opacidadVision = 150;
+    float tiempoDeCompra;
+    int opacidadVision;
+    float conoVision = 70.0f;
 
     // Constructor
     Configuracion(int width, int height, GameConfigInfo* gameConfig) : gameConfig(gameConfig){
@@ -21,6 +22,10 @@ struct Configuracion{
         int camWidth = widthWindow / zoom;
         int camHeight = heightWindow / zoom;
         camera = {0, 0, camWidth, camHeight};
+
+        tiempoDeCompra = gameConfig->get_buy_time() / 1000.0f;
+        opacidadVision = gameConfig->get_opacity();
+        //conoVision = gameConfig->get_cone_angle();
     }
 };
 #endif

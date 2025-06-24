@@ -89,6 +89,8 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
         if (puntoEnVision(myPlayer->get_pos_x(), myPlayer->get_pos_y(), visionAngle, bomb_x, bomb_y)) {
             mapa.drawBomb(bomb_x, bomb_y);
         }
+
+        mapa.activateBomb();
     } 
 
     if (is_bomb_planted && mensaje->is_round_ended() && mensaje->get_bomb_timer() == 0 && mensaje->get_round_winner() == Team::Terrorists) {
@@ -157,8 +159,7 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
         bloodStains.clear();
         lastHealths.clear();
     }
-    
-    if (tiempoPartida >= configuracion.tiempoDeCompra){
+    if (tiempoPartida >= configuracion.tiempoDeCompra && myPlayer->get_status() == Status::Alive){
         mapa.drawCampField(myAngle, myPlayer->get_pos_x(), myPlayer->get_pos_y());
     } else {
         mapa.drawShop();
@@ -203,7 +204,7 @@ double Render::getAnglePlayer(int jugadorX, int jugadorY, int mousex, int mousey
 }
 
 bool Render::puntoEnVision(int playerX, int playerY, float visionAngleDeg, int puntoX, int puntoY) {
-    float fovDeg = 70.0f;
+    float fovDeg = configuracion.conoVision;
     float radius = 60.0f;
     float dx = puntoX - playerX;
     float dy = puntoY - playerY;

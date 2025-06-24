@@ -7,8 +7,8 @@
 class MapSprite : public Component{
 
     private:
-    int anchoField = 2300;
-    int altoField = 2300;
+    int anchoField;
+    int altoField;
 
     int anchoCartel = 210;
     int altoCartel = 50;
