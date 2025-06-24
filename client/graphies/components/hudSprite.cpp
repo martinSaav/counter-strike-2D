@@ -120,18 +120,20 @@ void HudSprite::draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlaye
     }
 
     symbolX = weidthWindow * 0.05;
-    symbolY = heightWindow * 0.02;
-    int anchoCartel = 100;
+    symbolY = heightWindow * 0.00;
+    int anchoCartel;
+    int altoCartel = 100;
     // team poster
     char team = myPlayer.get_skin()[0];
     if (team == 'C'){
         textureName = "counterTerroristPost";
-        anchoCartel = 150;
+        anchoCartel = 260;
     } else {
         textureName = "terroristPost";
+        anchoCartel = 200;
     }
 
-    destRect = {symbolX, symbolY, anchoCartel, 70};
+    destRect = {symbolX, symbolY, anchoCartel, altoCartel};
     drawHud2(destRect, textureName);
 
     // mira

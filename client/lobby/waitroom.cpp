@@ -9,7 +9,6 @@ waitRoom::waitRoom(Protocol& protocolo, tipoUsuario& usuario, QWidget *parent)
 
     ui->setupUi(this);
     this->parentWidget()->hide();
-    ui->aleatorioButton->hide();
 
     if (usuario == UNIDO){
         ui->empezarButton->setEnabled(false);
@@ -66,10 +65,6 @@ void waitRoom::crearVentanaSeleccionSkin(team& teamPlayer){
         }
     });
     windowSkin->exec();
-}
-
-void waitRoom::on_aleatorioButton_clicked(){
-
 }
 
 void waitRoom::on_empezarButton_clicked(){
