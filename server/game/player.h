@@ -56,6 +56,7 @@ class Player {
     GunType equipped_weapon;
     std::vector<std::pair<int, int>>
             chunks_idxs;  // indices de los chunks en los que se encuentra el jugador
+    Action last_action;
     void add_kill();
     void receive_damage(const GameManager& manager, int damage);
     [[nodiscard]] Gun& get_equipped_gun() const;
@@ -82,7 +83,8 @@ public:
             is_defusing(false),
             defuse_time(0),
             current_team(team),
-            status(Status::Alive) {
+            status(Status::Alive),
+            last_action(Action::Idle) {
         terrorist_skin = PlayerSkin::T1;
         ct_skin = PlayerSkin::C1;
         chunks_idxs.emplace_back(0, 0);
@@ -106,6 +108,7 @@ public:
     [[nodiscard]] Team get_team() const;
     void restore() {
         status = Status::Alive;
+        last_action = Action::Idle;
         bomb = nullptr;
         is_planting = false;
         is_defusing = false;
@@ -125,7 +128,10 @@ public:
     void equip_bomb(std::unique_ptr<BombEncapsulator> bomb) { this->bomb = std::move(bomb); }
     void equip_weapon(std::unique_ptr<Gun> gun);
     [[nodiscard]] bool is_currently_defusing() const { return is_defusing; }
-    void start_defusing() { is_defusing = true; }
+    void start_defusing() {
+        is_defusing = true;
+        last_action = Action::DefuseBomb;
+    }
     void reload();
     bool operator==(const Player& player) const = delete;
     WeaponInfo get_primary_weapon_info();
@@ -135,6 +141,7 @@ public:
     void switch_weapon(GunType gun_type);
     void buy_weapon(std::unique_ptr<Gun> gun);
     void buy_ammo(GunType gun_type);
+    void set_idle();
 
     [[nodiscard]] std::string get_username() const { return username; }
 };

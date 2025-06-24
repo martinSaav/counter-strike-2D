@@ -23,10 +23,6 @@ void Player::set_location(const Position position, std::vector<std::pair<int, in
 
 
 PlayerDTO Player::get_player_info() {
-    auto last_action = Action::Idle;
-    if (is_shooting) {
-        last_action = Action::Shoot;
-    }
     Weapon bomb_info = Weapon::None;
     if (bomb != nullptr) {
         bomb_info = Weapon::Bomb;
@@ -137,6 +133,7 @@ void Player::buy_weapon(std::unique_ptr<Gun> gun) {
         } else {
             secondary_weapon = std::move(gun);
         }
+        last_action = Action::BuyingWeapon;
     }
 }
 
@@ -150,6 +147,7 @@ void Player::buy_ammo(const GunType gun_type) {
             secondary_weapon->add_magazine();
             money -= ammo_price;
         }
+        last_action = Action::BuyingAmmo;
     }
 }
 
@@ -196,6 +194,7 @@ void Player::reload() {
         } else if (equipped_weapon == GunType::Secondary) {
             secondary_weapon->reload_gun();
         }
+        last_action = Action::Reload;
     } catch (const NoAmmo&) {}
 }
 
@@ -262,6 +261,7 @@ void Player::update(GameManager& game_manager) {
         if (gun_to_shoot.get_gun_type() == GunType::Bomb) {
             if (game_manager.can_plant_bomb(position_x, position_y)) {
                 gun_to_shoot.fire_gun(map, *this, time, pos);
+                last_action = Action::PlantBomb;
             }
         }
         const ShootInfo shoots = gun_to_shoot.fire_gun(map, *this, time, pos);
@@ -279,6 +279,7 @@ void Player::update(GameManager& game_manager) {
             aim_x = x;
             aim_y = y;
         }
+        last_action = Action::Shoot;
         is_shooting = true;
     }
     if (is_planting && bomb->has_finished_planting(time)) {
@@ -322,6 +323,7 @@ void Player::equip_weapon(std::unique_ptr<Gun> gun) {
         secondary_weapon = std::move(gun);
     }
     equipped_weapon = type;
+    last_action = Action::EquipWeapon;
 }
 
 
@@ -339,3 +341,6 @@ WeaponInfo Player::get_secondary_weapon_info() {
     }
     return secondary_weapon->get_weapon_name();
 }
+
+
+void Player::set_idle() { last_action = Action::Idle; }

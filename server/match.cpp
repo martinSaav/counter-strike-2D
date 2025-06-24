@@ -410,6 +410,13 @@ void Match::update_game() {
 }
 
 
+void Match::reset_players_actions() {
+    for (const auto& player: players | std::views::values) {
+        player->set_idle();
+    }
+}
+
+
 void Match::run_game_loop() {
     using clock = std::chrono::steady_clock;
     using duration_ms = std::chrono::duration<double, std::milli>;
@@ -426,6 +433,7 @@ void Match::run_game_loop() {
 
         update_game();
         broadcast_match_status();
+        reset_players_actions();
 
         auto end = clock::now();
         duration_ms elapsed = end - start;
