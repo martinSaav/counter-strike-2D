@@ -50,6 +50,8 @@ class Match: public Thread {
 
     void broadcast_match_status();
 
+    void try_half_movement(const std::shared_ptr<Player>& player, int x_mov, int y_mov);
+
     void process_move_player(const std::shared_ptr<Player>& player, int x_mov, int y_mov);
 
     void process_movement_request(PlayerCredentials credentials, MovementType command,

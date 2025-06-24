@@ -100,8 +100,8 @@ map_config:
       y: 75
       width: 37
       height: 25
-    - x: 25
-      y: 62
+    - x: 62
+      y: 25
       width: 37
       height: 25
   bomb_site:

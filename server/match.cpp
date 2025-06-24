@@ -31,17 +31,13 @@ GameIdentification Match::join_match(const std::string& username) {
 }
 
 
-void Match::process_move_player(const std::shared_ptr<Player>& player, const int x_mov,
-                                const int y_mov) {
-    if (!game_manager.can_player_move_or_shoot(player)) {
-        return;
-    }
+void Match::try_half_movement(const std::shared_ptr<Player>& player, int x_mov, int y_mov) {
     auto [old_x, old_y] = player->get_location();
-    const int new_x = old_x + x_mov;
-    const int new_y = old_y + y_mov;
+    const int new_x = old_x + x_mov / 2;
+    const int new_y = old_y + y_mov / 2;
     try {
         auto new_chunks = map.calculate_player_chunks(new_x, new_y);
-        for (const std::vector<Structure> structures = map.get_structures_near_player(player);
+        for (const std::vector<Structure> structures = map.get_structures_near_player(new_x, new_y);
              const auto& structure: structures) {
             if (CollisionDetector::check_collision_between_player_and_structure(new_x, new_y,
                                                                                 structure)) {
@@ -53,6 +49,36 @@ void Match::process_move_player(const std::shared_ptr<Player>& player, const int
                 return CollisionDetector::check_collision_between_players(new_x, new_y, *p);
             })) {
             return;
+        }
+        const Position new_pos(new_x, new_y);
+        player->set_location(new_pos, std::move(new_chunks));
+    } catch (const InvalidPosition&) {
+    } catch (const PositionOutOfRange&) {}
+}
+
+
+void Match::process_move_player(const std::shared_ptr<Player>& player, const int x_mov,
+                                const int y_mov) {
+    if (!game_manager.can_player_move_or_shoot(player)) {
+        return;
+    }
+    auto [old_x, old_y] = player->get_location();
+    const int new_x = old_x + x_mov;
+    const int new_y = old_y + y_mov;
+    try {
+        auto new_chunks = map.calculate_player_chunks(new_x, new_y);
+        for (const std::vector<Structure> structures = map.get_structures_near_player(new_x, new_y);
+             const auto& structure: structures) {
+            if (CollisionDetector::check_collision_between_player_and_structure(new_x, new_y,
+                                                                                structure)) {
+                return try_half_movement(player, x_mov, y_mov);
+            }
+        }
+        if (const auto& near_players = map.get_near_players(player);
+            std::ranges::any_of(near_players, [&](const auto& p) {
+                return CollisionDetector::check_collision_between_players(new_x, new_y, *p);
+            })) {
+            return try_half_movement(player, x_mov, y_mov);
         }
         const Position new_pos(new_x, new_y);
         player->set_location(new_pos, std::move(new_chunks));

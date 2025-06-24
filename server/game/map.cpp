@@ -79,8 +79,7 @@ bool Map::check_if_position_is_in_range(const int x, const int y) const {
 }
 
 
-std::vector<Structure> Map::get_structures_near_player(const std::shared_ptr<Player>& player) {
-    auto [x, y] = player->get_location();
+std::vector<Structure> Map::get_structures_near_player(int x, int y) {
     std::set<std::pair<int, int>> chunks_indexes;
     const auto chunk_index_1 = get_chunk_index(x, y);
     const auto chunk_index_2 = get_chunk_index(x + player_hitbox_width, y);

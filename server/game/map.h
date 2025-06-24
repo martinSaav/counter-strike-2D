@@ -64,7 +64,7 @@ public:
     void add_structure(Structure structure);
     void add_bombsite(BombSite site);
     void add_player(const std::shared_ptr<Player>& player);
-    std::vector<Structure> get_structures_near_player(const std::shared_ptr<Player>& player);
+    std::vector<Structure> get_structures_near_player(int x, int y);
     [[nodiscard]] std::vector<std::pair<int, int>> calculate_player_chunks(int bottom_x,
                                                                            int bottom_y) const;
     [[nodiscard]] std::vector<std::shared_ptr<Player>> get_near_players(
