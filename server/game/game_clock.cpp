@@ -51,6 +51,7 @@ void GameClock::reset() {
     bomb_timer = 0;
     bomb_planted = false;
     bomb_exploded = false;
+    bomb_defused = false;
     has_round_finished = false;
 }
 
