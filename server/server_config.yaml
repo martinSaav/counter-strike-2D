@@ -60,7 +60,7 @@ m3:
   gun_price: 1700
   range: 15
   angle: 0.39269908169872414 # pi / 8
-  shoot_cooldown: 3000
+  shoot_cooldown: 1000
   base_precision: 0.85
   distance_precision_modifier: 0.06666666
 map_config:
