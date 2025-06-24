@@ -13,7 +13,7 @@ struct Configuracion {
     int widthWindow, heightWindow;
     float tiempoDeCompra;
     int opacidadVision;
-    int conoVision = 70;
+    int conoVision;
 
     // Constructor
     Configuracion(int width, int height, GameConfigInfo* gameConfig): gameConfig(gameConfig) {
