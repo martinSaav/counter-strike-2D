@@ -121,6 +121,9 @@ public:
             secondary_weapon->reset_time();
             secondary_weapon->reset_shoots();
         }
+        if (equipped_weapon == GunType::Bomb) {
+            equipped_weapon = GunType::Secondary;
+        }
         knife->reset_time();
         knife->reset_shoots();
     }
