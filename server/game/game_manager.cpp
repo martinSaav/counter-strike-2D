@@ -156,7 +156,7 @@ void GameManager::start_defusing(const std::shared_ptr<Player>& player) const {
     if (!map.can_defuse(player)) {
         return;
     }
-    player->is_defusing = true;
+    player->start_defusing();
     player->defuse_time = clock.get_time();
 }
 
