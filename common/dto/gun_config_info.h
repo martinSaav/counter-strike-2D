@@ -20,6 +20,8 @@ private:
     // m3 config cone angle and opacity
     float cone_angle;
     int32_t opacity;
+
+    public:
     GunConfigInfo(int32_t max_ammo, int32_t starting_reserve_ammo,
                   int32_t min_dmg, int32_t max_dmg, int32_t gun_price,
                   int32_t bullets_per_burst, int32_t shoot_cooldown,
