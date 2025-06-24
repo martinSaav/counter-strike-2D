@@ -103,6 +103,8 @@ class Match: public Thread {
 
     void update_game();
 
+    void reset_players_actions();
+
     void run_game_loop();
 
     void wait_for_players_to_leave_match();
