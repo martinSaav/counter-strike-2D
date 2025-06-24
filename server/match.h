@@ -116,7 +116,7 @@ public:
             match_started(false),
             player_count(0),
             max_player_count(game_config.ct_amount + game_config.tt_amount),
-            map(game_config.map_config),
+            map(game_config),
             game_clock(game_config),
             game_manager(map, game_clock, game_config),
             game_config(game_config) {}

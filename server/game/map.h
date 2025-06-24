@@ -60,7 +60,7 @@ class Map {
 
 
 public:
-    explicit Map(const MapConfig& config);
+    explicit Map(const GameConfig& config);
     void add_structure(Structure structure);
     void add_bombsite(BombSite site);
     void add_player(const std::shared_ptr<Player>& player);

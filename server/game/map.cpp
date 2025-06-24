@@ -5,20 +5,27 @@
 #include <set>
 
 #include "collision_detector.h"
+#include "gun_shop.h"
 
 
-Map::Map(const MapConfig& config):
-        ct_site(config.ct_site),
-        tt_site(config.tt_site),
+Map::Map(const GameConfig& config):
+        ct_site(config.map_config.ct_site),
+        tt_site(config.map_config.tt_site),
         dropped_bomb({Position(0, 0), nullptr}),
-        max_x(config.map_width),
-        max_y(config.map_height) {
-    for (const auto structure: config.structures) {
+        max_x(config.map_config.map_width),
+        max_y(config.map_config.map_height) {
+    for (const auto structure: config.map_config.structures) {
         try {
             add_structure(structure);
         } catch (...) {}
     }
-    add_bombsite(config.bombsite);
+    add_bombsite(config.map_config.bombsite);
+    for (auto [position, weapon]: config.map_config.dropped_weapons) {
+        try {
+            std::unique_ptr<Gun> gun = GunShop::get_gun(weapon, config);
+            dropped_guns.emplace_back(position, std::move(gun));
+        } catch (const CantBuyWeapon&) {}
+    }
 }
 
 
@@ -391,7 +398,7 @@ std::unique_ptr<Gun> Map::pick_weapon(int x, int y) {
             CollisionDetector::check_collision_between_player_and_structure(x, y, gun_hitbox)) {
             std::unique_ptr<Gun> gun = std::move(it->second);
             dropped_guns.erase(it);
-            return std::move(gun);
+            return gun;
         }
         ++it;
     }
@@ -407,7 +414,7 @@ std::unique_ptr<BombEncapsulator> Map::pick_bomb(const int x, const int y) {
         CollisionDetector::check_collision_between_player_and_structure(x, y, bomb_hitbox)) {
         std::unique_ptr<BombEncapsulator> bomb = std::move(dropped_bomb.second);
         dropped_bomb.second = nullptr;
-        return std::move(bomb);
+        return bomb;
     }
     return nullptr;
 }

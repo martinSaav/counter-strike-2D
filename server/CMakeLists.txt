@@ -22,6 +22,7 @@ target_sources(taller_server
         message_parser.cpp
         game_config.cpp
         configuration_loader.cpp
+        weapon_translator.cpp
         main.cpp
     PUBLIC
         client_handler.h
@@ -56,6 +57,7 @@ target_sources(taller_server
         configuration_loader.h
         message_parser.h
         map_config.h
+        weapon_translator.h
 )
 
 add_subdirectory(game)
