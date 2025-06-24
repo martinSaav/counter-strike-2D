@@ -1,11 +1,5 @@
 #include "inputHandler.h"
 
-#include "../../common/action.h"
-#include "../../common/dto/player_action.h"
-#include "../../common/dto/disconnect_request.h"
-#include "../../common/dto/buy_weapon_request.h"
-#include "../../common/dto/buy_ammo_request.h"
-
 InputHandler::InputHandler(Protocol& protocolo, Configuracion& configuracion, bool& gameOver, bool& clientClosed): 
 protocolo(protocolo), configuracion(configuracion), gameOver(gameOver), clientClosed(clientClosed){
     SDL_StartTextInput();  // Activa entrada de texto
@@ -41,8 +35,7 @@ void InputHandler::processEvents() {
             }
         }
 
-        Action actionActual;
-        Action* action = nullptr;
+        action = nullptr;
 
         // Leer estado del teclado
         const Uint8* state = SDL_GetKeyboardState(NULL);
@@ -56,7 +49,35 @@ void InputHandler::processEvents() {
             protocolo.send_message(disconnect);
         }
 
-        if (state[SDL_SCANCODE_W]) {
+        if (state[SDL_SCANCODE_W] && state[SDL_SCANCODE_D]){
+            actionActual = Action::MoveUp;
+            sendMensaje(actionActual);
+            
+            actionActual = Action::MoveRight;
+            action = &actionActual;
+
+        } else if (state[SDL_SCANCODE_W] && state[SDL_SCANCODE_A]) {
+            actionActual = Action::MoveUp;
+            sendMensaje(actionActual);
+            
+            actionActual = Action::MoveLeft;
+            action = &actionActual;
+
+        } else if (state[SDL_SCANCODE_S] && state[SDL_SCANCODE_A]) {
+            actionActual = Action::MoveDown;
+            sendMensaje(actionActual);
+            
+            actionActual = Action::MoveLeft;
+            action = &actionActual;
+
+        } else if (state[SDL_SCANCODE_S] && state[SDL_SCANCODE_D]) {
+            actionActual = Action::MoveDown;
+            sendMensaje(actionActual);
+            
+            actionActual = Action::MoveRight;
+            action = &actionActual;
+
+        } else if (state[SDL_SCANCODE_W]) {
             actionActual = Action::MoveUp;
             action = &actionActual;
 
@@ -102,17 +123,13 @@ void InputHandler::processEvents() {
         }
 
         if (action) {
-            mouse_map_x = int(mouseX / configuracion.zoom + configuracion.camera.x);
-            mouse_map_y = int(mouseY / configuracion.zoom + configuracion.camera.y);
-            PlayerAction playerAction(*action, mouse_map_x, mouse_map_y);
-            protocolo.send_message(playerAction);
+            sendMensaje(*action);
         }
 
         // Disparo (por click, independiente del movimiento)
         if (mouseState & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-            mouse_map_x = int(mouseX / configuracion.zoom + configuracion.camera.x);
-            mouse_map_y = int(mouseY / configuracion.zoom + configuracion.camera.y);
-            protocolo.send_message(PlayerAction(Action::Shoot, mouse_map_x, mouse_map_y));
+            actionActual = Action::Shoot;
+            sendMensaje(actionActual);
         }
 
         // Compra independiente
@@ -158,4 +175,11 @@ std::optional<std::string> InputHandler::getMensaje() {
         return mensaje;
     }
     return std::nullopt;
+}
+
+void InputHandler::sendMensaje(Action& actionActual) {
+    mouse_map_x = int(mouseX / configuracion.zoom + configuracion.camera.x);
+    mouse_map_y = int(mouseY / configuracion.zoom + configuracion.camera.y);
+    PlayerAction playerAction(actionActual, mouse_map_x, mouse_map_y);
+    protocolo.send_message(playerAction);
 }

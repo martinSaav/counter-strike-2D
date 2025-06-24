@@ -8,6 +8,11 @@
 #include <iostream>
 #include "../../common/protocol.h"
 #include "configuracion.h"
+#include "../../common/action.h"
+#include "../../common/dto/player_action.h"
+#include "../../common/dto/disconnect_request.h"
+#include "../../common/dto/buy_weapon_request.h"
+#include "../../common/dto/buy_ammo_request.h"
 
 // Lee el teclado y envía los mensajes al servidor
 class InputHandler {
@@ -23,6 +28,10 @@ private:
     int mouseY = 0;
     int mouse_map_x = 0;
     int mouse_map_y = 0;
+    Action actionActual;
+    Action* action = nullptr;
+
+    void sendMensaje(Action& actionActual);
 
 public:
     InputHandler(Protocol& protocolo, Configuracion& configuracion, bool& gameOver, bool& clientClosed);
