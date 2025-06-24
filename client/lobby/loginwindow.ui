@@ -62,7 +62,7 @@ background-color: transparent;</string>
     </font>
    </property>
    <property name="text">
-    <string>SING UP</string>
+    <string>SIGN UP</string>
    </property>
   </widget>
   <widget class="QTextEdit" name="usernameInput">
