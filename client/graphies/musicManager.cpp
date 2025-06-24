@@ -8,7 +8,7 @@ MusicManager::MusicManager(){
 
     // En el constructor:
     std::string ubicacionPistol = "../client/data/sounds/pistolShot.wav";
-    std::string ubicacionAk47 = "../client/data/sounds/akShot.mp3";
+    std::string ubicacionAk47 = "../client/data/sounds/ak47.wav";
     std::string ubicacionKnife = "../client/data/sounds/knife.wav";
     std::string ubicacionStep = "../client/data/sounds/step.wav";
     std::string ubicacionTimer = "../client/data/sounds/timer.wav";
@@ -18,6 +18,8 @@ MusicManager::MusicManager(){
     std::string ubicacionReload2 = "../client/data/sounds/rifleReload.mp3";
     std::string ubicacionBuy = "../client/data/sounds/buy.mp3";
     std::string ubicacionItemEquip = "../client/data/sounds/itemEquip.mp3";
+    std::string ubicacionAwp = "../client/data/sounds/awp.wav";
+    std::string ubicacionM3 = "../client/data/sounds/m3.wav";
 
     std::string ubicacionBombHasBeenDefused = "../client/data/sounds/BombHasBeenDefusedCounterTerroristsWin.mp3";
     std::string ubicacionBombHasBeenPlanted = "../client/data/sounds/BombHasBeenPlanted.mp3";
@@ -34,6 +36,9 @@ MusicManager::MusicManager(){
     ficheroDeUbicaciones[tipoMusic::RIFLERELOAD] = ubicacionReload2;
     ficheroDeUbicaciones[tipoMusic::BUY] = ubicacionBuy;
     ficheroDeUbicaciones[tipoMusic::ITEMEQUIP] = ubicacionItemEquip;
+    ficheroDeUbicaciones[tipoMusic::DISPARO_AWP] = ubicacionAwp;
+    ficheroDeUbicaciones[tipoMusic::DISPARO_M3] = ubicacionM3;
+
     
     ficheroDeUbicaciones[tipoMusic::BOMBHASBEENDEFUSED] = ubicacionBombHasBeenDefused;
     ficheroDeUbicaciones[tipoMusic::BOMBHASBEENPLANTED] = ubicacionBombHasBeenPlanted;
@@ -49,6 +54,8 @@ MusicManager::MusicManager(){
     std::vector<tipoMusic> sonidos = {
         tipoMusic::DISPARO_PISTOL,
         tipoMusic::DISPARO_AK47,
+        tipoMusic::DISPARO_AWP,
+        tipoMusic::DISPARO_M3,
         tipoMusic::KNIFE,
         tipoMusic::TIMER,
         tipoMusic::EXPLOIT,

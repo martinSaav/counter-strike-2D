@@ -10,6 +10,8 @@
 enum tipoMusic{
     DISPARO_AK47,
     DISPARO_PISTOL,
+    DISPARO_AWP,
+    DISPARO_M3,
     KNIFE,
     CAMINANDO,
     STEP,
