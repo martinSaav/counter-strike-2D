@@ -72,8 +72,8 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
         mapa.drawBomb(bomb_x, bomb_y);
     } 
 
-    if (is_bomb_planted && mensaje->is_round_ended() && mensaje->get_bomb_timer() == 0){
-        if (mapa.isBombActivated()){
+    if (is_bomb_planted && mensaje->is_round_ended() && mensaje->get_bomb_timer() == 0 && mensaje->get_round_winner() == Team::Terrorists) {
+        if (mapa.isBombActivated()) {
             mapa.exploitBomb();
         }
     }
