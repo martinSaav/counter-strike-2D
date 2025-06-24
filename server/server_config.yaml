@@ -1,7 +1,7 @@
 ---
 ct_amount: 5
 tt_amount: 5
-number_of_rounds: 3
+number_of_rounds: 10
 starting_money: 500
 player_health: 100
 defuse_time: 2500
@@ -23,15 +23,15 @@ knife:
   max_dmg: 70
   range: 5
   angle: 0.39269908169872414 # pi / 8
-  shoot_cooldown: 500
+  shoot_cooldown: 1000
 glock:
   max_ammo: 20
   starting_reserve_ammo: 40
   min_dmg: 30
   max_dmg: 50
   gun_price: 200
-  shoot_cooldown: 3000
-  base_precision: 0.8
+  shoot_cooldown: 1000
+  base_precision: 0.9
   distance_precision_modifier: 0.02
 ak:
   max_ammo: 30
@@ -40,7 +40,7 @@ ak:
   max_dmg: 45
   gun_price: 2700
   bullets_per_burst: 3
-  shoot_cooldown: 2500
+  shoot_cooldown: 500
   base_precision: 0.9
   distance_precision_modifier: 0.02
 awp:
@@ -55,13 +55,13 @@ awp:
 m3:
   max_ammo: 10
   starting_reserve_ammo: 20
-  min_dmg: 60
-  max_dmg: 90
+  min_dmg: 80
+  max_dmg: 120
   gun_price: 1700
   range: 15
   angle: 0.39269908169872414 # pi / 8
   shoot_cooldown: 3000
-  base_precision: 0.7
+  base_precision: 0.85
   distance_precision_modifier: 0.06666666
 map_config:
   map_name: "test_map"
