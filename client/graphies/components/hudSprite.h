@@ -46,9 +46,9 @@ private:
     void drawWeapon(int symbolX, int symbolY, int& anchoWeapon, int& weaponTextureX,
                     int& ammoWeapon, Weapon& weaponPLayer);
 
-    void castCordinates(Weapon& myWeapon, int& anchoWeapon, int& weaponTextureX);
+    void castCordinates(const Weapon& myWeapon, int& anchoWeapon, int& weaponTextureX);
 
-    void castSizesWeapon(Weapon& myWeapon, int& anchoWeapon, int& altoWeapon,
+    void castSizesWeapon(const Weapon& myWeapon, int& anchoWeapon, int& altoWeapon,
                          std::string& textureName);
 
     void drawSounds(PlayerInfo& myPlayer);

@@ -5,7 +5,7 @@
 
 #include "ui_estadistics.h"
 
-Estadistics::Estadistics(std::unique_ptr<GameStateUpdate>& gameState, QWidget* parent):
+Estadistics::Estadistics(const std::unique_ptr<GameStateUpdate>& gameState, QWidget* parent):
         QDialog(parent), ui(new Ui::Estadistics) {
     ui->setupUi(this);
 
@@ -38,7 +38,7 @@ Estadistics::Estadistics(std::unique_ptr<GameStateUpdate>& gameState, QWidget* p
     QString qtexto = QString::fromStdString(winner);
     ui->labelWinner->setText(qtexto);
 
-    for (PlayerInfo& jugador: players) {
+    for (const PlayerInfo& jugador: players) {
 
         // Me quedo con la primer letra de la skin
         char team = jugador.get_skin()[0];
@@ -50,7 +50,7 @@ Estadistics::Estadistics(std::unique_ptr<GameStateUpdate>& gameState, QWidget* p
     }
 }
 
-void Estadistics::configurarTabla(QTableWidget* tabla, int& contador, PlayerInfo& jugador) {
+void Estadistics::configurarTabla(QTableWidget* tabla, int& contador, const PlayerInfo& jugador) {
     tabla->setItem(contador, 0,
                    new QTableWidgetItem(QString::fromStdString(jugador.get_user_name())));
     tabla->setItem(contador, 1, new QTableWidgetItem(QString::number(jugador.get_kills())));

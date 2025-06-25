@@ -120,9 +120,7 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje) {
         std::string nombre = jugador.get_user_name();
         int vida_actual = jugador.get_health();
 
-        if (lastHealths.find(nombre) == lastHealths.end()) {
-            lastHealths[nombre] = vida_actual;
-        }
+        lastHealths.try_emplace(nombre, vida_actual);
 
         if (vida_actual < lastHealths[nombre]) {
             bloodStains.push_back({jugador.get_pos_x(), jugador.get_pos_y()});

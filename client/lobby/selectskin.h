@@ -19,7 +19,7 @@ class selectSkin: public QDialog {
 public:
     selectSkin(team& teamPlayer, std::string& skinSeleccionada, QWidget* parent = nullptr);
     ~selectSkin();
-
+    // cppcheck-suppress unknownMacro
 private slots:
     void on_button1_clicked();
 

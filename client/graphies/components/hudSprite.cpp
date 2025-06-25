@@ -183,6 +183,7 @@ void HudSprite::drawHuds(int num, HudType tipo, int& symbolX, int& symbolY) {
         if (num < 10) {
             int digito = 0;
             symbolX += anchoSymbolPantalla;
+            // cppcheck-suppress knownArgument
             srcRect = {anchoNum * digito, 0, anchoNum, alturaNum};
             destRect = {symbolX, symbolY, anchoSymbolPantalla, altoSymbolPantalla};
             drawHud(srcRect, destRect, textureName);
@@ -268,7 +269,7 @@ void HudSprite::drawWeaponDroped(Weapon weapon, int weaponX, int weaponY) {
     drawHud2(destRect, textureName);
 }
 
-void HudSprite::castCordinates(Weapon& myWeapon, int& anchoWeapon, int& weaponTextureX) {
+void HudSprite::castCordinates(const Weapon& myWeapon, int& anchoWeapon, int& weaponTextureX) {
     // Coordenadas de la textura
     switch (myWeapon) {
         case Weapon::AK47:
@@ -294,7 +295,7 @@ void HudSprite::castCordinates(Weapon& myWeapon, int& anchoWeapon, int& weaponTe
     }
 }
 
-void HudSprite::castSizesWeapon(Weapon& weapon, int& anchoWeapon, int& altoWeapon,
+void HudSprite::castSizesWeapon(const Weapon& weapon, int& anchoWeapon, int& altoWeapon,
                                 std::string& textureName) {
     anchoWeapon = 90;
     altoWeapon = 70;

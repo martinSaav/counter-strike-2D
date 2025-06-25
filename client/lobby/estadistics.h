@@ -16,13 +16,14 @@ class Estadistics: public QDialog {
     Q_OBJECT
 
 public:
-    explicit Estadistics(std::unique_ptr<GameStateUpdate>& gameState, QWidget* parent = nullptr);
+    explicit Estadistics(const std::unique_ptr<GameStateUpdate>& gameState,
+                         QWidget* parent = nullptr);
     ~Estadistics();
 
 private:
     Ui::Estadistics* ui;
 
-    void configurarTabla(QTableWidget* tabla, int& contador, PlayerInfo& jugador);
+    void configurarTabla(QTableWidget* tabla, int& contador, const PlayerInfo& jugador);
 };
 
 #endif  // ESTADISTICS_H
