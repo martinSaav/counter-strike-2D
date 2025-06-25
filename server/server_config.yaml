@@ -1,15 +1,15 @@
 ---
 ct_amount: 5
 tt_amount: 5
-number_of_rounds: 10
-starting_money: 500
+number_of_rounds: 4
+starting_money: 800
 player_health: 100
 defuse_time: 2500
 time_to_plant: 2500
 bomb_dmg: 200
 round_winner_money: 600
 round_loser_money: 200
-buy_time: 20000
+buy_time: 7000
 bomb_time: 90000
 after_round_time: 10000
 money_per_kill: 600
@@ -30,7 +30,7 @@ glock:
   min_dmg: 30
   max_dmg: 50
   gun_price: 200
-  shoot_cooldown: 1000
+  shoot_cooldown: 500
   base_precision: 0.9
   distance_precision_modifier: 0.02
 ak:
@@ -40,16 +40,16 @@ ak:
   max_dmg: 45
   gun_price: 2700
   bullets_per_burst: 3
-  shoot_cooldown: 500
-  base_precision: 0.9
+  shoot_cooldown: 200
+  base_precision: 0.98
   distance_precision_modifier: 0.02
 awp:
   max_ammo: 10
   starting_reserve_ammo: 20
-  min_dmg: 70
+  min_dmg: 90
   max_dmg: 120
   gun_price: 4750
-  shoot_cooldown: 6000
+  shoot_cooldown: 4000
   base_precision: 0.99
   distance_precision_modifier: 0.01
 m3:
@@ -64,7 +64,7 @@ m3:
   base_precision: 0.85
   distance_precision_modifier: 0.06666666
 map_config:
-  map_name: "test_map"
+  map_name: "aztec"
   map_height: 280
   map_width: 155
   structures:
