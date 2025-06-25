@@ -18,7 +18,7 @@ private:
     Renderer* sdlRenderer;
 
 public:
-    TextureStore(Renderer* sdlRenderer);
+    explicit TextureStore(Renderer* sdlRenderer);
 
     // Cargamos la textura en la memoria
     void loadTexture(const std::string& name, const std::string& path, bool setColorKey = true);

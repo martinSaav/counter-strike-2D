@@ -1,5 +1,6 @@
 #define CHATCLIENT_H
 #ifdef CHATCLIENT_H
+#include <memory>
 #include <string>
 
 #include "../../common/dto/game_config_info.h"

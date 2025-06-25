@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QTableWidget>
 #include <list>
+#include <memory>
 
 #include "../../common/dto/game_state_update.h"
 
@@ -15,7 +16,7 @@ class Estadistics: public QDialog {
     Q_OBJECT
 
 public:
-    Estadistics(std::unique_ptr<GameStateUpdate>& gameState, QWidget* parent = nullptr);
+    explicit Estadistics(std::unique_ptr<GameStateUpdate>& gameState, QWidget* parent = nullptr);
     ~Estadistics();
 
 private:

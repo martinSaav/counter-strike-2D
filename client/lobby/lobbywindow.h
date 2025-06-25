@@ -21,7 +21,7 @@ class MainWindow: public QMainWindow {
     Q_OBJECT
 
 public:
-    MainWindow(Protocol& protocolo, std::string& namePlayer, QWidget* parent = nullptr);
+    explicit MainWindow(Protocol& protocolo, std::string& namePlayer, QWidget* parent = nullptr);
     ~MainWindow();
 
 private Q_SLOTS:

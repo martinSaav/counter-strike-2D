@@ -1,6 +1,8 @@
 #ifndef MAPSPRITE_H
 #define MAPSPRITE_H
 
+#include <string>
+
 #include "../../common/dto/game_state_update.h"
 
 #include "component.h"
@@ -59,7 +61,7 @@ public:
 
     int getHeight();
 
-    void drawEndRound(Team& team, bool is_bomb_planted);
+    void drawEndRound(const Team& team_winer, bool is_bomb_planted);
 
     void drawBomb(int bomb_x, int bomb_y);
 

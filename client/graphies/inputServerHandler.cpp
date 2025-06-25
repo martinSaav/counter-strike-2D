@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <memory>
+#include <utility>
 
 InputServerHandler::InputServerHandler(Protocol& protocolo, bool& gameOver):
         protocolo(protocolo), gameOver(gameOver) {}

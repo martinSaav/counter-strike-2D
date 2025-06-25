@@ -1,5 +1,8 @@
 #include "estadistics.h"
 
+#include <memory>
+#include <string>
+
 #include "ui_estadistics.h"
 
 Estadistics::Estadistics(std::unique_ptr<GameStateUpdate>& gameState, QWidget* parent):

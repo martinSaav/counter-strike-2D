@@ -61,7 +61,6 @@ public:
         int32_t y;
         memcpy(&y, buffer + offset, sizeof(y));
         y = ntohl(y);
-        offset += sizeof(y);
 
         return BombSiteInfo(bomb_site_height, bomb_site_width, x, y);
     }

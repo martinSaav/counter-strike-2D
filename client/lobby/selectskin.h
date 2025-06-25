@@ -2,6 +2,7 @@
 #define SELECTSKIN_H
 
 #include <QDialog>
+#include <string>
 
 enum team {
     TERRORISTA = 0,

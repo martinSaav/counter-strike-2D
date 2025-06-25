@@ -2,6 +2,7 @@
 #define WAITROOM_H
 
 #include <QWidget>
+#include <string>
 #include <thread>
 
 #include "common/dto/game_ready_request.h"

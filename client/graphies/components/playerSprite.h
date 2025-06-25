@@ -1,6 +1,8 @@
 #ifndef PLAYERSPRITE_H
 #define PLAYERSPRITE_H
 
+#include <string>
+
 #include "component.h"
 
 class PlayerSprite: public Component {
@@ -10,11 +12,11 @@ private:
 
     void drawWeapon(int& jugadorX, int& jugadorY, double& angle, Weapon& weaponPlayer);
 
-    void drawBullet(int& shootX, int& shootY, double& angle);
+    void drawBullet(const int& shootX, const int& shootY, double& angle);
 
-    std::string castWeapon(Weapon& weapon);
+    std::string castWeapon(const Weapon& weapon);
 
-    tipoMusic castShoot(Weapon& weapon);
+    tipoMusic castShoot(const Weapon& weapon);
 
 public:
     PlayerSprite(Renderer* sdlRenderer, Configuracion& configuracion);

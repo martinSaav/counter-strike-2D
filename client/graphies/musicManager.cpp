@@ -1,6 +1,7 @@
 #include "musicManager.h"
 
 #include <utility>
+#include <vector>
 
 MusicManager::MusicManager() {
     Mix_Init(MIX_INIT_MP3);  // Iniciar SDL_mixer para manejar formato mp3
@@ -12,7 +13,7 @@ MusicManager::MusicManager() {
     std::string ubicacionPistol = "../client/data/sounds/pistolShot.wav";
     std::string ubicacionAk47 = "../client/data/sounds/ak47.wav";
     std::string ubicacionKnife = "../client/data/sounds/knife.wav";
-    std::string ubicacionStep = "../client/data/sounds/step.wav";
+    // std::string ubicacionStep = "../client/data/sounds/step.wav";
     std::string ubicacionTimer = "../client/data/sounds/timer.wav";
     std::string ubicacionAmbienceGame = "../client/data/sounds/ambienceGame.mp3";
     std::string ubicacionExploit = "../client/data/sounds/explosion.mp3";

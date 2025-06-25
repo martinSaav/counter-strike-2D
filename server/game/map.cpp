@@ -227,7 +227,8 @@ ImpactInfo Map::get_nearest_colliding_player(int ini_x, int ini_y, double curren
     int nearest_player_distance = -1;
     std::pair<int, int> nearest_player_pos;
     std::shared_ptr<Player> nearest_player = nullptr;
-    for (auto players = get_players_near_point(current_x, current_y); const auto& player: players) {
+    for (auto nearby_players = get_players_near_point(current_x, current_y);
+         const auto& player: nearby_players) {
         if (player->get_username() == gun_owner.get_username()) {
             continue;
         }
@@ -259,7 +260,7 @@ std::optional<ImpactInfo> Map::get_impacted_element(const std::pair<int, int>& c
     int nearest_structure_distance = -1;
     std::pair<int, int> nearest_structure_pos;
     if (auto chunk_p = structure_chunks.find(chunk_idx); chunk_p != structure_chunks.end()) {
-        Chunk& chunk = chunk_p->second;
+        const Chunk& chunk = chunk_p->second;
         ImpactInfo structure_hit =
                 get_nearest_colliding_structure(chunk, ini_x, ini_y, final_pos, velocity);
         if (structure_hit.hit) {

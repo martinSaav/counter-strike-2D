@@ -1,7 +1,11 @@
 #include "mapSprite.h"
 
+
 MapSprite::MapSprite(Renderer* sdlRenderer, Configuracion& configuracion):
         Component(sdlRenderer, configuracion),
+        anchoField(0),
+        altoField(0),
+        canalBomb(0),
         mapConfig(configuracion.gameConfig->get_map_config()) {
 
     // map
@@ -133,7 +137,7 @@ int MapSprite::getHeight() {
     return worldHeight;
 }
 
-void MapSprite::drawEndRound(Team& teamWiner, bool is_bomb_planted) {
+void MapSprite::drawEndRound(const Team& team_winer, bool is_bomb_planted) {
     std::string textureName;
     tipoMusic music;
     int anchoCartelPantalla = anchoCartel * configuracion.zoom / 8;
@@ -143,7 +147,7 @@ void MapSprite::drawEndRound(Team& teamWiner, bool is_bomb_planted) {
     SDL_Rect destRect = {symbolX, symbolY, anchoCartelPantalla,
                          int(altoCartel * configuracion.zoom / 4)};
 
-    switch (teamWiner) {
+    switch (team_winer) {
         case Team::Terrorists:
             textureName = "terroristWins";
             music = TERRORISTWIN;
@@ -156,7 +160,7 @@ void MapSprite::drawEndRound(Team& teamWiner, bool is_bomb_planted) {
     drawHud2(destRect, textureName);
 
 
-    if (teamWiner == Team::CounterTerrorists && is_bomb_activated) {
+    if (team_winer == Team::CounterTerrorists && is_bomb_activated) {
         music = BOMBHASBEENDEFUSED;
     }
     if (!is_finish_sound_round) {

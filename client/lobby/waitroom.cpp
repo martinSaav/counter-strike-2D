@@ -1,5 +1,7 @@
 #include "waitroom.h"
 
+#include <memory>
+
 #include "ui_waitroom.h"
 
 waitRoom::waitRoom(Protocol& protocolo, tipoUsuario& usuario, QWidget* parent):

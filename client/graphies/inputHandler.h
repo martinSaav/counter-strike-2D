@@ -30,7 +30,7 @@ private:
     int mouseY = 0;
     int mouse_map_x = 0;
     int mouse_map_y = 0;
-    Action actionActual;
+    Action actionActual = {};
     Action* action = nullptr;
 
     void sendMensaje(Action& actionActual);

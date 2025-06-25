@@ -69,7 +69,6 @@ public:
         offset += sizeof(range_net);
 
         memcpy(buffer + offset, &angle, sizeof(angle));
-        offset += sizeof(angle);
     }
 
     static GunConfigInfo deserialize(const uint8_t* buffer, size_t size) {
@@ -121,8 +120,6 @@ public:
 
         float angle;
         memcpy(&angle, buffer + offset, sizeof(angle));
-        offset += sizeof(angle);
-
 
         return GunConfigInfo(max_ammo, starting_reserve_ammo, min_dmg, max_dmg, gun_price,
                              bullets_per_burst, shoot_cooldown, range, angle);

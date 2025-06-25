@@ -3,7 +3,9 @@
 
 #include <cstdint>
 #include <cstring>
+#include <numeric>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <arpa/inet.h>
@@ -68,7 +70,6 @@ public:
         offset += ct_site.serialized_size();
 
         tt_site.serialize(buffer + offset);
-        offset += tt_site.serialized_size();
     }
 
     static MapConfigInfo deserialize(const uint8_t* buffer, size_t size) {
@@ -123,9 +124,10 @@ public:
     size_t serialized_size() const {
         size_t total = sizeof(uint16_t) + map_name.size();  // name length + name
         total += sizeof(int32_t) * 3;                       // width, height, count
-        for (const auto& s: structures) {
-            total += s.serialized_size();
-        }
+        total += std::accumulate(structures.begin(), structures.end(), size_t(0),
+                                 [](size_t acc, const auto& structure) {
+                                     return acc + structure.serialized_size();
+                                 });
         total += bombsite.serialized_size();
         total += ct_site.serialized_size();
         total += tt_site.serialized_size();

@@ -1,6 +1,8 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
 
+#include <string>
+
 #include "../../common/dto/player_info.h"
 
 #include "configuracion.h"
@@ -28,6 +30,6 @@ protected:
 public:
     // Crea el junto con sus medidas
     Component(Renderer* sdlRenderer, Configuracion& configuracion):
-            texturas(sdlRenderer), sdlRenderer(sdlRenderer), configuracion(configuracion){};
+            texturas(sdlRenderer), sdlRenderer(sdlRenderer), configuracion(configuracion) {}
 };
 #endif

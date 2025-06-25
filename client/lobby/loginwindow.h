@@ -12,7 +12,7 @@ class loginwindow: public QDialog {
     Q_OBJECT
 
 public:
-    loginwindow(std::string& namePlayer, QWidget* parent = nullptr);
+    explicit loginwindow(std::string& namePlayer, QWidget* parent = nullptr);
     ~loginwindow() override;
 
 protected:

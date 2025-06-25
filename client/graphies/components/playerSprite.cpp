@@ -70,7 +70,6 @@ void PlayerSprite::drawPlayer(const PlayerInfo& jugador, double& angle) {
         drawBullet(shootX, shootY, angle);
 
         tipoMusic music = castShoot(weaponPlayer);
-        int cantVeces = 1;
         sounds.loadSong(music, 0, volume);
     }
 }
@@ -101,7 +100,7 @@ void PlayerSprite::drawWeapon(int& jugadorX, int& jugadorY, double& angle, Weapo
     sdlRenderer->Copy(weaponTexture, SDL2pp::NullOpt, destRect, angle);
 }
 
-void PlayerSprite::drawBullet(int& shootX, int& shootY, double& angle) {
+void PlayerSprite::drawBullet(const int& shootX, const int& shootY, double& angle) {
 
     SDL_Rect destRect = {int((shootX - configuracion.camera.x) * configuracion.zoom),
                          int((shootY - configuracion.camera.y) * configuracion.zoom),
@@ -115,7 +114,6 @@ void PlayerSprite::drawPlayerDeath(int jugadorX, int jugadorY) {
     std::string textureName = "hud_symbols";
     hud_symbols.SetColorMod(255, 0, 0);
 
-    int posSymbolDeath = 12;
     SDL_Rect srcRectDeath = {64 * 12, 0, 64, 64};
 
     SDL_Rect destRect = {int((jugadorX - configuracion.camera.x) * configuracion.zoom),
@@ -125,7 +123,7 @@ void PlayerSprite::drawPlayerDeath(int jugadorX, int jugadorY) {
 }
 
 
-std::string PlayerSprite::castWeapon(Weapon& weapon) {
+std::string PlayerSprite::castWeapon(const Weapon& weapon) {
     switch (weapon) {
         case Weapon::Knife:
             return "knife";
@@ -144,7 +142,7 @@ std::string PlayerSprite::castWeapon(Weapon& weapon) {
     }
 }
 
-tipoMusic PlayerSprite::castShoot(Weapon& weapon) {
+tipoMusic PlayerSprite::castShoot(const Weapon& weapon) {
     switch (weapon) {
         case Weapon::Knife:
             return KNIFE;

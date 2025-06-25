@@ -1,6 +1,8 @@
 #ifndef HUDSPRITE_H
 #define HUDSPRITE_H
 
+#include <string>
+
 #include "component.h"
 
 enum HudType { HEALTH = 0, TIME = 2, SHOP = 4, BOMB = 6, MONEY = 7, DOBLEPUNTO = 10 };

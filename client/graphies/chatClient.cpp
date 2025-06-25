@@ -1,6 +1,8 @@
 #include "chatClient.h"
 
+#include <memory>
 #include <thread>
+#include <utility>
 
 #include "SDL_image.h"
 #include "SDL_mixer.h"
@@ -57,12 +59,14 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& estadistics) {
     const double FPS = 30.0;
     const double FRAME_TIME = 1.0 / FPS;  // en segundos
     // Main loop
+
+    std::optional<GameStateUpdate> mensaje;
     while (!gameOver) {
         double current = getCurrentTime();
 
         render.clearScreen();
 
-        auto mensaje = inputServerHandler.getMensaje();
+        mensaje = inputServerHandler.getMensaje();
         if (mensaje) {
             render.renderFrame(mensaje);
         }
@@ -77,7 +81,7 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& estadistics) {
         } else if (delay < 0) {
 
             while (delay < 0) {
-                auto mensaje = inputServerHandler.getMensaje();
+                mensaje = inputServerHandler.getMensaje();
                 if (!mensaje) {
                     break;  // no hay más mensajes para descartar
                 }
@@ -94,8 +98,8 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& estadistics) {
     if (clientClosed) {
         return CLIENTCLOSED;
     }
-    std::optional<GameStateUpdate> mensaje = inputServerHandler.getMensaje();
+    std::optional<GameStateUpdate> mensajeFinal = inputServerHandler.getMensaje();
     // Guardamos ultimo mensaje
-    estadistics = std::make_unique<GameStateUpdate>(std::move(mensaje.value()));
+    estadistics = std::make_unique<GameStateUpdate>(std::move(mensajeFinal.value()));
     return CONTINUAR;
 }
