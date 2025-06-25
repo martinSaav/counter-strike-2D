@@ -74,8 +74,8 @@ void waitRoom::on_empezarButton_clicked() {
     protocolo.send_message(gameReady);
 
     const std::unique_ptr<Message> responseGameReady = protocolo.recv_message();
-    //const auto game = dynamic_cast<GameReadyResponse*>(responseGameReady.get());
-    //bool gameStart = game->get_success();
+    // const auto game = dynamic_cast<GameReadyResponse*>(responseGameReady.get());
+    // bool gameStart = game->get_success();
 
     this->close();
     QApplication::exit(EXITLOBBY);
