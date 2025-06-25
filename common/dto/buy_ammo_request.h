@@ -4,6 +4,7 @@
 
 #include <cstring>
 #include <stdexcept>
+
 #include <netinet/in.h>
 
 #include "../message.h"
@@ -11,9 +12,8 @@
 #include "../weapon_type.h"
 
 
-
 class BuyAmmoRequest: public Message {
-private:    
+private:
     MessageType message_type = MessageType::BuyAmmoRequest;
     WeaponType weapon_type;
 
@@ -38,13 +38,12 @@ public:
     MessageType type() const override { return this->message_type; }
 
     size_t serialized_size() const override {
-        size_t size = HEADER_SIZE;  // header
-        size += sizeof(weapon_type);     // weapon_type
+        size_t size = HEADER_SIZE;    // header
+        size += sizeof(weapon_type);  // weapon_type
         return size;
     }
 
     WeaponType get_weapon_type() const { return weapon_type; }
-    
 };
 
 #endif

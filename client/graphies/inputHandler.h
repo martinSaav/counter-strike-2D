@@ -1,18 +1,20 @@
 #define INPUTHANDLER_H
 #ifdef INPUTHANDLER_H
 
+#include <iostream>
 #include <mutex>
 #include <optional>
 #include <queue>
 #include <string>
-#include <iostream>
-#include "../../common/protocol.h"
-#include "configuracion.h"
+
 #include "../../common/action.h"
-#include "../../common/dto/player_action.h"
-#include "../../common/dto/disconnect_request.h"
-#include "../../common/dto/buy_weapon_request.h"
 #include "../../common/dto/buy_ammo_request.h"
+#include "../../common/dto/buy_weapon_request.h"
+#include "../../common/dto/disconnect_request.h"
+#include "../../common/dto/player_action.h"
+#include "../../common/protocol.h"
+
+#include "configuracion.h"
 
 // Lee el teclado y envía los mensajes al servidor
 class InputHandler {
@@ -34,7 +36,8 @@ private:
     void sendMensaje(Action& actionActual);
 
 public:
-    InputHandler(Protocol& protocolo, Configuracion& configuracion, bool& gameOver, bool& clientClosed);
+    InputHandler(Protocol& protocolo, Configuracion& configuracion, bool& gameOver,
+                 bool& clientClosed);
     ~InputHandler();
 
     void processEvents();

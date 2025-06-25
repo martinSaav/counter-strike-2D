@@ -3,8 +3,10 @@
 
 #include <map>
 #include <string>
-#include "SDL_image.h"
+
 #include <SDL2pp/SDL2pp.hh>
+
+#include "SDL_image.h"
 
 using SDL2pp::Renderer;
 using SDL2pp::Texture;
@@ -16,7 +18,6 @@ private:
     Renderer* sdlRenderer;
 
 public:
-
     TextureStore(Renderer* sdlRenderer);
 
     // Cargamos la textura en la memoria

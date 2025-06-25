@@ -3,12 +3,12 @@
 
 #include "component.h"
 
-class PlayerSprite : public Component{
+class PlayerSprite: public Component {
 
-    private:
+private:
     SDL_Rect srcRect = {0, 0, 32, 32};
 
-    void drawWeapon(int& jugadorX, int& jugadorY,double& angle, Weapon& weaponPlayer);
+    void drawWeapon(int& jugadorX, int& jugadorY, double& angle, Weapon& weaponPlayer);
 
     void drawBullet(int& shootX, int& shootY, double& angle);
 
@@ -16,7 +16,7 @@ class PlayerSprite : public Component{
 
     tipoMusic castShoot(Weapon& weapon);
 
-    public:
+public:
     PlayerSprite(Renderer* sdlRenderer, Configuracion& configuracion);
 
     void drawPlayer(const PlayerInfo& jugador, double& angle);

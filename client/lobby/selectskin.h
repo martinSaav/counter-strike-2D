@@ -12,11 +12,11 @@ namespace Ui {
 class selectSkin;
 }
 
-class selectSkin : public QDialog {
+class selectSkin: public QDialog {
     Q_OBJECT
 
 public:
-    selectSkin(team& teamPlayer, std::string& skinSeleccionada, QWidget *parent = nullptr);
+    selectSkin(team& teamPlayer, std::string& skinSeleccionada, QWidget* parent = nullptr);
     ~selectSkin();
 
 private slots:
@@ -35,8 +35,8 @@ signals:
     void ventanaCerrada();
 
 private:
-    Ui::selectSkin *ui;
+    Ui::selectSkin* ui;
     std::string& skinSeleccionada;
     team& teamPlayer;
 };
-#endif // SELECTSKIN_H
+#endif  // SELECTSKIN_H

@@ -3,13 +3,13 @@
 #include "ui_loginwindow.h"
 
 loginwindow::loginwindow(std::string& namePlayer, QWidget* parent):
-        QDialog(parent), ui(new Ui::loginwindow), namePlayer(namePlayer){
+        QDialog(parent), ui(new Ui::loginwindow), namePlayer(namePlayer) {
     ui->setupUi(this);
 }
 
 loginwindow::~loginwindow() { delete ui; }
 
-void loginwindow::on_loginButton_clicked(){
+void loginwindow::on_loginButton_clicked() {
     QString nameInput = ui->usernameInput->toPlainText();
     if (nameInput != "") {
 
@@ -20,7 +20,7 @@ void loginwindow::on_loginButton_clicked(){
     }
 }
 
-void loginwindow::closeEvent(QCloseEvent* event){
+void loginwindow::closeEvent(QCloseEvent* event) {
     emit ventanaCerrada();
     QWidget::closeEvent(event);
 }

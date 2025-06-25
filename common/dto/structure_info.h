@@ -3,9 +3,10 @@
 
 #include <cstdint>
 #include <cstring>
-#include <utility>
-#include <arpa/inet.h>
 #include <stdexcept>
+#include <utility>
+
+#include <arpa/inet.h>
 
 class StructureInfo {
 private:
@@ -15,8 +16,8 @@ private:
     int32_t y;
 
 public:
-    StructureInfo(int32_t height, int32_t width, int32_t x, int32_t y)
-        : height(height), width(width), x(x), y(y) {}
+    StructureInfo(int32_t height, int32_t width, int32_t x, int32_t y):
+            height(height), width(width), x(x), y(y) {}
 
     void serialize(uint8_t* buffer) const {
         size_t offset = 0;
@@ -34,7 +35,7 @@ public:
         offset += sizeof(x_net);
 
         int32_t y_net = htonl(y);
-        memcpy(buffer + offset, &y_net, sizeof(y_net)); 
+        memcpy(buffer + offset, &y_net, sizeof(y_net));
     }
 
     static StructureInfo deserialize(const uint8_t* buffer, size_t size) {
@@ -43,7 +44,7 @@ public:
         }
 
         size_t offset = 0;
-        
+
         int32_t height;
         memcpy(&height, buffer + offset, sizeof(height));
         height = ntohl(height);
@@ -61,14 +62,12 @@ public:
 
         int32_t y;
         memcpy(&y, buffer + offset, sizeof(y));
-        y = ntohl(y);   
+        y = ntohl(y);
 
         return StructureInfo(height, width, x, y);
     }
 
-    size_t serialized_size() const {
-        return sizeof(int32_t) * 4;
-    }
+    size_t serialized_size() const { return sizeof(int32_t) * 4; }
 
     int32_t get_height() const { return height; }
 

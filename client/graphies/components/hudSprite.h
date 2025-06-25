@@ -3,19 +3,12 @@
 
 #include "component.h"
 
-enum HudType {
-    HEALTH = 0,
-    TIME = 2,
-    SHOP = 4,
-    BOMB = 6,
-    MONEY = 7,
-    DOBLEPUNTO = 10
-};
+enum HudType { HEALTH = 0, TIME = 2, SHOP = 4, BOMB = 6, MONEY = 7, DOBLEPUNTO = 10 };
 
 // huds Sobre la pantalla
-class HudSprite : public Component{
+class HudSprite: public Component {
 
-    private:
+private:
     int alturaSymbols = 64;
     int anchoSymbols = 64;
     int anchoSymbolPantalla = 40;
@@ -45,19 +38,20 @@ class HudSprite : public Component{
     SDL_Rect destRect;
 
     std::string textureName;
-    
+
     void drawHuds(int num, HudType tipo, int& symbolX, int& symbolY);
 
     void drawWeapon(int symbolX, int symbolY, int& anchoWeapon, int& weaponTextureX,
-        int& ammoWeapon, Weapon& weaponPLayer);
+                    int& ammoWeapon, Weapon& weaponPLayer);
 
     void castCordinates(Weapon& myWeapon, int& anchoWeapon, int& weaponTextureX);
 
-    void castSizesWeapon(Weapon& myWeapon, int& anchoWeapon, int& altoWeapon, std::string& textureName);
+    void castSizesWeapon(Weapon& myWeapon, int& anchoWeapon, int& altoWeapon,
+                         std::string& textureName);
 
     void drawSounds(PlayerInfo& myPlayer);
 
-    public:
+public:
     HudSprite(Renderer* sdlRenderer, Configuracion& configuracion);
 
     void draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlayer, bool& is_bomb_planted);

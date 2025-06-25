@@ -6,6 +6,7 @@
 #include <string>
 
 #include "common/protocol.h"
+
 #include "waitroom.h"
 
 namespace Ui {

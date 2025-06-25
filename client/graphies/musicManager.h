@@ -1,13 +1,15 @@
 #ifndef MUSIC_MANAGER_H
 #define MUSIC_MANAGER_H
 
-#include <SDL.h>
-#include "SDL_mixer.h"
 #include <map>
 #include <string>
+
+#include <SDL.h>
 #include <SDL2pp/SDL2pp.hh>
 
-enum tipoMusic{
+#include "SDL_mixer.h"
+
+enum tipoMusic {
     DISPARO_AK47,
     DISPARO_PISTOL,
     DISPARO_AWP,
@@ -30,17 +32,16 @@ enum tipoMusic{
     NONE
 };
 
-class MusicManager{
+class MusicManager {
 
-    private:
+private:
     Mix_Music* musicaActual = nullptr;
 
-    std::map <tipoMusic,Mix_Music*> ficheroDeMusica;
+    std::map<tipoMusic, Mix_Music*> ficheroDeMusica;
     std::map<tipoMusic, Mix_Chunk*> ficheroDeChunks;
-    std::map <tipoMusic,std::string> ficheroDeUbicaciones;
+    std::map<tipoMusic, std::string> ficheroDeUbicaciones;
 
-    public:
-
+public:
     MusicManager();
 
     ~MusicManager();

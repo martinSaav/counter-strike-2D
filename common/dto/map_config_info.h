@@ -5,6 +5,7 @@
 #include <cstring>
 #include <string>
 #include <vector>
+
 #include <arpa/inet.h>
 
 #include "bomb_site_info.h"
@@ -23,11 +24,15 @@ private:
 
 public:
     MapConfigInfo(std::string map_name, int32_t map_width, int32_t map_height,
-                  std::vector<StructureInfo> structures, BombSiteInfo bombsite,
-                  SiteInfo ct_site, SiteInfo tt_site)
-        : map_name(std::move(map_name)), map_width(map_width), map_height(map_height),
-          structures(std::move(structures)), bombsite(std::move(bombsite)),
-          ct_site(std::move(ct_site)), tt_site(std::move(tt_site)) {}
+                  std::vector<StructureInfo> structures, BombSiteInfo bombsite, SiteInfo ct_site,
+                  SiteInfo tt_site):
+            map_name(std::move(map_name)),
+            map_width(map_width),
+            map_height(map_height),
+            structures(std::move(structures)),
+            bombsite(std::move(bombsite)),
+            ct_site(std::move(ct_site)),
+            tt_site(std::move(tt_site)) {}
 
     void serialize(uint8_t* buffer) const {
         size_t offset = 0;
@@ -51,7 +56,7 @@ public:
         std::memcpy(buffer + offset, &struct_count, sizeof(struct_count));
         offset += sizeof(struct_count);
 
-        for (const auto& s : structures) {
+        for (const auto& s: structures) {
             s.serialize(buffer + offset);
             offset += s.serialized_size();
         }
@@ -110,16 +115,15 @@ public:
         offset += ct_site.serialized_size();
 
         SiteInfo tt_site = SiteInfo::deserialize(buffer + offset, size - offset);
-        
-        return MapConfigInfo(std::move(map_name), map_width, map_height,
-                             std::move(structures), std::move(bombsite),
-                             std::move(ct_site), std::move(tt_site));
+
+        return MapConfigInfo(std::move(map_name), map_width, map_height, std::move(structures),
+                             std::move(bombsite), std::move(ct_site), std::move(tt_site));
     }
 
     size_t serialized_size() const {
         size_t total = sizeof(uint16_t) + map_name.size();  // name length + name
-        total += sizeof(int32_t) * 3;  // width, height, count
-        for (const auto& s : structures) {
+        total += sizeof(int32_t) * 3;                       // width, height, count
+        for (const auto& s: structures) {
             total += s.serialized_size();
         }
         total += bombsite.serialized_size();
