@@ -24,7 +24,7 @@ public:
 
     void serialize(uint8_t* buffer) const override {
         buffer[0] = static_cast<uint8_t>(message_type);
-        size_t offset = 3;
+        size_t offset = HEADER_SIZE;
         for (const auto& game: games) {
             uint16_t name_length = htons(static_cast<uint16_t>(game.name.size()));
             std::memcpy(buffer + offset, &name_length, sizeof(name_length));
@@ -44,18 +44,6 @@ public:
         uint16_t payload_length = htons(static_cast<uint16_t>(offset - 3));
         std::memcpy(buffer + 1, &payload_length, sizeof(payload_length));
     }
-
-    size_t serialized_size() const override {
-        size_t size = 3;
-        for (const auto& game: games) {
-            size += sizeof(uint16_t) + game.name.size();
-            size += sizeof(uint16_t) + game.map_name.size();
-            size += sizeof(uint8_t) * 2;
-        }
-        return size;
-    }
-
-    MessageType type() const override { return message_type; }
 
     static GameListResponse deserialize(const uint8_t* buffer, size_t size) {
         if (size < 3) {
@@ -85,6 +73,18 @@ public:
             games_deserialized.emplace_back(GameInfo{name, map_name, current_players, max_players});
         }
         return GameListResponse(games_deserialized);
+    }
+
+    MessageType type() const override { return message_type; }
+
+    size_t serialized_size() const override {
+        size_t size = HEADER_SIZE;  // header
+        for (const auto& game: games) {
+            size += sizeof(uint16_t) + game.name.size();
+            size += sizeof(uint16_t) + game.map_name.size();
+            size += sizeof(uint8_t) * 2;
+        }
+        return size;
     }
 
     const std::list<GameInfo>& get_games() const { return games; }

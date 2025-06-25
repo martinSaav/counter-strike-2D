@@ -1,6 +1,174 @@
 ---
 ct_amount: 5
 tt_amount: 5
-rounds: 10
+number_of_rounds: 4
+starting_money: 800
 player_health: 100
-max_ammo: 30
+defuse_time: 2500
+time_to_plant: 2500
+bomb_dmg: 200
+round_winner_money: 600
+round_loser_money: 200
+buy_time: 7000
+bomb_time: 90000
+after_round_time: 10000
+money_per_kill: 600
+tiles_per_movement: 2
+game_rate: 30
+ammo_price: 200
+cone_angle: 70
+cone_opacity: 150
+knife:
+  min_dmg: 40
+  max_dmg: 70
+  range: 5
+  angle: 0.39269908169872414 # pi / 8
+  shoot_cooldown: 1000
+glock:
+  max_ammo: 20
+  starting_reserve_ammo: 40
+  min_dmg: 30
+  max_dmg: 50
+  gun_price: 200
+  shoot_cooldown: 500
+  base_precision: 0.9
+  distance_precision_modifier: 0.02
+ak:
+  max_ammo: 30
+  starting_reserve_ammo: 60
+  min_dmg: 20
+  max_dmg: 45
+  gun_price: 2700
+  bullets_per_burst: 3
+  shoot_cooldown: 200
+  base_precision: 0.98
+  distance_precision_modifier: 0.02
+awp:
+  max_ammo: 10
+  starting_reserve_ammo: 20
+  min_dmg: 90
+  max_dmg: 120
+  gun_price: 4750
+  shoot_cooldown: 4000
+  base_precision: 0.99
+  distance_precision_modifier: 0.01
+m3:
+  max_ammo: 10
+  starting_reserve_ammo: 20
+  min_dmg: 80
+  max_dmg: 120
+  gun_price: 1700
+  range: 15
+  angle: 0.39269908169872414 # pi / 8
+  shoot_cooldown: 1000
+  base_precision: 0.85
+  distance_precision_modifier: 0.06666666
+map_config:
+  map_name: "aztec"
+  map_height: 280
+  map_width: 155
+  structures:
+    - x: 62
+      y: 125
+      width: 12
+      height: 12
+    - x: 75
+      y: 150
+      width: 12
+      height: 12
+    - x: 50
+      y: 175
+      width: 37
+      height: 12
+    - x: 12
+      y: 137
+      width: 25
+      height: 25
+    - x: 112
+      y: 112
+      width: 12
+      height: 37
+    - x: 112
+      y: 187
+      width: 25
+      height: 12
+    - x: 50
+      y: 87
+      width: 25
+      height: 12
+    - x: 100
+      y: 75
+      width: 37
+      height: 25
+    - x: 62
+      y: 25
+      width: 37
+      height: 25
+  bomb_site:
+    x: 50
+    y: 112
+    height: 50
+    width: 50
+  tt_site:
+    x: 0
+    y: 0
+    width: 50
+    height: 50
+    spawns:
+      - x: 12
+        y: 12
+      - x: 37
+        y: 12
+      - x: 25
+        y: 25
+      - x: 12
+        y: 37
+      - x: 37
+        y: 37
+  ct_site:
+    x: 100
+    y: 225
+    width: 50
+    height: 50
+    spawns:
+      - x: 112
+        y: 237
+      - x: 137
+        y: 237
+      - x: 125
+        y: 250
+      - x: 112
+        y: 262
+      - x: 137
+        y: 262
+  weapon_drops:
+    - name: "ak-47"   #1
+      x: 12
+      y: 62
+    - name: "awp"     #2
+      x: 112
+      y: 37
+    - name: "m3"      #3
+      x: 62
+      y: 62
+    - name: "ak-47"   #4
+      x: 76
+      y: 125
+    - name: "m3"      #5
+      x: 50
+      y: 150
+    - name: "awp"     #6
+      x: 12
+      y: 225
+    - name: "ak-47"   #7
+      x: 75
+      y: 200
+    - name: "m3"      #8
+      x: 100
+      y: 212
+    - name: "ak-47"   #9
+      x: 75
+      y: 225
+    - name: "awp"     #10
+      x: 12
+      y: 100

@@ -7,7 +7,7 @@
 
 #include "common/protocol.h"
 
-enum closeType { EXITAPP = 0, EXITLOBBY = 1 };
+#include "waitroom.h"
 
 namespace Ui {
 class createMatchWindow;
@@ -27,14 +27,9 @@ private Q_SLOTS:
 
     void on_backButon_clicked();
 
-    void on_startButton_clicked();
-
 private:
     Ui::createMatchWindow* ui;
 
     Protocol& protocolo;
-
-    void desactivarWidgets();
 };
-
 #endif  // CREATEMATCHWINDOW_H

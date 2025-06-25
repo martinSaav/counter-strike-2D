@@ -1,0 +1,24 @@
+target_sources(game
+    PRIVATE
+        gun.cpp
+        ak47.cpp
+        glock.cpp
+        knife.cpp
+        shoot_result.cpp
+        bomb.cpp
+        bomb_encapsulator.cpp
+        awp.cpp
+        m3.cpp
+        PUBLIC
+        gun.h
+        shoot_result.h
+        gun_type.h
+        ak47.h
+        knife.h
+        glock.h
+        bomb.h
+        bomb_encapsulator.h
+        awp.h
+        m3.h
+        shoot_info.h
+        )

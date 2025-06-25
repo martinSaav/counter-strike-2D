@@ -28,5 +28,4 @@ private:
     Ui::loginwindow* ui;
     std::string& namePlayer;
 };
-
 #endif  // LOGINWINDOW_H

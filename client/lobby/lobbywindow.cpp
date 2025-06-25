@@ -44,33 +44,21 @@ void MainWindow::on_unirseButton_clicked() {
 
     if (item) {
 
-        // std::string texto = "Esperando a comienzo de partida";
-        // QString qtexto = QString::fromStdString(texto);
-
-        // Mostrar el texto en el QLabel
-        // ui->waitText->setText(qtexto);
-
-        // Desactiva todos los widgets
-        // this->setEnabled(false);
-
-        // ui->listaPartidas->clear();
-
-        // QApplication::exit(EXITLOBBY);
-
         QString map = item->text();
-
         JoinGameRequest requestJoinGame(map.toStdString());
         protocolo.send_message(requestJoinGame);
 
         const std::unique_ptr<Message> responseJoinGame = protocolo.recv_message();
-
         const auto* game = dynamic_cast<JoinGameResponse*>(responseJoinGame.get());
 
         bool gameJoined = game->get_success();
 
         if (gameJoined) {
-            this->hide();
-            QApplication::exit(EXITLOBBY);
+            // Creamos la ventana de espera
+            tipoUsuario usuario = UNIDO;
+            waitRoom* windoWait = new waitRoom(protocolo, usuario, this);
+            windoWait->setWindowFlags(Qt::Window);  // esto la hace ventana real
+            windoWait->show();
         }
     }
 }

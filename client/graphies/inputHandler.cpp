@@ -1,11 +1,11 @@
 #include "inputHandler.h"
 
-#include <SDL.h>
-
-#include "../../common/action.h"
-#include "../../common/dto/player_action.h"
-
-InputHandler::InputHandler(Protocol& protocolo): protocolo(protocolo) {
+InputHandler::InputHandler(Protocol& protocolo, Configuracion& configuracion, bool& gameOver,
+                           bool& clientClosed):
+        protocolo(protocolo),
+        configuracion(configuracion),
+        gameOver(gameOver),
+        clientClosed(clientClosed) {
     SDL_StartTextInput();  // Activa entrada de texto
 }
 
@@ -16,28 +16,71 @@ InputHandler::~InputHandler() {
 void InputHandler::processEvents() {
     SDL_Event event;
 
-
-    while (!exitGame()) {
+    Weapon weapon = Weapon::None;
+    WeaponType weaponType = WeaponType::Knife;
+    Weapon lastWeapon = Weapon::None;
+    while (!gameOver) {
 
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT)
-                quit = true;
+            if (event.type == SDL_QUIT) {
+                gameOver = true;
+                clientClosed = true;
+                DisconnectRequest disconnect;
+                protocolo.send_message(disconnect);
+            }
+            if (event.type == SDL_WINDOWEVENT) {
+                if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
+                    int newWidth = event.window.data1;
+                    int newHeight = event.window.data2;
+
+                    configuracion.reSizeWindow(newWidth, newHeight);
+                }
+            }
         }
 
-        Action actionActual;
-
-
-        Action* action = nullptr;
+        action = nullptr;
 
         // Leer estado del teclado
         const Uint8* state = SDL_GetKeyboardState(NULL);
+        Uint32 mouseState = SDL_GetMouseState(&mouseX, &mouseY);
 
         if (state[SDL_SCANCODE_Q]) {
 
-            quit = true;
+            gameOver = true;
+            clientClosed = true;
+            DisconnectRequest disconnect;
+            protocolo.send_message(disconnect);
         }
 
-        if (state[SDL_SCANCODE_W]) {
+        if (state[SDL_SCANCODE_W] && state[SDL_SCANCODE_D]) {
+            actionActual = Action::MoveUp;
+            sendMensaje(actionActual);
+
+            actionActual = Action::MoveRight;
+            action = &actionActual;
+
+        } else if (state[SDL_SCANCODE_W] && state[SDL_SCANCODE_A]) {
+            actionActual = Action::MoveUp;
+            sendMensaje(actionActual);
+
+            actionActual = Action::MoveLeft;
+            action = &actionActual;
+
+        } else if (state[SDL_SCANCODE_S] && state[SDL_SCANCODE_A]) {
+            actionActual = Action::MoveDown;
+            sendMensaje(actionActual);
+
+            actionActual = Action::MoveLeft;
+            action = &actionActual;
+
+        } else if (state[SDL_SCANCODE_S] && state[SDL_SCANCODE_D]) {
+            actionActual = Action::MoveDown;
+            sendMensaje(actionActual);
+
+            actionActual = Action::MoveRight;
+            action = &actionActual;
+
+        } else if (state[SDL_SCANCODE_W]) {
             actionActual = Action::MoveUp;
             action = &actionActual;
 
@@ -53,19 +96,77 @@ void InputHandler::processEvents() {
             actionActual = Action::MoveRight;
             action = &actionActual;
 
-        } else if (state[SDL_BUTTON_LEFT]) {
-            actionActual = Action::Shoot;
+        } else if (state[SDL_SCANCODE_1]) {
+            actionActual = Action::SetKnife;
+            action = &actionActual;
+
+        } else if (state[SDL_SCANCODE_2]) {
+            actionActual = Action::SetPrimaryWeapon;
+            action = &actionActual;
+
+        } else if (state[SDL_SCANCODE_3]) {
+            actionActual = Action::SetSecondaryWeapon;
+            action = &actionActual;
+
+        } else if (state[SDL_SCANCODE_4]) {
+            actionActual = Action::SetBomb;
+            action = &actionActual;
+
+        } else if (state[SDL_SCANCODE_R]) {
+            actionActual = Action::Reload;
+            action = &actionActual;
+
+        } else if (state[SDL_SCANCODE_E]) {
+            actionActual = Action::EquipWeapon;
+            action = &actionActual;
+
+        } else if (state[SDL_SCANCODE_F]) {
+            actionActual = Action::DefuseBomb;
             action = &actionActual;
         }
 
-
         if (action) {
-            PlayerAction playerAction(*action);
-            protocolo.send_message(playerAction);
+            sendMensaje(*action);
+        }
+
+        // Disparo (por click, independiente del movimiento)
+        if (mouseState & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+            actionActual = Action::Shoot;
+            sendMensaje(actionActual);
+        }
+
+        // Compra independiente
+        if (state[SDL_SCANCODE_I]) {
+            weapon = Weapon::AK47;
+
+        } else if (state[SDL_SCANCODE_O]) {
+            weapon = Weapon::M3;
+
+        } else if (state[SDL_SCANCODE_P]) {
+            weapon = Weapon::AWP;
+        }
+
+        if (weapon != Weapon::None && weapon != lastWeapon) {
+            BuyWeaponRequest buyWeapon(weapon);
+            protocolo.send_message(buyWeapon);
+            lastWeapon = weapon;
+            weapon = Weapon::None;
+        }
+
+        if (state[SDL_SCANCODE_K]) {
+            weaponType = WeaponType::Primary;
+
+        } else if (state[SDL_SCANCODE_L]) {
+            weaponType = WeaponType::Secondary;
+        }
+
+        if (weaponType != WeaponType::Knife) {
+            BuyAmmoRequest buyAmmo(weaponType);
+            protocolo.send_message(buyAmmo);
+            weaponType = WeaponType::Knife;
         }
         SDL_Delay(33);
     }
-    abort();
 }
 
 std::optional<std::string> InputHandler::getMensaje() {
@@ -79,4 +180,9 @@ std::optional<std::string> InputHandler::getMensaje() {
     return std::nullopt;
 }
 
-bool InputHandler::exitGame() { return quit; }
+void InputHandler::sendMensaje(Action& actionActual) {
+    mouse_map_x = int(mouseX / configuracion.zoom + configuracion.camera.x);
+    mouse_map_y = int(mouseY / configuracion.zoom + configuracion.camera.y);
+    PlayerAction playerAction(actionActual, mouse_map_x, mouse_map_y);
+    protocolo.send_message(playerAction);
+}

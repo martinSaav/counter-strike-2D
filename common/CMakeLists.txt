@@ -20,17 +20,34 @@ target_sources(taller_common
         dto/create_game_response.h
         dto/join_game_request.h
         dto/join_game_response.h
+        dto/join_team_request.h
+        dto/join_team_response.h
+        dto/select_skin_request.h
+        dto/game_ready_request.h
+        dto/game_ready_response.h
         dto/game_state_update.h
         dto/login_request.h
+        dto/login_response.h
         dto/player_action.h
         dto/game_list_request.h
         dto/game_list_response.h
         dto/map_names_request.h
         dto/map_names_response.h
-        dto/player.h
+        dto/buy_weapon_request.h
+        dto/buy_ammo_request.h
+        dto/disconnect_request.h
+        dto/player_info.h
+        dto/dropped_weapon.h
+        dto/site_info.h
+        dto/structure_info.h
+        dto/bomb_site_info.h
+        dto/gun_config_info.h
+        dto/map_config_info.h
+        dto/game_config_info.h
         action.h
         message_type.h
         message.h
         protocol.h
         game_info.h
+        team.h
     )

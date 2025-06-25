@@ -1,5 +1,8 @@
 #include "collision_detector.h"
 
+#include <algorithm>
+#include <cmath>
+
 bool CollisionDetector::check_collision_between_objects(
         const std::pair<int, int>& object1_bottom_coords,
         const std::pair<int, int>& object1_top_coords,
@@ -54,4 +57,116 @@ bool CollisionDetector::check_collision_between_players(int p1_bottom_x, int p1_
     const int p2_top_y = p2_bottom_y + player_hitbox_height;
     return check_collision_between_objects({p1_bottom_x, p1_bottom_y}, {p1_top_x, p1_top_y},
                                            {p2_bottom_x, p2_bottom_y}, {p2_top_x, p2_top_y});
+}
+
+
+std::pair<int, int> CollisionDetector::get_collision_point_between_bullet_and_object(
+        double inter_min_y, double inter_max_y, int ini_x, int ini_y,
+        std::pair<double, double> velocity) {
+    const double step_min_y = (inter_min_y - ini_y) / velocity.second;
+    const double step_max_y = (inter_max_y - ini_y) / velocity.second;
+    const double x_in_inter_min_y = ini_x + velocity.first * step_min_y;
+    const double x_in_inter_max_y = ini_x + velocity.first * step_max_y;
+    const double distance_inter_min_y =
+            sqrt(std::pow((inter_min_y - ini_y), 2) + std::pow((x_in_inter_min_y - ini_x), 2));
+    const double distance_inter_max_y =
+            sqrt(std::pow((inter_max_y - ini_y), 2) + std::pow((x_in_inter_max_y - ini_x), 2));
+    if (distance_inter_max_y < distance_inter_min_y) {
+        return std::make_pair(x_in_inter_max_y, inter_max_y);
+    }
+    return std::make_pair(x_in_inter_min_y, inter_min_y);
+}
+
+
+std::pair<int, int> CollisionDetector::get_impact_point(const Structure& structure, int ini_x,
+                                                        int ini_y, int final_x,
+                                                        const std::pair<double, double>& velocity) {
+    const int b_bottom_x = std::min(ini_x, final_x);
+    const int b_top_x = std::max(ini_x, final_x);
+    auto [s_bottom_x, s_bottom_y] = structure.get_position();
+    const int inter_min = std::max(s_bottom_x, b_bottom_x);
+    const int inter_max = std::min(s_bottom_x + structure.width, b_top_x);
+    const double step_1 = (inter_min - ini_x) / velocity.first;
+    const double inter_min_bullet_y = ini_y + step_1 * velocity.second;
+    const double step_2 = (inter_max - ini_x) / velocity.first;
+    const double inter_max_bullet_y = ini_y + step_2 * velocity.second;
+    const double bullet_min_y = std::min(inter_min_bullet_y, inter_max_bullet_y);
+    const double bullet_max_y = std::max(inter_min_bullet_y, inter_max_bullet_y);
+    const double inter_min_y = std::max(bullet_min_y, static_cast<double>(s_bottom_y));
+    const double inter_max_y =
+            std::min(bullet_max_y, static_cast<double>(s_bottom_y + structure.height));
+    return get_collision_point_between_bullet_and_object(inter_min_y, inter_max_y, ini_x, ini_y,
+                                                         velocity);
+}
+
+
+std::pair<int, int> CollisionDetector::get_impact_point(int p_bottom_x, int p_bottom_y, int ini_x,
+                                                        int ini_y, int final_x,
+                                                        const std::pair<double, double>& velocity) {
+    const int b_bottom_x = std::min(ini_x, final_x);
+    const int b_top_x = std::max(ini_x, final_x);
+    const int inter_min = std::max(p_bottom_x, b_bottom_x);
+    const int inter_max = std::min(p_bottom_x + player_hitbox_width, b_top_x);
+    const double step_1 = (inter_min - ini_x) / velocity.first;
+    const double inter_min_bullet_y = ini_y + step_1 * velocity.second;
+    const double step_2 = (inter_max - ini_x) / velocity.first;
+    const double inter_max_bullet_y = ini_y + step_2 * velocity.second;
+    const double bullet_min_y = std::min(inter_min_bullet_y, inter_max_bullet_y);
+    const double bullet_max_y = std::max(inter_min_bullet_y, inter_max_bullet_y);
+    const double inter_min_y = std::max(bullet_min_y, static_cast<double>(p_bottom_y));
+    const double inter_max_y =
+            std::min(bullet_max_y, static_cast<double>(p_bottom_y + player_hitbox_height));
+    return get_collision_point_between_bullet_and_object(inter_min_y, inter_max_y, ini_x, ini_y,
+                                                         velocity);
+}
+
+
+bool CollisionDetector::check_collision_between_player_and_bullet(
+        const int p_bottom_x, const int p_bottom_y, const int ini_x, const int ini_y,
+        const int final_x, const std::pair<double, double>& velocity) {
+    const int b_bottom_x = std::min(ini_x, final_x);
+    const int b_top_x = std::max(ini_x, final_x);
+    const int inter_min = std::max(p_bottom_x, b_bottom_x);
+    if (const int inter_max = std::min(p_bottom_x + player_hitbox_width, b_top_x);
+        inter_min <= inter_max) {
+        const double step_1 = (inter_min - ini_x) / velocity.first;
+        const double inter_min_bullet_y = ini_y + step_1 * velocity.second;
+        const double step_2 = (inter_max - ini_x) / velocity.first;
+        const double inter_max_bullet_y = ini_y + step_2 * velocity.second;
+        const double bullet_min_y = std::min(inter_min_bullet_y, inter_max_bullet_y);
+        const double bullet_max_y = std::max(inter_min_bullet_y, inter_max_bullet_y);
+        const double inter_min_y = std::max(bullet_min_y, static_cast<double>(p_bottom_y));
+        if (const double inter_max_y =
+                    std::min(bullet_max_y, static_cast<double>(p_bottom_y + player_hitbox_height));
+            inter_min_y <= inter_max_y) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+bool CollisionDetector::check_collision_between_structure_and_bullet(
+        const Structure& structure, const int ini_x, const int ini_y, const int final_x,
+        const std::pair<double, double>& velocity) {
+    const int b_bottom_x = std::min(ini_x, final_x);
+    const int b_top_x = std::max(ini_x, final_x);
+    auto [s_bottom_x, s_bottom_y] = structure.get_position();
+    const int inter_min = std::max(s_bottom_x, b_bottom_x);
+    if (const int inter_max = std::min(s_bottom_x + structure.width, b_top_x);
+        inter_min <= inter_max) {
+        const double step_1 = (inter_min - ini_x) / velocity.first;
+        const double inter_min_bullet_y = ini_y + step_1 * velocity.second;
+        const double step_2 = (inter_max - ini_x) / velocity.first;
+        const double inter_max_bullet_y = ini_y + step_2 * velocity.second;
+        const double bullet_min_y = std::min(inter_min_bullet_y, inter_max_bullet_y);
+        const double bullet_max_y = std::max(inter_min_bullet_y, inter_max_bullet_y);
+        const double inter_min_y = std::max(bullet_min_y, static_cast<double>(s_bottom_y));
+        if (const double inter_max_y =
+                    std::min(bullet_max_y, static_cast<double>(s_bottom_y + structure.height));
+            inter_min_y <= inter_max_y) {
+            return true;
+        }
+    }
+    return false;
 }

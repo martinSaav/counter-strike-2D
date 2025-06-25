@@ -4,8 +4,25 @@ target_sources(taller_server
         client_handler.cpp
         lobby.cpp
         match.cpp
-        player_command.cpp
         sender.cpp
+        skin_translator.cpp
+        commands/buy_weapon_command.cpp
+        commands/change_skin_command.cpp
+        commands/leave_match_command.cpp
+        commands/movement_command.cpp
+        commands/shoot_command.cpp
+        commands/game_ready_command.cpp
+        commands/switch_weapon_command.cpp
+        commands/reload_weapon_command.cpp
+        commands/defuse_bomb_command.cpp
+        commands/equip_weapon_command.cpp
+        commands/buy_ammo_command.cpp
+        request_processor.cpp
+        gun_shop.cpp
+        message_parser.cpp
+        game_config.cpp
+        configuration_loader.cpp
+        weapon_translator.cpp
         main.cpp
     PUBLIC
         client_handler.h
@@ -16,13 +33,37 @@ target_sources(taller_server
         match_status_dto.h
         player_credentials.h
         player_dto.h
-        player_command.h
         sender.h
         acceptor.h
+        game_ready_notification.h
+        skin_translator.h
+        movement_type.h
+        commands/player_command.h
+        commands/buy_weapon_command.h
+        commands/change_skin_command.h
+        commands/leave_match_command.h
+        commands/movement_command.h
+        commands/shoot_command.h
+        commands/game_ready_command.h
+        commands/switch_weapon_command.h
+        commands/reload_weapon_command.h
+        commands/defuse_bomb_command.h
+        commands/equip_weapon_command.h
+        commands/buy_ammo_command.h
+        request_processor.h
+        gun_shop.h
+        gun_config.h
+        game_config.h
+        configuration_loader.h
+        message_parser.h
+        map_config.h
+        weapon_translator.h
 )
 
 add_subdirectory(game)
-
 target_link_libraries(taller_server game)
 
-target_include_directories(taller_server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(taller_server PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${PROJECT_SOURCE_DIR}/common
+)

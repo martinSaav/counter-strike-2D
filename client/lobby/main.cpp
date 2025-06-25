@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "chatClient.h"
+#include "estadistics.h"
 #include "lobbywindow.h"
 
 int main(int argc, char* argv[]) {
@@ -14,6 +15,7 @@ int main(int argc, char* argv[]) {
     }
 
     std::string namePlayer;
+    std::unique_ptr<GameStateUpdate> estadistics;
 
     QApplication a(argc, argv);
 
@@ -36,7 +38,12 @@ int main(int argc, char* argv[]) {
         // Creamos el juego para el cliente
         ChatClient cliente(protocolo, namePlayer);
 
-        cliente.run();
+        result = cliente.run(estadistics);
+
+        if (result == CONTINUAR) {
+            Estadistics window(estadistics);
+            window.exec();  // bloquea hasta que se cierre
+        }
     }
     return 0;
 }

@@ -1,20 +1,32 @@
 #include "inputServerHandler.h"
 
+#include <iostream>
 #include <memory>
-InputServerHandler::InputServerHandler(Protocol& protocolo): protocolo(protocolo) {}
+#include <utility>
+
+InputServerHandler::InputServerHandler(Protocol& protocolo, bool& gameOver):
+        protocolo(protocolo), gameOver(gameOver) {}
 
 InputServerHandler::~InputServerHandler() {}
 
 void InputServerHandler::processEvents() {
 
-    while (!exitGame()) {
+    while (!gameOver) {
 
         const std::unique_ptr<Message> gameState = protocolo.recv_message();
 
         const auto game = dynamic_cast<GameStateUpdate*>(gameState.get());
 
-        std::lock_guard<std::mutex> lock(mtx);
-        mensajes.push(*game);
+        if (game) {
+            std::lock_guard<std::mutex> lock(mtx);
+            mensajes.push(std::move(*game));
+
+            if (game->is_game_ended()) {
+                gameOver = true;
+            }
+        } else {
+            std::cerr << "Unexpected exception: wrong message recibed \n";
+        }
     }
 }
 
@@ -28,5 +40,3 @@ std::optional<GameStateUpdate> InputServerHandler::getMensaje() {
     }
     return std::nullopt;
 }
-
-bool InputServerHandler::exitGame() { return quit; }
