@@ -1,15 +1,18 @@
 #ifndef RENDER_H
 #define RENDER_H
-#include <string>
-#include <memory>
 #include <iostream>
-#include "../../common/protocol.h"
-#include "../../common/action.h"
-#include "textureStore.h"
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
+#include "../../common/action.h"
+#include "../../common/protocol.h"
 #include "components/hudSprite.h"
 #include "components/mapSprite.h"
 #include "components/playerSprite.h"
+
+#include "textureStore.h"
 
 using SDL2pp::Renderer;
 using SDL2pp::Texture;
@@ -26,7 +29,7 @@ private:
     std::string& namePlayer;
 
     Configuracion& configuracion;
-    
+
     HudSprite hud;
     MapSprite mapa;
     PlayerSprite player;
@@ -39,7 +42,7 @@ private:
 
     // Angulo default
     double anglePlayer = 0.0;
-    
+
     // Pos mouse
     int mouseX = 0, mouseY = 0;
     unsigned int prev_ticks = SDL_GetTicks();
@@ -49,7 +52,7 @@ private:
 
     std::vector<BloodStain> bloodStains;
     std::unordered_map<std::string, int> lastHealths;
-    
+
 
     // Function to calculate the angle between the player and the mouse
     double getAnglePlayer(int jugadorX, int jugadorY, int mousex, int mousey);
@@ -57,7 +60,8 @@ private:
     float normalizarAngulo(float angulo);
 
 public:
-    Render(Renderer* renderer, Protocol& protocolo, std::string& namePlayer, Configuracion& configuracion);
+    Render(Renderer* renderer, Protocol& protocolo, std::string& namePlayer,
+           Configuracion& configuracion);
     void renderFrame(std::optional<GameStateUpdate> mensaje);
     bool puntoEnVision(int playerX, int playerY, float visionAngleDeg, int puntoX, int puntoY);
     void clearScreen();

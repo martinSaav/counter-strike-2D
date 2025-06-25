@@ -1,12 +1,15 @@
 #ifndef MAPSPRITE_H
 #define MAPSPRITE_H
 
-#include "component.h"
+#include <string>
+
 #include "../../common/dto/game_state_update.h"
 
-class MapSprite : public Component{
+#include "component.h"
 
-    private:
+class MapSprite: public Component {
+
+private:
     int anchoField;
     int altoField;
 
@@ -21,7 +24,7 @@ class MapSprite : public Component{
     int explosion_frame = 0;
     Uint32 explosion_start_time = 0;
     const int explosion_total_frames = 25;
-    const int explosion_frame_duration = 100; // milisegundos por frame
+    const int explosion_frame_duration = 100;  // milisegundos por frame
     int explosion_x = 0;
     int explosion_y = 0;
     int last_bomb_x = 0;
@@ -29,8 +32,8 @@ class MapSprite : public Component{
 
     bool is_shaking = false;
     Uint32 shake_start_time = 0;
-    int shake_duration_ms = 600; // duración del efecto
-    int shake_magnitude = 4; // magnitud del efecto
+    int shake_duration_ms = 600;  // duración del efecto
+    int shake_magnitude = 4;      // magnitud del efecto
 
 
     int canalBomb;
@@ -43,7 +46,7 @@ class MapSprite : public Component{
 
     const MapConfigInfo& mapConfig;
 
-    public:
+public:
     MapSprite(Renderer* sdlRenderer, Configuracion& configuracion);
 
     void draw();
@@ -58,7 +61,7 @@ class MapSprite : public Component{
 
     int getHeight();
 
-    void drawEndRound(Team& team, bool is_bomb_planted);
+    void drawEndRound(const Team& team_winer, bool is_bomb_planted);
 
     void drawBomb(int bomb_x, int bomb_y);
 
@@ -67,7 +70,7 @@ class MapSprite : public Component{
     void activateBomb();
 
     void exploitBomb();
-    
+
     void drawExplosion();
 
     bool isShaking() const;

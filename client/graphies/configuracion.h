@@ -8,26 +8,23 @@
 struct Configuracion {
 
     GameConfigInfo* gameConfig;
-    SDL_Rect camera = {0, 0, 0, 0};
-    float zoom = 15.0f;
+    float zoom;
     int widthWindow, heightWindow;
+    SDL_Rect camera;
     float tiempoDeCompra;
     int opacidadVision;
     int conoVision;
 
-    // Constructor
-    Configuracion(int width, int height, GameConfigInfo* gameConfig): gameConfig(gameConfig) {
-        widthWindow = width;
-        heightWindow = height;
+    Configuracion(int width, int height, GameConfigInfo* gameConfig):
+            gameConfig(gameConfig),
+            zoom(15.0f),
+            widthWindow(width),
+            heightWindow(height),
+            camera{0, 0, int(width / zoom), int(height / zoom)},
+            tiempoDeCompra(gameConfig->get_buy_time() / 1000.0f),
+            opacidadVision(gameConfig->get_opacity()),
+            conoVision(gameConfig->get_cone_angle()) {}
 
-        int camWidth = widthWindow / zoom;
-        int camHeight = heightWindow / zoom;
-        camera = {0, 0, camWidth, camHeight};
-
-        tiempoDeCompra = gameConfig->get_buy_time() / 1000.0f;
-        opacidadVision = gameConfig->get_opacity();
-        conoVision = gameConfig->get_cone_angle();
-    }
 
     void reSizeWindow(int width, int height) {
         widthWindow = width;

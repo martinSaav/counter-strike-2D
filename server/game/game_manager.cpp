@@ -38,7 +38,7 @@ bool GameManager::can_player_move_or_shoot(const std::shared_ptr<Player>& player
 
 
 void GameManager::advance_round(const std::vector<std::shared_ptr<Player>>& players) {
-    for (auto& player: players) {
+    for (const auto& player: players) {
         if (player->current_team == last_winner) {
             if (current_round != 6) {
                 player->money += round_winner_money;
@@ -70,7 +70,7 @@ void GameManager::check_winning_cond(const std::vector<std::shared_ptr<Player>>&
     }
     int alive_terrorists = 0;
     int alive_counter_terrorists = 0;
-    for (auto& player: players) {
+    for (const auto& player: players) {
         if (!player->is_dead()) {
             if (player->get_team() == Team::Terrorists) {
                 alive_terrorists++;

@@ -138,10 +138,10 @@ TEST(ProtocolTest, ReceivesCreateGameCorrectly) {
 
     size_t payload_size = serialized_size - 3;
     EXPECT_CALL(mock_socket, recvall(_, payload_size))
-        .WillOnce(Invoke([&](void* dst, unsigned int) {
-            memcpy(dst, serialized.data() + 3, payload_size);
-            return payload_size;
-        }));
+            .WillOnce(Invoke([&](void* dst, unsigned int) {
+                memcpy(dst, serialized.data() + 3, payload_size);
+                return payload_size;
+            }));
 
     Protocol protocol(mock_socket);
     const std::unique_ptr<Message> msg = protocol.recv_message();

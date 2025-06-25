@@ -1,6 +1,8 @@
 #include "chatClient.h"
 
+#include <memory>
 #include <thread>
+#include <utility>
 
 #include "SDL_image.h"
 #include "SDL_mixer.h"
@@ -11,8 +13,7 @@ using SDL2pp::SDL;
 using SDL2pp::Window;
 
 ChatClient::ChatClient(Protocol& protocolo, std::string& namePlayer):
-        protocolo(protocolo), namePlayer(namePlayer) {
-}
+        protocolo(protocolo), namePlayer(namePlayer) {}
 
 // Definición
 double getCurrentTime() {
@@ -34,15 +35,15 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& estadistics) {
     int widthWindow = 1000;
     int heightWindow = 1000;
 
-    Window window("Counter Strike 1.6", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        widthWindow, heightWindow, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);  // pantalla completa
+    Window window("Counter Strike 1.6", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, widthWindow,
+                  heightWindow, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);  // pantalla completa
 
     // Create accelerated video renderer with default driver
     Renderer renderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     // Create render object
     Configuracion configuracion(widthWindow, heightWindow, gameConfig);
-    
+
     Render render(&renderer, protocolo, namePlayer, configuracion);
 
     // Create input handler
@@ -58,12 +59,14 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& estadistics) {
     const double FPS = 30.0;
     const double FRAME_TIME = 1.0 / FPS;  // en segundos
     // Main loop
+
+    std::optional<GameStateUpdate> mensaje;
     while (!gameOver) {
         double current = getCurrentTime();
 
         render.clearScreen();
 
-        auto mensaje = inputServerHandler.getMensaje();
+        mensaje = inputServerHandler.getMensaje();
         if (mensaje) {
             render.renderFrame(mensaje);
         }
@@ -75,10 +78,10 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& estadistics) {
         if (delay > 0) {
             SDL_Delay((Uint32)(delay * 1000.0));  // convertir a milisegundos
 
-        } else if (delay < 0){
+        } else if (delay < 0) {
 
-            while (delay < 0){
-                auto mensaje = inputServerHandler.getMensaje();
+            while (delay < 0) {
+                mensaje = inputServerHandler.getMensaje();
                 if (!mensaje) {
                     break;  // no hay más mensajes para descartar
                 }
@@ -92,11 +95,11 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& estadistics) {
     inputServer.join();
     SDL_Quit();
 
-    if (clientClosed){
+    if (clientClosed) {
         return CLIENTCLOSED;
     }
-    std::optional<GameStateUpdate> mensaje = inputServerHandler.getMensaje();
+    std::optional<GameStateUpdate> mensajeFinal = inputServerHandler.getMensaje();
     // Guardamos ultimo mensaje
-    estadistics = std::make_unique<GameStateUpdate>(std::move(mensaje.value()));
+    estadistics = std::make_unique<GameStateUpdate>(std::move(mensajeFinal.value()));
     return CONTINUAR;
 }

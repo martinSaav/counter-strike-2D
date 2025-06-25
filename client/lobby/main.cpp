@@ -3,8 +3,8 @@
 #include <iostream>
 
 #include "chatClient.h"
-#include "lobbywindow.h"
 #include "estadistics.h"
+#include "lobbywindow.h"
 
 int main(int argc, char* argv[]) {
     // Comprobamos que la cantidad de argumentos sea correcta
@@ -40,9 +40,9 @@ int main(int argc, char* argv[]) {
 
         result = cliente.run(estadistics);
 
-        if (result == CONTINUAR){
+        if (result == CONTINUAR) {
             Estadistics window(estadistics);
-            window.exec(); //bloquea hasta que se cierre
+            window.exec();  // bloquea hasta que se cierre
         }
     }
     return 0;

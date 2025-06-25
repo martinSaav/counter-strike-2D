@@ -1,11 +1,12 @@
 #ifndef SITE_INFO_H
 #define SITE_INFO_H
 
-#include <cstdint>
-#include <vector>
-#include <utility>
 #include <algorithm>
+#include <cstdint>
 #include <cstring>
+#include <utility>
+#include <vector>
+
 #include <arpa/inet.h>
 
 class SiteInfo {
@@ -18,9 +19,13 @@ private:
 
 public:
     SiteInfo(int32_t x, int32_t y, int32_t site_width, int32_t site_height,
-            std::vector<std::pair<int32_t, int32_t>> spawns)
-        : x(x), y(y), site_width(site_width), site_height(site_height), spawns(std::move(spawns)) {}
-        
+             std::vector<std::pair<int32_t, int32_t>> spawns):
+            x(x),
+            y(y),
+            site_width(site_width),
+            site_height(site_height),
+            spawns(std::move(spawns)) {}
+
 
     void serialize(uint8_t* buffer) const {
         size_t offset = 0;
@@ -45,7 +50,7 @@ public:
         memcpy(buffer + offset, &num_spawns, sizeof(num_spawns));
         offset += sizeof(num_spawns);
 
-        for (const auto& spawn : spawns) {
+        for (const auto& spawn: spawns) {
             int32_t spawn_x = htonl(spawn.first);
             memcpy(buffer + offset, &spawn_x, sizeof(spawn_x));
             offset += sizeof(spawn_x);
@@ -56,8 +61,7 @@ public:
     }
 
     static SiteInfo deserialize(const uint8_t* buffer, size_t size) {
-        if (size < 3) {
-        }
+        if (size < 3) {}
         size_t offset = 0;
 
         int32_t x_net;
@@ -83,7 +87,7 @@ public:
         int32_t num_spawns_net;
         memcpy(&num_spawns_net, buffer + offset, sizeof(num_spawns_net));
         int32_t num_spawns = ntohl(num_spawns_net);
-        offset += sizeof(num_spawns_net);   
+        offset += sizeof(num_spawns_net);
 
         std::vector<std::pair<int32_t, int32_t>> spawns;
         spawns.reserve(num_spawns);
@@ -106,12 +110,12 @@ public:
 
     size_t serialized_size() const {
         size_t size = 0;
-        size += sizeof(int32_t); // x
-        size += sizeof(int32_t); // y
-        size += sizeof(int32_t); // site_width
-        size += sizeof(int32_t); // site_height
-        size += sizeof(int32_t); // num_spawns
-        size += spawns.size() * (sizeof(int32_t) * 2); // spawn coordinates
+        size += sizeof(int32_t);                        // x
+        size += sizeof(int32_t);                        // y
+        size += sizeof(int32_t);                        // site_width
+        size += sizeof(int32_t);                        // site_height
+        size += sizeof(int32_t);                        // num_spawns
+        size += spawns.size() * (sizeof(int32_t) * 2);  // spawn coordinates
         return size;
     }
 

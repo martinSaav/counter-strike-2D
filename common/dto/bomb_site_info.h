@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <cstring>
 #include <stdexcept>
+
 #include <arpa/inet.h>
 
 class BombSiteInfo {
@@ -14,9 +15,8 @@ private:
     int32_t y;
 
 public:
-    BombSiteInfo(int32_t bomb_site_height, int32_t bomb_site_width, int32_t x, int32_t y)
-        : bomb_site_height(bomb_site_height), bomb_site_width(bomb_site_width),
-          x(x), y(y) {}
+    BombSiteInfo(int32_t bomb_site_height, int32_t bomb_site_width, int32_t x, int32_t y):
+            bomb_site_height(bomb_site_height), bomb_site_width(bomb_site_width), x(x), y(y) {}
 
     void serialize(uint8_t* buffer) const {
         size_t offset = 0;
@@ -38,7 +38,7 @@ public:
     }
 
     static BombSiteInfo deserialize(const uint8_t* buffer, size_t size) {
-        if (size < 3 ) {
+        if (size < 3) {
             throw std::runtime_error("");
         }
 
@@ -61,13 +61,12 @@ public:
         int32_t y;
         memcpy(&y, buffer + offset, sizeof(y));
         y = ntohl(y);
-        offset += sizeof(y);
 
         return BombSiteInfo(bomb_site_height, bomb_site_width, x, y);
     }
 
     size_t serialized_size() const {
-        return sizeof(int32_t) * 4; // 4 int32_t values: height, width, x, y
+        return sizeof(int32_t) * 4;  // 4 int32_t values: height, width, x, y
     }
 
     int32_t get_x() const { return x; }

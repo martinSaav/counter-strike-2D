@@ -269,12 +269,12 @@ void Player::update(GameManager& game_manager) {
         int x = 0;
         int y = 0;
 
-        for (auto& shoot: shoots.results) {
-            if (!shoot.miss && shoot.type != ShootType::PlantingBomb) {
-                game_manager.attack_player(shoot.player_hit.value(), *this, shoot.dmg);
+        for (auto& result: shoots.results) {
+            if (!result.miss && result.type != ShootType::PlantingBomb) {
+                game_manager.attack_player(result.player_hit.value(), *this, result.dmg);
             }
-            x = shoot.position.first;
-            y = shoot.position.second;
+            x = result.position.first;
+            y = result.position.second;
         }
         if (shoots.results.size() == 1) {
             aim_x = x;

@@ -1,16 +1,19 @@
 #include "musicManager.h"
-#include <utility>
 
-MusicManager::MusicManager(){
-    Mix_Init(MIX_INIT_MP3); // Iniciar SDL_mixer para manejar formato mp3
+#include <utility>
+#include <vector>
+
+MusicManager::MusicManager() {
+    Mix_Init(MIX_INIT_MP3);  // Iniciar SDL_mixer para manejar formato mp3
     // Abrimos un dispositivo
-    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048); //(frecuencia, formato, número de canales, tam de buffer)
+    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2,
+                  2048);  //(frecuencia, formato, número de canales, tam de buffer)
 
     // En el constructor:
     std::string ubicacionPistol = "../client/data/sounds/pistolShot.wav";
     std::string ubicacionAk47 = "../client/data/sounds/ak47.wav";
     std::string ubicacionKnife = "../client/data/sounds/knife.wav";
-    std::string ubicacionStep = "../client/data/sounds/step.wav";
+    // std::string ubicacionStep = "../client/data/sounds/step.wav";
     std::string ubicacionTimer = "../client/data/sounds/timer.wav";
     std::string ubicacionAmbienceGame = "../client/data/sounds/ambienceGame.mp3";
     std::string ubicacionExploit = "../client/data/sounds/explosion.mp3";
@@ -21,7 +24,8 @@ MusicManager::MusicManager(){
     std::string ubicacionAwp = "../client/data/sounds/awp.wav";
     std::string ubicacionM3 = "../client/data/sounds/m3.wav";
 
-    std::string ubicacionBombHasBeenDefused = "../client/data/sounds/BombHasBeenDefusedCounterTerroristsWin.mp3";
+    std::string ubicacionBombHasBeenDefused =
+            "../client/data/sounds/BombHasBeenDefusedCounterTerroristsWin.mp3";
     std::string ubicacionBombHasBeenPlanted = "../client/data/sounds/BombHasBeenPlanted.mp3";
     std::string ubicacionCounterTerroristWin = "../client/data/sounds/CounterTerroristWin.mp3";
     std::string ubicacionTerroristWin = "../client/data/sounds/TerroristsWin.mp3";
@@ -39,63 +43,64 @@ MusicManager::MusicManager(){
     ficheroDeUbicaciones[tipoMusic::DISPARO_AWP] = ubicacionAwp;
     ficheroDeUbicaciones[tipoMusic::DISPARO_M3] = ubicacionM3;
 
-    
+
     ficheroDeUbicaciones[tipoMusic::BOMBHASBEENDEFUSED] = ubicacionBombHasBeenDefused;
     ficheroDeUbicaciones[tipoMusic::BOMBHASBEENPLANTED] = ubicacionBombHasBeenPlanted;
     ficheroDeUbicaciones[tipoMusic::COUNTERTERRORISTWIN] = ubicacionCounterTerroristWin;
     ficheroDeUbicaciones[tipoMusic::TERRORISTWIN] = ubicacionTerroristWin;
     ficheroDeUbicaciones[tipoMusic::PLANTINGBOMB] = ubicacionPlantingBomb;
 
-    Mix_Music *musica; musica = Mix_LoadMUS(ubicacionAmbienceGame.c_str());
+    Mix_Music* musica;
+    musica = Mix_LoadMUS(ubicacionAmbienceGame.c_str());
     ficheroDeMusica[tipoMusic::AMBIENTE] = musica;
     ficheroDeUbicaciones[tipoMusic::AMBIENTE] = ubicacionAmbienceGame;
 
     // Sonidos cortos
-    std::vector<tipoMusic> sonidos = {
-        tipoMusic::DISPARO_PISTOL,
-        tipoMusic::DISPARO_AK47,
-        tipoMusic::DISPARO_AWP,
-        tipoMusic::DISPARO_M3,
-        tipoMusic::KNIFE,
-        tipoMusic::TIMER,
-        tipoMusic::EXPLOIT,
-        tipoMusic::PISTOLRELOAD,
-        tipoMusic::RIFLERELOAD,
-        tipoMusic::BUY,
-        tipoMusic::ITEMEQUIP,
-        tipoMusic::BOMBHASBEENDEFUSED,
-        tipoMusic::BOMBHASBEENPLANTED,
-        tipoMusic::COUNTERTERRORISTWIN,
-        tipoMusic::TERRORISTWIN,
-        tipoMusic::PLANTINGBOMB
-    };
+    std::vector<tipoMusic> sonidos = {tipoMusic::DISPARO_PISTOL,
+                                      tipoMusic::DISPARO_AK47,
+                                      tipoMusic::DISPARO_AWP,
+                                      tipoMusic::DISPARO_M3,
+                                      tipoMusic::KNIFE,
+                                      tipoMusic::TIMER,
+                                      tipoMusic::EXPLOIT,
+                                      tipoMusic::PISTOLRELOAD,
+                                      tipoMusic::RIFLERELOAD,
+                                      tipoMusic::BUY,
+                                      tipoMusic::ITEMEQUIP,
+                                      tipoMusic::BOMBHASBEENDEFUSED,
+                                      tipoMusic::BOMBHASBEENPLANTED,
+                                      tipoMusic::COUNTERTERRORISTWIN,
+                                      tipoMusic::TERRORISTWIN,
+                                      tipoMusic::PLANTINGBOMB};
 
-    for (auto tipo : sonidos) {
+    for (auto tipo: sonidos) {
         ficheroDeChunks[tipo] = Mix_LoadWAV(ficheroDeUbicaciones[tipo].c_str());
     }
 }
 
-MusicManager::~MusicManager(){
+MusicManager::~MusicManager() {
 
-    for (auto& par : ficheroDeMusica) {
-        if (par.second) Mix_FreeMusic(par.second);
+    for (auto& par: ficheroDeMusica) {
+        if (par.second)
+            Mix_FreeMusic(par.second);
     }
-    for (auto& par : ficheroDeChunks) {
-        if (par.second) Mix_FreeChunk(par.second);
+    for (auto& par: ficheroDeChunks) {
+        if (par.second)
+            Mix_FreeChunk(par.second);
     }
     Mix_CloseAudio();
     Mix_Quit();
 }
 
 
-void MusicManager::loadMusic(tipoMusic music, int cantVeces){
+void MusicManager::loadMusic(tipoMusic music, int cantVeces) {
 
     auto it = ficheroDeMusica.find(music);
-    if (it == ficheroDeMusica.end()){
+    if (it == ficheroDeMusica.end()) {
         throw std::runtime_error("Musica no encontrada");
     }
 
-    Mix_Music *musica = it->second;
+    Mix_Music* musica = it->second;
 
     if (!musica) {
         throw std::runtime_error("Error cargando música: " + std::string(Mix_GetError()));
@@ -106,7 +111,7 @@ void MusicManager::loadMusic(tipoMusic music, int cantVeces){
     musicaActual = musica;
 }
 
-int MusicManager::loadSong(tipoMusic music, int loops, int volume){
+int MusicManager::loadSong(tipoMusic music, int loops, int volume) {
 
     auto it = ficheroDeChunks.find(music);
     if (it == ficheroDeChunks.end()) {
@@ -119,23 +124,17 @@ int MusicManager::loadSong(tipoMusic music, int loops, int volume){
     return canal;
 }
 
-void MusicManager::stopMusic(){
+void MusicManager::stopMusic() {
 
     if (musicaActual) {
-        //Mix_HaltMusic();  // Detiene la reproducción, no libera memoria
+        // Mix_HaltMusic();  // Detiene la reproducción, no libera memoria
         Mix_FreeMusic(musicaActual);
         musicaActual = nullptr;
     }
 }
 
-void MusicManager::stopAllSongs(){
-    Mix_HaltChannel(-1);
-}
+void MusicManager::stopAllSongs() { Mix_HaltChannel(-1); }
 
-void MusicManager::stopSongs(int canal){
-    Mix_HaltChannel(canal);
-}
+void MusicManager::stopSongs(int canal) { Mix_HaltChannel(canal); }
 
-void MusicManager::setVolume(int volume){
-    Mix_VolumeMusic(volume);
-}
+void MusicManager::setVolume(int volume) { Mix_VolumeMusic(volume); }

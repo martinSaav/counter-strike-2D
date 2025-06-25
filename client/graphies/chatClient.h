@@ -1,9 +1,11 @@
 #define CHATCLIENT_H
 #ifdef CHATCLIENT_H
+#include <memory>
 #include <string>
 
-#include "render.h"
 #include "../../common/dto/game_config_info.h"
+
+#include "render.h"
 const int CONTINUAR = 1;
 const int CLIENTCLOSED = 2;
 

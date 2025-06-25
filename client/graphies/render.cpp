@@ -6,14 +6,17 @@
 
 using SDL2pp::Rect;
 
-Render::Render(Renderer* renderer, Protocol& protocolo, std::string& namePlayer, Configuracion& configuracion):
-    sdlRenderer(renderer), protocolo(protocolo), namePlayer(namePlayer),
-    configuracion(configuracion), hud(sdlRenderer, configuracion),
-    mapa(sdlRenderer, configuracion), player(sdlRenderer, configuracion)
-{
-}
+Render::Render(Renderer* renderer, Protocol& protocolo, std::string& namePlayer,
+               Configuracion& configuracion):
+        sdlRenderer(renderer),
+        protocolo(protocolo),
+        namePlayer(namePlayer),
+        configuracion(configuracion),
+        hud(sdlRenderer, configuracion),
+        mapa(sdlRenderer, configuracion),
+        player(sdlRenderer, configuracion) {}
 
-void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
+void Render::renderFrame(std::optional<GameStateUpdate> mensaje) {
 
     std::list<PlayerInfo> jugadores = mensaje->get_players();
 
@@ -26,8 +29,8 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     int camHeight = configuracion.heightWindow / zoom;
 
     // Calcula la posición del jugador
-    for (auto& jugador : jugadores){
-        if (jugador.get_user_name() == namePlayer){
+    for (auto& jugador: jugadores) {
+        if (jugador.get_user_name() == namePlayer) {
             myPlayer = &jugador;
         }
     }
@@ -38,12 +41,16 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     camera.y = myPlayer->get_pos_y() - camHeight / 1.5;
 
     // Limitar bordes
-    if (camera.x < 0) camera.x = 0;
-    if (camera.y < 0) camera.y = 0;
-    if (camera.x > worldWidth - camWidth) camera.x = worldWidth - camWidth;
-    if (camera.y > worldHeight - camHeight) camera.y = worldHeight - camHeight;
+    if (camera.x < 0)
+        camera.x = 0;
+    if (camera.y < 0)
+        camera.y = 0;
+    if (camera.x > worldWidth - camWidth)
+        camera.x = worldWidth - camWidth;
+    if (camera.y > worldHeight - camHeight)
+        camera.y = worldHeight - camHeight;
 
-    sdlRenderer-> Clear();
+    sdlRenderer->Clear();
 
     if (mapa.isShaking()) {
         int elapsed = SDL_GetTicks() - mapa.getShakeStartTime();
@@ -56,8 +63,8 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
             mapa.stopShake();
         }
     }
-    
-    mapa.draw(); //Dibujo el mapa
+
+    mapa.draw();  // Dibujo el mapa
 
     // Obtengo mi angulo
     SDL_GetMouseState(&mouseX, &mouseY);
@@ -70,60 +77,63 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     int mousePlayerX = 0;
     int mousePlayerY = 0;
 
-    //visionAngle: debe ser el ángulo real hacia donde está mirando el jugador (sin correcciones de sprite ni nada).
-    myAngle = getAnglePlayer(myPlayer->get_pos_x(), myPlayer->get_pos_y(), mouse_map_x, mouse_map_y);
+    // visionAngle: debe ser el ángulo real hacia donde está mirando el jugador (sin correcciones de
+    // sprite ni nada).
+    myAngle =
+            getAnglePlayer(myPlayer->get_pos_x(), myPlayer->get_pos_y(), mouse_map_x, mouse_map_y);
     float visionAngle = myAngle;
-    if (visionAngle < 0) visionAngle += 360.0;
+    if (visionAngle < 0)
+        visionAngle += 360.0;
 
     // Reset bomb
-    if (mensaje->get_round_time() == 0){
+    if (mensaje->get_round_time() == 0) {
         mapa.desactivateBomb();
     }
 
     bool is_bomb_planted = mensaje->is_bomb_planted();
     // Draw bomb
-    if (is_bomb_planted && !mensaje->is_round_ended()){
+    if (is_bomb_planted && !mensaje->is_round_ended()) {
         int bomb_x = mensaje->get_bomb_x();
         int bomb_y = mensaje->get_bomb_y();
 
-        if (puntoEnVision(myPlayer->get_pos_x(), myPlayer->get_pos_y(), visionAngle, bomb_x, bomb_y)) {
+        if (puntoEnVision(myPlayer->get_pos_x(), myPlayer->get_pos_y(), visionAngle, bomb_x,
+                          bomb_y)) {
             mapa.drawBomb(bomb_x, bomb_y);
         }
 
         mapa.activateBomb();
-    } 
+    }
 
-    if (is_bomb_planted && mensaje->is_round_ended() && mensaje->get_bomb_timer() == 0 && mensaje->get_round_winner() == Team::Terrorists) {
+    if (is_bomb_planted && mensaje->is_round_ended() && mensaje->get_bomb_timer() == 0 &&
+        mensaje->get_round_winner() == Team::Terrorists) {
         if (mapa.isBombActivated()) {
             mapa.exploitBomb();
         }
     }
 
-    for (const auto& stain : bloodStains) {
+    for (const auto& stain: bloodStains) {
         player.drawBlood(stain.x, stain.y);
     }
 
-    for (auto const& jugador : jugadores){
+    for (auto const& jugador: jugadores) {
 
         std::string nombre = jugador.get_user_name();
         int vida_actual = jugador.get_health();
-    
-        if (lastHealths.find(nombre) == lastHealths.end()) {
-            lastHealths[nombre] = vida_actual;
-        }
-    
+
+        lastHealths.try_emplace(nombre, vida_actual);
+
         if (vida_actual < lastHealths[nombre]) {
             bloodStains.push_back({jugador.get_pos_x(), jugador.get_pos_y()});
         }
-    
+
         lastHealths[nombre] = vida_actual;
 
-        if (jugador.get_health() == 0){
+        if (jugador.get_health() == 0) {
             player.drawPlayerDeath(jugador.get_pos_x(), jugador.get_pos_y());
             continue;
         }
 
-        if (jugador.get_user_name() == namePlayer){
+        if (jugador.get_user_name() == namePlayer) {
             player.drawPlayer(jugador, myAngle);
             continue;
         }
@@ -133,9 +143,10 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
         mousePlayerX = jugador.get_pos_shoot_x();
         mousePlayerY = jugador.get_pos_shoot_y();
         anglePlayer = getAnglePlayer(posPlayerX, posPlayerY, mousePlayerX, mousePlayerY);
-            
-        if (puntoEnVision(myPlayer->get_pos_x(), myPlayer->get_pos_y(), visionAngle, jugador.get_pos_x(), jugador.get_pos_y())) {
-           player.drawPlayer(jugador, anglePlayer);
+
+        if (puntoEnVision(myPlayer->get_pos_x(), myPlayer->get_pos_y(), visionAngle,
+                          jugador.get_pos_x(), jugador.get_pos_y())) {
+            player.drawPlayer(jugador, anglePlayer);
         }
     }
 
@@ -143,7 +154,7 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     int tiempoPartida = mensaje->get_round_time();
     int round = mensaje->get_round();
 
-    if (is_bomb_planted){
+    if (is_bomb_planted) {
         time = mensaje->get_bomb_timer();
     } else {
         time = tiempoPartida;
@@ -152,31 +163,32 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     SDL_Rect mouse = {mouseX, mouseY, 40, 40};
     hud.draw(mouse, time, round, *myPlayer, is_bomb_planted);
 
-    if (mensaje->is_round_ended()){
+    if (mensaje->is_round_ended()) {
         Team team = mensaje->get_round_winner();
         mapa.drawEndRound(team, mensaje->is_bomb_planted());
 
         bloodStains.clear();
         lastHealths.clear();
     }
-    if (tiempoPartida >= configuracion.tiempoDeCompra && myPlayer->get_status() == Status::Alive){
+    if (tiempoPartida >= configuracion.tiempoDeCompra && myPlayer->get_status() == Status::Alive) {
         mapa.drawCampField(myAngle, myPlayer->get_pos_x(), myPlayer->get_pos_y());
-    } else if (tiempoPartida < configuracion.tiempoDeCompra){
+    } else if (tiempoPartida < configuracion.tiempoDeCompra) {
         mapa.drawShop();
     }
-    
+
     mapa.drawExplosion();
 
     std::list<DroppedWeapon> dropped_weapons = mensaje->get_dropped_weapons();
-    for (auto weapon : dropped_weapons){
-        if (puntoEnVision(myPlayer->get_pos_x(), myPlayer->get_pos_y(), visionAngle, weapon.get_pos_x(), weapon.get_pos_y())) {
+    for (auto weapon: dropped_weapons) {
+        if (puntoEnVision(myPlayer->get_pos_x(), myPlayer->get_pos_y(), visionAngle,
+                          weapon.get_pos_x(), weapon.get_pos_y())) {
             hud.drawWeaponDroped(weapon.get_weapon(), weapon.get_pos_x(), weapon.get_pos_y());
         }
     }
 
     int currentHealth = myPlayer->get_health();
     if (lastHealth != -1 && currentHealth < lastHealth) {
-        damageFlashTimer = 10; 
+        damageFlashTimer = 10;
     }
     lastHealth = currentHealth;
 
@@ -191,7 +203,7 @@ void Render::renderFrame(std::optional<GameStateUpdate> mensaje){
     sdlRenderer->Present();
 }
 
-double Render::getAnglePlayer(int jugadorX, int jugadorY, int mousex, int mousey){
+double Render::getAnglePlayer(int jugadorX, int jugadorY, int mousex, int mousey) {
 
     // Calcular el ángulo entre el jugador y el mouse
     int dx = mousex - jugadorX;
@@ -208,10 +220,11 @@ bool Render::puntoEnVision(int playerX, int playerY, float visionAngleDeg, int p
     float radius = 60.0f;
     float dx = puntoX - playerX;
     float dy = puntoY - playerY;
-    float distancia = std::sqrt(dx*dx + dy*dy);
+    float distancia = std::sqrt(dx * dx + dy * dy);
 
     // Esta dentro del radio
-    if (distancia > radius) return false;
+    if (distancia > radius)
+        return false;
 
     // angulo hacia el punto
     float angleToPoint = std::atan2(dy, dx) * 180.0f / M_PI;
@@ -221,13 +234,16 @@ bool Render::puntoEnVision(int playerX, int playerY, float visionAngleDeg, int p
     angleToPoint = normalizarAngulo(angleToPoint);
 
     // normalizá ángulos a [0, 360)
-    if (angleToPoint < 0) angleToPoint += 360;
-    if (visionAngleDeg < 0) visionAngleDeg += 360;
+    if (angleToPoint < 0)
+        angleToPoint += 360;
+    if (visionAngleDeg < 0)
+        visionAngleDeg += 360;
 
     float delta = std::fabs(angleToPoint - visionAngleDeg);
 
     // Manejar borde entre 0 y 360
-    if (delta > 180.0f) delta = 360.0f - delta;
+    if (delta > 180.0f)
+        delta = 360.0f - delta;
 
     return delta <= (fovDeg / 2.0f);
 }
