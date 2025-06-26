@@ -20,7 +20,11 @@ ASSETS_DIR="/var/$NAME"
 BIN_DIR="/usr/bin"
 DESKTOP_DIR="$HOME/Desktop"
 
-echo -e "${BLUE}🚀 Instalando $NAME...${NC}"
+echo -e "${BLUE} ================================== ${NC}"
+echo -e "${BLUE} 🚀 Instalador de $NAME_PROJECT${NC}"
+echo -e "${BLUE} ================================== ${NC}"
+
+sleep 2
 
 # ------------------------ Dependencias ------------------------
 echo -e "${BLUE}📦 Instalando dependencias...${NC}"
