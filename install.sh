@@ -1,20 +1,34 @@
 #!/bin/bash
 
+
 set -e
 
+# ------------------------ Colores ------------------------
+GREEN='\033[0;32m'
+BLUE='\033[94m'
+NC='\033[0m'  # No color
+
+# ------------------------ Variables ------------------------
 NAME="cs2d"
+NAME_PROJECT="Counter-Strike 2D"
 SERVER_NAME="taller_server"
 CLIENT_NAME="taller_client"
 TEST_NAME="taller_tests"
 
+CONFIG_DIR="/etc/$NAME"
+ASSETS_DIR="/var/$NAME"
+BIN_DIR="/usr/bin"
+DESKTOP_DIR="$HOME/Desktop"
 
-echo "Instalando $NAME..."
+echo -e "${BLUE}🚀 Instalando $NAME...${NC}"
 
-echo "Instalando dependencias..."
+# ------------------------ Dependencias ------------------------
+echo -e "${BLUE}📦 Instalando dependencias...${NC}"
 sudo apt-get update
 sudo apt-get install -y \
   build-essential \
   cmake \
+  git \
   libsdl2-dev \
   libsdl2-image-dev \
   libsdl2-mixer-dev \
@@ -26,31 +40,64 @@ sudo apt-get install -y \
   libfreetype-dev \
   qt6-base-dev \
   qt6-tools-dev \
-  qt6-tools-dev-tools
+  qt6-tools-dev-tools \
+  libyaml-cpp-dev
 
-echo "Compilando el proyecto..."
+# ------------------------ Compilacion ------------------------
+echo -e "${BLUE}🧱 Compilando el proyecto...${NC}"
 make compile-debug
 
-echo "Corriendo tests unitarios..."
-
+# ------------------------ Tests ------------------------
+echo -e "${BLUE}🧪 Corriendo tests unitarios...${NC}"
 ./build/$TEST_NAME
 
-echo "Instalando archivos..."
+# ------------------------ Instalacion ------------------------
+echo -e "${BLUE}📁 Instalando archivos del juego...${NC}"
+sudo mkdir -p "$BIN_DIR"
+sudo mkdir -p "$ASSETS_DIR"
+sudo mkdir -p "$CONFIG_DIR"
 
-# Crear directorios de destino
-sudo mkdir -p /usr/bin
-sudo mkdir -p /var/$NAME/
-sudo mkdir -p /etc/$NAME/
+# Binarios
+sudo cp build/$SERVER_NAME "$BIN_DIR/"
+sudo cp build/$CLIENT_NAME "$BIN_DIR/"
 
-# Copiar binarios
-sudo cp build/$SERVER_NAME /usr/bin/
-sudo cp build/$CLIENT_NAME /usr/bin/
+# Assets
+sudo cp -r client/data/* "$ASSETS_DIR/"
+
+# Configuracion
+sudo cp server/server_config.yaml "$CONFIG_DIR/"
+
+# ------------------------ Scripts del servidor y cliente ------------------------
+echo -e "${BLUE}📄 Creando scripts de arranque...${NC}"
+
+# Script para levantar el server
+cat <<EOF > "$DESKTOP_DIR/server.sh"
+#!/bin/bash
+cd $BIN_DIR
+PORT=8080
+CONFIG_PATH="$CONFIG_DIR/server_config.yaml"
+
+./$SERVER_NAME \$PORT \$CONFIG_PATH
+EOF
+
+# Script para levantar el client
+cat <<EOF > "$DESKTOP_DIR/client.sh"
+#!/bin/bash
+cd $BIN_DIR
+PORT=8080
+HOST="localhost"
+export ${NAME^^}_CLIENT_CONFIG_FILE="$CONFIG_DIR/client_config.yaml"
+
+./$CLIENT_NAME \$HOST \$PORT
+EOF
+
+chmod +x "$DESKTOP_DIR/server.sh" "$DESKTOP_DIR/client.sh"
 
 
-# Copiar assets
-sudo cp -r client/data /var/$NAME/
+# ------------------------ Finalizacion ------------------------
 
-# Copiar configuración 
-sudo cp -r server/server_config.yaml /etc/$NAME/
-
-echo "🎉 Instalación completada correctamente."
+echo -e "${GREEN}🎉 Instalacion completada con exito.${NC}"
+echo -e "${GREEN}📌 Ejecutables en:${NC} $BIN_DIR"
+echo -e "${GREEN}📌 Archivos de configuracion en:${NC} $CONFIG_DIR"
+echo -e "${GREEN}📌 Datos del juego en:${NC} $ASSETS_DIR"
+echo -e "${GREEN}📌 Accesos directos creados en:${NC} $DESKTOP_DIR"
