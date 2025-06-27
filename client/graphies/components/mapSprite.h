@@ -47,7 +47,7 @@ private:
     const MapConfigInfo& mapConfig;
 
 public:
-    MapSprite(Renderer* sdlRenderer, Configuracion& configuracion);
+    MapSprite(Renderer* sdlRenderer, Configuracion& configuracion, std::string& assetsPath);
 
     void draw();
 

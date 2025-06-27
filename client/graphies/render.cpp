@@ -7,14 +7,15 @@
 using SDL2pp::Rect;
 
 Render::Render(Renderer* renderer, Protocol& protocolo, std::string& namePlayer,
-               Configuracion& configuracion):
+               Configuracion& configuracion, std::string& assetsPath):
         sdlRenderer(renderer),
         protocolo(protocolo),
         namePlayer(namePlayer),
         configuracion(configuracion),
-        hud(sdlRenderer, configuracion),
-        mapa(sdlRenderer, configuracion),
-        player(sdlRenderer, configuracion) {}
+        assetsPath(assetsPath),
+        hud(sdlRenderer, configuracion, assetsPath),
+        mapa(sdlRenderer, configuracion, assetsPath),
+        player(sdlRenderer, configuracion, assetsPath) {}
 
 void Render::renderFrame(std::optional<GameStateUpdate> mensaje) {
 

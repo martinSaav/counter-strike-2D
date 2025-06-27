@@ -2,38 +2,40 @@
 
 #include <cmath>
 
-HudSprite::HudSprite(Renderer* sdlRenderer, Configuracion& configuracion):
-        Component(sdlRenderer, configuracion) {
+HudSprite::HudSprite(Renderer* sdlRenderer, Configuracion& configuracion, std::string& assetsPath):
+        Component(sdlRenderer, configuracion, assetsPath) {
 
-    texturas.loadTexture("mira", "../client/data/mira.png");
-    texturas.loadTexture("symbols", "../client/data/hud/hud_symbols.png");
-    texturas.loadTexture("nums", "../client/data/hud/hud_nums.png");
-    texturas.loadTexture("nums2", "../client/data/hud/nums2.png");
+    // HUD básico
+    texturas.loadTexture("mira", assetsPath + "/mira.png");
+    texturas.loadTexture("symbols", assetsPath + "/hud/hud_symbols.png");
+    texturas.loadTexture("nums", assetsPath + "/hud/hud_nums.png");
+    texturas.loadTexture("nums2", assetsPath + "/hud/nums2.png");
 
-    // weapons
-    texturas.loadTexture("weapons", "../client/data/weapons/weapons.png");
-    texturas.loadTexture("bullets", "../client/data/weapons/bullet.png");
+    // Armas
+    texturas.loadTexture("weapons", assetsPath + "/weapons/weapons.png");
+    texturas.loadTexture("bullets", assetsPath + "/weapons/bullet.png");
 
-    // slot
-    texturas.loadTexture("slot", "../client/data/weapons/hud_slot.png");
+    // Slot
+    texturas.loadTexture("slot", assetsPath + "/weapons/hud_slot.png");
 
-    // posters player
-    texturas.loadTexture("counterTerroristPost", "../client/data/hud/counterTerroristPost.png");
-    texturas.loadTexture("terroristPost", "../client/data/hud/terroristPost.png");
+    // Posters
+    texturas.loadTexture("counterTerroristPost", assetsPath + "/hud/counterTerroristPost.png");
+    texturas.loadTexture("terroristPost", assetsPath + "/hud/terroristPost.png");
 
-    // weapons dropped
-    texturas.loadTexture("ak47_dropped", "../client/data/weapons/ak47_d.bmp");
-    texturas.loadTexture("glock_dropped", "../client/data/weapons/glock_d.bmp");
-    texturas.loadTexture("awp_dropped", "../client/data/weapons/awp_d.bmp");
-    texturas.loadTexture("m3_dropped", "../client/data/weapons/m3_d.bmp");
-    texturas.loadTexture("bomb_dropped", "../client/data/weapons/bomb_d.bmp");
+    // Armas tiradas
+    texturas.loadTexture("ak47_dropped", assetsPath + "/weapons/ak47_d.bmp");
+    texturas.loadTexture("glock_dropped", assetsPath + "/weapons/glock_d.bmp");
+    texturas.loadTexture("awp_dropped", assetsPath + "/weapons/awp_d.bmp");
+    texturas.loadTexture("m3_dropped", assetsPath + "/weapons/m3_d.bmp");
+    texturas.loadTexture("bomb_dropped", assetsPath + "/weapons/bomb_d.bmp");
 
-    // Aplico colores
+    // Color mod
     Texture& counterPost = texturas.getTexture("counterTerroristPost");
     Texture& terroristPost = texturas.getTexture("terroristPost");
     counterPost.SetColorMod(255, 165, 0);
     terroristPost.SetColorMod(255, 165, 0);
 }
+
 
 void HudSprite::draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlayer,
                      bool& is_bomb_planted) {
