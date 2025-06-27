@@ -42,7 +42,7 @@ private:
     std::map<tipoMusic, std::string> ficheroDeUbicaciones;
 
 public:
-    explicit MusicManager(std::string& assetsPath);
+    explicit MusicManager(const std::string& assetsPath);
 
     ~MusicManager();
 

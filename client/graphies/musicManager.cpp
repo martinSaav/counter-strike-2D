@@ -3,7 +3,7 @@
 #include <utility>
 #include <vector>
 
-MusicManager::MusicManager(std::string& assetsPath) {
+MusicManager::MusicManager(const std::string& assetsPath) {
     Mix_Init(MIX_INIT_MP3);  // Iniciar SDL_mixer para manejar formato mp3
     // Abrimos un dispositivo
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2,
@@ -23,8 +23,9 @@ MusicManager::MusicManager(std::string& assetsPath) {
     std::string ubicacionItemEquip = assetsPath + "/sounds/itemEquip.mp3";
     std::string ubicacionAwp = assetsPath + "/sounds/awp.wav";
     std::string ubicacionM3 = assetsPath + "/sounds/m3.wav";
-    
-    std::string ubicacionBombHasBeenDefused = assetsPath + "/sounds/BombHasBeenDefusedCounterTerroristsWin.mp3";
+
+    std::string ubicacionBombHasBeenDefused =
+            assetsPath + "/sounds/BombHasBeenDefusedCounterTerroristsWin.mp3";
     std::string ubicacionBombHasBeenPlanted = assetsPath + "/sounds/BombHasBeenPlanted.mp3";
     std::string ubicacionCounterTerroristWin = assetsPath + "/sounds/CounterTerroristWin.mp3";
     std::string ubicacionTerroristWin = assetsPath + "/sounds/TerroristsWin.mp3";

@@ -2,7 +2,8 @@
 
 #include <cmath>
 
-PlayerSprite::PlayerSprite(Renderer* sdlRenderer, Configuracion& configuracion, std::string& assetsPath):
+PlayerSprite::PlayerSprite(Renderer* sdlRenderer, Configuracion& configuracion,
+                           std::string& assetsPath):
         Component(sdlRenderer, configuracion, assetsPath) {
 
     // Skins

@@ -30,6 +30,9 @@ protected:
 public:
     // Crea el junto con sus medidas
     Component(Renderer* sdlRenderer, Configuracion& configuracion, std::string& assetsPath):
-            texturas(sdlRenderer), sdlRenderer(sdlRenderer), configuracion(configuracion), sounds(assetsPath) {}
+            texturas(sdlRenderer),
+            sdlRenderer(sdlRenderer),
+            configuracion(configuracion),
+            sounds(assetsPath) {}
 };
 #endif
