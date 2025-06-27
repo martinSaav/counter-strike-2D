@@ -74,8 +74,11 @@ sudo cp server/server_config.yaml "$CONFIG_DIR/"
 # ------------------------ Scripts del servidor y cliente ------------------------
 echo -e "${BLUE}📄 Creando scripts de arranque...${NC}"
 
+# Guardar en raiz del proyecto
+PROJECT_DIR=$(pwd)
+
 # Script para levantar el server
-cat <<EOF > "$DESKTOP_DIR/server.sh"
+cat <<EOF > "$PROJECT_DIR/server.sh"
 #!/bin/bash
 cd $BIN_DIR
 PORT=8080
@@ -85,18 +88,21 @@ CONFIG_PATH="$CONFIG_DIR/server_config.yaml"
 EOF
 
 # Script para levantar el client
-cat <<EOF > "$DESKTOP_DIR/client.sh"
+cat <<EOF > "$PROJECT_DIR/client.sh"
 #!/bin/bash
 cd $BIN_DIR
 PORT=8080
 HOST="localhost"
-export ${NAME^^}_CLIENT_CONFIG_FILE="$CONFIG_DIR/client_config.yaml"
-
+export CS2D_ASSETS_DIR="/var/cs2d"
 ./$CLIENT_NAME \$HOST \$PORT
 EOF
 
-chmod +x "$DESKTOP_DIR/server.sh" "$DESKTOP_DIR/client.sh"
+# Dar permisos de ejecución
+chmod +x "$PROJECT_DIR/server.sh" "$PROJECT_DIR/client.sh"
 
+# Copiar accesos al escritorio
+ln -s "$PROJECT_DIR/server.sh" "$DESKTOP_DIR/server.sh"
+ln -s "$PROJECT_DIR/client.sh" "$DESKTOP_DIR/client.sh"
 
 # ------------------------ Finalizacion ------------------------
 

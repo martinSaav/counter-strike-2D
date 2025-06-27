@@ -44,7 +44,14 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& estadistics) {
     // Create render object
     Configuracion configuracion(widthWindow, heightWindow, gameConfig);
 
-    Render render(&renderer, protocolo, namePlayer, configuracion);
+    const char* assetsPath = std::getenv("CS2D_ASSETS_DIR");
+    if (!assetsPath) {
+        assetsPath = "../client/data";
+    }
+
+    std::string assetsPathStr(assetsPath);
+
+    Render render(&renderer, protocolo, namePlayer, configuracion, assetsPathStr);
 
     // Create input handler
     InputHandler inputHandler(protocolo, configuracion, gameOver, clientClosed);

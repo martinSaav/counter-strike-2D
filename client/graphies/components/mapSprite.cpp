@@ -1,40 +1,40 @@
 #include "mapSprite.h"
 
 
-MapSprite::MapSprite(Renderer* sdlRenderer, Configuracion& configuracion):
-        Component(sdlRenderer, configuracion),
+MapSprite::MapSprite(Renderer* sdlRenderer, Configuracion& configuracion, std::string& assetsPath):
+        Component(sdlRenderer, configuracion, assetsPath),
         anchoField(0),
         altoField(0),
         canalBomb(0),
         mapConfig(configuracion.gameConfig->get_map_config()) {
 
     // map
-    texturas.loadTexture("map", "../client/data/maps/default_aztec.png");
+    texturas.loadTexture("map", assetsPath + "/maps/default_aztec.png");
 
     // map obstacles
-    texturas.loadTexture("mapObstacles", "../client/data/maps/aztec.bmp");
+    texturas.loadTexture("mapObstacles", assetsPath + "/maps/aztec.bmp");
 
     // map sites
-    texturas.loadTexture("bspot_a", "../client/data/maps/bspot_a.png");
-    texturas.loadTexture("bspot_b", "../client/data/maps/bspot_b.png");
+    texturas.loadTexture("bspot_a", assetsPath + "/maps/bspot_a.png");
+    texturas.loadTexture("bspot_b", assetsPath + "/maps/bspot_b.png");
 
-    texturas.loadTexture("cross", "../client/data/maps/cross.png");
+    texturas.loadTexture("cross", assetsPath + "/maps/cross.png");
 
     // round
-    texturas.loadTexture("terroristWins", "../client/data/hud/terroristWins.png");
-    texturas.loadTexture("counterterroristWins", "../client/data/hud/counterTerroristWins.png");
+    texturas.loadTexture("terroristWins", assetsPath + "/hud/terroristWins.png");
+    texturas.loadTexture("counterterroristWins", assetsPath + "/hud/counterTerroristWins.png");
 
     // bomb
-    texturas.loadTexture("bomb", "../client/data/weapons/bomb.bmp");
+    texturas.loadTexture("bomb", assetsPath + "/weapons/bomb.bmp");
 
     // camp field
-    texturas.loadTexture("field", "../client/data/maps/field.png", false);
+    texturas.loadTexture("field", assetsPath + "/maps/field.png", false);
 
     // shop
-    texturas.loadTexture("shop", "../client/data/maps/shop.png");
+    texturas.loadTexture("shop", assetsPath + "/maps/shop.png");
 
     // explosion
-    texturas.loadTexture("explosion", "../client/data/hud/bomb_explotion.png", false);
+    texturas.loadTexture("explosion", assetsPath + "/hud/bomb_explotion.png", false);
 
     tipoMusic music = AMBIENTE;
     int cantVeces = 4;

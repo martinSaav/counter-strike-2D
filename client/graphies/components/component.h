@@ -13,9 +13,9 @@ class Component {
 
 protected:
     TextureStore texturas;
-    MusicManager sounds;
     Renderer* sdlRenderer;
     Configuracion& configuracion;
+    MusicManager sounds;
 
     void drawHud(SDL_Rect srcRect, SDL_Rect destRect, std::string& textureName) {
         Texture& texture = texturas.getTexture(textureName);
@@ -29,7 +29,7 @@ protected:
 
 public:
     // Crea el junto con sus medidas
-    Component(Renderer* sdlRenderer, Configuracion& configuracion):
-            texturas(sdlRenderer), sdlRenderer(sdlRenderer), configuracion(configuracion) {}
+    Component(Renderer* sdlRenderer, Configuracion& configuracion, std::string& assetsPath):
+            texturas(sdlRenderer), sdlRenderer(sdlRenderer), configuracion(configuracion), sounds(assetsPath) {}
 };
 #endif

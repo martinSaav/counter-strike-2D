@@ -19,7 +19,7 @@ private:
     tipoMusic castShoot(const Weapon& weapon);
 
 public:
-    PlayerSprite(Renderer* sdlRenderer, Configuracion& configuracion);
+    PlayerSprite(Renderer* sdlRenderer, Configuracion& configuracion, std::string& assetsPath);
 
     void drawPlayer(const PlayerInfo& jugador, double& angle);
 
