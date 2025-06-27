@@ -2,36 +2,37 @@
 
 #include <cmath>
 
-PlayerSprite::PlayerSprite(Renderer* sdlRenderer, Configuracion& configuracion):
-        Component(sdlRenderer, configuracion) {
+PlayerSprite::PlayerSprite(Renderer* sdlRenderer, Configuracion& configuracion,
+                           std::string& assetsPath):
+        Component(sdlRenderer, configuracion, assetsPath) {
 
     // Skins
-    texturas.loadTexture("T1", "../client/data/players/t1.bmp");
-    texturas.loadTexture("T2", "../client/data/players/t2.bmp");
-    texturas.loadTexture("T3", "../client/data/players/t3.bmp");
-    texturas.loadTexture("T4", "../client/data/players/t4.bmp");
+    texturas.loadTexture("T1", assetsPath + "/players/t1.bmp");
+    texturas.loadTexture("T2", assetsPath + "/players/t2.bmp");
+    texturas.loadTexture("T3", assetsPath + "/players/t3.bmp");
+    texturas.loadTexture("T4", assetsPath + "/players/t4.bmp");
 
-    texturas.loadTexture("C1", "../client/data/players/ct1.bmp");
-    texturas.loadTexture("C2", "../client/data/players/ct2.bmp");
-    texturas.loadTexture("C3", "../client/data/players/ct3.bmp");
-    texturas.loadTexture("C4", "../client/data/players/ct4.bmp");
+    texturas.loadTexture("C1", assetsPath + "/players/ct1.bmp");
+    texturas.loadTexture("C2", assetsPath + "/players/ct2.bmp");
+    texturas.loadTexture("C3", assetsPath + "/players/ct3.bmp");
+    texturas.loadTexture("C4", assetsPath + "/players/ct4.bmp");
 
     // Weapons
-    texturas.loadTexture("ak47", "../client/data/weapons/ak47.bmp");
-    texturas.loadTexture("awp", "../client/data/weapons/awp.bmp");
-    texturas.loadTexture("m3", "../client/data/weapons/m3.bmp");
-    texturas.loadTexture("glock", "../client/data/weapons/glock.bmp");
-    texturas.loadTexture("knife", "../client/data/weapons/knife.bmp");
-    texturas.loadTexture("bomb", "../client/data/weapons/bomb.bmp");
+    texturas.loadTexture("ak47", assetsPath + "/weapons/ak47.bmp");
+    texturas.loadTexture("awp", assetsPath + "/weapons/awp.bmp");
+    texturas.loadTexture("m3", assetsPath + "/weapons/m3.bmp");
+    texturas.loadTexture("glock", assetsPath + "/weapons/glock.bmp");
+    texturas.loadTexture("knife", assetsPath + "/weapons/knife.bmp");
+    texturas.loadTexture("bomb", assetsPath + "/weapons/bomb.bmp");
 
     // Bullets
-    texturas.loadTexture("tiro", "../client/data/hud/explocion.png");
+    texturas.loadTexture("tiro", assetsPath + "/hud/explocion.png");
 
     // Death
-    texturas.loadTexture("hud_symbols", "../client/data/hud/hud_symbols.png");
+    texturas.loadTexture("hud_symbols", assetsPath + "/hud/hud_symbols.png");
 
     // Blood
-    texturas.loadTexture("blood", "../client/data/maps/blood.png");
+    texturas.loadTexture("blood", assetsPath + "/maps/blood.png");
 }
 
 void PlayerSprite::drawPlayer(const PlayerInfo& jugador, double& angle) {

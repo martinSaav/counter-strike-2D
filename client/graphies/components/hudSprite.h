@@ -54,7 +54,7 @@ private:
     void drawSounds(PlayerInfo& myPlayer);
 
 public:
-    HudSprite(Renderer* sdlRenderer, Configuracion& configuracion);
+    HudSprite(Renderer* sdlRenderer, Configuracion& configuracion, std::string& assetsPath);
 
     void draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlayer, bool& is_bomb_planted);
 

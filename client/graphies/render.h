@@ -27,6 +27,7 @@ private:
     Renderer* sdlRenderer;
     Protocol& protocolo;
     std::string& namePlayer;
+    std::string& assetsPath;
 
     Configuracion& configuracion;
 
@@ -61,7 +62,7 @@ private:
 
 public:
     Render(Renderer* renderer, Protocol& protocolo, std::string& namePlayer,
-           Configuracion& configuracion);
+           Configuracion& configuracion, std::string& assetsPath);
     void renderFrame(std::optional<GameStateUpdate> mensaje);
     bool puntoEnVision(int playerX, int playerY, float visionAngleDeg, int puntoX, int puntoY);
     void clearScreen();

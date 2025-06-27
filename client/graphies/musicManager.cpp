@@ -3,33 +3,33 @@
 #include <utility>
 #include <vector>
 
-MusicManager::MusicManager() {
+MusicManager::MusicManager(const std::string& assetsPath) {
     Mix_Init(MIX_INIT_MP3);  // Iniciar SDL_mixer para manejar formato mp3
     // Abrimos un dispositivo
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2,
                   2048);  //(frecuencia, formato, número de canales, tam de buffer)
 
     // En el constructor:
-    std::string ubicacionPistol = "../client/data/sounds/pistolShot.wav";
-    std::string ubicacionAk47 = "../client/data/sounds/ak47.wav";
-    std::string ubicacionKnife = "../client/data/sounds/knife.wav";
-    // std::string ubicacionStep = "../client/data/sounds/step.wav";
-    std::string ubicacionTimer = "../client/data/sounds/timer.wav";
-    std::string ubicacionAmbienceGame = "../client/data/sounds/ambienceGame.mp3";
-    std::string ubicacionExploit = "../client/data/sounds/explosion.mp3";
-    std::string ubicacionReload = "../client/data/sounds/pistolReload.mp3";
-    std::string ubicacionReload2 = "../client/data/sounds/rifleReload.mp3";
-    std::string ubicacionBuy = "../client/data/sounds/buy.mp3";
-    std::string ubicacionItemEquip = "../client/data/sounds/itemEquip.mp3";
-    std::string ubicacionAwp = "../client/data/sounds/awp.wav";
-    std::string ubicacionM3 = "../client/data/sounds/m3.wav";
+    std::string ubicacionPistol = assetsPath + "/sounds/pistolShot.wav";
+    std::string ubicacionAk47 = assetsPath + "/sounds/ak47.wav";
+    std::string ubicacionKnife = assetsPath + "/sounds/knife.wav";
+    // std::string ubicacionStep = assetsPath + "/sounds/step.wav";
+    std::string ubicacionTimer = assetsPath + "/sounds/timer.wav";
+    std::string ubicacionAmbienceGame = assetsPath + "/sounds/ambienceGame.mp3";
+    std::string ubicacionExploit = assetsPath + "/sounds/explosion.mp3";
+    std::string ubicacionReload = assetsPath + "/sounds/pistolReload.mp3";
+    std::string ubicacionReload2 = assetsPath + "/sounds/rifleReload.mp3";
+    std::string ubicacionBuy = assetsPath + "/sounds/buy.mp3";
+    std::string ubicacionItemEquip = assetsPath + "/sounds/itemEquip.mp3";
+    std::string ubicacionAwp = assetsPath + "/sounds/awp.wav";
+    std::string ubicacionM3 = assetsPath + "/sounds/m3.wav";
 
     std::string ubicacionBombHasBeenDefused =
-            "../client/data/sounds/BombHasBeenDefusedCounterTerroristsWin.mp3";
-    std::string ubicacionBombHasBeenPlanted = "../client/data/sounds/BombHasBeenPlanted.mp3";
-    std::string ubicacionCounterTerroristWin = "../client/data/sounds/CounterTerroristWin.mp3";
-    std::string ubicacionTerroristWin = "../client/data/sounds/TerroristsWin.mp3";
-    std::string ubicacionPlantingBomb = "../client/data/sounds/PlantingC4Bomb.mp3";
+            assetsPath + "/sounds/BombHasBeenDefusedCounterTerroristsWin.mp3";
+    std::string ubicacionBombHasBeenPlanted = assetsPath + "/sounds/BombHasBeenPlanted.mp3";
+    std::string ubicacionCounterTerroristWin = assetsPath + "/sounds/CounterTerroristWin.mp3";
+    std::string ubicacionTerroristWin = assetsPath + "/sounds/TerroristsWin.mp3";
+    std::string ubicacionPlantingBomb = assetsPath + "/sounds/PlantingC4Bomb.mp3";
 
     ficheroDeUbicaciones[tipoMusic::DISPARO_PISTOL] = ubicacionPistol;
     ficheroDeUbicaciones[tipoMusic::DISPARO_AK47] = ubicacionAk47;
