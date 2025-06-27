@@ -15,6 +15,9 @@ SERVER_NAME="taller_server"
 CLIENT_NAME="taller_client"
 TEST_NAME="taller_tests"
 
+SERVER_EXECUTABLE="server.sh"
+CLIENT_EXECUTABLE="client.sh"
+
 CONFIG_DIR="/etc/$NAME"
 ASSETS_DIR="/var/$NAME"
 BIN_DIR="/usr/bin"
@@ -40,7 +43,10 @@ sudo apt-get install -y \
   libopusfile-dev \
   libxmp-dev \
   libfluidsynth-dev \
+  fluidsynth \
+  libwavpack1 \
   libwavpack-dev \
+  wavpack \
   libfreetype-dev \
   qt6-base-dev \
   qt6-tools-dev \
@@ -68,6 +74,9 @@ sudo cp build/$CLIENT_NAME "$BIN_DIR/"
 # Assets
 sudo cp -r client/data/* "$ASSETS_DIR/"
 
+# Dar permisos a los assets
+sudo chmod -R 777 "$ASSETS_DIR"
+
 # Configuracion
 sudo cp server/server_config.yaml "$CONFIG_DIR/"
 
@@ -78,7 +87,7 @@ echo -e "${BLUE}📄 Creando scripts de arranque...${NC}"
 PROJECT_DIR=$(pwd)
 
 # Script para levantar el server
-cat <<EOF > "$PROJECT_DIR/server.sh"
+cat <<EOF > "$PROJECT_DIR/$SERVER_EXECUTABLE"
 #!/bin/bash
 cd $BIN_DIR
 PORT=8080
@@ -88,7 +97,7 @@ CONFIG_PATH="$CONFIG_DIR/server_config.yaml"
 EOF
 
 # Script para levantar el client
-cat <<EOF > "$PROJECT_DIR/client.sh"
+cat <<EOF > "$PROJECT_DIR/$CLIENT_EXECUTABLE"
 #!/bin/bash
 cd $BIN_DIR
 PORT=8080
@@ -98,15 +107,15 @@ export CS2D_ASSETS_DIR="/var/cs2d"
 EOF
 
 # Dar permisos de ejecución
-chmod +x "$PROJECT_DIR/server.sh" "$PROJECT_DIR/client.sh"
+chmod +x "$PROJECT_DIR/$SERVER_EXECUTABLE" "$PROJECT_DIR/$CLIENT_EXECUTABLE"
 
 # Eliminar accesos previos si existen
-rm -f "$DESKTOP_DIR/server.sh"
-rm -f "$DESKTOP_DIR/client.sh"
+rm -f "$DESKTOP_DIR/$SERVER_EXECUTABLE"
+rm -f "$DESKTOP_DIR/$CLIENT_EXECUTABLE"
 
 # Copiar accesos al escritorio
-ln -s "$PROJECT_DIR/server.sh" "$DESKTOP_DIR/server.sh"
-ln -s "$PROJECT_DIR/client.sh" "$DESKTOP_DIR/client.sh"
+ln -s "$PROJECT_DIR/$SERVER_EXECUTABLE" "$DESKTOP_DIR/$SERVER_EXECUTABLE"
+ln -s "$PROJECT_DIR/$CLIENT_EXECUTABLE" "$DESKTOP_DIR/$CLIENT_EXECUTABLE"
 
 # ------------------------ Finalizacion ------------------------
 
