@@ -101,7 +101,9 @@ cat <<EOF > "$PROJECT_DIR/$CLIENT_EXECUTABLE"
 #!/bin/bash
 cd $BIN_DIR
 PORT=8080
+#PORT=6000
 HOST="localhost"
+#HOST="56.124.17.90"
 export CS2D_ASSETS_DIR="/var/cs2d"
 ./$CLIENT_NAME \$HOST \$PORT
 EOF
