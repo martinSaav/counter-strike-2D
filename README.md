@@ -18,7 +18,7 @@
 ## Integrantes
 
 - [Manuel Herrera Esteban](https://github.com/Manuuherrera)
-- [Carlos Marias Sagastume](https://github.com/MatiasSagastume)
+- [Carlos Matias Sagastume](https://github.com/MatiasSagastume)
 - [Martín Alejandro Estrada Saavedra](https://github.com/martinSaav)
   
 ## Descripción
