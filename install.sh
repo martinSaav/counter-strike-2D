@@ -100,6 +100,10 @@ EOF
 # Dar permisos de ejecución
 chmod +x "$PROJECT_DIR/server.sh" "$PROJECT_DIR/client.sh"
 
+# Eliminar accesos previos si existen
+rm -f "$DESKTOP_DIR/server.sh"
+rm -f "$DESKTOP_DIR/client.sh"
+
 # Copiar accesos al escritorio
 ln -s "$PROJECT_DIR/server.sh" "$DESKTOP_DIR/server.sh"
 ln -s "$PROJECT_DIR/client.sh" "$DESKTOP_DIR/client.sh"
