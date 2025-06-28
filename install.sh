@@ -22,6 +22,7 @@ CONFIG_DIR="/etc/$NAME"
 ASSETS_DIR="/var/$NAME"
 BIN_DIR="/usr/bin"
 DESKTOP_DIR="$HOME/Desktop"
+RELEASE_URL="https://github.com/martinSaav/counter-strike-2D/archive/refs/tags/1.zip"
 
 echo -e "${BLUE} ================================== ${NC}"
 echo -e "${BLUE} 🚀 Instalador de $NAME_PROJECT${NC}"
@@ -36,6 +37,7 @@ sudo apt-get install -y \
   build-essential \
   cmake \
   git \
+  wget \
   libsdl2-dev \
   libsdl2-image-dev \
   libsdl2-mixer-dev \
@@ -53,6 +55,15 @@ sudo apt-get install -y \
   qt6-tools-dev-tools \
   libyaml-cpp-dev
 
+
+# ------------------------ Descargar release ------------------------
+echo -e "${BLUE}📥 Descargando la última release...${NC}"
+TMP_DIR=$(mktemp -d)
+wget -q -O "$TMP_DIR/release.zip" "$RELEASE_URL"
+unzip -q "$TMP_DIR/release.zip" -d "$TMP_DIR"
+PROJECT_DIR=$(find "$TMP_DIR" -type d -name "counter-strike-2D-*")
+cd "$PROJECT_DIR"
+
 # ------------------------ Compilacion ------------------------
 echo -e "${BLUE}🧱 Compilando el proyecto...${NC}"
 make compile-debug
@@ -63,11 +74,7 @@ echo -e "${BLUE}🧪 Corriendo tests unitarios...${NC}"
 
 # ------------------------ Instalacion ------------------------
 echo -e "${BLUE}📁 Instalando archivos del juego...${NC}"
-sudo mkdir -p "$BIN_DIR"
-sudo mkdir -p "$ASSETS_DIR"
-sudo mkdir -p "$CONFIG_DIR"
-
-# Binarios
+sudo mkdir -p "$BIN_DIR" "$ASSETS_DIR" "$CONFIG_DIR"
 sudo cp build/$SERVER_NAME "$BIN_DIR/"
 sudo cp build/$CLIENT_NAME "$BIN_DIR/"
 
@@ -83,21 +90,15 @@ sudo cp server/server_config.yaml "$CONFIG_DIR/"
 # ------------------------ Scripts del servidor y cliente ------------------------
 echo -e "${BLUE}📄 Creando scripts de arranque...${NC}"
 
-# Guardar en raiz del proyecto
-PROJECT_DIR=$(pwd)
-
-# Script para levantar el server
-cat <<EOF > "$PROJECT_DIR/$SERVER_EXECUTABLE"
+cat <<EOF > "$TMP_DIR/$SERVER_EXECUTABLE"
 #!/bin/bash
 cd $BIN_DIR
 PORT=8080
 CONFIG_PATH="$CONFIG_DIR/server_config.yaml"
-
 ./$SERVER_NAME \$PORT \$CONFIG_PATH
 EOF
 
-# Script para levantar el client
-cat <<EOF > "$PROJECT_DIR/$CLIENT_EXECUTABLE"
+cat <<EOF > "$TMP_DIR/$CLIENT_EXECUTABLE"
 #!/bin/bash
 cd $BIN_DIR
 PORT=8080
@@ -108,19 +109,12 @@ export CS2D_ASSETS_DIR="/var/cs2d"
 ./$CLIENT_NAME \$HOST \$PORT
 EOF
 
-# Dar permisos de ejecución
-chmod +x "$PROJECT_DIR/$SERVER_EXECUTABLE" "$PROJECT_DIR/$CLIENT_EXECUTABLE"
-
-# Eliminar accesos previos si existen
-rm -f "$DESKTOP_DIR/$SERVER_EXECUTABLE"
-rm -f "$DESKTOP_DIR/$CLIENT_EXECUTABLE"
-
-# Copiar accesos al escritorio
-ln -s "$PROJECT_DIR/$SERVER_EXECUTABLE" "$DESKTOP_DIR/$SERVER_EXECUTABLE"
-ln -s "$PROJECT_DIR/$CLIENT_EXECUTABLE" "$DESKTOP_DIR/$CLIENT_EXECUTABLE"
+chmod +x "$TMP_DIR/$SERVER_EXECUTABLE" "$TMP_DIR/$CLIENT_EXECUTABLE"
+rm -f "$DESKTOP_DIR/$SERVER_EXECUTABLE" "$DESKTOP_DIR/$CLIENT_EXECUTABLE"
+cp "$TMP_DIR/$SERVER_EXECUTABLE" "$DESKTOP_DIR/"
+cp "$TMP_DIR/$CLIENT_EXECUTABLE" "$DESKTOP_DIR/"
 
 # ------------------------ Finalizacion ------------------------
-
 echo -e "${GREEN}🎉 Instalacion completada con exito.${NC}"
 echo -e "${GREEN}📌 Ejecutables en:${NC} $BIN_DIR"
 echo -e "${GREEN}📌 Archivos de configuracion en:${NC} $CONFIG_DIR"
