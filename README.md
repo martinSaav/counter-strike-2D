@@ -90,7 +90,15 @@ El juego consiste en una batalla armada entre dos bandos, donde los terroristas 
 
 ### Instalación
 
-#### 1. Clonar el repositorio
+#### 1. Obtener el instalador
+
+
+#### Opción A - Descargar el instalador
+1. Ir a la pagina web del proyecto: [Counter-Strike 2D](https://martinsaav.github.io/Counter-Strike-2D-Website/)
+2. Hacer click en el botón "Descargar instalador (.sh)" 
+3. Guardar el archivo `install.sh` en una carpeta de tu elección
+
+#### Opción B - Clonar el repositorio (requiere git)
 
 ```bash
 git clone https://github.com/martinSaav/counter-strike-2D
