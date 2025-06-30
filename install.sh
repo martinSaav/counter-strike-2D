@@ -23,6 +23,7 @@ ASSETS_DIR="/var/$NAME"
 BIN_DIR="/usr/bin"
 DESKTOP_DIR="$HOME/Desktop"
 RELEASE_URL="https://github.com/martinSaav/counter-strike-2D/archive/refs/tags/1.zip"
+TMP_DIR=$(mktemp -d)
 
 echo -e "${BLUE} ================================== ${NC}"
 echo -e "${BLUE} 🚀 Instalador de $NAME_PROJECT${NC}"
@@ -35,7 +36,6 @@ echo -e "${BLUE}📦 Instalando dependencias...${NC}"
 sudo apt-get update
 sudo apt-get install -y \
   build-essential \
-  cmake \
   git \
   wget \
   libsdl2-dev \
@@ -55,10 +55,14 @@ sudo apt-get install -y \
   qt6-tools-dev-tools \
   libyaml-cpp-dev
 
+cd "$TMP_DIR"
+wget -q https://github.com/Kitware/CMake/releases/download/v3.24.4/cmake-3.24.4-linux-x86_64.tar.gz
+tar -xf cmake-3.24.4-linux-x86_64.tar.gz
+export PATH="$TMP_DIR/cmake-3.24.4-linux-x86_64/bin:$PATH"
+
 
 # ------------------------ Descargar release ------------------------
 echo -e "${BLUE}📥 Descargando la última release...${NC}"
-TMP_DIR=$(mktemp -d)
 wget -q -O "$TMP_DIR/release.zip" "$RELEASE_URL"
 unzip -q "$TMP_DIR/release.zip" -d "$TMP_DIR"
 PROJECT_DIR=$(find "$TMP_DIR" -type d -name "counter-strike-2D-*")
