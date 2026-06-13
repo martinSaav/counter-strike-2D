@@ -11,16 +11,16 @@
 class InputServerHandler {
 private:
     bool& gameOver;
-    std::queue<GameStateUpdate> mensajes;
+    std::queue<GameStateUpdate> messages;
     std::mutex mtx;
-    Protocol& protocolo;
+    Protocol& protocol;
 
 public:
-    explicit InputServerHandler(Protocol& protocolo, bool& gameOver);
+    explicit InputServerHandler(Protocol& protocol, bool& gameOver);
     ~InputServerHandler();
 
     void processEvents();
 
-    std::optional<GameStateUpdate> getMensaje();
+    std::optional<GameStateUpdate> getMessage();
 };
 #endif

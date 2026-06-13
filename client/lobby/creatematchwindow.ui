@@ -32,7 +32,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Crear partida</string>
+    <string>Create match</string>
    </property>
   </widget>
   <widget class="QTextEdit" name="inputNameMatch">
@@ -70,7 +70,7 @@
 background-color: transparent;</string>
    </property>
    <property name="text">
-    <string>Nombre  partida:</string>
+    <string>Match name:</string>
    </property>
   </widget>
   <widget class="QLabel" name="labelMaps">
@@ -95,7 +95,7 @@ background-color: transparent;</string>
 background-color: transparent;</string>
    </property>
    <property name="text">
-    <string>Seleccionar mapa:</string>
+    <string>Select map:</string>
    </property>
   </widget>
   <widget class="QListWidget" name="listMaps">
@@ -124,7 +124,7 @@ background-color: transparent;</string>
     </rect>
    </property>
    <property name="text">
-    <string>Atras</string>
+    <string>Back</string>
    </property>
   </widget>
   <widget class="QLabel" name="label">
@@ -140,7 +140,7 @@ background-color: transparent;</string>
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="recursos.qrc">:/imagenes/imagenes/fondos/fondo4.jpg</pixmap>
+    <pixmap resource="resources.qrc">:/images/images/backgrounds/background4.jpg</pixmap>
    </property>
   </widget>
   <zorder>label</zorder>
@@ -152,7 +152,7 @@ background-color: transparent;</string>
   <zorder>backButon</zorder>
  </widget>
  <resources>
-  <include location="recursos.qrc"/>
+  <include location="resources.qrc"/>
  </resources>
  <connections/>
 </ui>

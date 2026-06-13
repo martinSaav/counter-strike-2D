@@ -22,7 +22,7 @@ private Q_SLOTS:
     void on_loginButton_clicked();
 
 Q_SIGNALS:
-    void ventanaCerrada();
+    void windowClosed();
 
 private:
     Ui::loginwindow* ui;

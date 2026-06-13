@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Wait room</string>
   </property>
-  <widget class="QLabel" name="labelSeleccion">
+  <widget class="QLabel" name="labelSelection">
    <property name="geometry">
     <rect>
      <x>240</x>
@@ -37,10 +37,10 @@
     <string notr="true">color: white;</string>
    </property>
    <property name="text">
-    <string>Seleccion de equipo</string>
+    <string>Team selection</string>
    </property>
   </widget>
-  <widget class="QLabel" name="labelTerrorista">
+  <widget class="QLabel" name="labelTerrorist">
    <property name="geometry">
     <rect>
      <x>90</x>
@@ -61,10 +61,10 @@
     <string notr="true">color: white;</string>
    </property>
    <property name="text">
-    <string>Terrorista</string>
+    <string>Terrorist</string>
    </property>
   </widget>
-  <widget class="QLabel" name="labelContraterrorista">
+  <widget class="QLabel" name="labelCounterTerrorist">
    <property name="geometry">
     <rect>
      <x>490</x>
@@ -85,10 +85,10 @@
     <string notr="true">color: white;</string>
    </property>
    <property name="text">
-    <string>Contraterrorista</string>
+    <string>Counter-Terrorist</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="terroristaButton">
+  <widget class="QPushButton" name="terroristButton">
    <property name="geometry">
     <rect>
      <x>100</x>
@@ -98,10 +98,10 @@
     </rect>
    </property>
    <property name="text">
-    <string>Terrorista</string>
+    <string>Terrorist</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="contraterroristaButton">
+  <widget class="QPushButton" name="counterTerroristButton">
    <property name="geometry">
     <rect>
      <x>520</x>
@@ -111,10 +111,10 @@
     </rect>
    </property>
    <property name="text">
-    <string>Contraterrorista</string>
+    <string>Counter-Terrorist</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="empezarButton">
+  <widget class="QPushButton" name="startButton">
    <property name="geometry">
     <rect>
      <x>320</x>
@@ -124,7 +124,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Empezar</string>
+    <string>Start</string>
    </property>
   </widget>
   <widget class="QLabel" name="label">
@@ -148,7 +148,7 @@
     <string notr="true">color: white;</string>
    </property>
    <property name="text">
-    <string>Esperando comienzo de partida</string>
+    <string>Waiting for match to start</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">
@@ -164,7 +164,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="recursos.qrc">:/imagenes/imagenes/fondos/fondo4.jpg</pixmap>
+    <pixmap resource="resources.qrc">:/images/images/backgrounds/background4.jpg</pixmap>
    </property>
    <property name="scaledContents">
     <bool>false</bool>
@@ -183,7 +183,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="recursos.qrc">:/imagenes/imagenes/skins/noSkin.png</pixmap>
+    <pixmap resource="resources.qrc">:/images/images/skins/noSkin.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="labelC">
@@ -199,22 +199,22 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="recursos.qrc">:/imagenes/imagenes/skins/noSkin.png</pixmap>
+    <pixmap resource="resources.qrc">:/images/images/skins/noSkin.png</pixmap>
    </property>
   </widget>
   <zorder>label_2</zorder>
   <zorder>labelSeleccion</zorder>
   <zorder>labelTerrorista</zorder>
   <zorder>labelContraterrorista</zorder>
-  <zorder>terroristaButton</zorder>
-  <zorder>contraterroristaButton</zorder>
-  <zorder>empezarButton</zorder>
+  <zorder>terroristButton</zorder>
+  <zorder>counterTerroristButton</zorder>
+  <zorder>startButton</zorder>
   <zorder>label</zorder>
   <zorder>labelT</zorder>
   <zorder>labelC</zorder>
  </widget>
  <resources>
-  <include location="recursos.qrc"/>
+  <include location="resources.qrc"/>
  </resources>
  <connections/>
 </ui>

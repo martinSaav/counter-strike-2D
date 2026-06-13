@@ -12,8 +12,8 @@ using SDL2pp::Renderer;
 using SDL2pp::SDL;
 using SDL2pp::Window;
 
-ChatClient::ChatClient(Protocol& protocolo, std::string& namePlayer):
-        protocolo(protocolo), namePlayer(namePlayer) {}
+ChatClient::ChatClient(Protocol& protocol, std::string& namePlayer):
+        protocol(protocol), namePlayer(namePlayer) {}
 
 // Definición
 double getCurrentTime() {
@@ -21,14 +21,14 @@ double getCurrentTime() {
     return (double)SDL_GetPerformanceCounter() / frequency;
 }
 
-int ChatClient::run(std::unique_ptr<GameStateUpdate>& estadistics) {
+int ChatClient::run(std::unique_ptr<GameStateUpdate>& statistics) {
     SDL sdl(SDL_INIT_VIDEO);
     IMG_Init(IMG_INIT_PNG);
     SDL_ShowCursor(SDL_DISABLE);  // desabilitamos el mouse
 
 
     // Recibimos la configuracion
-    const std::unique_ptr<Message> gameConfigRequest = protocolo.recv_message();
+    const std::unique_ptr<Message> gameConfigRequest = protocol.recv_message();
     auto gameConfig = dynamic_cast<GameConfigInfo*>(gameConfigRequest.get());
 
     // Create main window
@@ -42,7 +42,7 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& estadistics) {
     Renderer renderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     // Create render object
-    Configuracion configuracion(widthWindow, heightWindow, gameConfig);
+    Configuration configuration(widthWindow, heightWindow, gameConfig);
 
     const char* assetsPath = std::getenv("CS2D_ASSETS_DIR");
     if (!assetsPath) {
@@ -51,12 +51,12 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& estadistics) {
 
     std::string assetsPathStr(assetsPath);
 
-    Render render(&renderer, protocolo, namePlayer, configuracion, assetsPathStr);
+    Render render(&renderer, protocol, namePlayer, configuration, assetsPathStr);
 
     // Create input handler
-    InputHandler inputHandler(protocolo, configuracion, gameOver, clientClosed);
+    InputHandler inputHandler(protocol, configuration, gameOver, clientClosed);
 
-    InputServerHandler inputServerHandler(protocolo, gameOver);
+    InputServerHandler inputServerHandler(protocol, gameOver);
 
     std::thread inputThread(&InputHandler::processEvents, &inputHandler);
 
@@ -67,7 +67,7 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& estadistics) {
     const double FRAME_TIME = 1.0 / FPS;  // en segundos
     // Main loop
 
-    std::optional<GameStateUpdate> mensaje;
+    std::optional<GameStateUpdate> message;
     while (!gameOver) {
         double current = getCurrentTime();
 
@@ -79,12 +79,12 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& estadistics) {
         // dejando el render permanentemente atrasado respecto al estado real.
         std::optional<GameStateUpdate> ultimo;
         std::optional<GameStateUpdate> siguiente;
-        while ((siguiente = inputServerHandler.getMensaje())) {
+        while ((siguiente = inputServerHandler.getMessage())) {
             ultimo = std::move(siguiente);
         }
         if (ultimo) {
-            mensaje = std::move(ultimo);
-            render.renderFrame(mensaje);
+            message = std::move(ultimo);
+            render.renderFrame(message);
         }
 
         // Sleep si el frame fue más rápido de lo esperado
@@ -96,7 +96,7 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& estadistics) {
         }
     }
 
-    protocolo.kill();
+    protocol.kill();
     inputThread.join();
     inputServer.join();
     SDL_Quit();
@@ -104,8 +104,8 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& estadistics) {
     if (clientClosed) {
         return CLIENTCLOSED;
     }
-    std::optional<GameStateUpdate> mensajeFinal = inputServerHandler.getMensaje();
+    std::optional<GameStateUpdate> finalMessage = inputServerHandler.getMessage();
     // Guardamos ultimo mensaje
-    estadistics = std::make_unique<GameStateUpdate>(std::move(mensajeFinal.value()));
-    return CONTINUAR;
+    statistics = std::make_unique<GameStateUpdate>(std::move(finalMessage.value()));
+    return CONTINUE;
 }

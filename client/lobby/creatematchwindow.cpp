@@ -7,9 +7,9 @@
 
 #include "ui_creatematchwindow.h"
 
-createMatchWindow::createMatchWindow(Protocol& protocolo, const std::list<std::string>& maps,
+createMatchWindow::createMatchWindow(Protocol& protocol, const std::list<std::string>& maps,
                                      QWidget* parent):
-        QDialog(parent), ui(new Ui::createMatchWindow), protocolo(protocolo) {
+        QDialog(parent), ui(new Ui::createMatchWindow), protocol(protocol) {
     this->setAttribute(Qt::WA_DeleteOnClose);  // Para eliminar el widget al cerrarlo
 
     ui->setupUi(this);
@@ -32,9 +32,9 @@ void createMatchWindow::on_createButton_clicked() {
         QString map = item->text();
 
         CreateGameRequest requestGameCreate(nameMatch.toStdString(), map.toStdString());
-        protocolo.send_message(requestGameCreate);
+        protocol.send_message(requestGameCreate);
 
-        const std::unique_ptr<Message> responseGameCreate = protocolo.recv_message();
+        const std::unique_ptr<Message> responseGameCreate = protocol.recv_message();
 
         const auto game = dynamic_cast<CreateGameResponse*>(responseGameCreate.get());
 
@@ -43,10 +43,10 @@ void createMatchWindow::on_createButton_clicked() {
         if (gameCreated) {
             accept();  // Cerramos la ventana
             // Creamos la ventana de espera
-            tipoUsuario usuario = CREADOR;
-            waitRoom* windoWait = new waitRoom(protocolo, usuario, this->parentWidget());
-            windoWait->setWindowFlags(Qt::Window);  // esto la hace ventana real
-            windoWait->show();
+            userType user = CREATOR;
+            waitRoom* windowWait = new waitRoom(protocol, user, this->parentWidget());
+            windowWait->setWindowFlags(Qt::Window);  // esto la hace ventana real
+            windowWait->show();
         }
     }
 }

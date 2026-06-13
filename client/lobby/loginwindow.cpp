@@ -21,6 +21,6 @@ void loginwindow::on_loginButton_clicked() {
 }
 
 void loginwindow::closeEvent(QCloseEvent* event) {
-    emit ventanaCerrada();
+    emit windowClosed();
     QWidget::closeEvent(event);
 }

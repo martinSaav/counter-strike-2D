@@ -1,9 +1,9 @@
 #include "inputHandler.h"
 
-InputHandler::InputHandler(Protocol& protocolo, Configuracion& configuracion, bool& gameOver,
+InputHandler::InputHandler(Protocol& protocol, Configuration& configuration, bool& gameOver,
                            bool& clientClosed):
-        protocolo(protocolo),
-        configuracion(configuracion),
+        protocol(protocol),
+        configuration(configuration),
         gameOver(gameOver),
         clientClosed(clientClosed) {
     SDL_StartTextInput();  // Activa entrada de texto
@@ -26,14 +26,14 @@ void InputHandler::processEvents() {
                 gameOver = true;
                 clientClosed = true;
                 DisconnectRequest disconnect;
-                protocolo.send_message(disconnect);
+                protocol.send_message(disconnect);
             }
             if (event.type == SDL_WINDOWEVENT) {
                 if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
                     int newWidth = event.window.data1;
                     int newHeight = event.window.data2;
 
-                    configuracion.reSizeWindow(newWidth, newHeight);
+                    configuration.reSizeWindow(newWidth, newHeight);
                 }
             }
         }
@@ -49,90 +49,90 @@ void InputHandler::processEvents() {
             gameOver = true;
             clientClosed = true;
             DisconnectRequest disconnect;
-            protocolo.send_message(disconnect);
+            protocol.send_message(disconnect);
         }
 
         if (state[SDL_SCANCODE_W] && state[SDL_SCANCODE_D]) {
-            actionActual = Action::MoveUp;
-            sendMensaje(actionActual);
+            currentAction = Action::MoveUp;
+            sendMessage(currentAction);
 
-            actionActual = Action::MoveRight;
-            action = &actionActual;
+            currentAction = Action::MoveRight;
+            action = &currentAction;
 
         } else if (state[SDL_SCANCODE_W] && state[SDL_SCANCODE_A]) {
-            actionActual = Action::MoveUp;
-            sendMensaje(actionActual);
+            currentAction = Action::MoveUp;
+            sendMessage(currentAction);
 
-            actionActual = Action::MoveLeft;
-            action = &actionActual;
+            currentAction = Action::MoveLeft;
+            action = &currentAction;
 
         } else if (state[SDL_SCANCODE_S] && state[SDL_SCANCODE_A]) {
-            actionActual = Action::MoveDown;
-            sendMensaje(actionActual);
+            currentAction = Action::MoveDown;
+            sendMessage(currentAction);
 
-            actionActual = Action::MoveLeft;
-            action = &actionActual;
+            currentAction = Action::MoveLeft;
+            action = &currentAction;
 
         } else if (state[SDL_SCANCODE_S] && state[SDL_SCANCODE_D]) {
-            actionActual = Action::MoveDown;
-            sendMensaje(actionActual);
+            currentAction = Action::MoveDown;
+            sendMessage(currentAction);
 
-            actionActual = Action::MoveRight;
-            action = &actionActual;
+            currentAction = Action::MoveRight;
+            action = &currentAction;
 
         } else if (state[SDL_SCANCODE_W]) {
-            actionActual = Action::MoveUp;
-            action = &actionActual;
+            currentAction = Action::MoveUp;
+            action = &currentAction;
 
         } else if (state[SDL_SCANCODE_A]) {
-            actionActual = Action::MoveLeft;
-            action = &actionActual;
+            currentAction = Action::MoveLeft;
+            action = &currentAction;
 
         } else if (state[SDL_SCANCODE_S]) {
-            actionActual = Action::MoveDown;
-            action = &actionActual;
+            currentAction = Action::MoveDown;
+            action = &currentAction;
 
         } else if (state[SDL_SCANCODE_D]) {
-            actionActual = Action::MoveRight;
-            action = &actionActual;
+            currentAction = Action::MoveRight;
+            action = &currentAction;
 
         } else if (state[SDL_SCANCODE_1]) {
-            actionActual = Action::SetKnife;
-            action = &actionActual;
+            currentAction = Action::SetKnife;
+            action = &currentAction;
 
         } else if (state[SDL_SCANCODE_2]) {
-            actionActual = Action::SetPrimaryWeapon;
-            action = &actionActual;
+            currentAction = Action::SetPrimaryWeapon;
+            action = &currentAction;
 
         } else if (state[SDL_SCANCODE_3]) {
-            actionActual = Action::SetSecondaryWeapon;
-            action = &actionActual;
+            currentAction = Action::SetSecondaryWeapon;
+            action = &currentAction;
 
         } else if (state[SDL_SCANCODE_4]) {
-            actionActual = Action::SetBomb;
-            action = &actionActual;
+            currentAction = Action::SetBomb;
+            action = &currentAction;
 
         } else if (state[SDL_SCANCODE_R]) {
-            actionActual = Action::Reload;
-            action = &actionActual;
+            currentAction = Action::Reload;
+            action = &currentAction;
 
         } else if (state[SDL_SCANCODE_E]) {
-            actionActual = Action::EquipWeapon;
-            action = &actionActual;
+            currentAction = Action::EquipWeapon;
+            action = &currentAction;
 
         } else if (state[SDL_SCANCODE_F]) {
-            actionActual = Action::DefuseBomb;
-            action = &actionActual;
+            currentAction = Action::DefuseBomb;
+            action = &currentAction;
         }
 
         if (action) {
-            sendMensaje(*action);
+            sendMessage(*action);
         }
 
         // Disparo (por click, independiente del movimiento)
         if (mouseState & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-            actionActual = Action::Shoot;
-            sendMensaje(actionActual);
+            currentAction = Action::Shoot;
+            sendMessage(currentAction);
         }
 
         // Compra independiente
@@ -148,7 +148,7 @@ void InputHandler::processEvents() {
 
         if (weapon != Weapon::None && weapon != lastWeapon) {
             BuyWeaponRequest buyWeapon(weapon);
-            protocolo.send_message(buyWeapon);
+            protocol.send_message(buyWeapon);
             lastWeapon = weapon;
             weapon = Weapon::None;
         }
@@ -162,27 +162,27 @@ void InputHandler::processEvents() {
 
         if (weaponType != WeaponType::Knife) {
             BuyAmmoRequest buyAmmo(weaponType);
-            protocolo.send_message(buyAmmo);
+            protocol.send_message(buyAmmo);
             weaponType = WeaponType::Knife;
         }
         SDL_Delay(33);
     }
 }
 
-std::optional<std::string> InputHandler::getMensaje() {
+std::optional<std::string> InputHandler::getMessage() {
     std::lock_guard<std::mutex> lock(mtx);
 
-    if (!mensajes.empty()) {
-        std::string mensaje = mensajes.front();
-        mensajes.pop();
-        return mensaje;
+    if (!messages.empty()) {
+        std::string message = messages.front();
+        messages.pop();
+        return message;
     }
     return std::nullopt;
 }
 
-void InputHandler::sendMensaje(Action& actionActual) {
-    mouse_map_x = int(mouseX / configuracion.zoom + configuracion.camera.x);
-    mouse_map_y = int(mouseY / configuracion.zoom + configuracion.camera.y);
-    PlayerAction playerAction(actionActual, mouse_map_x, mouse_map_y);
-    protocolo.send_message(playerAction);
+void InputHandler::sendMessage(Action& currentAction) {
+    mouse_map_x = int(mouseX / configuration.zoom + configuration.camera.x);
+    mouse_map_y = int(mouseY / configuration.zoom + configuration.camera.y);
+    PlayerAction playerAction(currentAction, mouse_map_x, mouse_map_y);
+    protocol.send_message(playerAction);
 }

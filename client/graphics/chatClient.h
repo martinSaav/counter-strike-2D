@@ -6,19 +6,19 @@
 #include "../../common/dto/game_config_info.h"
 
 #include "render.h"
-const int CONTINUAR = 1;
+const int CONTINUE = 1;
 const int CLIENTCLOSED = 2;
 
 class ChatClient {
 private:
-    Protocol& protocolo;  // Protocolo a usar
+    Protocol& protocol;  // Protocolo a usar
     std::string& namePlayer;
     bool clientClosed = false;
     bool gameOver = false;
 
 public:
-    int run(std::unique_ptr<GameStateUpdate>& estadistics);  // loop
+    int run(std::unique_ptr<GameStateUpdate>& statistics);  // loop
 
-    ChatClient(Protocol& protocolo, std::string& namePlayer);  // Constructor
+    ChatClient(Protocol& protocol, std::string& namePlayer);  // Constructor
 };
 #endif

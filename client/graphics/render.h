@@ -25,14 +25,14 @@ struct BloodStain {
 class Render {
 private:
     Renderer* sdlRenderer;
-    Protocol& protocolo;
+    Protocol& protocol;
     std::string& namePlayer;
     std::string& assetsPath;
 
-    Configuracion& configuracion;
+    Configuration& configuration;
 
     HudSprite hud;
-    MapSprite mapa;
+    MapSprite map;
     PlayerSprite player;
 
     // Coordenadas de mi jugador
@@ -56,15 +56,15 @@ private:
 
 
     // Function to calculate the angle between the player and the mouse
-    double getAnglePlayer(int jugadorX, int jugadorY, int mousex, int mousey);
+    double getAnglePlayer(int playerX, int playerY, int mousex, int mousey);
 
-    float normalizarAngulo(float angulo);
+    float normalizeAngle(float angle);
 
 public:
-    Render(Renderer* renderer, Protocol& protocolo, std::string& namePlayer,
-           Configuracion& configuracion, std::string& assetsPath);
-    void renderFrame(std::optional<GameStateUpdate> mensaje);
-    bool puntoEnVision(int playerX, int playerY, float visionAngleDeg, int puntoX, int puntoY);
+    Render(Renderer* renderer, Protocol& protocol, std::string& namePlayer,
+           Configuration& configuration, std::string& assetsPath);
+    void renderFrame(std::optional<GameStateUpdate> message);
+    bool pointInVision(int playerX, int playerY, float visionAngleDeg, int puntoX, int puntoY);
     void clearScreen();
 };
 #endif

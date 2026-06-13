@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Estadistics</class>
- <widget class="QDialog" name="Estadistics">
+ <class>Statistics</class>
+ <widget class="QDialog" name="Statistics">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -195,7 +195,7 @@ QTableWidget::item:selected {
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="recursos.qrc">:/imagenes/imagenes/estadistics/azul.png</pixmap>
+    <pixmap resource="resources.qrc">:/images/images/statistics/blue.png</pixmap>
    </property>
    <property name="scaledContents">
     <bool>true</bool>
@@ -214,13 +214,13 @@ QTableWidget::item:selected {
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="recursos.qrc">:/imagenes/imagenes/estadistics/naranja.png</pixmap>
+    <pixmap resource="resources.qrc">:/images/images/statistics/orange.png</pixmap>
    </property>
    <property name="scaledContents">
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLabel" name="fondo">
+  <widget class="QLabel" name="background">
    <property name="geometry">
     <rect>
      <x>-10</x>
@@ -233,7 +233,7 @@ QTableWidget::item:selected {
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="recursos.qrc">:/imagenes/imagenes/fondos/staticsImage.png</pixmap>
+    <pixmap resource="resources.qrc">:/images/images/backgrounds/staticsImage.png</pixmap>
    </property>
    <property name="scaledContents">
     <bool>true</bool>
@@ -259,7 +259,7 @@ QTableWidget::item:selected {
     <string/>
    </property>
   </widget>
-  <zorder>fondo</zorder>
+  <zorder>background</zorder>
   <zorder>tableTeam1</zorder>
   <zorder>tableTeam2</zorder>
   <zorder>copaAzul</zorder>
@@ -267,8 +267,8 @@ QTableWidget::item:selected {
   <zorder>labelWinner</zorder>
  </widget>
  <resources>
-  <include location="Desktop/merge con server/counter-strike-2D/client/lobby/recursos.qrc"/>
-  <include location="recursos.qrc"/>
+  <include location="Desktop/merge con server/counter-strike-2D/client/lobby/resources.qrc"/>
+  <include location="resources.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -13,7 +13,7 @@
 #include "selectskin.h"
 
 enum closeType { EXITAPP = 0, EXITLOBBY = 1 };
-enum tipoUsuario { CREADOR = 0, UNIDO = 1 };
+enum userType { CREATOR = 0, JOINED = 1 };
 
 namespace Ui {
 class waitRoom;
@@ -23,7 +23,7 @@ class waitRoom: public QWidget {
     Q_OBJECT
 
 public:
-    explicit waitRoom(Protocol& protocolo, tipoUsuario& usuario, QWidget* parent = nullptr);
+    explicit waitRoom(Protocol& protocol, userType& user, QWidget* parent = nullptr);
     ~waitRoom();
 
 private slots:
@@ -37,15 +37,15 @@ signals:
     void gameReady();
 
 private:
-    void crearVentanaSeleccionSkin(team& teamPlayer);
+    void createSkinSelectionWindow(team& teamPlayer);
 
     void ask_game_started();
 
     std::thread socketThread;
 
     Ui::waitRoom* ui;
-    Protocol& protocolo;
-    tipoUsuario usuario;
-    std::string skinSeleccionada;
+    Protocol& protocol;
+    userType user;
+    std::string selectedSkin;
 };
 #endif  // WAITROOM_H
