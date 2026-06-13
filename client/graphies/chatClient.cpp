@@ -73,8 +73,17 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& estadistics) {
 
         render.clearScreen();
 
-        mensaje = inputServerHandler.getMensaje();
-        if (mensaje) {
+        // Drenamos toda la cola y nos quedamos con el estado más nuevo. El server produce estados al
+        // mismo ritmo que renderizamos (30 Hz), así que consumir uno solo por frame haría que
+        // cualquier backlog acumulado en el arranque (mientras se cargaban texturas) nunca se drene,
+        // dejando el render permanentemente atrasado respecto al estado real.
+        std::optional<GameStateUpdate> ultimo;
+        std::optional<GameStateUpdate> siguiente;
+        while ((siguiente = inputServerHandler.getMensaje())) {
+            ultimo = std::move(siguiente);
+        }
+        if (ultimo) {
+            mensaje = std::move(ultimo);
             render.renderFrame(mensaje);
         }
 
@@ -84,16 +93,6 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& estadistics) {
 
         if (delay > 0) {
             SDL_Delay((Uint32)(delay * 1000.0));  // convertir a milisegundos
-
-        } else if (delay < 0) {
-
-            while (delay < 0) {
-                mensaje = inputServerHandler.getMensaje();
-                if (!mensaje) {
-                    break;  // no hay más mensajes para descartar
-                }
-                delay += FRAME_TIME;
-            }
         }
     }
 
