@@ -29,13 +29,13 @@ MainWindow::MainWindow(Protocol& protocol, std::string& namePlayer, QWidget* par
 
 MainWindow::~MainWindow() { delete ui; }
 
-void MainWindow::on_crearButton_clicked() {
+void MainWindow::on_createButton_clicked() {
     createMatchWindow* windowCreate = new createMatchWindow(this->protocol, this->maps, this);
 
     windowCreate->exec();
 }
 
-void MainWindow::on_unirseButton_clicked() {
+void MainWindow::on_joinButton_clicked() {
     // Obtener la fila seleccionada
     int selectedRow = ui->matchList->currentRow();
 
@@ -63,7 +63,7 @@ void MainWindow::on_unirseButton_clicked() {
     }
 }
 
-void MainWindow::on_actualizarButton_clicked() {
+void MainWindow::on_refreshButton_clicked() {
     // recibimos del protocolo
     GameListRequest requestGameList;
     protocol.send_message(requestGameList);
@@ -101,14 +101,14 @@ void MainWindow::on_actualizarButton_clicked() {
 
 void MainWindow::on_quitButton_clicked() { this->close(); }
 
-void MainWindow::on_buscarButton_clicked() {
+void MainWindow::on_searchButton_clicked() {
     // Habilitamos los widgets para buscar partida
     ui->searchButton->setEnabled(false);
     ui->matchList->show();
     ui->refreshButton->show();
     ui->joinButton->show();
 
-    this->on_actualizarButton_clicked();
+    this->on_refreshButton_clicked();
 }
 
 void MainWindow::on_loginButton_clicked() {

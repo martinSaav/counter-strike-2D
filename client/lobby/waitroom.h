@@ -27,11 +27,11 @@ public:
     ~waitRoom();
 
 private slots:
-    void on_terroristaButton_clicked();
+    void on_terroristButton_clicked();
 
-    void on_contraterroristaButton_clicked();
+    void on_counterTerroristButton_clicked();
 
-    void on_empezarButton_clicked();
+    void on_startButton_clicked();
 
 signals:
     void gameReady();

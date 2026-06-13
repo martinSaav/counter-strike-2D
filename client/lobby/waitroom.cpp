@@ -28,12 +28,12 @@ waitRoom::~waitRoom() {
     delete ui;
 }
 
-void waitRoom::on_terroristaButton_clicked() {
+void waitRoom::on_terroristButton_clicked() {
     team teamPlayer = TERRORIST;
     this->createSkinSelectionWindow(teamPlayer);
 }
 
-void waitRoom::on_contraterroristaButton_clicked() {
+void waitRoom::on_counterTerroristButton_clicked() {
     team teamPlayer = COUNTERTERRORIST;
     this->createSkinSelectionWindow(teamPlayer);
 }
@@ -67,7 +67,7 @@ void waitRoom::createSkinSelectionWindow(team& teamPlayer) {
     windowSkin->exec();
 }
 
-void waitRoom::on_empezarButton_clicked() {
+void waitRoom::on_startButton_clicked() {
 
     // Empezamos la partida
     GameReadyRequest gameReady;
