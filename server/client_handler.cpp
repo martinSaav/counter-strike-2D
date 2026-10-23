@@ -145,6 +145,8 @@ void ClientHandler::handle_game(MessageParser parser,
 void ClientHandler::run() {
     try {
         username = handle_login();
+    } catch (const ConnectionClosed&) {
+        return;  // el cliente se fue antes de loguearse
     } catch (const std::exception& e) {
         if (!should_keep_running()) {
             return;

@@ -5,6 +5,7 @@
 #include <utility>
 #include <vector>
 
+#include "../common/catedra/liberror.h"
 #include "../common/dto/buy_ammo_request.h"
 #include "../common/dto/buy_weapon_request.h"
 #include "../common/dto/create_game_request.h"
@@ -32,7 +33,10 @@ Protocol::Protocol(SocketInterface& peer): peer(peer) {}
 
 std::unique_ptr<Message> Protocol::recv_message() {
     uint8_t header[HEADER_SIZE];
-    peer.recvall(header, HEADER_SIZE);
+    // recvall retorna 0 si el socket se cerró sin recibir ningún byte
+    if (peer.recvall(header, HEADER_SIZE) == 0) {
+        throw ConnectionClosed();
+    }
     MessageType message_type = static_cast<MessageType>(header[0]);
     uint16_t payload_length;
     memcpy(&payload_length, header + 1, sizeof(payload_length));
@@ -44,7 +48,9 @@ std::unique_ptr<Message> Protocol::recv_message() {
 
 
     if (payload_length > 0) {
-        peer.recvall(buffer.data() + HEADER_SIZE, payload_length);
+        if (peer.recvall(buffer.data() + HEADER_SIZE, payload_length) == 0) {
+            throw ConnectionClosed();
+        }
     }
 
 
@@ -142,6 +148,9 @@ void Protocol::send_message(const Message& message) {
 }
 
 void Protocol::kill() {
-    peer.shutdown(2);
+    // Si el peer ya cerró la conexión el shutdown puede fallar (ENOTCONN); igual cerramos el socket
+    try {
+        peer.shutdown(2);
+    } catch (const LibError&) {}
     peer.close();
 }

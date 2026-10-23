@@ -14,6 +14,7 @@ private:
     std::queue<GameStateUpdate> messages;
     std::mutex mtx;
     Protocol& protocol;
+    bool connectionLost = false;
 
 public:
     explicit InputServerHandler(Protocol& protocol, bool& gameOver);
@@ -22,5 +23,8 @@ public:
     void processEvents();
 
     std::optional<GameStateUpdate> getMessage();
+
+    // true si el servidor cerró la conexión antes de que termine la partida
+    bool isConnectionLost() const;
 };
 #endif

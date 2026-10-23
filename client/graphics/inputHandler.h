@@ -34,6 +34,7 @@ private:
     Action* action = nullptr;
 
     void sendMessage(Action& currentAction);
+    void handleEvents();
 
 public:
     InputHandler(Protocol& protocol, Configuration& configuration, bool& gameOver,

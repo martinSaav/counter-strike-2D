@@ -101,10 +101,17 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& statistics) {
     inputServer.join();
     SDL_Quit();
 
-    if (clientClosed) {
+    if (clientClosed || inputServerHandler.isConnectionLost()) {
         return CLIENTCLOSED;
     }
     std::optional<GameStateUpdate> finalMessage = inputServerHandler.getMessage();
+    // El main loop pudo haber drenado ya el último estado de la cola
+    if (!finalMessage) {
+        finalMessage = std::move(message);
+    }
+    if (!finalMessage) {
+        return CLIENTCLOSED;
+    }
     // Guardamos ultimo mensaje
     statistics = std::make_unique<GameStateUpdate>(std::move(finalMessage.value()));
     return CONTINUE;

@@ -14,6 +14,18 @@ InputHandler::~InputHandler() {
 }
 
 void InputHandler::processEvents() {
+    try {
+        handleEvents();
+    } catch (const std::exception& e) {
+        // El socket se cerró (lo cerramos nosotros o el servidor) mientras enviábamos
+        if (!gameOver) {
+            std::cerr << "Error sending to server: " << e.what() << "\n";
+        }
+        gameOver = true;
+    }
+}
+
+void InputHandler::handleEvents() {
     SDL_Event event;
 
     Weapon weapon = Weapon::None;
