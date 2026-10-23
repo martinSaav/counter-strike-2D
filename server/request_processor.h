@@ -23,7 +23,7 @@ public:
     static void process_leave_match_request(PlayerCredentials credentials, Match* match);
     static void process_change_skin_request(PlayerCredentials credentials, PlayerSkin new_skin,
                                             Match* match);
-    static void process_game_ready_request(Match* match);
+    static void process_game_ready_request(PlayerCredentials credentials, Match* match);
     static void process_buy_weapon_request(PlayerCredentials credentials, Weapon weapon,
                                            Match* match);
     static void process_switch_weapon_request(PlayerCredentials credentials, GunType gun_type,

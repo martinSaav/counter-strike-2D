@@ -1,5 +1,6 @@
 #include "lobbywindow.h"
 
+#include <QMessageBox>
 #include <memory>
 
 #include "./ui_lobbywindow.h"
@@ -59,6 +60,11 @@ void MainWindow::on_joinButton_clicked() {
             waitRoom* windowWait = new waitRoom(protocol, user, this);
             windowWait->setWindowFlags(Qt::Window);  // esto la hace ventana real
             windowWait->show();
+        } else {
+            QMessageBox::warning(this, "No se pudo entrar",
+                                 "La partida ya empezó o está llena. Actualizá la lista y "
+                                 "elegí otra.");
+            on_refreshButton_clicked();
         }
     }
 }

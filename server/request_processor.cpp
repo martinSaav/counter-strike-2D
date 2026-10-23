@@ -31,8 +31,9 @@ void RequestProcessor::process_change_skin_request(const PlayerCredentials crede
 }
 
 
-void RequestProcessor::process_game_ready_request(Match* match) {
-    match->process_game_ready_request();
+void RequestProcessor::process_game_ready_request(const PlayerCredentials credentials,
+                                                  Match* match) {
+    match->process_game_ready_request(credentials);
 }
 
 

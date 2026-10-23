@@ -93,6 +93,8 @@ std::optional<GameIdentification> ClientHandler::pick_match() {
                         return handle_join_game_request(std::move(message));
                     } catch (const MatchFull&) {
                         protocol.send_message(JoinGameResponse(false));
+                    } catch (const MatchAlreadyStarted&) {
+                        protocol.send_message(JoinGameResponse(false));
                     } catch (const MatchNotFound&) {
                         protocol.send_message(JoinGameResponse(false));
                     }

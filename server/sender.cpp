@@ -83,9 +83,11 @@ void Sender::run() {
             if (auto status_v = sender_queue->pop();
                 std::holds_alternative<MatchStatusDTO>(status_v)) {
                 send_status(std::get<MatchStatusDTO>(status_v));
-            } else {
+            } else if (std::get<GameReadyNotification>(status_v).success) {
                 protocol.send_message(GameReadyResponse(true));
                 send_game_config();
+            } else {
+                protocol.send_message(GameReadyResponse(false));
             }
         } catch (const ClosedQueue&) {
             running = false;

@@ -36,8 +36,11 @@ class Match: public Thread {
     Queue<std::shared_ptr<PlayerCommand>> commands_queue;
     std::vector<std::shared_ptr<Queue<std::variant<MatchStatusDTO, GameReadyNotification>>>>
             senders_queues;
+    std::map<PlayerCredentials,
+             std::shared_ptr<Queue<std::variant<MatchStatusDTO, GameReadyNotification>>>>
+            senders_by_player;
     std::mutex mtx;
-    bool match_started;
+    std::atomic<bool> match_started;
     int player_count;
     const int max_player_count;
     Map map;
@@ -81,9 +84,9 @@ class Match: public Thread {
 
     void process_change_skin_request(PlayerCredentials credentials, PlayerSkin new_skin);
 
-    void process_game_ready();
+    void process_game_ready(PlayerCredentials credentials);
 
-    void process_game_ready_request();
+    void process_game_ready_request(PlayerCredentials credentials);
 
     void process_buy_weapon(const std::shared_ptr<Player>& player, Weapon weapon);
 
@@ -130,6 +133,8 @@ public:
     [[nodiscard]] int get_player_count() const;
     [[nodiscard]] int get_max_player_count() const;
     [[nodiscard]] bool has_match_finished() const;
+
+    [[nodiscard]] bool has_match_started() const;
 };
 
 #endif  // GAME_LOOP_H

@@ -24,6 +24,7 @@ GameIdentification Match::join_match(const std::string& username) {
     auto sender_queue =
             std::make_shared<Queue<std::variant<MatchStatusDTO, GameReadyNotification>>>();
     GameIdentification game_identification(commands_queue, sender_queue, credentials);
+    senders_by_player[credentials] = sender_queue;
     senders_queues.push_back(std::move(sender_queue));
     map.add_player(player);
     game_manager.add_player_to_team(player);
@@ -311,15 +312,35 @@ void Match::process_change_skin_request(const PlayerCredentials credentials,
 }
 
 
-void Match::process_game_ready() {
-    if (!match_started) {
-        match_started = true;
-        broadcast_match_start();
+void Match::process_game_ready(const PlayerCredentials credentials) {
+    if (match_started) {
+        return;
     }
+    const bool has_terrorists =
+            std::ranges::any_of(players | std::views::values,
+                                [](const auto& p) { return p->get_team() == Team::Terrorists; });
+    const bool has_counter_terrorists = std::ranges::any_of(
+            players | std::views::values,
+            [](const auto& p) { return p->get_team() == Team::CounterTerrorists; });
+    if (!has_terrorists || !has_counter_terrorists) {
+        // Falta al menos un jugador por equipo: solo le avisamos al que pidio arrancar.
+        if (const auto sender = senders_by_player.find(credentials);
+            sender != senders_by_player.end()) {
+            try {
+                sender->second->push(GameReadyNotification{false});
+            } catch (const ClosedQueue&) {}
+        }
+        return;
+    }
+    match_started = true;
+    broadcast_match_start();
 }
 
 
-void Match::process_game_ready_request() { process_game_ready(); }
+void Match::process_game_ready_request(const PlayerCredentials credentials) {
+    std::lock_guard<std::mutex> lck(mtx);
+    process_game_ready(credentials);
+}
 
 
 void Match::wait_for_match_to_start() {
@@ -516,3 +537,6 @@ void Match::stop() {
 
 
 bool Match::has_match_finished() const { return has_finished && player_count == 0; }
+
+
+bool Match::has_match_started() const { return match_started; }
