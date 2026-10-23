@@ -204,6 +204,7 @@ GameConfig ConfigurationLoader::load_configuration() const {
     int game_rate = config["game_rate"].as<int>();
     int cone_angle = config["cone_angle"].as<int>();
     int cone_opacity = config["cone_opacity"].as<int>();
+    int round_time = config["round_time"].as<int>();
     YAML::Node knife_config = config["knife"];
     YAML::Node ak_config = config["ak"];
     YAML::Node glock_config = config["glock"];
@@ -222,5 +223,5 @@ GameConfig ConfigurationLoader::load_configuration() const {
                       time_to_plant,      bomb_dmg,         round_winner_money, round_loser_money,
                       buy_time,           bomb_time,        after_round_time,   money_per_kill,
                       tiles_per_movement, game_rate,        std::move(map),     cone_angle,
-                      cone_opacity};
+                      cone_opacity,       round_time};
 }
