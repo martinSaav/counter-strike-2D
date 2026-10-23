@@ -203,9 +203,9 @@
    </property>
   </widget>
   <zorder>label_2</zorder>
-  <zorder>labelSeleccion</zorder>
-  <zorder>labelTerrorista</zorder>
-  <zorder>labelContraterrorista</zorder>
+  <zorder>labelSelection</zorder>
+  <zorder>labelTerrorist</zorder>
+  <zorder>labelCounterTerrorist</zorder>
   <zorder>terroristButton</zorder>
   <zorder>counterTerroristButton</zorder>
   <zorder>startButton</zorder>
