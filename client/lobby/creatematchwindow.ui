@@ -51,10 +51,10 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>30</y>
-     <width>201</width>
-     <height>21</height>
+     <x>0</x>
+     <y>25</y>
+     <width>231</width>
+     <height>32</height>
     </rect>
    </property>
    <property name="font">
@@ -76,10 +76,10 @@ background-color: transparent;</string>
   <widget class="QLabel" name="labelMaps">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>0</x>
      <y>130</y>
-     <width>211</width>
-     <height>31</height>
+     <width>242</width>
+     <height>32</height>
     </rect>
    </property>
    <property name="font">
