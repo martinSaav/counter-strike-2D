@@ -201,6 +201,31 @@ void Match::process_pick_weapon_request(const PlayerCredentials credentials) {
 }
 
 
+void Match::process_drop_weapon_request(const PlayerCredentials credentials) {
+    std::lock_guard<std::mutex> lck(mtx);
+    const auto player_p = players.find(credentials);
+    if (player_p == players.end()) {
+        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
+    }
+    const std::shared_ptr<Player>& player = player_p->second;
+    if (player->is_dead()) {
+        return;
+    }
+    player->drop_equipped_weapon(game_manager);
+}
+
+
+void Match::process_aim_request(const PlayerCredentials credentials, const Position aim_pos) {
+    std::lock_guard<std::mutex> lck(mtx);
+    const auto player_p = players.find(credentials);
+    if (player_p == players.end()) {
+        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
+    }
+    auto [x, y] = aim_pos.get_position();
+    player_p->second->set_aim_pos(x, y);
+}
+
+
 void Match::process_leave_match(const std::shared_ptr<Player>& player) {
     map.remove_player(player);
     game_manager.remove_player_from_team(player);
@@ -356,7 +381,10 @@ void Match::process_buy_weapon(const std::shared_ptr<Player>& player, const Weap
     }
     try {
         std::unique_ptr<Gun> gun = GunShop::get_gun(weapon, game_config);
-        player->buy_weapon(std::move(gun));
+        if (std::unique_ptr<Gun> replaced = player->buy_weapon(std::move(gun));
+            replaced != nullptr) {
+            game_manager.drop_weapon(*player, std::move(replaced));
+        }
     } catch (const CantBuyWeapon&) {}
 }
 

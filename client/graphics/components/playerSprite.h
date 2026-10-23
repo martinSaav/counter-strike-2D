@@ -25,6 +25,8 @@ public:
 
     void drawPlayerDeath(int playerX, int playerY);
 
+    void drawShotgunSpread(int playerX, int playerY, int shootX, int shootY);
+
     void drawBlood(int x, int y);
 };
 #endif

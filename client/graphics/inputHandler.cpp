@@ -135,6 +135,10 @@ void InputHandler::handleEvents() {
         } else if (state[SDL_SCANCODE_F]) {
             currentAction = Action::DefuseBomb;
             action = &currentAction;
+
+        } else if (state[SDL_SCANCODE_G]) {
+            currentAction = Action::DropWeapon;
+            action = &currentAction;
         }
 
         if (action) {

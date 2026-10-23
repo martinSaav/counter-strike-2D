@@ -30,6 +30,8 @@ public:
                                               Match* match);
     static void process_reload_request(PlayerCredentials credentials, Match* match);
     static void process_pick_weapon_request(PlayerCredentials credentials, Match* match);
+    static void process_drop_weapon_request(PlayerCredentials credentials, Match* match);
+    static void process_aim_request(PlayerCredentials credentials, Position aim_pos, Match* match);
     static void process_defuse_request(PlayerCredentials credentials, Match* match);
     static void process_buy_ammo_request(PlayerCredentials credentials, GunType gun_type,
                                          Match* match);

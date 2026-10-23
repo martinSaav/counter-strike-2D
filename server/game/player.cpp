@@ -125,16 +125,23 @@ void Player::add_kill() {
 }
 
 
-void Player::buy_weapon(std::unique_ptr<Gun> gun) {
+std::unique_ptr<Gun> Player::buy_weapon(std::unique_ptr<Gun> gun) {
+    std::unique_ptr<Gun> replaced_weapon = nullptr;
     if (const int price = gun->get_gun_price(); money >= price) {
         money -= price;
         if (gun->get_gun_type() == GunType::Primary) {
+            replaced_weapon = std::move(primary_weapon);
+            if (replaced_weapon != nullptr) {
+                replaced_weapon->reset_shoots();
+                replaced_weapon->reset_time();
+            }
             primary_weapon = std::move(gun);
         } else {
             secondary_weapon = std::move(gun);
         }
         last_action = Action::BuyingWeapon;
     }
+    return replaced_weapon;
 }
 
 
@@ -345,3 +352,18 @@ WeaponInfo Player::get_secondary_weapon_info() {
 
 
 void Player::set_idle() { last_action = Action::Idle; }
+
+
+void Player::drop_equipped_weapon(const GameManager& manager) {
+    if (equipped_weapon == GunType::Bomb && bomb != nullptr) {
+        is_planting = false;
+        manager.drop_bomb(*this, std::move(bomb));
+        equipped_weapon = GunType::Secondary;
+    } else if (equipped_weapon == GunType::Primary && primary_weapon != nullptr) {
+        primary_weapon->reset_shoots();
+        primary_weapon->reset_time();
+        manager.drop_weapon(*this, std::move(primary_weapon));
+        primary_weapon = nullptr;
+        equipped_weapon = GunType::Secondary;
+    }
+}

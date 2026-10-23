@@ -60,6 +60,18 @@ void RequestProcessor::process_pick_weapon_request(const PlayerCredentials crede
 }
 
 
+void RequestProcessor::process_drop_weapon_request(const PlayerCredentials credentials,
+                                                   Match* match) {
+    match->process_drop_weapon_request(credentials);
+}
+
+
+void RequestProcessor::process_aim_request(const PlayerCredentials credentials,
+                                           const Position aim_pos, Match* match) {
+    match->process_aim_request(credentials, aim_pos);
+}
+
+
 void RequestProcessor::process_defuse_request(const PlayerCredentials credentials, Match* match) {
     match->process_defuse_request(credentials);
 }

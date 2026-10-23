@@ -4,10 +4,12 @@
 
 #include "message_parser.h"
 
+#include "commands/aim_command.h"
 #include "commands/buy_ammo_command.h"
 #include "commands/buy_weapon_command.h"
 #include "commands/change_skin_command.h"
 #include "commands/defuse_bomb_command.h"
+#include "commands/drop_weapon_command.h"
 #include "commands/equip_weapon_command.h"
 #include "commands/game_ready_command.h"
 #include "commands/leave_match_command.h"
@@ -82,6 +84,12 @@ std::shared_ptr<PlayerCommand> MessageParser::parse_action(
         }
         case Action::EquipWeapon: {
             return std::make_shared<EquipWeaponCommand>(credentials);
+        }
+        case Action::DropWeapon: {
+            return std::make_shared<DropWeaponCommand>(credentials);
+        }
+        case Action::Idle: {
+            return std::make_shared<AimCommand>(credentials, position);
         }
         case Action::Shoot: {
             return std::make_shared<ShootCommand>(credentials, position);

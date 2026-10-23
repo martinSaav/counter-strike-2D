@@ -130,6 +130,9 @@ public:
     void start_planting();
     void equip_bomb(std::unique_ptr<BombEncapsulator> bomb) { this->bomb = std::move(bomb); }
     void equip_weapon(std::unique_ptr<Gun> gun);
+    // Tira al piso el arma equipada si es la primaria o la bomba (el cuchillo y la glock no se
+    // pueden tirar) y equipa la secundaria.
+    void drop_equipped_weapon(const GameManager& manager);
     [[nodiscard]] bool is_currently_defusing() const { return is_defusing; }
     void start_defusing() {
         is_defusing = true;
@@ -142,7 +145,8 @@ public:
     [[nodiscard]] bool has_bomb() const { return bomb != nullptr; }
     void switch_team();
     void switch_weapon(GunType gun_type);
-    void buy_weapon(std::unique_ptr<Gun> gun);
+    // Devuelve la primaria que se reemplazo (o nullptr) para que quede tirada en el mapa.
+    std::unique_ptr<Gun> buy_weapon(std::unique_ptr<Gun> gun);
     void buy_ammo(GunType gun_type);
     void set_idle();
 

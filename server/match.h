@@ -76,6 +76,10 @@ class Match: public Thread {
 
     void process_pick_weapon_request(PlayerCredentials credentials);
 
+    void process_drop_weapon_request(PlayerCredentials credentials);
+
+    void process_aim_request(PlayerCredentials credentials, Position aim_pos);
+
     void process_leave_match(const std::shared_ptr<Player>& player);
 
     void process_leave_match_request(PlayerCredentials credentials);
