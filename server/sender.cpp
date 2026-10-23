@@ -64,7 +64,8 @@ void Sender::send_game_config() const {
             SiteInfo{ct_site.x, ct_site.y, ct_site.site_width, ct_site.site_height,
                      std::move(ct_spawns)},
             SiteInfo{tt_site.x, tt_site.y, tt_site.site_width, tt_site.site_height,
-                     std::move(tt_spawns)});
+                     std::move(tt_spawns)},
+            map_cfg.theme);
     GameConfigInfo game_cfg_message(
             config.player_health, config.number_of_rounds, config.starting_money, config.ct_amount,
             config.tt_amount, config.ammo_price, config.knife_config.get_info(),

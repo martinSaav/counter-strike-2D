@@ -23,18 +23,21 @@ private:
     BombSiteInfo bombsite;
     SiteInfo ct_site;
     SiteInfo tt_site;
+    // Estilo visual del mapa (carpeta de texturas en el cliente)
+    std::string theme;
 
 public:
     MapConfigInfo(std::string map_name, int32_t map_width, int32_t map_height,
                   std::vector<StructureInfo> structures, BombSiteInfo bombsite, SiteInfo ct_site,
-                  SiteInfo tt_site):
+                  SiteInfo tt_site, std::string theme = "desert"):
             map_name(std::move(map_name)),
             map_width(map_width),
             map_height(map_height),
             structures(std::move(structures)),
             bombsite(std::move(bombsite)),
             ct_site(std::move(ct_site)),
-            tt_site(std::move(tt_site)) {}
+            tt_site(std::move(tt_site)),
+            theme(std::move(theme)) {}
 
     void serialize(uint8_t* buffer) const {
         size_t offset = 0;
@@ -70,6 +73,12 @@ public:
         offset += ct_site.serialized_size();
 
         tt_site.serialize(buffer + offset);
+        offset += tt_site.serialized_size();
+
+        uint16_t theme_len = htons(static_cast<uint16_t>(theme.size()));
+        std::memcpy(buffer + offset, &theme_len, sizeof(theme_len));
+        offset += sizeof(theme_len);
+        std::memcpy(buffer + offset, theme.data(), theme.size());
     }
 
     static MapConfigInfo deserialize(const uint8_t* buffer, size_t size) {
@@ -116,9 +125,17 @@ public:
         offset += ct_site.serialized_size();
 
         SiteInfo tt_site = SiteInfo::deserialize(buffer + offset, size - offset);
+        offset += tt_site.serialized_size();
+
+        uint16_t theme_len;
+        std::memcpy(&theme_len, buffer + offset, sizeof(theme_len));
+        theme_len = ntohs(theme_len);
+        offset += sizeof(theme_len);
+        std::string theme(reinterpret_cast<const char*>(buffer + offset), theme_len);
 
         return MapConfigInfo(std::move(map_name), map_width, map_height, std::move(structures),
-                             std::move(bombsite), std::move(ct_site), std::move(tt_site));
+                             std::move(bombsite), std::move(ct_site), std::move(tt_site),
+                             std::move(theme));
     }
 
     size_t serialized_size() const {
@@ -131,6 +148,7 @@ public:
         total += bombsite.serialized_size();
         total += ct_site.serialized_size();
         total += tt_site.serialized_size();
+        total += sizeof(uint16_t) + theme.size();  // theme length + theme
         return total;
     }
 
@@ -147,6 +165,8 @@ public:
     const SiteInfo& get_ct_site() const { return ct_site; }
 
     const SiteInfo& get_tt_site() const { return tt_site; }
+
+    const std::string& get_theme() const { return theme; }
 };
 
 #endif

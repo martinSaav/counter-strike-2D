@@ -29,6 +29,10 @@ struct MatchAlreadyStarted: public std::runtime_error {
 
 class Match: public Thread {
     friend class RequestProcessor;
+    // Cada partida tiene su propia configuracion (con el mapa elegido); el Sender de cada
+    // jugador comparte el puntero para mandarsela al cliente.
+    std::shared_ptr<GameConfig> game_config_ptr;
+    GameConfig& game_config;
     const int tiles_per_movement;
     const int rate;
     const double miliseconds_per_iteration;
@@ -46,7 +50,6 @@ class Match: public Thread {
     Map map;
     GameClock game_clock;
     GameManager game_manager;
-    GameConfig& game_config;
     std::atomic<bool> has_finished;
 
     MatchStatusDTO get_match_status();
@@ -119,7 +122,10 @@ class Match: public Thread {
     void wait_for_players_to_leave_match();
 
 public:
-    explicit Match(GameConfig& game_config):
+    Match(const GameConfig& base_config, const std::string& map_name):
+            game_config_ptr(
+                    std::make_shared<GameConfig>(base_config, base_config.find_map(map_name))),
+            game_config(*game_config_ptr),
             tiles_per_movement(game_config.tiles_per_movement),
             rate(game_config.game_rate),
             miliseconds_per_iteration(static_cast<double>(1000) / rate),
@@ -129,8 +135,7 @@ public:
             max_player_count(game_config.ct_amount + game_config.tt_amount),
             map(game_config),
             game_clock(game_config),
-            game_manager(map, game_clock, game_config),
-            game_config(game_config) {}
+            game_manager(map, game_clock, game_config) {}
     GameIdentification join_match(const std::string& username);
     void run() override;
     void stop() override;
@@ -139,6 +144,10 @@ public:
     [[nodiscard]] bool has_match_finished() const;
 
     [[nodiscard]] bool has_match_started() const;
+
+    [[nodiscard]] const std::string& get_map_name() const {
+        return game_config.map_config.map_name;
+    }
 };
 
 #endif  // GAME_LOOP_H

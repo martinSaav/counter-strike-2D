@@ -23,7 +23,8 @@ GameIdentification Match::join_match(const std::string& username) {
     players.insert(std::pair{credentials, player});
     auto sender_queue =
             std::make_shared<Queue<std::variant<MatchStatusDTO, GameReadyNotification>>>();
-    GameIdentification game_identification(commands_queue, sender_queue, credentials);
+    GameIdentification game_identification(commands_queue, sender_queue, credentials,
+                                           game_config_ptr);
     senders_by_player[credentials] = sender_queue;
     senders_queues.push_back(std::move(sender_queue));
     map.add_player(player);

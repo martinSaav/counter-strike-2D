@@ -1,5 +1,7 @@
 #include "mapSprite.h"
 
+#include <fstream>
+
 
 MapSprite::MapSprite(Renderer* sdlRenderer, Configuration& configuration, std::string& assetsPath):
         Component(sdlRenderer, configuration, assetsPath),
@@ -8,11 +10,15 @@ MapSprite::MapSprite(Renderer* sdlRenderer, Configuration& configuration, std::s
         bombChannel(0),
         mapConfig(configuration.gameConfig->get_map_config()) {
 
-    // map
-    textures.loadTexture("map", assetsPath + "/maps/default_aztec.png");
+    // map: piso y estructuras segun el tema del mapa (si falta la carpeta, el del desierto)
+    std::string themePath = assetsPath + "/maps/" + mapConfig.get_theme();
+    if (!std::ifstream(themePath + "/floor.png").good()) {
+        themePath = assetsPath + "/maps/desert";
+    }
+    textures.loadTexture("map", themePath + "/floor.png");
 
     // map obstacles
-    textures.loadTexture("mapObstacles", assetsPath + "/maps/aztec.bmp");
+    textures.loadTexture("mapObstacles", themePath + "/wall.png");
 
     // map sites
     textures.loadTexture("bspot_a", assetsPath + "/maps/bspot_a.png");
@@ -70,7 +76,7 @@ void MapSprite::draw() {
 
 void MapSprite::drawObstacles() {
     std::string textureName = "mapObstacles";
-    SDL_Rect srcRect = {480, 64, 32, 32};
+    SDL_Rect srcRect = {0, 0, 32, 32};
     SDL_Rect destRect;
     auto obstacles = mapConfig.get_structures();
 

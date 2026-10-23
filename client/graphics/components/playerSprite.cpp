@@ -61,10 +61,17 @@ void PlayerSprite::drawPlayer(const PlayerInfo& player, double& angle) {
         int shootY = player.get_pos_shoot_y();
 
         if (weaponPlayer == Weapon::M3) {
-            drawShotgunSpread(playerX, playerY, shootX, shootY);
+            // El disparo llega en un solo estado: lo dejamos visible un instante
+            recentSpreads[player.get_user_name()] = {SDL_Point{shootX, shootY},
+                                                     SDL_GetTicks() + 150};
         } else {
             drawBullet(shootX, shootY, angle);
         }
+    }
+
+    auto spread = recentSpreads.find(player.get_user_name());
+    if (spread != recentSpreads.end() && SDL_GetTicks() < spread->second.second) {
+        drawShotgunSpread(playerX, playerY, spread->second.first.x, spread->second.first.y);
     }
 }
 

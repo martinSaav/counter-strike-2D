@@ -26,7 +26,8 @@ class Lobby {
 
 public:
     explicit Lobby(GameConfig& game_config): game_config(game_config) {}
-    GameIdentification create_match(const std::string& match_name, const std::string& player_name);
+    GameIdentification create_match(const std::string& match_name, const std::string& player_name,
+                                    const std::string& map_name);
     GameIdentification join_match(const std::string& match_name, const std::string& player_name);
     std::vector<MatchDTO> list_matches();
     void remove_finished_matches();

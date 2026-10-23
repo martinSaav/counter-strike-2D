@@ -4,6 +4,9 @@
 
 #ifndef GAMECONFIG_H
 #define GAMECONFIG_H
+#include <string>
+#include <vector>
+
 #include "gun_config.h"
 #include "map_config.h"
 
@@ -32,7 +35,9 @@ public:
     const int money_per_kill;
     const int tiles_per_movement;
     const int game_rate;
+    // Mapa de la partida. En la configuracion global es el primero de la lista.
     const MapConfig map_config;
+    const std::vector<MapConfig> maps;
     const int cone_angle;
     const int cone_opacity;
     const int round_time;
@@ -42,7 +47,12 @@ public:
                int defuse_time, int time_to_plant, int bomb_dmg, int round_winner_money,
                int round_loser_money, int buy_time, int bomb_time, int after_round_time,
                int money_per_kill, int tiles_per_movement, int game_rate, MapConfig&& map_config,
-               int cone_angle, int cone_opacity, int round_time);
+               int cone_angle, int cone_opacity, int round_time, std::vector<MapConfig> maps = {});
+    // Copia de la configuracion que juega en otro mapa (cada partida elige el suyo).
+    GameConfig(const GameConfig& base, const MapConfig& selected_map);
+    // Mapa con ese nombre; si no existe, el primero.
+    [[nodiscard]] const MapConfig& find_map(const std::string& name) const;
+    [[nodiscard]] std::vector<std::string> get_map_names() const;
 };
 
 

@@ -172,6 +172,7 @@ MapConfig ConfigurationLoader::get_map_config(YAML::Node& map_config) {
     Site tt = get_site_config(tt_site);
     Site ct = get_site_config(ct_site);
     auto dropped_weapons = get_dropped_weapons(dropped_weapons_cfg);
+    std::string theme = map_config["theme"] ? map_config["theme"].as<std::string>() : "desert";
     return MapConfig{std::move(map_name),
                      map_width,
                      map_height,
@@ -179,7 +180,8 @@ MapConfig ConfigurationLoader::get_map_config(YAML::Node& map_config) {
                      bombsite,
                      std::move(ct),
                      std::move(tt),
-                     std::move(dropped_weapons)};
+                     std::move(dropped_weapons),
+                     std::move(theme)};
 }
 
 
@@ -215,13 +217,23 @@ GameConfig ConfigurationLoader::load_configuration() const {
     GunConfig ak = get_ak_config(ak_config);
     GunConfig awp = get_awp_config(awp_config);
     GunConfig m3 = get_m3_config(m3_config);
-    YAML::Node map_config = config["map_config"];
-    MapConfig map = get_map_config(map_config);
+    // "maps" es la lista de mapas que se pueden elegir al crear una partida; se acepta tambien el
+    // formato viejo con un unico "map_config".
+    std::vector<MapConfig> maps;
+    if (YAML::Node maps_config = config["maps"]) {
+        for (auto map_node: maps_config) {
+            maps.push_back(get_map_config(map_node));
+        }
+    } else {
+        YAML::Node map_config = config["map_config"];
+        maps.push_back(get_map_config(map_config));
+    }
+    MapConfig map = maps.front();
     return GameConfig{player_health,      number_of_rounds, starting_money,     ct_amount,
                       tt_amount,          ammo_price,       std::move(knife),   std::move(glock),
                       std::move(ak),      std::move(awp),   std::move(m3),      defuse_time,
                       time_to_plant,      bomb_dmg,         round_winner_money, round_loser_money,
                       buy_time,           bomb_time,        after_round_time,   money_per_kill,
                       tiles_per_movement, game_rate,        std::move(map),     cone_angle,
-                      cone_opacity,       round_time};
+                      cone_opacity,       round_time,       std::move(maps)};
 }
