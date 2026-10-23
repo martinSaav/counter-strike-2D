@@ -9,7 +9,7 @@
 std::map<Stages, double> GameClock::get_stage_duration_map() const {
     std::map<Stages, double> stage_duration_map = {
             {Stages::BuyStage, buy_stage_time},
-            {Stages::PrePlantStage, 0},
+            {Stages::PrePlantStage, round_stage_time},
             {Stages::PostPlantStage, post_bomb_stage_time},
             {Stages::AfterRoundStage, after_round_stage_time}};
     return stage_duration_map;
@@ -28,6 +28,8 @@ void GameClock::advance(const double dt) {
         if (current_stage == Stages::BuyStage) {
             current_stage = Stages::PrePlantStage;
             stage_time -= duration;
+        } else if (current_stage == Stages::PrePlantStage) {
+            round_time_expired = true;
         } else if (current_stage == Stages::PostPlantStage) {
             bomb_exploded = true;
             bomb_timer = duration;
@@ -53,6 +55,7 @@ void GameClock::reset() {
     bomb_exploded = false;
     bomb_defused = false;
     has_round_finished = false;
+    round_time_expired = false;
 }
 
 
@@ -80,4 +83,13 @@ double GameClock::get_bomb_timer() const {
         return std::max(post_bomb_stage_time - bomb_timer, static_cast<double>(0));
     }
     return 0;
+}
+
+
+double GameClock::get_stage_time_left() const {
+    if (current_stage == Stages::PostPlantStage) {
+        return get_bomb_timer();
+    }
+    std::map<Stages, double> stage_duration_map = get_stage_duration_map();
+    return std::max(stage_duration_map[current_stage] - stage_time, static_cast<double>(0));
 }

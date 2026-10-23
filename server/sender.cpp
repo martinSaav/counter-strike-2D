@@ -27,11 +27,11 @@ void Sender::send_status(const MatchStatusDTO& status) const {
                           player_dto.current_weapon_ammo);
         players.push_back(player);
     }
-    const GameStateUpdate state(status.game_started, status.game_ended, status.round,
-                                status.round_time, status.round_started, status.round_ended,
-                                status.bomb_planted, status.bomb_x, status.bomb_y,
-                                status.bomb_timer, status.round_winner, status.game_winner,
-                                std::move(players), status.dropped_weapons);
+    const GameStateUpdate state(
+            status.game_started, status.game_ended, status.round, status.round_time,
+            status.round_started, status.round_ended, status.bomb_planted, status.bomb_x,
+            status.bomb_y, status.bomb_timer, status.round_winner, status.game_winner,
+            std::move(players), status.dropped_weapons, status.stage, status.time_left);
     protocol.send_message(state);
 }
 

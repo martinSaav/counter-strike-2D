@@ -151,18 +151,14 @@ void Render::renderFrame(std::optional<GameStateUpdate> message) {
         }
     }
 
-    int time;
-    int matchTime = message->get_round_time();
+    // El servidor manda cuanto le queda a la etapa actual (compra, ronda o bomba), asi el
+    // reloj siempre cuenta hacia atras.
+    int time = static_cast<int>(std::ceil(message->get_time_left()));
     int round = message->get_round();
-
-    if (is_bomb_planted) {
-        time = message->get_bomb_timer();
-    } else {
-        time = matchTime;
-    }
+    bool isBuyStage = message->get_stage() == RoundStage::Buy;
 
     SDL_Rect mouse = {mouseX, mouseY, 40, 40};
-    hud.draw(mouse, time, round, *myPlayer, is_bomb_planted);
+    hud.draw(mouse, time, round, *myPlayer, is_bomb_planted, isBuyStage);
 
     if (message->is_round_ended()) {
         Team team = message->get_round_winner();
@@ -171,9 +167,9 @@ void Render::renderFrame(std::optional<GameStateUpdate> message) {
         bloodStains.clear();
         lastHealths.clear();
     }
-    if (matchTime >= configuration.buyTime && myPlayer->get_status() == Status::Alive) {
+    if (!isBuyStage && myPlayer->get_status() == Status::Alive) {
         map.drawCampField(myAngle, myPlayer->get_pos_x(), myPlayer->get_pos_y());
-    } else if (matchTime < configuration.buyTime) {
+    } else if (isBuyStage) {
         map.drawShop();
     }
 

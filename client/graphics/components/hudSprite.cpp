@@ -38,7 +38,7 @@ HudSprite::HudSprite(Renderer* sdlRenderer, Configuration& configuration, std::s
 
 
 void HudSprite::draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlayer,
-                     bool& is_bomb_planted) {
+                     bool& is_bomb_planted, bool isBuyStage) {
     Texture& hud_symbols = textures.getTexture("symbols");
     Texture& nums = textures.getTexture("nums");
     HudType type = HEALTH;
@@ -91,10 +91,18 @@ void HudSprite::draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlaye
         drawHud(srcRect, destRect, textureName);
     }
 
-    // time
+    // time: con la bomba plantada el reloj pasa a ser la cuenta regresiva de la detonacion,
+    // en rojo y con el simbolo de la bomba
     symbolX = widthWindow * 0.45;
     type = TIME;
+    if (is_bomb_planted) {
+        nums.SetColorMod(230, 40, 40);
+        hud_symbols.SetColorMod(230, 40, 40);
+        type = BOMB;
+    }
     drawHuds(time, type, symbolX, symbolY);
+    nums.SetColorMod(255, 165, 0);
+    hud_symbols.SetColorMod(255, 165, 0);
 
     // weapon
     symbolX = widthWindow * 0.76;
@@ -111,7 +119,7 @@ void HudSprite::draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlaye
     type = MONEY;
     drawHuds(money, type, symbolX, symbolY);
 
-    if (time < configuration.buyTime && !is_bomb_planted) {
+    if (isBuyStage) {
         textureName = "symbols";
         // Shop
         symbolY = heightWindow * 0.92;
@@ -158,7 +166,7 @@ void HudSprite::drawHuds(int num, HudType type, int& symbolX, int& symbolY) {
 
     // Numbers
     textureName = "nums";
-    if (type == TIME) {
+    if (type == TIME || type == BOMB) {
 
         int minutes = num / 60;
         int seconds = num % 60;
