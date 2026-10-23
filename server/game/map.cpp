@@ -324,7 +324,7 @@ ImpactInfo Map::trace_bullet_path(int ini_x, int ini_y, const Position final_pos
 
 std::vector<std::shared_ptr<Player>> Map::get_players_near_radio(const double x, const double y,
                                                                  const double radio) const {
-    std::vector<std::shared_ptr<Player>> resultado;
+    std::vector<std::shared_ptr<Player>> result;
 
     for (const auto& player: players) {
         if (player->is_dead()) {
@@ -335,11 +335,11 @@ std::vector<std::shared_ptr<Player>> Map::get_players_near_radio(const double x,
         const double dis_y = center_y - y;
 
         if (const double distance = sqrt(dis_x * dis_x + dis_y * dis_y); distance <= radio) {
-            resultado.push_back(player);
+            result.push_back(player);
         }
     }
 
-    return resultado;
+    return result;
 }
 
 
