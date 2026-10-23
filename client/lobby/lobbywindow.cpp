@@ -82,12 +82,10 @@ void MainWindow::on_refreshButton_clicked() {
     int i = 0;
     for (const auto& game: games) {
         ui->matchList->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(game.name)));
-        ui->matchList->setItem(i, 1,
-                                   new QTableWidgetItem(QString::fromStdString(game.map_name)));
+        ui->matchList->setItem(i, 1, new QTableWidgetItem(QString::fromStdString(game.map_name)));
         std::string playerCount =
                 std::to_string(game.current_players) + "/" + std::to_string(game.max_players);
-        ui->matchList->setItem(i, 2,
-                                   new QTableWidgetItem(QString::fromStdString(playerCount)));
+        ui->matchList->setItem(i, 2, new QTableWidgetItem(QString::fromStdString(playerCount)));
         ++i;
     }
 

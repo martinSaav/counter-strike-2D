@@ -3,8 +3,8 @@
 #include <iostream>
 
 #include "chatClient.h"
-#include "statistics.h"
 #include "lobbywindow.h"
+#include "statistics.h"
 
 int main(int argc, char* argv[]) {
     // Comprobamos que la cantidad de argumentos sea correcta

@@ -17,7 +17,7 @@ class Statistics: public QDialog {
 
 public:
     explicit Statistics(const std::unique_ptr<GameStateUpdate>& gameState,
-                         QWidget* parent = nullptr);
+                        QWidget* parent = nullptr);
     ~Statistics();
 
 private:

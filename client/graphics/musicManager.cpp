@@ -57,21 +57,21 @@ MusicManager::MusicManager(const std::string& assetsPath) {
 
     // Sonidos cortos
     std::vector<MusicType> shortSounds = {MusicType::SHOT_PISTOL,
-                                      MusicType::SHOT_AK47,
-                                      MusicType::SHOT_AWP,
-                                      MusicType::SHOT_M3,
-                                      MusicType::KNIFE,
-                                      MusicType::TIMER,
-                                      MusicType::EXPLOIT,
-                                      MusicType::PISTOLRELOAD,
-                                      MusicType::RIFLERELOAD,
-                                      MusicType::BUY,
-                                      MusicType::ITEMEQUIP,
-                                      MusicType::BOMBHASBEENDEFUSED,
-                                      MusicType::BOMBHASBEENPLANTED,
-                                      MusicType::COUNTERTERRORISTWIN,
-                                      MusicType::TERRORISTWIN,
-                                      MusicType::PLANTINGBOMB};
+                                          MusicType::SHOT_AK47,
+                                          MusicType::SHOT_AWP,
+                                          MusicType::SHOT_M3,
+                                          MusicType::KNIFE,
+                                          MusicType::TIMER,
+                                          MusicType::EXPLOIT,
+                                          MusicType::PISTOLRELOAD,
+                                          MusicType::RIFLERELOAD,
+                                          MusicType::BUY,
+                                          MusicType::ITEMEQUIP,
+                                          MusicType::BOMBHASBEENDEFUSED,
+                                          MusicType::BOMBHASBEENPLANTED,
+                                          MusicType::COUNTERTERRORISTWIN,
+                                          MusicType::TERRORISTWIN,
+                                          MusicType::PLANTINGBOMB};
 
     for (auto type: shortSounds) {
         chunkFiles[type] = Mix_LoadWAV(locationFiles[type].c_str());

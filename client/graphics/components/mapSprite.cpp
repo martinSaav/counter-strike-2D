@@ -262,7 +262,7 @@ void MapSprite::drawExplosion() {
 void MapSprite::drawCampField(int angle, int playerX, int playerY) {
     Texture& field = textures.getTexture("field");
 
-    field.SetBlendMode(SDL_BLENDMODE_BLEND);          // Habilita la mezcla alfa
+    field.SetBlendMode(SDL_BLENDMODE_BLEND);         // Habilita la mezcla alfa
     field.SetAlphaMod(configuration.visionOpacity);  // Cambia la opacidad (0-255)
 
     // coregimos el anglo por la imagen
@@ -284,8 +284,8 @@ void MapSprite::drawCampField(int angle, int playerX, int playerY) {
         fieldHeight = 2300;
     }
 
-    SDL_Rect destRect = {playerScreenX - fieldWidth / 2, playerScreenY - fieldHeight / 2, fieldWidth,
-                         fieldHeight};
+    SDL_Rect destRect = {playerScreenX - fieldWidth / 2, playerScreenY - fieldHeight / 2,
+                         fieldWidth, fieldHeight};
     // Centro de la textura
     SDL_Point center = {fieldWidth / 2, fieldHeight / 2};
 
