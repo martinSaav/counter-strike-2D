@@ -8,12 +8,12 @@ TextureStore::TextureStore(Renderer* sdlRenderer): sdlRenderer(sdlRenderer) {}
 
 void TextureStore::loadTexture(const std::string& name, const std::string& path, bool setColorKey) {
 
-    auto imagen = IMG_Load(path.c_str());
-    auto surfaceImagen = Surface(imagen);
+    auto image = IMG_Load(path.c_str());
+    auto imageSurface = Surface(image);
     if (setColorKey) {
-        surfaceImagen.SetColorKey(true, 0);
+        imageSurface.SetColorKey(true, 0);
     }
-    Texture texture(*sdlRenderer, surfaceImagen);
+    Texture texture(*sdlRenderer, imageSurface);
 
     textures.emplace(name, std::move(texture));
 }
@@ -22,7 +22,7 @@ Texture& TextureStore::getTexture(const std::string& name) {
 
     auto it = textures.find(name);
     if (it == textures.end()) {
-        throw std::runtime_error("Textura '" + name + "' no encontrada");
+        throw std::runtime_error("Texture '" + name + "' not found");
     }
     return it->second;
 }

@@ -14,34 +14,35 @@
 #include "../../common/dto/player_action.h"
 #include "../../common/protocol.h"
 
-#include "configuracion.h"
+#include "configuration.h"
 
 // Lee el teclado y envía los mensajes al servidor
 class InputHandler {
 private:
     bool& gameOver;
     bool& clientClosed;
-    std::queue<std::string> mensajes;
+    std::queue<std::string> messages;
     std::mutex mtx;
-    Protocol& protocolo;
-    Configuracion& configuracion;
+    Protocol& protocol;
+    Configuration& configuration;
 
     int mouseX = 0;
     int mouseY = 0;
     int mouse_map_x = 0;
     int mouse_map_y = 0;
-    Action actionActual = {};
+    Action currentAction = {};
     Action* action = nullptr;
 
-    void sendMensaje(Action& actionActual);
+    void sendMessage(Action& currentAction);
+    void handleEvents();
 
 public:
-    InputHandler(Protocol& protocolo, Configuracion& configuracion, bool& gameOver,
+    InputHandler(Protocol& protocol, Configuration& configuration, bool& gameOver,
                  bool& clientClosed);
     ~InputHandler();
 
     void processEvents();
 
-    std::optional<std::string> getMensaje();
+    std::optional<std::string> getMessage();
 };
 #endif

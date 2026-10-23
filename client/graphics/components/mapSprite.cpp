@@ -1,60 +1,60 @@
 #include "mapSprite.h"
 
 
-MapSprite::MapSprite(Renderer* sdlRenderer, Configuracion& configuracion, std::string& assetsPath):
-        Component(sdlRenderer, configuracion, assetsPath),
-        anchoField(0),
-        altoField(0),
-        canalBomb(0),
-        mapConfig(configuracion.gameConfig->get_map_config()) {
+MapSprite::MapSprite(Renderer* sdlRenderer, Configuration& configuration, std::string& assetsPath):
+        Component(sdlRenderer, configuration, assetsPath),
+        fieldWidth(0),
+        fieldHeight(0),
+        bombChannel(0),
+        mapConfig(configuration.gameConfig->get_map_config()) {
 
     // map
-    texturas.loadTexture("map", assetsPath + "/maps/default_aztec.png");
+    textures.loadTexture("map", assetsPath + "/maps/default_aztec.png");
 
     // map obstacles
-    texturas.loadTexture("mapObstacles", assetsPath + "/maps/aztec.bmp");
+    textures.loadTexture("mapObstacles", assetsPath + "/maps/aztec.bmp");
 
     // map sites
-    texturas.loadTexture("bspot_a", assetsPath + "/maps/bspot_a.png");
-    texturas.loadTexture("bspot_b", assetsPath + "/maps/bspot_b.png");
+    textures.loadTexture("bspot_a", assetsPath + "/maps/bspot_a.png");
+    textures.loadTexture("bspot_b", assetsPath + "/maps/bspot_b.png");
 
-    texturas.loadTexture("cross", assetsPath + "/maps/cross.png");
+    textures.loadTexture("cross", assetsPath + "/maps/cross.png");
 
     // round
-    texturas.loadTexture("terroristWins", assetsPath + "/hud/terroristWins.png");
-    texturas.loadTexture("counterterroristWins", assetsPath + "/hud/counterTerroristWins.png");
+    textures.loadTexture("terroristWins", assetsPath + "/hud/terroristWins.png");
+    textures.loadTexture("counterterroristWins", assetsPath + "/hud/counterTerroristWins.png");
 
     // bomb
-    texturas.loadTexture("bomb", assetsPath + "/weapons/bomb.bmp");
+    textures.loadTexture("bomb", assetsPath + "/weapons/bomb.bmp");
 
     // camp field
-    texturas.loadTexture("field", assetsPath + "/maps/field.png", false);
+    textures.loadTexture("field", assetsPath + "/maps/field.png", false);
 
     // shop
-    texturas.loadTexture("shop", assetsPath + "/maps/shop.png");
+    textures.loadTexture("shop", assetsPath + "/maps/shop.png");
 
     // explosion
-    texturas.loadTexture("explosion", assetsPath + "/hud/bomb_explotion.png", false);
+    textures.loadTexture("explosion", assetsPath + "/hud/bomb_explotion.png", false);
 
-    tipoMusic music = AMBIENTE;
-    int cantVeces = 4;
-    sounds.loadMusic(music, cantVeces);
+    MusicType music = AMBIENCE;
+    int times = 4;
+    sounds.loadMusic(music, times);
 
     // Aplico colores
-    Texture& counterWins = texturas.getTexture("terroristWins");
-    Texture& terroristWins = texturas.getTexture("counterterroristWins");
+    Texture& counterWins = textures.getTexture("terroristWins");
+    Texture& terroristWins = textures.getTexture("counterterroristWins");
     counterWins.SetColorMod(255, 165, 0);
     terroristWins.SetColorMod(255, 165, 0);
 }
 
 void MapSprite::draw() {
     std::string textureName = "map";
-    int camWidth = configuracion.widthWindow / configuracion.zoom;
-    int camHeight = configuracion.heightWindow / configuracion.zoom;
+    int camWidth = configuration.widthWindow / configuration.zoom;
+    int camHeight = configuration.heightWindow / configuration.zoom;
 
-    SDL_Rect srcRect = {configuracion.camera.x, configuracion.camera.y, camWidth, camHeight};
+    SDL_Rect srcRect = {configuration.camera.x, configuration.camera.y, camWidth, camHeight};
 
-    SDL_Rect destRect = {0, 0, configuracion.widthWindow, configuracion.heightWindow};
+    SDL_Rect destRect = {0, 0, configuration.widthWindow, configuration.heightWindow};
     drawHud(srcRect, destRect, textureName);
 
     // Draw bombSite
@@ -80,9 +80,9 @@ void MapSprite::drawObstacles() {
         int height = obstacle.get_height();
         int width = obstacle.get_width();
 
-        destRect = {int((posX - configuracion.camera.x) * configuracion.zoom),
-                    int((posY - configuracion.camera.y) * configuracion.zoom),
-                    int(width * configuracion.zoom), int(height * configuracion.zoom)};
+        destRect = {int((posX - configuration.camera.x) * configuration.zoom),
+                    int((posY - configuration.camera.y) * configuration.zoom),
+                    int(width * configuration.zoom), int(height * configuration.zoom)};
         drawHud(srcRect, destRect, textureName);
     }
 }
@@ -97,16 +97,16 @@ void MapSprite::drawBombsite() {
     int posX = bombsite.get_x();
     int posY = bombsite.get_y();
 
-    SDL_Rect destRect = {int((posX - configuracion.camera.x) * configuracion.zoom),
-                         int((posY - configuracion.camera.y) * configuracion.zoom),
-                         int(bomb_site_width * configuracion.zoom),
-                         int(bomb_site_height * configuracion.zoom)};
+    SDL_Rect destRect = {int((posX - configuration.camera.x) * configuration.zoom),
+                         int((posY - configuration.camera.y) * configuration.zoom),
+                         int(bomb_site_width * configuration.zoom),
+                         int(bomb_site_height * configuration.zoom)};
     drawHud2(destRect, textureName);
 }
 
 void MapSprite::drawSite(const SiteInfo& site, const std::string& nameSite) {
     std::string textureName = nameSite;
-    Texture& texture = texturas.getTexture(nameSite);
+    Texture& texture = textures.getTexture(nameSite);
 
     // Aplicamos el color rojo
     texture.SetColorMod(255, 0, 0);
@@ -116,22 +116,22 @@ void MapSprite::drawSite(const SiteInfo& site, const std::string& nameSite) {
     int posX = site.get_x();
     int posY = site.get_y();
 
-    SDL_Rect destRect = {int((posX - configuracion.camera.x) * configuracion.zoom),
-                         int((posY - configuracion.camera.y) * configuracion.zoom),
-                         int(site_width * configuracion.zoom / 2),
-                         int(site_height * configuracion.zoom / 2)};
+    SDL_Rect destRect = {int((posX - configuration.camera.x) * configuration.zoom),
+                         int((posY - configuration.camera.y) * configuration.zoom),
+                         int(site_width * configuration.zoom / 2),
+                         int(site_height * configuration.zoom / 2)};
     drawHud2(destRect, textureName);
 }
 
 int MapSprite::getWidth() {
-    Texture& map = texturas.getTexture("map");
+    Texture& map = textures.getTexture("map");
     int worldWidth = map.GetWidth();
 
     return worldWidth;
 }
 
 int MapSprite::getHeight() {
-    Texture& map = texturas.getTexture("map");
+    Texture& map = textures.getTexture("map");
     int worldHeight = map.GetHeight();
 
     return worldHeight;
@@ -139,13 +139,13 @@ int MapSprite::getHeight() {
 
 void MapSprite::drawEndRound(const Team& team_winer, bool is_bomb_planted) {
     std::string textureName;
-    tipoMusic music;
-    int anchoCartelPantalla = anchoCartel * configuracion.zoom / 8;
-    int symbolX = (configuracion.widthWindow * 0.5) - anchoCartelPantalla / 2;
-    int symbolY = configuracion.heightWindow * 0.2;
+    MusicType music;
+    int bannerScreenWidth = bannerWidth * configuration.zoom / 8;
+    int symbolX = (configuration.widthWindow * 0.5) - bannerScreenWidth / 2;
+    int symbolY = configuration.heightWindow * 0.2;
 
-    SDL_Rect destRect = {symbolX, symbolY, anchoCartelPantalla,
-                         int(altoCartel * configuracion.zoom / 4)};
+    SDL_Rect destRect = {symbolX, symbolY, bannerScreenWidth,
+                         int(bannerHeight * configuration.zoom / 4)};
 
     switch (team_winer) {
         case Team::Terrorists:
@@ -177,24 +177,24 @@ void MapSprite::activateBomb() {
         return;
     this->is_bomb_activated = true;
 
-    tipoMusic music = BOMBHASBEENPLANTED;
+    MusicType music = BOMBHASBEENPLANTED;
 
     sounds.loadSong(music);
 
     music = TIMER;
     // Dura 2 segundos
-    int cantVeces = 48;
-    canalBomb = sounds.loadSong(music, cantVeces);
+    int times = 48;
+    bombChannel = sounds.loadSong(music, times);
 }
 
 void MapSprite::desactivateBomb() {
     this->is_bomb_activated = false;
     this->is_finish_sound_round = false;
-    sounds.stopSongs(canalBomb);
+    sounds.stopSongs(bombChannel);
 }
 
 void MapSprite::exploitBomb() {
-    tipoMusic music = EXPLOIT;
+    MusicType music = EXPLOIT;
     sounds.loadSong(music);
 
     is_exploding = true;
@@ -212,9 +212,9 @@ void MapSprite::exploitBomb() {
 
 void MapSprite::drawBomb(int bomb_x, int bomb_y) {
 
-    SDL_Rect destRectBomb = {int((bomb_x - configuracion.camera.x) * configuracion.zoom),
-                             int((bomb_y - configuracion.camera.y) * configuracion.zoom),
-                             int(32 * configuracion.zoom / 8), int(32 * configuracion.zoom / 8)};
+    SDL_Rect destRectBomb = {int((bomb_x - configuration.camera.x) * configuration.zoom),
+                             int((bomb_y - configuration.camera.y) * configuration.zoom),
+                             int(32 * configuration.zoom / 8), int(32 * configuration.zoom / 8)};
 
     this->last_bomb_x = bomb_x;
     this->last_bomb_y = bomb_y;
@@ -237,7 +237,7 @@ void MapSprite::drawExplosion() {
         return;
     }
 
-    Texture& explosion = texturas.getTexture("explosion");
+    Texture& explosion = textures.getTexture("explosion");
 
     int frame_width = 64;
     int frame_height = 64;
@@ -249,10 +249,10 @@ void MapSprite::drawExplosion() {
 
     SDL_Rect srcRect = {src_x, src_y, frame_width, frame_height};
 
-    SDL_Rect destRect = {int((explosion_x - configuracion.camera.x) * configuracion.zoom),
-                         int((explosion_y - configuracion.camera.y) * configuracion.zoom),
-                         int(frame_width * configuracion.zoom * scale / 8),
-                         int(frame_height * configuracion.zoom * scale / 8)};
+    SDL_Rect destRect = {int((explosion_x - configuration.camera.x) * configuration.zoom),
+                         int((explosion_y - configuration.camera.y) * configuration.zoom),
+                         int(frame_width * configuration.zoom * scale / 8),
+                         int(frame_height * configuration.zoom * scale / 8)};
 
     explosion.SetBlendMode(SDL_BLENDMODE_BLEND);
     sdlRenderer->Copy(explosion, srcRect, destRect);
@@ -260,10 +260,10 @@ void MapSprite::drawExplosion() {
 
 
 void MapSprite::drawCampField(int angle, int playerX, int playerY) {
-    Texture& field = texturas.getTexture("field");
+    Texture& field = textures.getTexture("field");
 
-    field.SetBlendMode(SDL_BLENDMODE_BLEND);          // Habilita la mezcla alfa
-    field.SetAlphaMod(configuracion.opacidadVision);  // Cambia la opacidad (0-255)
+    field.SetBlendMode(SDL_BLENDMODE_BLEND);         // Habilita la mezcla alfa
+    field.SetAlphaMod(configuration.visionOpacity);  // Cambia la opacidad (0-255)
 
     // coregimos el anglo por la imagen
     angle -= 90;
@@ -273,30 +273,30 @@ void MapSprite::drawCampField(int angle, int playerX, int playerY) {
     int playerCenterY = playerY + int(30 / 8) / 2;
 
     // Posición del jugador en la pantalla
-    int playerScreenX = int((playerCenterX - configuracion.camera.x) * configuracion.zoom);
-    int playerScreenY = int((playerCenterY - configuracion.camera.y) * configuracion.zoom);
+    int playerScreenX = int((playerCenterX - configuration.camera.x) * configuration.zoom);
+    int playerScreenY = int((playerCenterY - configuration.camera.y) * configuration.zoom);
 
-    if (configuracion.heightWindow > 1000 || configuracion.widthWindow > 1000) {
-        anchoField = 3700;
-        altoField = 3700;
+    if (configuration.heightWindow > 1000 || configuration.widthWindow > 1000) {
+        fieldWidth = 3700;
+        fieldHeight = 3700;
     } else {
-        anchoField = 2300;
-        altoField = 2300;
+        fieldWidth = 2300;
+        fieldHeight = 2300;
     }
 
-    SDL_Rect destRect = {playerScreenX - anchoField / 2, playerScreenY - altoField / 2, anchoField,
-                         altoField};
+    SDL_Rect destRect = {playerScreenX - fieldWidth / 2, playerScreenY - fieldHeight / 2,
+                         fieldWidth, fieldHeight};
     // Centro de la textura
-    SDL_Point center = {anchoField / 2, altoField / 2};
+    SDL_Point center = {fieldWidth / 2, fieldHeight / 2};
 
     sdlRenderer->Copy(field, SDL2pp::NullOpt, destRect, angle, center);
 }
 
 void MapSprite::drawShop() {
     // Shop
-    int symbolX = (configuracion.widthWindow * 0.5) - anchoShopPantalla / 2;
-    int symbolY = configuracion.heightWindow * 0.2;
-    SDL_Rect destRect = {symbolX, symbolY, anchoShopPantalla, altoShopPantalla};
+    int symbolX = (configuration.widthWindow * 0.5) - shopScreenWidth / 2;
+    int symbolY = configuration.heightWindow * 0.2;
+    SDL_Rect destRect = {symbolX, symbolY, shopScreenWidth, shopScreenHeight};
     std::string textureName = "shop";
     drawHud2(destRect, textureName);
 }

@@ -9,16 +9,16 @@
 
 #include "SDL_mixer.h"
 
-enum tipoMusic {
-    DISPARO_AK47,
-    DISPARO_PISTOL,
-    DISPARO_AWP,
-    DISPARO_M3,
+enum MusicType {
+    SHOT_AK47,
+    SHOT_PISTOL,
+    SHOT_AWP,
+    SHOT_M3,
     KNIFE,
-    CAMINANDO,
+    WALKING,
     STEP,
     TIMER,
-    AMBIENTE,
+    AMBIENCE,
     EXPLOIT,
     PISTOLRELOAD,
     RIFLERELOAD,
@@ -35,27 +35,27 @@ enum tipoMusic {
 class MusicManager {
 
 private:
-    Mix_Music* musicaActual = nullptr;
+    Mix_Music* currentMusic = nullptr;
 
-    std::map<tipoMusic, Mix_Music*> ficheroDeMusica;
-    std::map<tipoMusic, Mix_Chunk*> ficheroDeChunks;
-    std::map<tipoMusic, std::string> ficheroDeUbicaciones;
+    std::map<MusicType, Mix_Music*> musicFiles;
+    std::map<MusicType, Mix_Chunk*> chunkFiles;
+    std::map<MusicType, std::string> locationFiles;
 
 public:
     explicit MusicManager(const std::string& assetsPath);
 
     ~MusicManager();
 
-    void loadMusic(tipoMusic music, int cantVeces);
+    void loadMusic(MusicType music, int times);
 
     void setVolume(int volume);
 
     void stopMusic();
 
-    int loadSong(tipoMusic music, int loops = 0, int volume = MIX_MAX_VOLUME / 2);
+    int loadSong(MusicType music, int loops = 0, int volume = MIX_MAX_VOLUME / 2);
 
     void stopAllSongs();
 
-    void stopSongs(int canal);
+    void stopSongs(int channel);
 };
 #endif

@@ -21,26 +21,26 @@ class MainWindow: public QMainWindow {
     Q_OBJECT
 
 public:
-    explicit MainWindow(Protocol& protocolo, std::string& namePlayer, QWidget* parent = nullptr);
+    explicit MainWindow(Protocol& protocol, std::string& namePlayer, QWidget* parent = nullptr);
     ~MainWindow();
 
 private Q_SLOTS:
-    void on_crearButton_clicked();
+    void on_createButton_clicked();
 
-    void on_unirseButton_clicked();
+    void on_joinButton_clicked();
 
-    void on_actualizarButton_clicked();
+    void on_refreshButton_clicked();
 
     void on_quitButton_clicked();
 
-    void on_buscarButton_clicked();
+    void on_searchButton_clicked();
 
     void on_loginButton_clicked();
 
 private:
     Ui::LobbyWindow* ui;
 
-    Protocol& protocolo;
+    Protocol& protocol;
 
     std::list<std::string> maps;
 

@@ -4,4 +4,4 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 # Agregar subdirectorios
 add_subdirectory(lobby)
-add_subdirectory(graphies)
+add_subdirectory(graphics)

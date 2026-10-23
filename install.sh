@@ -26,13 +26,13 @@ RELEASE_URL="https://github.com/martinSaav/counter-strike-2D/archive/refs/tags/1
 TMP_DIR=$(mktemp -d)
 
 echo -e "${BLUE} ================================== ${NC}"
-echo -e "${BLUE} 🚀 Instalador de $NAME_PROJECT${NC}"
+echo -e "${BLUE} 🚀 Installer for $NAME_PROJECT${NC}"
 echo -e "${BLUE} ================================== ${NC}"
 
 sleep 2
 
 # ------------------------ Dependencias ------------------------
-echo -e "${BLUE}📦 Instalando dependencias...${NC}"
+echo -e "${BLUE}📦 Installing dependencies...${NC}"
 sudo apt-get update
 sudo apt-get install -y \
   build-essential \
@@ -62,22 +62,22 @@ export PATH="$TMP_DIR/cmake-3.24.4-linux-x86_64/bin:$PATH"
 
 
 # ------------------------ Descargar release ------------------------
-echo -e "${BLUE}📥 Descargando la última release...${NC}"
+echo -e "${BLUE}📥 Downloading the latest release...${NC}"
 wget -q -O "$TMP_DIR/release.zip" "$RELEASE_URL"
 unzip -q "$TMP_DIR/release.zip" -d "$TMP_DIR"
 PROJECT_DIR=$(find "$TMP_DIR" -type d -name "counter-strike-2D-*")
 cd "$PROJECT_DIR"
 
 # ------------------------ Compilacion ------------------------
-echo -e "${BLUE}🧱 Compilando el proyecto...${NC}"
+echo -e "${BLUE}🧱 Building the project...${NC}"
 make compile-debug
 
 # ------------------------ Tests ------------------------
-echo -e "${BLUE}🧪 Corriendo tests unitarios...${NC}"
+echo -e "${BLUE}🧪 Running unit tests...${NC}"
 ./build/$TEST_NAME
 
 # ------------------------ Instalacion ------------------------
-echo -e "${BLUE}📁 Instalando archivos del juego...${NC}"
+echo -e "${BLUE}📁 Installing game files...${NC}"
 sudo mkdir -p "$BIN_DIR" "$ASSETS_DIR" "$CONFIG_DIR"
 sudo cp build/$SERVER_NAME "$BIN_DIR/"
 sudo cp build/$CLIENT_NAME "$BIN_DIR/"
@@ -92,7 +92,7 @@ sudo chmod -R 777 "$ASSETS_DIR"
 sudo cp server/server_config.yaml "$CONFIG_DIR/"
 
 # ------------------------ Scripts del servidor y cliente ------------------------
-echo -e "${BLUE}📄 Creando scripts de arranque...${NC}"
+echo -e "${BLUE}📄 Creating startup scripts...${NC}"
 
 cat <<EOF > "$TMP_DIR/$SERVER_EXECUTABLE"
 #!/bin/bash
@@ -119,8 +119,8 @@ cp "$TMP_DIR/$SERVER_EXECUTABLE" "$DESKTOP_DIR/"
 cp "$TMP_DIR/$CLIENT_EXECUTABLE" "$DESKTOP_DIR/"
 
 # ------------------------ Finalizacion ------------------------
-echo -e "${GREEN}🎉 Instalacion completada con exito.${NC}"
-echo -e "${GREEN}📌 Ejecutables en:${NC} $BIN_DIR"
-echo -e "${GREEN}📌 Archivos de configuracion en:${NC} $CONFIG_DIR"
-echo -e "${GREEN}📌 Datos del juego en:${NC} $ASSETS_DIR"
-echo -e "${GREEN}📌 Accesos directos creados en:${NC} $DESKTOP_DIR"
+echo -e "${GREEN}🎉 Installation completed successfully.${NC}"
+echo -e "${GREEN}📌 Executables at:${NC} $BIN_DIR"
+echo -e "${GREEN}📌 Configuration files at:${NC} $CONFIG_DIR"
+echo -e "${GREEN}📌 Game data at:${NC} $ASSETS_DIR"
+echo -e "${GREEN}📌 Shortcuts created at:${NC} $DESKTOP_DIR"

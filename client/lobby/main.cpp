@@ -3,8 +3,8 @@
 #include <iostream>
 
 #include "chatClient.h"
-#include "estadistics.h"
 #include "lobbywindow.h"
+#include "statistics.h"
 
 int main(int argc, char* argv[]) {
     // Comprobamos que la cantidad de argumentos sea correcta
@@ -15,13 +15,13 @@ int main(int argc, char* argv[]) {
     }
 
     std::string namePlayer;
-    std::unique_ptr<GameStateUpdate> estadistics;
+    std::unique_ptr<GameStateUpdate> statistics;
 
     QApplication a(argc, argv);
 
     Socket socket(argv[1], argv[2]);
-    Protocol protocolo(socket);
-    MainWindow lobby(protocolo, namePlayer);
+    Protocol protocol(socket);
+    MainWindow lobby(protocol, namePlayer);
 
     lobby.move(900, 900);
 
@@ -36,12 +36,12 @@ int main(int argc, char* argv[]) {
     } else if (result == EXITLOBBY) {
 
         // Creamos el juego para el cliente
-        ChatClient cliente(protocolo, namePlayer);
+        ChatClient client(protocol, namePlayer);
 
-        result = cliente.run(estadistics);
+        result = client.run(statistics);
 
-        if (result == CONTINUAR) {
-            Estadistics window(estadistics);
+        if (result == CONTINUE) {
+            Statistics window(statistics);
             window.exec();  // bloquea hasta que se cierre
         }
     }

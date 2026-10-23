@@ -5,34 +5,34 @@
 
 #include "../../common/dto/player_info.h"
 
-#include "configuracion.h"
+#include "configuration.h"
 #include "musicManager.h"
 #include "textureStore.h"
 
 class Component {
 
 protected:
-    TextureStore texturas;
+    TextureStore textures;
     Renderer* sdlRenderer;
-    Configuracion& configuracion;
+    Configuration& configuration;
     MusicManager sounds;
 
     void drawHud(SDL_Rect srcRect, SDL_Rect destRect, std::string& textureName) {
-        Texture& texture = texturas.getTexture(textureName);
+        Texture& texture = textures.getTexture(textureName);
         sdlRenderer->Copy(texture, srcRect, destRect);
     }
 
     void drawHud2(SDL_Rect destRect, std::string& textureName, double angle = 0) {
-        Texture& texture = texturas.getTexture(textureName);
+        Texture& texture = textures.getTexture(textureName);
         sdlRenderer->Copy(texture, SDL2pp::NullOpt, destRect, angle);
     }
 
 public:
     // Crea el junto con sus medidas
-    Component(Renderer* sdlRenderer, Configuracion& configuracion, std::string& assetsPath):
-            texturas(sdlRenderer),
+    Component(Renderer* sdlRenderer, Configuration& configuration, std::string& assetsPath):
+            textures(sdlRenderer),
             sdlRenderer(sdlRenderer),
-            configuracion(configuracion),
+            configuration(configuration),
             sounds(assetsPath) {}
 };
 #endif

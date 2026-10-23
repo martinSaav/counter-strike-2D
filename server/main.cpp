@@ -20,8 +20,8 @@ int main(const int argc, const char* argv[]) {
     Socket skt(argv[1]);
     Acceptor client_acceptor(std::move(skt), std::move(config));
     client_acceptor.start();
-    while (true) {
-        std::cin >> c;
+    // Si stdin llega a EOF (o falla) se sale del loop en vez de quedar girando
+    while (std::cin >> c) {
         if (c == exit_char) {
             break;
         }

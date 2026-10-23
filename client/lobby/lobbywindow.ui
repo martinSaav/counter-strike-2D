@@ -33,7 +33,7 @@
 </string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="buscarButton">
+   <widget class="QPushButton" name="searchButton">
     <property name="geometry">
      <rect>
       <x>90</x>
@@ -43,10 +43,10 @@
      </rect>
     </property>
     <property name="text">
-     <string>Buscar partida</string>
+     <string>Search match</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="crearButton">
+   <widget class="QPushButton" name="createButton">
     <property name="geometry">
      <rect>
       <x>90</x>
@@ -56,7 +56,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Crear partida</string>
+     <string>Create match</string>
     </property>
    </widget>
    <widget class="QLabel" name="waitText">
@@ -98,7 +98,7 @@
      <string>Counter Strike 1.6</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="unirseButton">
+   <widget class="QPushButton" name="joinButton">
     <property name="geometry">
      <rect>
       <x>390</x>
@@ -108,10 +108,10 @@
      </rect>
     </property>
     <property name="text">
-     <string>Unirse partida</string>
+     <string>Join match</string>
     </property>
    </widget>
-   <widget class="QTableWidget" name="listaPartidas">
+   <widget class="QTableWidget" name="matchList">
     <property name="geometry">
      <rect>
       <x>330</x>
@@ -157,7 +157,7 @@
     <row/>
     <column>
      <property name="text">
-      <string>Nombre partida</string>
+      <string>Match name</string>
      </property>
      <property name="font">
       <font>
@@ -167,12 +167,12 @@
     </column>
     <column>
      <property name="text">
-      <string>Mapa</string>
+      <string>Map</string>
      </property>
     </column>
     <column>
      <property name="text">
-      <string>Cantidad jugadores</string>
+      <string>Players</string>
      </property>
     </column>
    </widget>
@@ -186,10 +186,10 @@
      </rect>
     </property>
     <property name="text">
-     <string>Salir</string>
+     <string>Quit</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="actualizarButton">
+   <widget class="QPushButton" name="refreshButton">
     <property name="geometry">
      <rect>
       <x>570</x>
@@ -199,7 +199,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Actualizar</string>
+     <string>Refresh</string>
     </property>
    </widget>
    <widget class="QLabel" name="nameLabel">
@@ -236,7 +236,7 @@
      <string>Login</string>
     </property>
    </widget>
-   <widget class="QLabel" name="fondoImage">
+   <widget class="QLabel" name="backgroundImage">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -255,7 +255,7 @@
      <string/>
     </property>
     <property name="pixmap">
-     <pixmap resource="recursos.qrc">:/imagenes/imagenes/fondo.jpg</pixmap>
+     <pixmap resource="resources.qrc">:/images/images/background.jpg</pixmap>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
@@ -274,21 +274,21 @@
      <string/>
     </property>
     <property name="pixmap">
-     <pixmap resource="recursos.qrc">:/imagenes/imagenes/user.png</pixmap>
+     <pixmap resource="resources.qrc">:/images/images/user.png</pixmap>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
     </property>
    </widget>
-   <zorder>fondoImage</zorder>
-   <zorder>buscarButton</zorder>
-   <zorder>crearButton</zorder>
+   <zorder>backgroundImage</zorder>
+   <zorder>searchButton</zorder>
+   <zorder>createButton</zorder>
    <zorder>waitText</zorder>
    <zorder>titulo</zorder>
-   <zorder>unirseButton</zorder>
-   <zorder>listaPartidas</zorder>
+   <zorder>joinButton</zorder>
+   <zorder>matchList</zorder>
    <zorder>quitButton</zorder>
-   <zorder>actualizarButton</zorder>
+   <zorder>refreshButton</zorder>
    <zorder>nameLabel</zorder>
    <zorder>loginButton</zorder>
    <zorder>userImage</zorder>
@@ -306,7 +306,7 @@
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources>
-  <include location="recursos.qrc"/>
+  <include location="resources.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -5,8 +5,8 @@
 #include <string>
 
 enum team {
-    TERRORISTA = 0,
-    CONTRATERRORISTA = 1,
+    TERRORIST = 0,
+    COUNTERTERRORIST = 1,
 };
 
 namespace Ui {
@@ -17,7 +17,7 @@ class selectSkin: public QDialog {
     Q_OBJECT
 
 public:
-    selectSkin(team& teamPlayer, std::string& skinSeleccionada, QWidget* parent = nullptr);
+    selectSkin(team& teamPlayer, std::string& selectedSkin, QWidget* parent = nullptr);
     ~selectSkin();
     // cppcheck-suppress unknownMacro
 private slots:
@@ -33,11 +33,11 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 signals:
-    void ventanaCerrada();
+    void windowClosed();
 
 private:
     Ui::selectSkin* ui;
-    std::string& skinSeleccionada;
+    std::string& selectedSkin;
     team& teamPlayer;
 };
 #endif  // SELECTSKIN_H

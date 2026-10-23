@@ -10,15 +10,15 @@
 class MapSprite: public Component {
 
 private:
-    int anchoField;
-    int altoField;
+    int fieldWidth;
+    int fieldHeight;
 
-    int anchoCartel = 210;
-    int altoCartel = 50;
+    int bannerWidth = 210;
+    int bannerHeight = 50;
 
     // Shop
-    int altoShopPantalla = 600;
-    int anchoShopPantalla = 600;
+    int shopScreenHeight = 600;
+    int shopScreenWidth = 600;
 
     bool is_exploding = false;
     int explosion_frame = 0;
@@ -36,7 +36,7 @@ private:
     int shake_magnitude = 4;      // magnitud del efecto
 
 
-    int canalBomb;
+    int bombChannel;
 
     SDL_Rect destRectMap = {0, 0, 1000, 1000};
 
@@ -47,7 +47,7 @@ private:
     const MapConfigInfo& mapConfig;
 
 public:
-    MapSprite(Renderer* sdlRenderer, Configuracion& configuracion, std::string& assetsPath);
+    MapSprite(Renderer* sdlRenderer, Configuration& configuration, std::string& assetsPath);
 
     void draw();
 

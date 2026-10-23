@@ -10,20 +10,20 @@ class PlayerSprite: public Component {
 private:
     SDL_Rect srcRect = {0, 0, 32, 32};
 
-    void drawWeapon(int& jugadorX, int& jugadorY, double& angle, Weapon& weaponPlayer);
+    void drawWeapon(int& playerX, int& playerY, double& angle, Weapon& weaponPlayer);
 
     void drawBullet(const int& shootX, const int& shootY, double& angle);
 
     std::string castWeapon(const Weapon& weapon);
 
-    tipoMusic castShoot(const Weapon& weapon);
+    MusicType castShoot(const Weapon& weapon);
 
 public:
-    PlayerSprite(Renderer* sdlRenderer, Configuracion& configuracion, std::string& assetsPath);
+    PlayerSprite(Renderer* sdlRenderer, Configuration& configuration, std::string& assetsPath);
 
-    void drawPlayer(const PlayerInfo& jugador, double& angle);
+    void drawPlayer(const PlayerInfo& player, double& angle);
 
-    void drawPlayerDeath(int jugadorX, int jugadorY);
+    void drawPlayerDeath(int playerX, int playerY);
 
     void drawBlood(int x, int y);
 };

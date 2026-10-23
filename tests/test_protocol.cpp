@@ -527,3 +527,32 @@ TEST(ProtocolTest, ReceivesPlayerActionCorrectly) {
     EXPECT_EQ(player_action->get_pos_mouse_x(), pos_mouse_x);
     EXPECT_EQ(player_action->get_pos_mouse_y(), pos_mouse_y);
 }
+
+// Connection closed Test Cases
+
+TEST(ProtocolTest, ThrowsConnectionClosedWhenHeaderNotReceived) {
+    MockSocket mock_socket;
+
+    EXPECT_CALL(mock_socket, recvall(_, 3)).WillOnce(Return(0));
+
+    Protocol protocol(mock_socket);
+    EXPECT_THROW(protocol.recv_message(), ConnectionClosed);
+}
+
+TEST(ProtocolTest, ThrowsConnectionClosedWhenPayloadNotReceived) {
+    MockSocket mock_socket;
+
+    uint8_t header[3];
+    header[0] = static_cast<uint8_t>(MessageType::LoginRequest);
+    const uint16_t len = htons(6);
+    memcpy(&header[1], &len, sizeof(len));
+
+    EXPECT_CALL(mock_socket, recvall(_, 3)).WillOnce(Invoke([&](void* dst, unsigned int) {
+        memcpy(dst, header, 3);
+        return 3;
+    }));
+    EXPECT_CALL(mock_socket, recvall(_, 6)).WillOnce(Return(0));
+
+    Protocol protocol(mock_socket);
+    EXPECT_THROW(protocol.recv_message(), ConnectionClosed);
+}

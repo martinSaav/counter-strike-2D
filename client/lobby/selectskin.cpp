@@ -2,16 +2,16 @@
 
 #include "ui_selectskin.h"
 
-selectSkin::selectSkin(team& teamPlayer, std::string& skinSeleccionada, QWidget* parent):
+selectSkin::selectSkin(team& teamPlayer, std::string& selectedSkin, QWidget* parent):
         QDialog(parent),
         ui(new Ui::selectSkin),
-        skinSeleccionada(skinSeleccionada),
+        selectedSkin(selectedSkin),
         teamPlayer(teamPlayer) {
 
     ui->setupUi(this);
 
     switch (teamPlayer) {
-        case TERRORISTA:
+        case TERRORIST:
             // Desactivamos las imagenes de contraterrorista
             ui->labelC1->setEnabled(false);
             ui->labelC2->setEnabled(false);
@@ -19,7 +19,7 @@ selectSkin::selectSkin(team& teamPlayer, std::string& skinSeleccionada, QWidget*
             ui->labelC4->setEnabled(false);
             break;
 
-        case CONTRATERRORISTA:
+        case COUNTERTERRORIST:
             // Desactivamos las imagenes de terorrista
             ui->labelT1->setEnabled(false);
             ui->labelT2->setEnabled(false);
@@ -33,45 +33,45 @@ selectSkin::~selectSkin() { delete ui; }
 
 void selectSkin::on_button1_clicked() {
 
-    if (teamPlayer == TERRORISTA) {
-        skinSeleccionada = "T1";
+    if (teamPlayer == TERRORIST) {
+        selectedSkin = "T1";
     } else {
-        skinSeleccionada = "C1";
+        selectedSkin = "C1";
     }
     this->close();
 }
 
 void selectSkin::on_button2_clicked() {
 
-    if (teamPlayer == TERRORISTA) {
-        skinSeleccionada = "T2";
+    if (teamPlayer == TERRORIST) {
+        selectedSkin = "T2";
     } else {
-        skinSeleccionada = "C2";
+        selectedSkin = "C2";
     }
     this->close();
 }
 
 void selectSkin::on_button3_clicked() {
 
-    if (teamPlayer == TERRORISTA) {
-        skinSeleccionada = "T3";
+    if (teamPlayer == TERRORIST) {
+        selectedSkin = "T3";
     } else {
-        skinSeleccionada = "C3";
+        selectedSkin = "C3";
     }
     this->close();
 }
 
 void selectSkin::on_button4_clicked() {
 
-    if (teamPlayer == TERRORISTA) {
-        skinSeleccionada = "T4";
+    if (teamPlayer == TERRORIST) {
+        selectedSkin = "T4";
     } else {
-        skinSeleccionada = "C4";
+        selectedSkin = "C4";
     }
     this->close();
 }
 
 void selectSkin::closeEvent(QCloseEvent* event) {
-    emit ventanaCerrada();
+    emit windowClosed();
     QDialog::closeEvent(event);
 }
