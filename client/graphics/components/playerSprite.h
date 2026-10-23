@@ -27,6 +27,10 @@ public:
 
     void drawShotgunSpread(int playerX, int playerY, int shootX, int shootY);
 
+    void playShotSound(const PlayerInfo& player, float distance);
+
+    void playSound(MusicType music, int baseVolume, float distance);
+
     void drawBlood(int x, int y);
 };
 #endif

@@ -56,15 +56,7 @@ void PlayerSprite::drawPlayer(const PlayerInfo& player, double& angle) {
     }
     this->drawWeapon(playerX, playerY, angle, weaponPlayer);
 
-    if (player.get_action() == Action::Shoot) {
-
-        int volume = 64;
-
-        if (weaponPlayer == Weapon::Bomb) {
-            return;
-        } else if (weaponPlayer == Weapon::Knife) {
-            volume = 90;
-        }
+    if (player.get_action() == Action::Shoot && weaponPlayer != Weapon::Bomb) {
         int shootX = player.get_pos_shoot_x();
         int shootY = player.get_pos_shoot_y();
 
@@ -73,8 +65,23 @@ void PlayerSprite::drawPlayer(const PlayerInfo& player, double& angle) {
         } else {
             drawBullet(shootX, shootY, angle);
         }
+    }
+}
 
-        MusicType music = castShoot(weaponPlayer);
+void PlayerSprite::playShotSound(const PlayerInfo& player, float distance) {
+    // Se escucha aunque el que dispara no este a la vista, mas bajo cuanto mas lejos
+    Weapon weaponPlayer = player.get_active_weapon();
+    if (player.get_action() != Action::Shoot || weaponPlayer == Weapon::Bomb ||
+        weaponPlayer == Weapon::None) {
+        return;
+    }
+    int volume = weaponPlayer == Weapon::Knife ? 90 : 64;
+    playSound(castShoot(weaponPlayer), volume, distance);
+}
+
+void PlayerSprite::playSound(MusicType music, int baseVolume, float distance) {
+    int volume = MusicManager::volumeForDistance(baseVolume, distance);
+    if (volume > 0) {
         sounds.loadSong(music, 0, volume);
     }
 }

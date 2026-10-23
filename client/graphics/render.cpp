@@ -116,18 +116,39 @@ void Render::renderFrame(std::optional<GameStateUpdate> message) {
         player.drawBlood(stain.x, stain.y);
     }
 
+    Uint32 now = SDL_GetTicks();
     for (auto const& playerInfo: players) {
 
         std::string name = playerInfo.get_user_name();
         int currentHealth = playerInfo.get_health();
+        float dxToMe = playerInfo.get_pos_x() - myPlayer->get_pos_x();
+        float dyToMe = playerInfo.get_pos_y() - myPlayer->get_pos_y();
+        float distanceToMe = std::sqrt(dxToMe * dxToMe + dyToMe * dyToMe);
 
         lastHealths.try_emplace(name, currentHealth);
 
         if (currentHealth < lastHealths[name]) {
             bloodStains.push_back({playerInfo.get_pos_x(), playerInfo.get_pos_y()});
+            if (currentHealth == 0) {
+                player.playSound(DEATH, 110, distanceToMe);
+            }
         }
 
         lastHealths[name] = currentHealth;
+
+        // Pasos: un sonido cada tanto mientras el jugador se mueve
+        std::pair<int, int> position(playerInfo.get_pos_x(), playerInfo.get_pos_y());
+        auto lastPosition = lastPositions.find(name);
+        if (lastPosition != lastPositions.end() && lastPosition->second != position &&
+            currentHealth > 0 && now - lastStepTicks[name] > 350) {
+            player.playSound(STEP, 40, distanceToMe);
+            lastStepTicks[name] = now;
+        }
+        lastPositions[name] = position;
+
+        if (currentHealth > 0) {
+            player.playShotSound(playerInfo, distanceToMe);
+        }
 
         if (playerInfo.get_health() == 0) {
             player.drawPlayerDeath(playerInfo.get_pos_x(), playerInfo.get_pos_y());
@@ -193,7 +214,11 @@ void Render::renderFrame(std::optional<GameStateUpdate> message) {
     if (taskProgress > 0 && myPlayer->get_status() == Status::Alive) {
         bool planting = myPlayer->get_skin()[0] != 'C';
         hud.drawTaskProgress(taskProgress, planting);
+        if (!planting && lastTaskProgress == 0) {
+            player.playSound(DEFUSING, 100, 0);
+        }
     }
+    lastTaskProgress = taskProgress;
 
     // La ayuda aparece sola en la primera compra; despues solo si la abren con H
     if (!isBuyStage && !configuration.helpToggled) {

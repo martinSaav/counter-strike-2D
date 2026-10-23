@@ -1,5 +1,6 @@
 #include "musicManager.h"
 
+#include <algorithm>
 #include <utility>
 #include <vector>
 
@@ -30,6 +31,9 @@ MusicManager::MusicManager(const std::string& assetsPath) {
     std::string counterTerroristWinLocation = assetsPath + "/sounds/CounterTerroristWin.mp3";
     std::string terroristWinLocation = assetsPath + "/sounds/TerroristsWin.mp3";
     std::string plantingBombLocation = assetsPath + "/sounds/PlantingC4Bomb.mp3";
+    std::string deathLocation = assetsPath + "/sounds/death.wav";
+    std::string stepLocation = assetsPath + "/sounds/step_short.wav";
+    std::string defusingLocation = assetsPath + "/sounds/c4_disarm.wav";
 
     locationFiles[MusicType::SHOT_PISTOL] = pistolLocation;
     locationFiles[MusicType::SHOT_AK47] = ak47Location;
@@ -49,6 +53,9 @@ MusicManager::MusicManager(const std::string& assetsPath) {
     locationFiles[MusicType::COUNTERTERRORISTWIN] = counterTerroristWinLocation;
     locationFiles[MusicType::TERRORISTWIN] = terroristWinLocation;
     locationFiles[MusicType::PLANTINGBOMB] = plantingBombLocation;
+    locationFiles[MusicType::DEATH] = deathLocation;
+    locationFiles[MusicType::STEP] = stepLocation;
+    locationFiles[MusicType::DEFUSING] = defusingLocation;
 
     Mix_Music* musicTrack;
     musicTrack = Mix_LoadMUS(ambienceGameLocation.c_str());
@@ -71,7 +78,10 @@ MusicManager::MusicManager(const std::string& assetsPath) {
                                           MusicType::BOMBHASBEENPLANTED,
                                           MusicType::COUNTERTERRORISTWIN,
                                           MusicType::TERRORISTWIN,
-                                          MusicType::PLANTINGBOMB};
+                                          MusicType::PLANTINGBOMB,
+                                          MusicType::DEATH,
+                                          MusicType::STEP,
+                                          MusicType::DEFUSING};
 
     for (auto type: shortSounds) {
         chunkFiles[type] = Mix_LoadWAV(locationFiles[type].c_str());
@@ -122,6 +132,14 @@ int MusicManager::loadSong(MusicType music, int loops, int volume) {
     int channel = Mix_PlayChannel(-1, chunk, loops);
     Mix_Volume(channel, volume);
     return channel;
+}
+
+int MusicManager::volumeForDistance(int baseVolume, float distance, float maxDistance) {
+    float factor = 1.0f - distance / maxDistance;
+    if (factor <= 0) {
+        return 0;
+    }
+    return int(baseVolume * std::min(factor, 1.0f));
 }
 
 void MusicManager::stopMusic() {

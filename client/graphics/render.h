@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "../../common/action.h"
@@ -53,6 +54,9 @@ private:
 
     std::vector<BloodStain> bloodStains;
     std::unordered_map<std::string, int> lastHealths;
+    std::unordered_map<std::string, std::pair<int, int>> lastPositions;
+    std::unordered_map<std::string, Uint32> lastStepTicks;
+    int lastTaskProgress = 0;
 
 
     // Function to calculate the angle between the player and the mouse

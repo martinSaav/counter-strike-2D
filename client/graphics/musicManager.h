@@ -29,6 +29,8 @@ enum MusicType {
     COUNTERTERRORISTWIN,
     TERRORISTWIN,
     PLANTINGBOMB,
+    DEATH,
+    DEFUSING,
     NONE
 };
 
@@ -53,6 +55,10 @@ public:
     void stopMusic();
 
     int loadSong(MusicType music, int loops = 0, int volume = MIX_MAX_VOLUME / 2);
+
+    // Volumen para un sonido que ocurre a cierta distancia (en tiles) del jugador: baja de forma
+    // lineal y a partir de maxDistance ya no se escucha.
+    static int volumeForDistance(int baseVolume, float distance, float maxDistance = 80.0f);
 
     void stopAllSongs();
 
