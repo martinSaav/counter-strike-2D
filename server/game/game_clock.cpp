@@ -88,7 +88,8 @@ double GameClock::get_bomb_timer() const {
 
 double GameClock::get_stage_time_left() const {
     if (current_stage == Stages::PostPlantStage) {
-        return get_bomb_timer();
+        // get_bomb_timer devuelve 0 en el tick en que se planta; aca queremos el tiempo entero
+        return std::max(post_bomb_stage_time - bomb_timer, static_cast<double>(0));
     }
     std::map<Stages, double> stage_duration_map = get_stage_duration_map();
     return std::max(stage_duration_map[current_stage] - stage_time, static_cast<double>(0));

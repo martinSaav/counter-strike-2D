@@ -136,6 +136,7 @@ public:
     void drop_equipped_weapon(const GameManager& manager);
     void update_task_progress(double time);
     [[nodiscard]] bool is_currently_defusing() const { return is_defusing; }
+    [[nodiscard]] bool is_currently_planting() const { return is_planting; }
     void start_defusing() {
         is_defusing = true;
         last_action = Action::DefuseBomb;

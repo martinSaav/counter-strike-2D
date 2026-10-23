@@ -180,6 +180,10 @@ void GameManager::start_defusing(const std::shared_ptr<Player>& player) const {
     if (!map.can_defuse(player)) {
         return;
     }
+    if (player->is_currently_defusing()) {
+        // Mantener F manda un pedido por frame: el tiempo cuenta desde el primero
+        return;
+    }
     player->start_defusing();
     player->defuse_time = clock.get_time();
 }

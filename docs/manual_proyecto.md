@@ -48,6 +48,10 @@ Si el servidor cerraba la conexión durante una partida, `Protocol` leía un enc
 
 La ronda del cambio de bando estaba fija en 6 dentro del código, mientras que la configuración tenía 4 rondas: el cambio nunca pasaba. Ahora se calcula a partir de `number_of_rounds` (mitad + 1), igual que la cantidad de rondas necesarias para ganar. Lo cubre un test.
 
+### La bomba no se podía desactivar manteniendo F
+
+Mantener F manda un pedido por frame, y cada pedido reiniciaba el momento de inicio de la desactivación: nunca se llegaba al tiempo necesario. Por eso en la demo no se sabía si la bomba no se desactivaba "por lag". Con el click mantenido para plantar pasaba lo mismo. Ahora el tiempo cuenta desde el primer pedido (moverse lo sigue cancelando), y hay tests que simulan mantener la tecla un frame tras otro.
+
 ### Unirse a una partida ya empezada colgaba el cliente
 
 El servidor tiraba `MatchAlreadyStarted` y, como no se atrapaba, cortaba la conexión sin responder. El cliente quedaba esperando una respuesta que nunca llegaba. Ahora el servidor responde que no se pudo unir, el cliente lo avisa y esas partidas ya no aparecen en la lista.

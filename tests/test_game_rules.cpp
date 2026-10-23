@@ -5,6 +5,7 @@
 #include "gtest/gtest.h"
 #include "server/game/game_clock.h"
 #include "server/game/game_manager.h"
+#include "server/game/gun/bomb_encapsulator.h"
 #include "server/game/map.h"
 #include "server/game/player.h"
 #include "server/game_config.h"
@@ -121,4 +122,81 @@ TEST_F(GameRulesTest, MatchEndsWhenATeamWinsMoreThanHalfTheRounds) {
         manager.advance_round(players);
     }
     EXPECT_TRUE(manager.has_ended());
+}
+
+TEST_F(GameRulesTest, BombCountsDownFromBombTimeAfterPlanting) {
+    clock.advance(BUY_TIME);
+    clock.advance(1000);
+    clock.set_post_plant_stage();
+    clock.advance(1000);
+    EXPECT_NEAR(clock.get_stage_time_left(), BOMB_TIME - 1000, 1);
+    EXPECT_FALSE(clock.has_bomb_exploded());
+}
+
+TEST_F(GameRulesTest, DroppedBombCanBePickedUpAgain) {
+    auto& terrorist = players[0];
+    terrorist->equip_bomb(std::make_unique<BombEncapsulator>(config));
+    terrorist->switch_weapon(GunType::Bomb);
+
+    terrorist->drop_equipped_weapon(manager);
+    EXPECT_EQ(terrorist->get_player_info().bomb, Weapon::None);
+
+    manager.pick_weapon(terrorist);
+    EXPECT_EQ(terrorist->get_player_info().bomb, Weapon::Bomb);
+}
+
+TEST_F(GameRulesTest, PlantedBombLastsBombTimeWithRealTicks) {
+    const double tick = 1000.0 / 30;
+    clock.advance(BUY_TIME);
+    for (int i = 0; i < 30; i++) {
+        clock.advance(tick);
+        manager.check_winning_cond(players);
+    }
+    manager.plant_bomb(50, 50);
+    int ticks = 0;
+    while (!manager.get_time_information().round_ended && ticks < 1000) {
+        clock.advance(tick);
+        manager.check_winning_cond(players);
+        ticks++;
+    }
+    EXPECT_NEAR(ticks * tick, BOMB_TIME, 2 * tick);
+}
+
+TEST_F(GameRulesTest, HoldingDefuseFinishesAfterDefuseTime) {
+    // El cliente manda un pedido de desactivar por frame mientras se mantiene F
+    const double tick = 1000.0 / 30;
+    auto& counter_terrorist = players[1];
+    clock.advance(BUY_TIME);
+    auto [x, y] = counter_terrorist->get_location();
+    manager.plant_bomb(x, y);
+    int ticks = 0;
+    while (!manager.get_time_information().round_ended && ticks < 300) {
+        manager.start_defusing(counter_terrorist);
+        clock.advance(tick);
+        manager.has_finished_defusing(*counter_terrorist);
+        manager.check_winning_cond(players);
+        ticks++;
+    }
+    const TimeInformation info = manager.get_time_information();
+    EXPECT_TRUE(info.round_ended);
+    EXPECT_EQ(info.round_winner, Team::CounterTerrorists);
+    EXPECT_NEAR(ticks * tick, 2500, 2 * tick);
+}
+
+TEST_F(GameRulesTest, HoldingClickPlantsAfterTimeToPlant) {
+    // Mantener el click con la bomba equipada manda un disparo por frame
+    const double tick = 1000.0 / 30;
+    auto terrorist = std::make_shared<Player>("planter", config, 42, 42, Team::Terrorists);
+    terrorist->equip_bomb(std::make_unique<BombEncapsulator>(config));
+    terrorist->switch_weapon(GunType::Bomb);
+    clock.advance(BUY_TIME);
+    int ticks = 0;
+    while (!manager.get_time_information().bomb_planted && ticks < 300) {
+        terrorist->shoot(Position(42, 42), static_cast<float>(clock.get_time()));
+        terrorist->update(manager);
+        clock.advance(tick);
+        ticks++;
+    }
+    EXPECT_TRUE(manager.get_time_information().bomb_planted);
+    EXPECT_NEAR(ticks * tick, 2500, 3 * tick);
 }

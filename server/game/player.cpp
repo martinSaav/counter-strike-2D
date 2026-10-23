@@ -220,7 +220,10 @@ void Player::switch_team() {
 
 void Player::shoot(const Position& pos, float time) {
     is_defusing = false;
-    is_planting = false;
+    if (equipped_weapon != GunType::Bomb) {
+        // Con la bomba equipada, seguir "disparando" (click mantenido) continua el plantado
+        is_planting = false;
+    }
     try {
         if (equipped_weapon == GunType::Primary) {
             primary_weapon->shoot_gun(pos, time);
