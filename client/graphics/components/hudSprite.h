@@ -60,5 +60,9 @@ public:
               bool isBuyStage);
 
     void drawWeaponDroped(Weapon weapon, int weaponX, int weaponY);
+
+    void drawHelp();
+
+    void drawTaskProgress(int progress, bool planting);
 };
 #endif

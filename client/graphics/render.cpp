@@ -189,6 +189,20 @@ void Render::renderFrame(std::optional<GameStateUpdate> message) {
     }
     lastHealth = currentHealth;
 
+    int taskProgress = myPlayer->get_task_progress();
+    if (taskProgress > 0 && myPlayer->get_status() == Status::Alive) {
+        bool planting = myPlayer->get_skin()[0] != 'C';
+        hud.drawTaskProgress(taskProgress, planting);
+    }
+
+    // La ayuda aparece sola en la primera compra; despues solo si la abren con H
+    if (!isBuyStage && !configuration.helpToggled) {
+        configuration.helpVisible = false;
+    }
+    if (configuration.helpVisible) {
+        hud.drawHelp();
+    }
+
     if (damageFlashTimer > 0) {
         SDL_Rect screen = {0, 0, configuration.widthWindow, configuration.heightWindow};
         sdlRenderer->SetDrawBlendMode(SDL_BLENDMODE_BLEND);
@@ -214,10 +228,15 @@ double Render::getAnglePlayer(int playerX, int playerY, int mousex, int mousey) 
 
 bool Render::pointInVision(int playerX, int playerY, float visionAngleDeg, int puntoX, int puntoY) {
     float fovDeg = configuration.visionCone;
-    float radius = 60.0f;
+    float radius = configuration.visionRadius();
+    // Lo que esta pegado al jugador se ve siempre, aunque quede fuera del cono
+    const float nearRadius = 6.0f;
     float dx = puntoX - playerX;
     float dy = puntoY - playerY;
     float distancia = std::sqrt(dx * dx + dy * dy);
+
+    if (distancia <= nearRadius)
+        return true;
 
     // Esta dentro del radio
     if (distancia > radius)

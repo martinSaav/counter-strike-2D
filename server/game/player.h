@@ -47,6 +47,7 @@ class Player {
     bool is_planting;
     bool is_defusing;
     float defuse_time;
+    int task_progress = 0;
     Team current_team;
     Status status;
     std::unique_ptr<Gun> knife;
@@ -133,6 +134,7 @@ public:
     // Tira al piso el arma equipada si es la primaria o la bomba (el cuchillo y la glock no se
     // pueden tirar) y equipa la secundaria.
     void drop_equipped_weapon(const GameManager& manager);
+    void update_task_progress(double time);
     [[nodiscard]] bool is_currently_defusing() const { return is_defusing; }
     void start_defusing() {
         is_defusing = true;

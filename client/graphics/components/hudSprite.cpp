@@ -1,5 +1,6 @@
 #include "hudSprite.h"
 
+#include <algorithm>
 #include <cmath>
 
 HudSprite::HudSprite(Renderer* sdlRenderer, Configuration& configuration, std::string& assetsPath):
@@ -28,6 +29,11 @@ HudSprite::HudSprite(Renderer* sdlRenderer, Configuration& configuration, std::s
     textures.loadTexture("awp_dropped", assetsPath + "/weapons/awp_d.bmp");
     textures.loadTexture("m3_dropped", assetsPath + "/weapons/m3_d.bmp");
     textures.loadTexture("bomb_dropped", assetsPath + "/weapons/bomb_d.bmp");
+
+    // Ayuda y carteles de plantar / desactivar (generados con tools/generate_hud_images.py)
+    textures.loadTexture("help", assetsPath + "/hud/help.png", false);
+    textures.loadTexture("planting", assetsPath + "/hud/planting.png", false);
+    textures.loadTexture("defusing", assetsPath + "/hud/defusing.png", false);
 
     // Color mod
     Texture& counterPost = textures.getTexture("counterTerroristPost");
@@ -371,4 +377,29 @@ void HudSprite::drawSounds(PlayerInfo& myPlayer) {
             return;
     }
     sounds.loadSong(music, 0, volume);
+}
+
+void HudSprite::drawHelp() {
+    SDL_Rect destRect = configuration.helpRect();
+    textureName = "help";
+    drawHud2(destRect, textureName);
+}
+
+void HudSprite::drawTaskProgress(int progress, bool planting) {
+    // Barra con el avance de la bomba que se esta plantando o desactivando
+    int barWidth = int(configuration.widthWindow * 0.3);
+    int barHeight = 18;
+    int barX = configuration.widthWindow / 2 - barWidth / 2;
+    int barY = int(configuration.heightWindow * 0.72);
+
+    textureName = planting ? "planting" : "defusing";
+    SDL_Rect labelRect = {configuration.widthWindow / 2 - 180, barY - 44, 360, 40};
+    drawHud2(labelRect, textureName);
+
+    sdlRenderer->SetDrawBlendMode(SDL_BLENDMODE_BLEND);
+    sdlRenderer->SetDrawColor(0, 0, 0, 180);
+    sdlRenderer->FillRect(SDL_Rect{barX, barY, barWidth, barHeight});
+    sdlRenderer->SetDrawColor(255, 165, 0, 230);
+    sdlRenderer->FillRect(
+            SDL_Rect{barX + 2, barY + 2, (barWidth - 4) * progress / 100, barHeight - 4});
 }

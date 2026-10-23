@@ -24,7 +24,8 @@ void Sender::send_status(const MatchStatusDTO& status) const {
                           player_dto.primary_weapon, player_dto.primary_weapon_ammo,
                           player_dto.secondary_weapon, player_dto.secondary_weapon_ammo,
                           player_dto.knife, player_dto.bomb, player_dto.current_weapon,
-                          player_dto.current_weapon_ammo);
+                          player_dto.current_weapon_ammo,
+                          static_cast<uint8_t>(player_dto.task_progress));
         players.push_back(player);
     }
     const GameStateUpdate state(

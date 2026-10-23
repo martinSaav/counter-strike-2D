@@ -1,5 +1,7 @@
 #include "chatClient.h"
 
+#include <cstdlib>
+#include <iostream>
 #include <memory>
 #include <thread>
 #include <utility>
@@ -58,8 +60,6 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& statistics) {
 
     InputServerHandler inputServerHandler(protocol, gameOver);
 
-    std::thread inputThread(&InputHandler::processEvents, &inputHandler);
-
     std::thread inputServer(&InputServerHandler::processEvents, &inputServerHandler);
 
 
@@ -67,9 +67,21 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& statistics) {
     const double FRAME_TIME = 1.0 / FPS;  // en segundos
     // Main loop
 
+    // Con CS2D_DEBUG_FRAMES definida se imprime cada 5 s el tiempo medio de frame y cuantos
+    // estados del servidor se juntaron por frame (si crece, el cliente no da abasto).
+    const bool debugFrames = std::getenv("CS2D_DEBUG_FRAMES") != nullptr;
+    double debugStart = getCurrentTime();
+    double debugFrameTime = 0;
+    int debugFrames_ = 0;
+    int debugStates = 0;
+
     std::optional<GameStateUpdate> message;
     while (!gameOver) {
         double current = getCurrentTime();
+
+        // La entrada se procesa en el hilo principal, que es el que creo la ventana.
+        bool isBuyStage = message && message->get_stage() == RoundStage::Buy;
+        inputHandler.processFrame(isBuyStage);
 
         render.clearScreen();
 
@@ -81,6 +93,7 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& statistics) {
         std::optional<GameStateUpdate> next;
         while ((next = inputServerHandler.getMessage())) {
             latest = std::move(next);
+            debugStates++;
         }
         if (latest) {
             message = std::move(latest);
@@ -89,6 +102,19 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& statistics) {
 
         // Sleep si el frame fue más rápido de lo esperado
         double frameTime = getCurrentTime() - current;
+        if (debugFrames) {
+            debugFrameTime += frameTime;
+            debugFrames_++;
+            if (getCurrentTime() - debugStart >= 5.0) {
+                std::cerr << "[frames] frame medio " << (debugFrameTime / debugFrames_) * 1000
+                          << " ms, estados por frame " << double(debugStates) / debugFrames_
+                          << "\n";
+                debugStart = getCurrentTime();
+                debugFrameTime = 0;
+                debugFrames_ = 0;
+                debugStates = 0;
+            }
+        }
         double delay = FRAME_TIME - frameTime;
 
         if (delay > 0) {
@@ -97,7 +123,6 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& statistics) {
     }
 
     protocol.kill();
-    inputThread.join();
     inputServer.join();
     SDL_Quit();
 

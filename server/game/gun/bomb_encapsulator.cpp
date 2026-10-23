@@ -41,3 +41,8 @@ bool BombEncapsulator::has_finished_planting(const float current_time) const {
 
 
 bool BombEncapsulator::is_planting() const { return bomb.is_currently_planting(); }
+
+
+float BombEncapsulator::get_planting_progress(const float current_time) const {
+    return bomb.get_planting_progress(current_time);
+}

@@ -64,7 +64,8 @@ PlayerDTO Player::get_player_info() {
                          bomb_info,
                          last_action,
                          current_weapon,
-                         current_weapon_ammo};
+                         current_weapon_ammo,
+                         task_progress};
     }
     return PlayerDTO{username,
                      position_x,
@@ -85,7 +86,8 @@ PlayerDTO Player::get_player_info() {
                      bomb_info,
                      last_action,
                      current_weapon,
-                     current_weapon_ammo};
+                     current_weapon_ammo,
+                     task_progress};
 }
 
 
@@ -258,6 +260,7 @@ Gun& Player::get_equipped_gun() const {
 
 
 void Player::update(GameManager& game_manager) {
+    task_progress = 0;
     if (status == Status::Dead) {
         return;
     }
@@ -296,6 +299,7 @@ void Player::update(GameManager& game_manager) {
         is_planting = false;
         bomb = nullptr;
     }
+    update_task_progress(time);
     if (is_defusing) {
         game_manager.has_finished_defusing(*this);
     }
@@ -365,5 +369,16 @@ void Player::drop_equipped_weapon(const GameManager& manager) {
         manager.drop_weapon(*this, std::move(primary_weapon));
         primary_weapon = nullptr;
         equipped_weapon = GunType::Secondary;
+    }
+}
+
+
+void Player::update_task_progress(const double time) {
+    if (is_planting && bomb != nullptr) {
+        task_progress =
+                static_cast<int>(bomb->get_planting_progress(static_cast<float>(time)) * 100);
+    } else if (is_defusing && game_config.defuse_time > 0) {
+        const double progress = (time - defuse_time) / game_config.defuse_time;
+        task_progress = static_cast<int>(std::clamp(progress, 0.0, 1.0) * 100);
     }
 }

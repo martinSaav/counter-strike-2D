@@ -268,21 +268,16 @@ void MapSprite::drawCampField(int angle, int playerX, int playerY) {
     // coregimos el anglo por la imagen
     angle -= 90;
 
-    // Dimensiones reales de la textura de campo de visión
-    int playerCenterX = playerX + int(30 / 8) / 2;
-    int playerCenterY = playerY + int(30 / 8) / 2;
+    // El sprite del jugador mide 32 / 8 = 4 tiles: el cono sale de su centro
+    int playerCenterX = playerX + 2;
+    int playerCenterY = playerY + 2;
 
     // Posición del jugador en la pantalla
     int playerScreenX = int((playerCenterX - configuration.camera.x) * configuration.zoom);
     int playerScreenY = int((playerCenterY - configuration.camera.y) * configuration.zoom);
 
-    if (configuration.heightWindow > 1000 || configuration.widthWindow > 1000) {
-        fieldWidth = 3700;
-        fieldHeight = 3700;
-    } else {
-        fieldWidth = 2300;
-        fieldHeight = 2300;
-    }
+    fieldWidth = configuration.visionFieldSize();
+    fieldHeight = configuration.visionFieldSize();
 
     SDL_Rect destRect = {playerScreenX - fieldWidth / 2, playerScreenY - fieldHeight / 2,
                          fieldWidth, fieldHeight};
@@ -293,10 +288,8 @@ void MapSprite::drawCampField(int angle, int playerX, int playerY) {
 }
 
 void MapSprite::drawShop() {
-    // Shop
-    int symbolX = (configuration.widthWindow * 0.5) - shopScreenWidth / 2;
-    int symbolY = configuration.heightWindow * 0.2;
-    SDL_Rect destRect = {symbolX, symbolY, shopScreenWidth, shopScreenHeight};
+    // Shop (se puede usar con el mouse: ver InputHandler::clickShop)
+    SDL_Rect destRect = configuration.shopRect();
     std::string textureName = "shop";
     drawHud2(destRect, textureName);
 }

@@ -2,7 +2,7 @@
 ct_amount: 5
 tt_amount: 5
 number_of_rounds: 10
-starting_money: 800
+starting_money: 2000
 player_health: 100
 defuse_time: 2500
 time_to_plant: 2500
