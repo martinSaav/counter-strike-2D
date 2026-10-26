@@ -1,5 +1,6 @@
 #include "mapSprite.h"
 
+#include <algorithm>
 #include <fstream>
 
 
@@ -15,10 +16,10 @@ MapSprite::MapSprite(Renderer* sdlRenderer, Configuration& configuration, std::s
     if (!std::ifstream(themePath + "/floor.png").good()) {
         themePath = assetsPath + "/maps/desert";
     }
-    textures.loadTexture("map", themePath + "/floor.png");
+    textures.loadTexture("map", themePath + "/floor.png", false);
 
     // map obstacles
-    textures.loadTexture("mapObstacles", themePath + "/wall.png");
+    textures.loadTexture("mapObstacles", themePath + "/wall.png", false);
 
     // map sites
     textures.loadTexture("bspot_a", assetsPath + "/maps/bspot_a.png");
@@ -53,15 +54,41 @@ MapSprite::MapSprite(Renderer* sdlRenderer, Configuration& configuration, std::s
     terroristWins.SetColorMod(255, 165, 0);
 }
 
+void MapSprite::drawTiled(Texture& texture, float areaX, float areaY, float areaWidth,
+                          float areaHeight) {
+    // Repite la textura sobre el area (en tiles del mapa) a escala fija: TEXTURE_PX_PER_TILE
+    // pixeles de textura por tile, asi un tile de 32 px del CS2D ocupa lo mismo que un jugador.
+    // Solo se dibujan los bloques que entran en la camara, recortando los del borde del area.
+    const float blockWidth = static_cast<float>(texture.GetWidth()) / TEXTURE_PX_PER_TILE;
+    const float blockHeight = static_cast<float>(texture.GetHeight()) / TEXTURE_PX_PER_TILE;
+    const SDL_Rect& camera = configuration.camera;
+    const float zoom = configuration.zoom;
+    const float viewRight = camera.x + configuration.widthWindow / zoom;
+    const float viewBottom = camera.y + configuration.heightWindow / zoom;
+
+    for (float by = areaY; by < areaY + areaHeight && by < viewBottom; by += blockHeight) {
+        const float h = std::min(blockHeight, areaY + areaHeight - by);
+        if (by + h < camera.y) {
+            continue;
+        }
+        for (float bx = areaX; bx < areaX + areaWidth && bx < viewRight; bx += blockWidth) {
+            const float w = std::min(blockWidth, areaX + areaWidth - bx);
+            if (bx + w < camera.x) {
+                continue;
+            }
+            SDL_Rect src = {0, 0, int(w * TEXTURE_PX_PER_TILE), int(h * TEXTURE_PX_PER_TILE)};
+            // El +1 evita que queden lineas entre bloques por el redondeo
+            SDL_Rect dest = {int((bx - camera.x) * zoom), int((by - camera.y) * zoom),
+                             int(w * zoom) + 1, int(h * zoom) + 1};
+            sdlRenderer->Copy(texture, src, dest);
+        }
+    }
+}
+
 void MapSprite::draw() {
-    std::string textureName = "map";
-    int camWidth = configuration.widthWindow / configuration.zoom;
-    int camHeight = configuration.heightWindow / configuration.zoom;
-
-    SDL_Rect srcRect = {configuration.camera.x, configuration.camera.y, camWidth, camHeight};
-
-    SDL_Rect destRect = {0, 0, configuration.widthWindow, configuration.heightWindow};
-    drawHud(srcRect, destRect, textureName);
+    // Piso del terreno en mosaico sobre todo el mapa
+    drawTiled(textures.getTexture("map"), 0, 0, mapConfig.get_map_width(),
+              mapConfig.get_map_height());
 
     // Draw bombSite
     drawBombsite();
@@ -75,21 +102,11 @@ void MapSprite::draw() {
 }
 
 void MapSprite::drawObstacles() {
-    std::string textureName = "mapObstacles";
-    SDL_Rect srcRect = {0, 0, 32, 32};
-    SDL_Rect destRect;
-    auto obstacles = mapConfig.get_structures();
-
-    for (auto obstacle: obstacles) {
-        int posX = obstacle.get_x() + 1;
-        int posY = obstacle.get_y();
-        int height = obstacle.get_height();
-        int width = obstacle.get_width();
-
-        destRect = {int((posX - configuration.camera.x) * configuration.zoom),
-                    int((posY - configuration.camera.y) * configuration.zoom),
-                    int(width * configuration.zoom), int(height * configuration.zoom)};
-        drawHud(srcRect, destRect, textureName);
+    // Estructuras solidas: el tile de pared del terreno en mosaico
+    Texture& wall = textures.getTexture("mapObstacles");
+    for (const auto& obstacle: mapConfig.get_structures()) {
+        drawTiled(wall, obstacle.get_x() + 1, obstacle.get_y(), obstacle.get_width(),
+                  obstacle.get_height());
     }
 }
 
@@ -124,19 +141,10 @@ void MapSprite::drawSite(const SiteInfo& site, const std::string& nameSite) {
     drawHud2(destRect, textureName);
 }
 
-int MapSprite::getWidth() {
-    Texture& map = textures.getTexture("map");
-    int worldWidth = map.GetWidth();
+// Tamano del mundo en tiles (lo usa la camara para no salirse del mapa)
+int MapSprite::getWidth() { return mapConfig.get_map_width(); }
 
-    return worldWidth;
-}
-
-int MapSprite::getHeight() {
-    Texture& map = textures.getTexture("map");
-    int worldHeight = map.GetHeight();
-
-    return worldHeight;
-}
+int MapSprite::getHeight() { return mapConfig.get_map_height(); }
 
 void MapSprite::drawEndRound(const Team& team_winer, bool is_bomb_planted) {
     std::string textureName;

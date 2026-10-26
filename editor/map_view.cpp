@@ -77,16 +77,10 @@ void MapView::rebuild() {
 void MapView::loadTextures() {
     // Mismas texturas que usa el juego para cada terreno
     const QString mapsDir = QString::fromStdString(assetsPath + "/maps/" + document.theme);
+    // Las texturas son mosaicos de tiles de 32 px que ocupan 4x4 tiles del mapa, igual que en el
+    // juego: con TILE_PX = 8 se usan sin escalar
     floorTexture = QPixmap(mapsDir + "/floor.png");
     wallTexture = QPixmap(mapsDir + "/wall.png");
-    if (!floorTexture.isNull()) {
-        floorTexture =
-                floorTexture.scaled(floorTexture.width() * TILE_PX, floorTexture.height() * TILE_PX,
-                                    Qt::IgnoreAspectRatio, Qt::FastTransformation);
-    }
-    if (!wallTexture.isNull()) {
-        wallTexture = wallTexture.scaled(4 * TILE_PX, 4 * TILE_PX);
-    }
     const std::map<std::string, std::string> files = {
             {"ak-47", "ak47_d.bmp"}, {"m3", "m3_d.bmp"}, {"awp", "awp_d.bmp"}};
     weaponPixmaps.clear();
@@ -466,7 +460,10 @@ void MapView::drawBackground(QPainter* painter, const QRectF& rect) {
     for (const auto& structure: document.structures) {
         const QRectF r = toScene(structure);
         if (!wallTexture.isNull()) {
+            // El mosaico arranca en la esquina de cada estructura, como en el juego
+            painter->setBrushOrigin(r.topLeft());
             painter->fillRect(r, QBrush(wallTexture));
+            painter->setBrushOrigin(0, 0);
         } else {
             painter->fillRect(r, QColor(120, 90, 60));
         }

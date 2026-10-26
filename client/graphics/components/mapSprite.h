@@ -46,6 +46,11 @@ private:
 
     const MapConfigInfo& mapConfig;
 
+    // Pixeles de textura por tile del mapa: un tile de 32 px del CS2D ocupa 4x4 tiles
+    static constexpr int TEXTURE_PX_PER_TILE = 8;
+
+    void drawTiled(Texture& texture, float areaX, float areaY, float areaWidth, float areaHeight);
+
 public:
     MapSprite(Renderer* sdlRenderer, Configuration& configuration, std::string& assetsPath);
 
