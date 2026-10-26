@@ -22,7 +22,7 @@ MusicManager::MusicManager(const std::string& assetsPath) {
             {MusicType::SHOT_AK47, {"ak47.wav"}},
             {MusicType::SHOT_AWP, {"awp.wav"}},
             {MusicType::SHOT_M3, {"m3.wav"}},
-            {MusicType::KNIFE, {"knife_slash.wav"}},
+            {MusicType::KNIFE, {"knife.wav"}},
             {MusicType::EXPLOIT, {"c4_explode.wav"}},
             {MusicType::PISTOLRELOAD, {"reload.wav"}},
             {MusicType::RIFLERELOAD, {"reload.wav"}},

@@ -82,7 +82,8 @@ void PlayerSprite::playShotSound(const PlayerInfo& player, float distance) {
         weaponPlayer == Weapon::None) {
         return;
     }
-    int volume = weaponPlayer == Weapon::Knife ? 90 : 64;
+    // El cuchillo es un "swish" mucho mas suave que un disparo: va al maximo
+    int volume = weaponPlayer == Weapon::Knife ? MIX_MAX_VOLUME : 64;
     playSound(castShoot(weaponPlayer), volume, distance);
 }
 

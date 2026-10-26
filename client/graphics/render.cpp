@@ -143,7 +143,7 @@ void Render::renderFrame(std::optional<GameStateUpdate> message) {
         auto lastPosition = lastPositions.find(name);
         if (lastPosition != lastPositions.end() && lastPosition->second != position &&
             currentHealth > 0 && now - lastStepTicks[name] > 350) {
-            player.playSound(STEP, 40, distanceToMe);
+            player.playSound(STEP, 110, distanceToMe);
             lastStepTicks[name] = now;
         }
         lastPositions[name] = position;
