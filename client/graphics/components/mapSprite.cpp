@@ -94,20 +94,15 @@ void MapSprite::drawObstacles() {
 }
 
 void MapSprite::drawBombsite() {
+    // Una cruz por cada zona donde se puede plantar la bomba
     std::string textureName = "cross";
-    SDL_Rect srcRect = {192, 32, 32, 32};
-    auto bombsite = mapConfig.get_bombsite();
-
-    int bomb_site_height = bombsite.get_height();
-    int bomb_site_width = bombsite.get_width();
-    int posX = bombsite.get_x();
-    int posY = bombsite.get_y();
-
-    SDL_Rect destRect = {int((posX - configuration.camera.x) * configuration.zoom),
-                         int((posY - configuration.camera.y) * configuration.zoom),
-                         int(bomb_site_width * configuration.zoom),
-                         int(bomb_site_height * configuration.zoom)};
-    drawHud2(destRect, textureName);
+    for (const auto& bombsite: mapConfig.get_bombsites()) {
+        SDL_Rect destRect = {int((bombsite.get_x() - configuration.camera.x) * configuration.zoom),
+                             int((bombsite.get_y() - configuration.camera.y) * configuration.zoom),
+                             int(bombsite.get_width() * configuration.zoom),
+                             int(bombsite.get_height() * configuration.zoom)};
+        drawHud2(destRect, textureName);
+    }
 }
 
 void MapSprite::drawSite(const SiteInfo& site, const std::string& nameSite) {

@@ -25,7 +25,7 @@ GameConfig make_game_config() {
                          100,
                          100,
                          {},
-                         BombSite{10, 10, 40, 40},
+                         {BombSite{10, 10, 40, 40}},
                          Site{80, 80, 10, 10, {{82, 82}}},
                          Site{0, 0, 10, 10, {{2, 2}}},
                          {}};

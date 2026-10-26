@@ -4,6 +4,8 @@
 
 #include "configuration_loader.h"
 
+#include <filesystem>
+
 #include <yaml-cpp/yaml.h>
 
 #include "weapon_translator.h"
@@ -160,28 +162,30 @@ MapConfig ConfigurationLoader::get_map_config(YAML::Node& map_config) {
         Structure structure_v(height, width, Position{x, y});
         structures_v.push_back(structure_v);
     }
-    YAML::Node bomb_site = map_config["bomb_site"];
     YAML::Node tt_site = map_config["tt_site"];
     YAML::Node ct_site = map_config["ct_site"];
     YAML::Node dropped_weapons_cfg = map_config["weapon_drops"];
-    int bomb_site_x = bomb_site["x"].as<int>();
-    int bomb_site_y = bomb_site["y"].as<int>();
-    int bomb_site_height = bomb_site["height"].as<int>();
-    int bomb_site_width = bomb_site["width"].as<int>();
-    BombSite bombsite(bomb_site_height, bomb_site_width, bomb_site_x, bomb_site_y);
+    // "bomb_sites" es la lista de zonas para plantar; se acepta tambien una sola "bomb_site"
+    std::vector<BombSite> bomb_sites;
+    auto add_bomb_site = [&bomb_sites](const YAML::Node& site) {
+        bomb_sites.emplace_back(site["height"].as<int>(), site["width"].as<int>(),
+                                site["x"].as<int>(), site["y"].as<int>());
+    };
+    if (YAML::Node sites = map_config["bomb_sites"]) {
+        for (const auto& site: sites) {
+            add_bomb_site(site);
+        }
+    } else {
+        add_bomb_site(map_config["bomb_site"]);
+    }
     Site tt = get_site_config(tt_site);
     Site ct = get_site_config(ct_site);
     auto dropped_weapons = get_dropped_weapons(dropped_weapons_cfg);
     std::string theme = map_config["theme"] ? map_config["theme"].as<std::string>() : "desert";
-    return MapConfig{std::move(map_name),
-                     map_width,
-                     map_height,
-                     structures_v,
-                     bombsite,
-                     std::move(ct),
-                     std::move(tt),
-                     std::move(dropped_weapons),
-                     std::move(theme)};
+    return MapConfig{
+            std::move(map_name),   map_width,     map_height,    structures_v,
+            std::move(bomb_sites), std::move(ct), std::move(tt), std::move(dropped_weapons),
+            std::move(theme)};
 }
 
 
@@ -221,8 +225,17 @@ GameConfig ConfigurationLoader::load_configuration() const {
     // formato viejo con un unico "map_config".
     std::vector<MapConfig> maps;
     if (YAML::Node maps_config = config["maps"]) {
+        // Cada entrada es la ruta a un archivo de mapa (relativa a este archivo de configuracion)
+        // o el mapa escrito directamente en la lista
+        const std::filesystem::path config_dir = std::filesystem::path(filename).parent_path();
         for (auto map_node: maps_config) {
-            maps.push_back(get_map_config(map_node));
+            if (map_node.IsScalar()) {
+                YAML::Node map_file =
+                        YAML::LoadFile((config_dir / map_node.as<std::string>()).string());
+                maps.push_back(get_map_config(map_file));
+            } else {
+                maps.push_back(get_map_config(map_node));
+            }
         }
     } else {
         YAML::Node map_config = config["map_config"];

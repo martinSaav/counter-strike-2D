@@ -1,0 +1,45 @@
+# Mapa "entrenamiento". Se puede abrir y editar con el editor de niveles (taller_editor).
+map_name: entrenamiento
+theme: training
+map_width: 110
+map_height: 110
+structures:
+- {x: 51, y: 51, width: 8, height: 8}
+- {x: 35, y: 35, width: 8, height: 8}
+- {x: 67, y: 35, width: 8, height: 8}
+- {x: 35, y: 67, width: 8, height: 8}
+- {x: 67, y: 67, width: 8, height: 8}
+- {x: 45, y: 30, width: 20, height: 4}
+- {x: 45, y: 80, width: 20, height: 4}
+- {x: 20, y: 20, width: 6, height: 6}
+- {x: 84, y: 20, width: 6, height: 6}
+- {x: 20, y: 84, width: 6, height: 6}
+- {x: 84, y: 84, width: 6, height: 6}
+bomb_sites:
+- {x: 42, y: 4, height: 22, width: 26}
+tt_site:
+  x: 4
+  y: 40
+  width: 24
+  height: 30
+  spawns:
+  - {x: 6, y: 44}
+  - {x: 18, y: 44}
+  - {x: 6, y: 56}
+  - {x: 18, y: 56}
+  - {x: 12, y: 64}
+ct_site:
+  x: 82
+  y: 40
+  width: 24
+  height: 30
+  spawns:
+  - {x: 84, y: 44}
+  - {x: 96, y: 44}
+  - {x: 84, y: 56}
+  - {x: 96, y: 56}
+  - {x: 90, y: 64}
+weapon_drops:
+- {name: m3, x: 55, y: 95}
+- {name: ak-47, x: 12, y: 95}
+- {name: awp, x: 95, y: 95}

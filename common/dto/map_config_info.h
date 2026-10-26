@@ -20,7 +20,7 @@ private:
     int32_t map_width;
     int32_t map_height;
     std::vector<StructureInfo> structures;
-    BombSiteInfo bombsite;
+    std::vector<BombSiteInfo> bombsites;
     SiteInfo ct_site;
     SiteInfo tt_site;
     // Estilo visual del mapa (carpeta de texturas en el cliente)
@@ -28,13 +28,13 @@ private:
 
 public:
     MapConfigInfo(std::string map_name, int32_t map_width, int32_t map_height,
-                  std::vector<StructureInfo> structures, BombSiteInfo bombsite, SiteInfo ct_site,
-                  SiteInfo tt_site, std::string theme = "desert"):
+                  std::vector<StructureInfo> structures, std::vector<BombSiteInfo> bombsites,
+                  SiteInfo ct_site, SiteInfo tt_site, std::string theme = "desert"):
             map_name(std::move(map_name)),
             map_width(map_width),
             map_height(map_height),
             structures(std::move(structures)),
-            bombsite(std::move(bombsite)),
+            bombsites(std::move(bombsites)),
             ct_site(std::move(ct_site)),
             tt_site(std::move(tt_site)),
             theme(std::move(theme)) {}
@@ -66,8 +66,13 @@ public:
             offset += s.serialized_size();
         }
 
-        bombsite.serialize(buffer + offset);
-        offset += bombsite.serialized_size();
+        int32_t bombsite_count = htonl(static_cast<int32_t>(bombsites.size()));
+        std::memcpy(buffer + offset, &bombsite_count, sizeof(bombsite_count));
+        offset += sizeof(bombsite_count);
+        for (const auto& bombsite: bombsites) {
+            bombsite.serialize(buffer + offset);
+            offset += bombsite.serialized_size();
+        }
 
         ct_site.serialize(buffer + offset);
         offset += ct_site.serialized_size();
@@ -118,8 +123,15 @@ public:
             offset += structures.back().serialized_size();
         }
 
-        BombSiteInfo bombsite = BombSiteInfo::deserialize(buffer + offset, size - offset);
-        offset += bombsite.serialized_size();
+        int32_t bombsite_count;
+        std::memcpy(&bombsite_count, buffer + offset, sizeof(bombsite_count));
+        bombsite_count = ntohl(bombsite_count);
+        offset += sizeof(bombsite_count);
+        std::vector<BombSiteInfo> bombsites;
+        for (int32_t i = 0; i < bombsite_count; ++i) {
+            bombsites.push_back(BombSiteInfo::deserialize(buffer + offset, size - offset));
+            offset += bombsites.back().serialized_size();
+        }
 
         SiteInfo ct_site = SiteInfo::deserialize(buffer + offset, size - offset);
         offset += ct_site.serialized_size();
@@ -134,7 +146,7 @@ public:
         std::string theme(reinterpret_cast<const char*>(buffer + offset), theme_len);
 
         return MapConfigInfo(std::move(map_name), map_width, map_height, std::move(structures),
-                             std::move(bombsite), std::move(ct_site), std::move(tt_site),
+                             std::move(bombsites), std::move(ct_site), std::move(tt_site),
                              std::move(theme));
     }
 
@@ -145,7 +157,10 @@ public:
                                  [](size_t acc, const auto& structure) {
                                      return acc + structure.serialized_size();
                                  });
-        total += bombsite.serialized_size();
+        total += sizeof(int32_t);  // cantidad de zonas de bomba
+        total += std::accumulate(
+                bombsites.begin(), bombsites.end(), size_t(0),
+                [](size_t acc, const auto& site) { return acc + site.serialized_size(); });
         total += ct_site.serialized_size();
         total += tt_site.serialized_size();
         total += sizeof(uint16_t) + theme.size();  // theme length + theme
@@ -160,7 +175,7 @@ public:
 
     const std::vector<StructureInfo>& get_structures() const { return structures; }
 
-    const BombSiteInfo& get_bombsite() const { return bombsite; }
+    const std::vector<BombSiteInfo>& get_bombsites() const { return bombsites; }
 
     const SiteInfo& get_ct_site() const { return ct_site; }
 

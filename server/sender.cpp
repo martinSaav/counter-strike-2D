@@ -39,7 +39,10 @@ void Sender::send_status(const MatchStatusDTO& status) const {
 void Sender::send_game_config() const {
     std::vector<StructureInfo> structures_info;
     const MapConfig& map_cfg = config.map_config;
-    const BombSite& bomb_site_cfg = map_cfg.bombsite;
+    std::vector<BombSiteInfo> bomb_sites_info;
+    for (const auto& site: map_cfg.bomb_sites) {
+        bomb_sites_info.emplace_back(site.bomb_site_height, site.bomb_site_width, site.x, site.y);
+    }
     const Site& ct_site = map_cfg.ct_site;
     const Site& tt_site = map_cfg.tt_site;
     for (auto& structure: map_cfg.structures) {
@@ -56,16 +59,14 @@ void Sender::send_game_config() const {
     for (const auto& [x, y]: tt_site.spawns) {
         tt_spawns.emplace_back(x, y);
     }
-    MapConfigInfo map_config(
-            config.map_config.map_name, config.map_config.map_width, config.map_config.map_height,
-            std::move(structures_info),
-            BombSiteInfo{bomb_site_cfg.bomb_site_height, bomb_site_cfg.bomb_site_width,
-                         bomb_site_cfg.x, bomb_site_cfg.y},
-            SiteInfo{ct_site.x, ct_site.y, ct_site.site_width, ct_site.site_height,
-                     std::move(ct_spawns)},
-            SiteInfo{tt_site.x, tt_site.y, tt_site.site_width, tt_site.site_height,
-                     std::move(tt_spawns)},
-            map_cfg.theme);
+    MapConfigInfo map_config(config.map_config.map_name, config.map_config.map_width,
+                             config.map_config.map_height, std::move(structures_info),
+                             std::move(bomb_sites_info),
+                             SiteInfo{ct_site.x, ct_site.y, ct_site.site_width, ct_site.site_height,
+                                      std::move(ct_spawns)},
+                             SiteInfo{tt_site.x, tt_site.y, tt_site.site_width, tt_site.site_height,
+                                      std::move(tt_spawns)},
+                             map_cfg.theme);
     GameConfigInfo game_cfg_message(
             config.player_health, config.number_of_rounds, config.starting_money, config.ct_amount,
             config.tt_amount, config.ammo_price, config.knife_config.get_info(),
