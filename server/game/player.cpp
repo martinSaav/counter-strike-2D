@@ -271,13 +271,18 @@ void Player::update(GameManager& game_manager) {
     Map& map = game_manager.get_map();
     const double time = game_manager.get_time();
     Position pos(this->position_x, this->position_y);
-    if (Gun& gun_to_shoot = get_equipped_gun(); gun_to_shoot.has_to_shoot(time)) {
-        if (gun_to_shoot.get_gun_type() == GunType::Bomb) {
-            if (game_manager.can_plant_bomb(position_x, position_y)) {
-                gun_to_shoot.fire_gun(map, *this, time, pos);
-                last_action = Action::PlantBomb;
-            }
+    Gun& gun_to_shoot = get_equipped_gun();
+    if (gun_to_shoot.get_gun_type() == GunType::Bomb && gun_to_shoot.has_to_shoot(time)) {
+        // Con la bomba, "disparar" es plantar y solo vale dentro de una zona de bomba. Antes se
+        // seguia de largo al disparo comun, que tambien llamaba a fire_gun y plantaba en cualquier
+        // lugar del mapa.
+        if (game_manager.can_plant_bomb(position_x, position_y)) {
+            gun_to_shoot.fire_gun(map, *this, time, pos);
+            last_action = Action::PlantBomb;
+        } else {
+            gun_to_shoot.reset_shoots();
         }
+    } else if (gun_to_shoot.has_to_shoot(time)) {
         const ShootInfo shoots = gun_to_shoot.fire_gun(map, *this, time, pos);
         int x = 0;
         int y = 0;

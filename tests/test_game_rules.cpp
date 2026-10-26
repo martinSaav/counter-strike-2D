@@ -200,3 +200,19 @@ TEST_F(GameRulesTest, HoldingClickPlantsAfterTimeToPlant) {
     EXPECT_TRUE(manager.get_time_information().bomb_planted);
     EXPECT_NEAR(ticks * tick, 2500, 3 * tick);
 }
+
+TEST_F(GameRulesTest, CannotPlantOutsideABombSite) {
+    // La zona de bomba del mapa de prueba va de (40, 40) a (50, 50)
+    const double tick = 1000.0 / 30;
+    auto terrorist = std::make_shared<Player>("planter", config, 10, 10, Team::Terrorists);
+    terrorist->equip_bomb(std::make_unique<BombEncapsulator>(config));
+    terrorist->switch_weapon(GunType::Bomb);
+    clock.advance(BUY_TIME);
+    for (int i = 0; i < 150; i++) {
+        terrorist->shoot(Position(10, 10), static_cast<float>(clock.get_time()));
+        terrorist->update(manager);
+        clock.advance(tick);
+    }
+    EXPECT_FALSE(manager.get_time_information().bomb_planted);
+    EXPECT_EQ(terrorist->get_player_info().bomb, Weapon::Bomb);
+}
