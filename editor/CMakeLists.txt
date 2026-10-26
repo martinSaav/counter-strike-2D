@@ -9,4 +9,9 @@ target_link_libraries(editor_model PUBLIC yaml-cpp)
 target_sources(taller_editor
     PRIVATE
         main.cpp
+        editor_window.cpp
+        map_view.cpp
+    PUBLIC
+        editor_window.h
+        map_view.h
 )
