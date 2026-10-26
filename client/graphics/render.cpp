@@ -131,6 +131,8 @@ void Render::renderFrame(std::optional<GameStateUpdate> message) {
             bloodStains.push_back({playerInfo.get_pos_x(), playerInfo.get_pos_y()});
             if (currentHealth == 0) {
                 player.playSound(DEATH, 110, distanceToMe);
+            } else {
+                player.playSound(HIT, 90, distanceToMe);
             }
         }
 
@@ -220,6 +222,8 @@ void Render::renderFrame(std::optional<GameStateUpdate> message) {
     }
     lastTaskProgress = taskProgress;
 
+    playStateSounds(*message, *myPlayer, isBuyStage);
+
     // La ayuda aparece sola en la primera compra; despues solo si la abren con H
     if (!isBuyStage && !configuration.helpToggled) {
         configuration.helpVisible = false;
@@ -298,4 +302,54 @@ float Render::normalizeAngle(float angle) {
 void Render::clearScreen() {
     sdlRenderer->SetDrawColor(0, 0, 0, 255);
     sdlRenderer->Clear();
+}
+
+void Render::playStateSounds(const GameStateUpdate& message, const PlayerInfo& me,
+                             bool isBuyStage) {
+    const Uint32 now = SDL_GetTicks();
+
+    // Bomba plantada: un pitido que se acelera en los ultimos 10 segundos, mas fuerte cuanto
+    // mas cerca este la bomba
+    if (message.is_bomb_planted() && !message.is_round_ended()) {
+        const float timeLeft = message.get_time_left();
+        const Uint32 interval = static_cast<Uint32>(std::clamp(timeLeft * 100.0f, 150.0f, 1000.0f));
+        if (now - lastBombBeep >= interval) {
+            const float dx = message.get_bomb_x() - me.get_pos_x();
+            const float dy = message.get_bomb_y() - me.get_pos_y();
+            player.playSound(C4_BEEP, 100, std::sqrt(dx * dx + dy * dy));
+            lastBombBeep = now;
+        }
+    }
+
+    const bool alive = me.get_status() == Status::Alive;
+
+    // Gatillo sin balas: el servidor no dispara, asi que el aviso lo da el cliente
+    const Weapon active = me.get_active_weapon();
+    const bool isGun = active == Weapon::Glock || active == Weapon::AK47 || active == Weapon::M3 ||
+                       active == Weapon::AWP;
+    const bool clicking = SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON(SDL_BUTTON_LEFT);
+    if (alive && !isBuyStage && clicking && isGun && me.get_active_weapon_ammo() == 0 &&
+        now - lastEmptyClick > 350) {
+        player.playSound(EMPTY_CLICK, 80, 0);
+        lastEmptyClick = now;
+    }
+
+    // Levantar (E) o tirar (G) la principal o la bomba. Comprar tiene su propio sonido, y al
+    // morir o plantar tambien se pierden armas sin que sea "tirarlas".
+    const Weapon primary = me.get_primary_weapon();
+    const bool hasBomb = me.get_bomb() == Weapon::Bomb;
+    if (alive && wasAlive && me.get_action() != Action::BuyingWeapon) {
+        const bool gotWeapon =
+                (primary != lastPrimary && primary != Weapon::None) || (hasBomb && !lastHadBomb);
+        const bool lostWeapon = (primary == Weapon::None && lastPrimary != Weapon::None) ||
+                                (!hasBomb && lastHadBomb && !message.is_bomb_planted());
+        if (gotWeapon) {
+            player.playSound(PICKUP, 90, 0);
+        } else if (lostWeapon) {
+            player.playSound(DROP, 90, 0);
+        }
+    }
+    lastPrimary = primary;
+    lastHadBomb = hasBomb;
+    wasAlive = alive;
 }

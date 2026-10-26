@@ -8,7 +8,6 @@ MapSprite::MapSprite(Renderer* sdlRenderer, Configuration& configuration, std::s
         Component(sdlRenderer, configuration, assetsPath),
         fieldWidth(0),
         fieldHeight(0),
-        bombChannel(0),
         mapConfig(configuration.gameConfig->get_map_config()) {
 
     // map: piso y estructuras segun el tema del mapa (si falta la carpeta, el del desierto)
@@ -189,17 +188,12 @@ void MapSprite::activateBomb() {
     MusicType music = BOMBHASBEENPLANTED;
 
     sounds.loadSong(music);
-
-    music = TIMER;
-    // Dura 2 segundos
-    int times = 48;
-    bombChannel = sounds.loadSong(music, times);
+    // El pitido de la bomba lo reproduce Render (se acelera al final y depende de la distancia)
 }
 
 void MapSprite::desactivateBomb() {
     this->is_bomb_activated = false;
     this->is_finish_sound_round = false;
-    sounds.stopSongs(bombChannel);
 }
 
 void MapSprite::exploitBomb() {

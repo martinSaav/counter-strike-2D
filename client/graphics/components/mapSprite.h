@@ -36,8 +36,6 @@ private:
     int shake_magnitude = 4;      // magnitud del efecto
 
 
-    int bombChannel;
-
     SDL_Rect destRectMap = {0, 0, 1000, 1000};
 
     bool is_bomb_activated = false;

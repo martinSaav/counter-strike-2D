@@ -1,6 +1,7 @@
 #include "musicManager.h"
 
 #include <algorithm>
+#include <cstdlib>
 #include <utility>
 #include <vector>
 
@@ -10,81 +11,43 @@ MusicManager::MusicManager(const std::string& assetsPath) {
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2,
                   2048);  //(frecuencia, formato, número de canales, tam de buffer)
 
-    // En el constructor:
-    std::string pistolLocation = assetsPath + "/sounds/pistolShot.wav";
-    std::string ak47Location = assetsPath + "/sounds/ak47.wav";
-    std::string knifeLocation = assetsPath + "/sounds/knife.wav";
-    // std::string ubicacionStep = assetsPath + "/sounds/step.wav";
-    std::string timerLocation = assetsPath + "/sounds/timer.wav";
-    std::string ambienceGameLocation = assetsPath + "/sounds/ambienceGame.mp3";
-    std::string exploitLocation = assetsPath + "/sounds/explosion.mp3";
-    std::string reloadLocation = assetsPath + "/sounds/pistolReload.mp3";
-    std::string reload2Location = assetsPath + "/sounds/rifleReload.mp3";
-    std::string buyLocation = assetsPath + "/sounds/buy.mp3";
-    std::string itemEquipLocation = assetsPath + "/sounds/itemEquip.mp3";
-    std::string awpLocation = assetsPath + "/sounds/awp.wav";
-    std::string m3Location = assetsPath + "/sounds/m3.wav";
+    // Musica de fondo
+    const std::string ambienceGameLocation = assetsPath + "/sounds/ambienceGame.mp3";
+    musicFiles[MusicType::AMBIENCE] = Mix_LoadMUS(ambienceGameLocation.c_str());
 
-    std::string bombHasBeenDefusedLocation =
-            assetsPath + "/sounds/BombHasBeenDefusedCounterTerroristsWin.mp3";
-    std::string bombHasBeenPlantedLocation = assetsPath + "/sounds/BombHasBeenPlanted.mp3";
-    std::string counterTerroristWinLocation = assetsPath + "/sounds/CounterTerroristWin.mp3";
-    std::string terroristWinLocation = assetsPath + "/sounds/TerroristsWin.mp3";
-    std::string plantingBombLocation = assetsPath + "/sounds/PlantingC4Bomb.mp3";
-    std::string deathLocation = assetsPath + "/sounds/death.wav";
-    std::string stepLocation = assetsPath + "/sounds/step_short.wav";
-    std::string defusingLocation = assetsPath + "/sounds/c4_disarm.wav";
+    // Sonidos cortos. Algunos tienen varias variantes (muerte, dano, pasos) y se elige una al
+    // azar cada vez, como en el CS2D original.
+    const std::vector<std::pair<MusicType, std::vector<std::string>>> shortSounds = {
+            {MusicType::SHOT_PISTOL, {"glock18.wav"}},
+            {MusicType::SHOT_AK47, {"ak47.wav"}},
+            {MusicType::SHOT_AWP, {"awp.wav"}},
+            {MusicType::SHOT_M3, {"m3.wav"}},
+            {MusicType::KNIFE, {"knife_slash.wav"}},
+            {MusicType::EXPLOIT, {"c4_explode.wav"}},
+            {MusicType::PISTOLRELOAD, {"reload.wav"}},
+            {MusicType::RIFLERELOAD, {"reload.wav"}},
+            {MusicType::BUY, {"buy.mp3"}},
+            {MusicType::ITEMEQUIP, {"itemEquip.mp3"}},
+            {MusicType::BOMBHASBEENDEFUSED, {"BombHasBeenDefusedCounterTerroristsWin.mp3"}},
+            {MusicType::BOMBHASBEENPLANTED, {"BombHasBeenPlanted.mp3"}},
+            {MusicType::COUNTERTERRORISTWIN, {"CounterTerroristWin.mp3"}},
+            {MusicType::TERRORISTWIN, {"TerroristsWin.mp3"}},
+            {MusicType::PLANTINGBOMB, {"PlantingC4Bomb.mp3"}},
+            {MusicType::DEATH, {"die1.wav", "die2.wav", "die3.wav"}},
+            {MusicType::HIT, {"hit1.wav", "hit2.wav", "hit3.wav"}},
+            {MusicType::STEP, {"pl_step1.wav", "pl_step2.wav", "pl_step3.wav", "pl_step4.wav"}},
+            {MusicType::DEFUSING, {"c4_disarm.wav"}},
+            {MusicType::C4_BEEP, {"c4.wav"}},
+            {MusicType::EMPTY_CLICK, {"click.wav"}},
+            {MusicType::PICKUP, {"pickup.wav"}},
+            {MusicType::DROP, {"drop.wav"}}};
 
-    locationFiles[MusicType::SHOT_PISTOL] = pistolLocation;
-    locationFiles[MusicType::SHOT_AK47] = ak47Location;
-    locationFiles[MusicType::KNIFE] = knifeLocation;
-    locationFiles[MusicType::TIMER] = timerLocation;
-    locationFiles[MusicType::EXPLOIT] = exploitLocation;
-    locationFiles[MusicType::PISTOLRELOAD] = reloadLocation;
-    locationFiles[MusicType::RIFLERELOAD] = reload2Location;
-    locationFiles[MusicType::BUY] = buyLocation;
-    locationFiles[MusicType::ITEMEQUIP] = itemEquipLocation;
-    locationFiles[MusicType::SHOT_AWP] = awpLocation;
-    locationFiles[MusicType::SHOT_M3] = m3Location;
-
-
-    locationFiles[MusicType::BOMBHASBEENDEFUSED] = bombHasBeenDefusedLocation;
-    locationFiles[MusicType::BOMBHASBEENPLANTED] = bombHasBeenPlantedLocation;
-    locationFiles[MusicType::COUNTERTERRORISTWIN] = counterTerroristWinLocation;
-    locationFiles[MusicType::TERRORISTWIN] = terroristWinLocation;
-    locationFiles[MusicType::PLANTINGBOMB] = plantingBombLocation;
-    locationFiles[MusicType::DEATH] = deathLocation;
-    locationFiles[MusicType::STEP] = stepLocation;
-    locationFiles[MusicType::DEFUSING] = defusingLocation;
-
-    Mix_Music* musicTrack;
-    musicTrack = Mix_LoadMUS(ambienceGameLocation.c_str());
-    musicFiles[MusicType::AMBIENCE] = musicTrack;
-    locationFiles[MusicType::AMBIENCE] = ambienceGameLocation;
-
-    // Sonidos cortos
-    std::vector<MusicType> shortSounds = {MusicType::SHOT_PISTOL,
-                                          MusicType::SHOT_AK47,
-                                          MusicType::SHOT_AWP,
-                                          MusicType::SHOT_M3,
-                                          MusicType::KNIFE,
-                                          MusicType::TIMER,
-                                          MusicType::EXPLOIT,
-                                          MusicType::PISTOLRELOAD,
-                                          MusicType::RIFLERELOAD,
-                                          MusicType::BUY,
-                                          MusicType::ITEMEQUIP,
-                                          MusicType::BOMBHASBEENDEFUSED,
-                                          MusicType::BOMBHASBEENPLANTED,
-                                          MusicType::COUNTERTERRORISTWIN,
-                                          MusicType::TERRORISTWIN,
-                                          MusicType::PLANTINGBOMB,
-                                          MusicType::DEATH,
-                                          MusicType::STEP,
-                                          MusicType::DEFUSING};
-
-    for (auto type: shortSounds) {
-        chunkFiles[type] = Mix_LoadWAV(locationFiles[type].c_str());
+    for (const auto& [type, files]: shortSounds) {
+        for (const auto& file: files) {
+            if (Mix_Chunk* chunk = Mix_LoadWAV((assetsPath + "/sounds/" + file).c_str())) {
+                chunkFiles[type].push_back(chunk);
+            }
+        }
     }
 }
 
@@ -94,9 +57,10 @@ MusicManager::~MusicManager() {
         if (pair.second)
             Mix_FreeMusic(pair.second);
     }
-    for (auto& pair: chunkFiles) {
-        if (pair.second)
-            Mix_FreeChunk(pair.second);
+    for (auto& [type, chunks]: chunkFiles) {
+        for (Mix_Chunk* chunk: chunks) {
+            Mix_FreeChunk(chunk);
+        }
     }
     Mix_CloseAudio();
     Mix_Quit();
@@ -124,11 +88,11 @@ void MusicManager::loadMusic(MusicType music, int times) {
 int MusicManager::loadSong(MusicType music, int loops, int volume) {
 
     auto it = chunkFiles.find(music);
-    if (it == chunkFiles.end()) {
+    if (it == chunkFiles.end() || it->second.empty()) {
         throw std::runtime_error("Sound not found");
     }
 
-    Mix_Chunk* chunk = it->second;
+    Mix_Chunk* chunk = it->second[std::rand() % it->second.size()];
     int channel = Mix_PlayChannel(-1, chunk, loops);
     Mix_Volume(channel, volume);
     return channel;

@@ -186,9 +186,10 @@ weapon_drops:                    # armas en el piso al comenzar: ak-47, m3 o awp
 
 - `server/server_config.yaml` (instalado en `/etc/cs2d/`) contiene todos los valores numéricos y la sección `maps` con las rutas de los mapas, relativas a la carpeta del archivo (`maps/desierto.yaml`, etc.; también acepta un mapa escrito directamente en la lista). Para agregar un mapa alcanza con crearlo en el editor, copiarlo a `maps/` y sumarlo a la lista. Un **tema visual** nuevo necesita además las texturas `client/data/maps/<theme>/floor.png` (un píxel por tile, del tamaño del mapa) y `wall.png` (baldosa de 32×32).
 - Assets generados por scripts, que se pueden regenerar:
-  - `tools/generate_map_textures.py`: texturas de los temas `desert`, `aztec_village` y `training`;
+  - `tools/generate_map_textures.py`: piso y pared de los temas `desert`, `aztec_village` y `training`, armados con tiles de los tilesets originales del CS2D (`client/data/maps/tilesets/`: dust, aztec y cs2dnorm). El cliente y el editor los dibujan en mosaico a 8 px de textura por tile, así un tile de 32 px ocupa lo mismo que un jugador;
   - `tools/generate_hud_images.py`: ayuda de controles y carteles de plantar y desactivar;
-  - `tools/generate_sounds.py`: sonido de muerte y paso corto.
+  - `tools/generate_sounds.py`: `reload.wav`, que une `w_clipout.wav` y `w_clipin.wav` del CS2D.
+- Los sonidos son los originales del CS2D (`client/data/sounds/`): disparos, cuchillo, recarga, muerte y daño (`die1-3`, `hit1-3`, elegidos al azar), pasos (`pl_step1-4`), pitido y explosión de la bomba (`c4`, `c4_explode`), gatillo sin balas (`click`) y levantar y tirar armas (`pickup`, `drop`).
 
 ## 7. Tests
 
