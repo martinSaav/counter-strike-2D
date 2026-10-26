@@ -19,7 +19,7 @@ project(taller_tp
 option(TALLER_TESTS "Enable / disable tests." ON)
 option(TALLER_CLIENT "Enable / disable client program." ON)
 option(TALLER_SERVER "Enable / disable server program." ON)
-option(TALLER_EDITOR "Enable / disable editor program." OFF)
+option(TALLER_EDITOR "Enable / disable editor program." ON)
 option(TALLER_MAKE_WARNINGS_AS_ERRORS "Enable / disable warnings as errors." OFF)
 
 message(CMAKE_CXX_COMPILER_ID="${CMAKE_CXX_COMPILER_ID}")
@@ -135,7 +135,8 @@ if(TALLER_CLIENT)
     )
 endif()
 
-if(TALLER_SERVER)
+# yaml-cpp: lo usan el servidor (configuracion) y el editor (archivos de mapa)
+if(TALLER_SERVER OR TALLER_EDITOR)
     include(FetchContent)
     FetchContent_Declare(
             yaml-cpp
@@ -144,6 +145,9 @@ if(TALLER_SERVER)
     )
 
     FetchContent_MakeAvailable(yaml-cpp)
+endif()
+
+if(TALLER_SERVER)
     # HEY!! TODO XXX: Change the name of the executable to the one you like!
     add_executable(taller_server)
 
@@ -161,23 +165,18 @@ if(TALLER_SERVER)
 endif()
 
 if(TALLER_EDITOR)
-    # HEY!! TODO XXX: Change the name of the executable to the one you like!
+    # Editor de niveles: interfaz en Qt6 y archivos de mapa en YAML
+    find_package(Qt6 REQUIRED COMPONENTS Widgets)
+    set(CMAKE_AUTOMOC ON)
+
     add_executable(taller_editor)
 
-    # Make them depend on taller_common lib
-    add_dependencies(taller_editor taller_common SDL2pp::SDL2pp)
-
-    # Add source files and enable warnings
-    # HEY!! TODO XXX: add more subfolders here
+    # editor/ define tambien la biblioteca editor_model (el mapa sin Qt) que usan los tests
     add_subdirectory(editor)
 
     set_project_warnings(taller_editor ${TALLER_MAKE_WARNINGS_AS_ERRORS} FALSE)
 
-    # add libSDL2pp's headers
-    target_include_directories(taller_editor PRIVATE ${libSDL2pp_SOURCE_DIR})
-
-    # Link the taller_common lib target
-    target_link_libraries(taller_editor taller_common SDL2pp::SDL2pp)
+    target_link_libraries(taller_editor PRIVATE editor_model Qt6::Widgets)
 endif()
 
 
