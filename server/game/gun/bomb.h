@@ -22,6 +22,8 @@ public:
     void start_planting(float time);
     void stop_planting();
     [[nodiscard]] bool has_finished_planting(float time) const;
+    // Fraccion (0 a 1) del plantado que ya se completo.
+    [[nodiscard]] float get_planting_progress(float time) const;
     [[nodiscard]] bool is_currently_planting() const { return is_planting; }
 };
 

@@ -15,8 +15,12 @@ bool BombEncapsulator::has_to_shoot(float current_time) { return has_to_fire; }
 ShootInfo BombEncapsulator::fire_gun(Map& map, Player& owner, const float current_time,
                                      Position& current_position) {
     has_to_fire = false;
-    bomb.start_planting(current_time);
-    owner.start_planting();
+    // Mantener el click manda un disparo por frame: el plantado cuenta desde el primero, salvo
+    // que se haya cancelado (por moverse o cambiar de arma)
+    if (!owner.is_currently_planting()) {
+        bomb.start_planting(current_time);
+        owner.start_planting();
+    }
     std::vector<ShootResult> result;
     result.emplace_back();
     return ShootInfo{std::move(result)};
@@ -41,3 +45,8 @@ bool BombEncapsulator::has_finished_planting(const float current_time) const {
 
 
 bool BombEncapsulator::is_planting() const { return bomb.is_currently_planting(); }
+
+
+float BombEncapsulator::get_planting_progress(const float current_time) const {
+    return bomb.get_planting_progress(current_time);
+}

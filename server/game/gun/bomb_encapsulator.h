@@ -24,6 +24,7 @@ class BombEncapsulator: public Gun {
 public:
     explicit BombEncapsulator(const GameConfig& config): bomb(config), has_to_fire(false) {}
     [[nodiscard]] bool has_finished_planting(float current_time) const;
+    [[nodiscard]] float get_planting_progress(float current_time) const;
     GunType get_gun_type() override { return type; }
     bool can_reload() override { return false; }
     void reload_gun() override;

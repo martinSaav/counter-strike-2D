@@ -10,5 +10,5 @@ GameReadyCommand::GameReadyCommand(const PlayerCredentials credentials): credent
 
 
 void GameReadyCommand::process_command(Match* match) {
-    RequestProcessor::process_game_ready_request(match);
+    RequestProcessor::process_game_ready_request(credentials, match);
 }

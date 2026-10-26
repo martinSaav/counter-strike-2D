@@ -56,21 +56,40 @@ void PlayerSprite::drawPlayer(const PlayerInfo& player, double& angle) {
     }
     this->drawWeapon(playerX, playerY, angle, weaponPlayer);
 
-    if (player.get_action() == Action::Shoot) {
-
-        int volume = 64;
-
-        if (weaponPlayer == Weapon::Bomb) {
-            return;
-        } else if (weaponPlayer == Weapon::Knife) {
-            volume = 90;
-        }
+    if (player.get_action() == Action::Shoot && weaponPlayer != Weapon::Bomb) {
         int shootX = player.get_pos_shoot_x();
         int shootY = player.get_pos_shoot_y();
 
-        drawBullet(shootX, shootY, angle);
+        if (weaponPlayer == Weapon::M3) {
+            // El disparo llega en un solo estado: lo dejamos visible un instante
+            recentSpreads[player.get_user_name()] = {SDL_Point{shootX, shootY},
+                                                     SDL_GetTicks() + 150};
+        } else {
+            drawBullet(shootX, shootY, angle);
+        }
+    }
 
-        MusicType music = castShoot(weaponPlayer);
+    auto spread = recentSpreads.find(player.get_user_name());
+    if (spread != recentSpreads.end() && SDL_GetTicks() < spread->second.second) {
+        drawShotgunSpread(playerX, playerY, spread->second.first.x, spread->second.first.y);
+    }
+}
+
+void PlayerSprite::playShotSound(const PlayerInfo& player, float distance) {
+    // Se escucha aunque el que dispara no este a la vista, mas bajo cuanto mas lejos
+    Weapon weaponPlayer = player.get_active_weapon();
+    if (player.get_action() != Action::Shoot || weaponPlayer == Weapon::Bomb ||
+        weaponPlayer == Weapon::None) {
+        return;
+    }
+    // El cuchillo es un "swish" mucho mas suave que un disparo: va al maximo
+    int volume = weaponPlayer == Weapon::Knife ? MIX_MAX_VOLUME : 64;
+    playSound(castShoot(weaponPlayer), volume, distance);
+}
+
+void PlayerSprite::playSound(MusicType music, int baseVolume, float distance) {
+    int volume = MusicManager::volumeForDistance(baseVolume, distance);
+    if (volume > 0) {
         sounds.loadSong(music, 0, volume);
     }
 }
@@ -108,6 +127,32 @@ void PlayerSprite::drawBullet(const int& shootX, const int& shootY, double& angl
                          int(2 * configuration.zoom), int(2 * configuration.zoom)};
     std::string textureName = "shot";
     drawHud2(destRect, textureName);
+}
+
+void PlayerSprite::drawShotgunSpread(int playerX, int playerY, int shootX, int shootY) {
+    // El M3 dispara un cono de perdigones con alcance corto: dibujamos varios trazos dentro del
+    // angulo y cortados en el alcance configurado, para que se entienda a quien puede pegarle.
+    const GunConfigInfo& m3 = configuration.gameConfig->get_m3_config();
+    const float range = static_cast<float>(m3.get_range());
+    const float halfAngle = m3.get_angle();
+    const float playerSize = 32.0f / 8.0f;
+    const float centerX = playerX + playerSize / 2;
+    const float centerY = playerY + playerSize / 2;
+    const float aimAngle = std::atan2(shootY - centerY, shootX - centerX);
+
+    const int pellets = 7;
+    sdlRenderer->SetDrawBlendMode(SDL_BLENDMODE_BLEND);
+    sdlRenderer->SetDrawColor(255, 220, 120, 170);
+    for (int i = 0; i < pellets; i++) {
+        const float offset = -halfAngle + (2 * halfAngle) * i / (pellets - 1);
+        const float pelletAngle = aimAngle + offset;
+        const float endX = centerX + range * std::cos(pelletAngle);
+        const float endY = centerY + range * std::sin(pelletAngle);
+        sdlRenderer->DrawLine(int((centerX - configuration.camera.x) * configuration.zoom),
+                              int((centerY - configuration.camera.y) * configuration.zoom),
+                              int((endX - configuration.camera.x) * configuration.zoom),
+                              int((endY - configuration.camera.y) * configuration.zoom));
+    }
 }
 
 void PlayerSprite::drawPlayerDeath(int playerX, int playerY) {

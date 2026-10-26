@@ -32,6 +32,8 @@ class M3: public Gun {
     void reset_shoots() override;
     [[nodiscard]] int calculate_damage(double distance) const;
     [[nodiscard]] bool calculate_if_bullet_hit(double distance) const;
+    [[nodiscard]] bool has_line_of_sight(Map& map, const Player& owner, const Position& from,
+                                         Player& target) const;
     void reset_time() override;
 
 public:

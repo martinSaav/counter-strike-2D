@@ -1,5 +1,7 @@
 #include "sender.h"
 
+#include <algorithm>
+#include <iterator>
 #include <list>
 #include <vector>
 
@@ -24,21 +26,26 @@ void Sender::send_status(const MatchStatusDTO& status) const {
                           player_dto.primary_weapon, player_dto.primary_weapon_ammo,
                           player_dto.secondary_weapon, player_dto.secondary_weapon_ammo,
                           player_dto.knife, player_dto.bomb, player_dto.current_weapon,
-                          player_dto.current_weapon_ammo);
+                          player_dto.current_weapon_ammo,
+                          static_cast<uint8_t>(player_dto.task_progress));
         players.push_back(player);
     }
-    const GameStateUpdate state(status.game_started, status.game_ended, status.round,
-                                status.round_time, status.round_started, status.round_ended,
-                                status.bomb_planted, status.bomb_x, status.bomb_y,
-                                status.bomb_timer, status.round_winner, status.game_winner,
-                                std::move(players), status.dropped_weapons);
+    const GameStateUpdate state(
+            status.game_started, status.game_ended, status.round, status.round_time,
+            status.round_started, status.round_ended, status.bomb_planted, status.bomb_x,
+            status.bomb_y, status.bomb_timer, status.round_winner, status.game_winner,
+            std::move(players), status.dropped_weapons, status.stage, status.time_left);
     protocol.send_message(state);
 }
 
 void Sender::send_game_config() const {
     std::vector<StructureInfo> structures_info;
     const MapConfig& map_cfg = config.map_config;
-    const BombSite& bomb_site_cfg = map_cfg.bombsite;
+    std::vector<BombSiteInfo> bomb_sites_info;
+    std::ranges::transform(
+            map_cfg.bomb_sites, std::back_inserter(bomb_sites_info), [](const BombSite& site) {
+                return BombSiteInfo{site.bomb_site_height, site.bomb_site_width, site.x, site.y};
+            });
     const Site& ct_site = map_cfg.ct_site;
     const Site& tt_site = map_cfg.tt_site;
     for (auto& structure: map_cfg.structures) {
@@ -55,15 +62,14 @@ void Sender::send_game_config() const {
     for (const auto& [x, y]: tt_site.spawns) {
         tt_spawns.emplace_back(x, y);
     }
-    MapConfigInfo map_config(
-            config.map_config.map_name, config.map_config.map_width, config.map_config.map_height,
-            std::move(structures_info),
-            BombSiteInfo{bomb_site_cfg.bomb_site_height, bomb_site_cfg.bomb_site_width,
-                         bomb_site_cfg.x, bomb_site_cfg.y},
-            SiteInfo{ct_site.x, ct_site.y, ct_site.site_width, ct_site.site_height,
-                     std::move(ct_spawns)},
-            SiteInfo{tt_site.x, tt_site.y, tt_site.site_width, tt_site.site_height,
-                     std::move(tt_spawns)});
+    MapConfigInfo map_config(config.map_config.map_name, config.map_config.map_width,
+                             config.map_config.map_height, std::move(structures_info),
+                             std::move(bomb_sites_info),
+                             SiteInfo{ct_site.x, ct_site.y, ct_site.site_width, ct_site.site_height,
+                                      std::move(ct_spawns)},
+                             SiteInfo{tt_site.x, tt_site.y, tt_site.site_width, tt_site.site_height,
+                                      std::move(tt_spawns)},
+                             map_cfg.theme);
     GameConfigInfo game_cfg_message(
             config.player_health, config.number_of_rounds, config.starting_money, config.ct_amount,
             config.tt_amount, config.ammo_price, config.knife_config.get_info(),
@@ -83,9 +89,11 @@ void Sender::run() {
             if (auto status_v = sender_queue->pop();
                 std::holds_alternative<MatchStatusDTO>(status_v)) {
                 send_status(std::get<MatchStatusDTO>(status_v));
-            } else {
+            } else if (std::get<GameReadyNotification>(status_v).success) {
                 protocol.send_message(GameReadyResponse(true));
                 send_game_config();
+            } else {
+                protocol.send_message(GameReadyResponse(false));
             }
         } catch (const ClosedQueue&) {
             running = false;

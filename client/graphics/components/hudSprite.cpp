@@ -1,5 +1,6 @@
 #include "hudSprite.h"
 
+#include <algorithm>
 #include <cmath>
 
 HudSprite::HudSprite(Renderer* sdlRenderer, Configuration& configuration, std::string& assetsPath):
@@ -29,6 +30,11 @@ HudSprite::HudSprite(Renderer* sdlRenderer, Configuration& configuration, std::s
     textures.loadTexture("m3_dropped", assetsPath + "/weapons/m3_d.bmp");
     textures.loadTexture("bomb_dropped", assetsPath + "/weapons/bomb_d.bmp");
 
+    // Ayuda y carteles de plantar / desactivar (generados con tools/generate_hud_images.py)
+    textures.loadTexture("help", assetsPath + "/hud/help.png", false);
+    textures.loadTexture("planting", assetsPath + "/hud/planting.png", false);
+    textures.loadTexture("defusing", assetsPath + "/hud/defusing.png", false);
+
     // Color mod
     Texture& counterPost = textures.getTexture("counterTerroristPost");
     Texture& terroristPost = textures.getTexture("terroristPost");
@@ -38,7 +44,7 @@ HudSprite::HudSprite(Renderer* sdlRenderer, Configuration& configuration, std::s
 
 
 void HudSprite::draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlayer,
-                     bool& is_bomb_planted) {
+                     bool& is_bomb_planted, bool isBuyStage) {
     Texture& hud_symbols = textures.getTexture("symbols");
     Texture& nums = textures.getTexture("nums");
     HudType type = HEALTH;
@@ -91,10 +97,18 @@ void HudSprite::draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlaye
         drawHud(srcRect, destRect, textureName);
     }
 
-    // time
+    // time: con la bomba plantada el reloj pasa a ser la cuenta regresiva de la detonacion,
+    // en rojo y con el simbolo de la bomba
     symbolX = widthWindow * 0.45;
     type = TIME;
+    if (is_bomb_planted) {
+        nums.SetColorMod(230, 40, 40);
+        hud_symbols.SetColorMod(230, 40, 40);
+        type = BOMB;
+    }
     drawHuds(time, type, symbolX, symbolY);
+    nums.SetColorMod(255, 165, 0);
+    hud_symbols.SetColorMod(255, 165, 0);
 
     // weapon
     symbolX = widthWindow * 0.76;
@@ -111,7 +125,7 @@ void HudSprite::draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlaye
     type = MONEY;
     drawHuds(money, type, symbolX, symbolY);
 
-    if (time < configuration.buyTime && !is_bomb_planted) {
+    if (isBuyStage) {
         textureName = "symbols";
         // Shop
         symbolY = heightWindow * 0.92;
@@ -158,7 +172,7 @@ void HudSprite::drawHuds(int num, HudType type, int& symbolX, int& symbolY) {
 
     // Numbers
     textureName = "nums";
-    if (type == TIME) {
+    if (type == TIME || type == BOMB) {
 
         int minutes = num / 60;
         int seconds = num % 60;
@@ -363,4 +377,28 @@ void HudSprite::drawSounds(PlayerInfo& myPlayer) {
             return;
     }
     sounds.loadSong(music, 0, volume);
+}
+
+void HudSprite::drawHelp() {
+    textureName = "help";
+    drawHud2(configuration.helpRect(), textureName);
+}
+
+void HudSprite::drawTaskProgress(int progress, bool planting) {
+    // Barra con el avance de la bomba que se esta plantando o desactivando
+    int barWidth = int(configuration.widthWindow * 0.3);
+    int barHeight = 18;
+    int barX = configuration.widthWindow / 2 - barWidth / 2;
+    int barY = int(configuration.heightWindow * 0.72);
+
+    textureName = planting ? "planting" : "defusing";
+    SDL_Rect labelRect = {configuration.widthWindow / 2 - 180, barY - 44, 360, 40};
+    drawHud2(labelRect, textureName);
+
+    sdlRenderer->SetDrawBlendMode(SDL_BLENDMODE_BLEND);
+    sdlRenderer->SetDrawColor(0, 0, 0, 180);
+    sdlRenderer->FillRect(SDL_Rect{barX, barY, barWidth, barHeight});
+    sdlRenderer->SetDrawColor(255, 165, 0, 230);
+    sdlRenderer->FillRect(
+            SDL_Rect{barX + 2, barY + 2, (barWidth - 4) * progress / 100, barHeight - 4});
 }

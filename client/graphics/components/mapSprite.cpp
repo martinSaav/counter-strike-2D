@@ -1,18 +1,24 @@
 #include "mapSprite.h"
 
+#include <algorithm>
+#include <fstream>
+
 
 MapSprite::MapSprite(Renderer* sdlRenderer, Configuration& configuration, std::string& assetsPath):
         Component(sdlRenderer, configuration, assetsPath),
         fieldWidth(0),
         fieldHeight(0),
-        bombChannel(0),
         mapConfig(configuration.gameConfig->get_map_config()) {
 
-    // map
-    textures.loadTexture("map", assetsPath + "/maps/default_aztec.png");
+    // map: piso y estructuras segun el tema del mapa (si falta la carpeta, el del desierto)
+    std::string themePath = assetsPath + "/maps/" + mapConfig.get_theme();
+    if (!std::ifstream(themePath + "/floor.png").good()) {
+        themePath = assetsPath + "/maps/desert";
+    }
+    textures.loadTexture("map", themePath + "/floor.png", false);
 
     // map obstacles
-    textures.loadTexture("mapObstacles", assetsPath + "/maps/aztec.bmp");
+    textures.loadTexture("mapObstacles", themePath + "/wall.png", false);
 
     // map sites
     textures.loadTexture("bspot_a", assetsPath + "/maps/bspot_a.png");
@@ -47,15 +53,41 @@ MapSprite::MapSprite(Renderer* sdlRenderer, Configuration& configuration, std::s
     terroristWins.SetColorMod(255, 165, 0);
 }
 
+void MapSprite::drawTiled(Texture& texture, float areaX, float areaY, float areaWidth,
+                          float areaHeight) {
+    // Repite la textura sobre el area (en tiles del mapa) a escala fija: TEXTURE_PX_PER_TILE
+    // pixeles de textura por tile, asi un tile de 32 px del CS2D ocupa lo mismo que un jugador.
+    // Solo se dibujan los bloques que entran en la camara, recortando los del borde del area.
+    const float blockWidth = static_cast<float>(texture.GetWidth()) / TEXTURE_PX_PER_TILE;
+    const float blockHeight = static_cast<float>(texture.GetHeight()) / TEXTURE_PX_PER_TILE;
+    const SDL_Rect& camera = configuration.camera;
+    const float zoom = configuration.zoom;
+    const float viewRight = camera.x + configuration.widthWindow / zoom;
+    const float viewBottom = camera.y + configuration.heightWindow / zoom;
+
+    for (float by = areaY; by < areaY + areaHeight && by < viewBottom; by += blockHeight) {
+        const float h = std::min(blockHeight, areaY + areaHeight - by);
+        if (by + h < camera.y) {
+            continue;
+        }
+        for (float bx = areaX; bx < areaX + areaWidth && bx < viewRight; bx += blockWidth) {
+            const float w = std::min(blockWidth, areaX + areaWidth - bx);
+            if (bx + w < camera.x) {
+                continue;
+            }
+            SDL_Rect src = {0, 0, int(w * TEXTURE_PX_PER_TILE), int(h * TEXTURE_PX_PER_TILE)};
+            // El +1 evita que queden lineas entre bloques por el redondeo
+            SDL_Rect dest = {int((bx - camera.x) * zoom), int((by - camera.y) * zoom),
+                             int(w * zoom) + 1, int(h * zoom) + 1};
+            sdlRenderer->Copy(texture, src, dest);
+        }
+    }
+}
+
 void MapSprite::draw() {
-    std::string textureName = "map";
-    int camWidth = configuration.widthWindow / configuration.zoom;
-    int camHeight = configuration.heightWindow / configuration.zoom;
-
-    SDL_Rect srcRect = {configuration.camera.x, configuration.camera.y, camWidth, camHeight};
-
-    SDL_Rect destRect = {0, 0, configuration.widthWindow, configuration.heightWindow};
-    drawHud(srcRect, destRect, textureName);
+    // Piso del terreno en mosaico sobre todo el mapa
+    drawTiled(textures.getTexture("map"), 0, 0, mapConfig.get_map_width(),
+              mapConfig.get_map_height());
 
     // Draw bombSite
     drawBombsite();
@@ -69,39 +101,24 @@ void MapSprite::draw() {
 }
 
 void MapSprite::drawObstacles() {
-    std::string textureName = "mapObstacles";
-    SDL_Rect srcRect = {480, 64, 32, 32};
-    SDL_Rect destRect;
-    auto obstacles = mapConfig.get_structures();
-
-    for (auto obstacle: obstacles) {
-        int posX = obstacle.get_x() + 1;
-        int posY = obstacle.get_y();
-        int height = obstacle.get_height();
-        int width = obstacle.get_width();
-
-        destRect = {int((posX - configuration.camera.x) * configuration.zoom),
-                    int((posY - configuration.camera.y) * configuration.zoom),
-                    int(width * configuration.zoom), int(height * configuration.zoom)};
-        drawHud(srcRect, destRect, textureName);
+    // Estructuras solidas: el tile de pared del terreno en mosaico
+    Texture& wall = textures.getTexture("mapObstacles");
+    for (const auto& obstacle: mapConfig.get_structures()) {
+        drawTiled(wall, obstacle.get_x() + 1, obstacle.get_y(), obstacle.get_width(),
+                  obstacle.get_height());
     }
 }
 
 void MapSprite::drawBombsite() {
+    // Una cruz por cada zona donde se puede plantar la bomba
     std::string textureName = "cross";
-    SDL_Rect srcRect = {192, 32, 32, 32};
-    auto bombsite = mapConfig.get_bombsite();
-
-    int bomb_site_height = bombsite.get_height();
-    int bomb_site_width = bombsite.get_width();
-    int posX = bombsite.get_x();
-    int posY = bombsite.get_y();
-
-    SDL_Rect destRect = {int((posX - configuration.camera.x) * configuration.zoom),
-                         int((posY - configuration.camera.y) * configuration.zoom),
-                         int(bomb_site_width * configuration.zoom),
-                         int(bomb_site_height * configuration.zoom)};
-    drawHud2(destRect, textureName);
+    for (const auto& bombsite: mapConfig.get_bombsites()) {
+        SDL_Rect destRect = {int((bombsite.get_x() - configuration.camera.x) * configuration.zoom),
+                             int((bombsite.get_y() - configuration.camera.y) * configuration.zoom),
+                             int(bombsite.get_width() * configuration.zoom),
+                             int(bombsite.get_height() * configuration.zoom)};
+        drawHud2(destRect, textureName);
+    }
 }
 
 void MapSprite::drawSite(const SiteInfo& site, const std::string& nameSite) {
@@ -123,19 +140,10 @@ void MapSprite::drawSite(const SiteInfo& site, const std::string& nameSite) {
     drawHud2(destRect, textureName);
 }
 
-int MapSprite::getWidth() {
-    Texture& map = textures.getTexture("map");
-    int worldWidth = map.GetWidth();
+// Tamano del mundo en tiles (lo usa la camara para no salirse del mapa)
+int MapSprite::getWidth() { return mapConfig.get_map_width(); }
 
-    return worldWidth;
-}
-
-int MapSprite::getHeight() {
-    Texture& map = textures.getTexture("map");
-    int worldHeight = map.GetHeight();
-
-    return worldHeight;
-}
+int MapSprite::getHeight() { return mapConfig.get_map_height(); }
 
 void MapSprite::drawEndRound(const Team& team_winer, bool is_bomb_planted) {
     std::string textureName;
@@ -180,17 +188,12 @@ void MapSprite::activateBomb() {
     MusicType music = BOMBHASBEENPLANTED;
 
     sounds.loadSong(music);
-
-    music = TIMER;
-    // Dura 2 segundos
-    int times = 48;
-    bombChannel = sounds.loadSong(music, times);
+    // El pitido de la bomba lo reproduce Render (se acelera al final y depende de la distancia)
 }
 
 void MapSprite::desactivateBomb() {
     this->is_bomb_activated = false;
     this->is_finish_sound_round = false;
-    sounds.stopSongs(bombChannel);
 }
 
 void MapSprite::exploitBomb() {
@@ -268,21 +271,16 @@ void MapSprite::drawCampField(int angle, int playerX, int playerY) {
     // coregimos el anglo por la imagen
     angle -= 90;
 
-    // Dimensiones reales de la textura de campo de visión
-    int playerCenterX = playerX + int(30 / 8) / 2;
-    int playerCenterY = playerY + int(30 / 8) / 2;
+    // El sprite del jugador mide 32 / 8 = 4 tiles: el cono sale de su centro
+    int playerCenterX = playerX + 2;
+    int playerCenterY = playerY + 2;
 
     // Posición del jugador en la pantalla
     int playerScreenX = int((playerCenterX - configuration.camera.x) * configuration.zoom);
     int playerScreenY = int((playerCenterY - configuration.camera.y) * configuration.zoom);
 
-    if (configuration.heightWindow > 1000 || configuration.widthWindow > 1000) {
-        fieldWidth = 3700;
-        fieldHeight = 3700;
-    } else {
-        fieldWidth = 2300;
-        fieldHeight = 2300;
-    }
+    fieldWidth = configuration.visionFieldSize();
+    fieldHeight = configuration.visionFieldSize();
 
     SDL_Rect destRect = {playerScreenX - fieldWidth / 2, playerScreenY - fieldHeight / 2,
                          fieldWidth, fieldHeight};
@@ -293,10 +291,8 @@ void MapSprite::drawCampField(int angle, int playerX, int playerY) {
 }
 
 void MapSprite::drawShop() {
-    // Shop
-    int symbolX = (configuration.widthWindow * 0.5) - shopScreenWidth / 2;
-    int symbolY = configuration.heightWindow * 0.2;
-    SDL_Rect destRect = {symbolX, symbolY, shopScreenWidth, shopScreenHeight};
+    // Shop (se puede usar con el mouse: ver InputHandler::clickShop)
+    SDL_Rect destRect = configuration.shopRect();
     std::string textureName = "shop";
     drawHud2(destRect, textureName);
 }

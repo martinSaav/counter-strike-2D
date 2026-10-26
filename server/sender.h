@@ -17,6 +17,7 @@
 
 class Sender: public Thread {
     Protocol& protocol;
+    std::shared_ptr<GameConfig> config_owner;
     GameConfig& config;
     std::atomic<bool> running;
     std::shared_ptr<Queue<std::variant<MatchStatusDTO, GameReadyNotification>>> sender_queue;
@@ -25,11 +26,12 @@ class Sender: public Thread {
     void send_game_config() const;
 
 public:
-    Sender(Protocol& protocol, GameConfig& config,
+    Sender(Protocol& protocol, std::shared_ptr<GameConfig> config,
            std::shared_ptr<Queue<std::variant<MatchStatusDTO, GameReadyNotification>>>
                    sender_queue):
             protocol(protocol),
-            config(config),
+            config_owner(std::move(config)),
+            config(*config_owner),
             running(true),
             sender_queue(std::move(sender_queue)) {}
     void run() override;

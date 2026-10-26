@@ -18,8 +18,11 @@ public:
     const int bomb_y;
     const float bomb_timer;
     const Team round_winner;
+    const RoundStage stage;
+    const float time_left;
     TimeInformation(int round, float round_time, bool round_started, bool round_ended,
-                    bool bomb_planted, int bomb_x, int bomb_y, float bomb_timer, Team round_winner):
+                    bool bomb_planted, int bomb_x, int bomb_y, float bomb_timer, Team round_winner,
+                    RoundStage stage, float time_left):
             round(round),
             round_time(round_time),
             round_started(round_started),
@@ -28,7 +31,9 @@ public:
             bomb_x(bomb_x),
             bomb_y(bomb_y),
             bomb_timer(bomb_timer),
-            round_winner(round_winner) {}
+            round_winner(round_winner),
+            stage(stage),
+            time_left(time_left) {}
 };
 
 

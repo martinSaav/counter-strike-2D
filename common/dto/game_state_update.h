@@ -14,6 +14,7 @@
 #include "../action.h"
 #include "../message.h"
 #include "../message_type.h"
+#include "../round_stage.h"
 #include "../team.h"
 #include "../weapon.h"
 
@@ -38,13 +39,16 @@ private:
     Team game_winner;
     std::list<PlayerInfo> players;
     std::list<DroppedWeapon> dropped_weapons;
+    RoundStage stage;
+    float time_left;
 
 public:
     explicit GameStateUpdate(bool game_started, bool game_ended, uint8_t round, float round_time,
                              bool round_started, bool round_ended, bool bomb_planted,
                              uint16_t bomb_x, uint16_t bomb_y, float bomb_timer, Team round_winner,
                              Team game_winner, std::list<PlayerInfo> players,
-                             std::list<DroppedWeapon> dropped_weapons):
+                             std::list<DroppedWeapon> dropped_weapons,
+                             RoundStage stage = RoundStage::Buy, float time_left = 0):
             game_started(game_started),
             game_ended(game_ended),
             round(round),
@@ -58,7 +62,9 @@ public:
             round_winner(round_winner),
             game_winner(game_winner),
             players(std::move(players)),
-            dropped_weapons(std::move(dropped_weapons)) {}
+            dropped_weapons(std::move(dropped_weapons)),
+            stage(stage),
+            time_left(time_left) {}
 
 
     void serialize(uint8_t* buffer) const override {
@@ -88,6 +94,10 @@ public:
 
         buffer[offset++] = static_cast<uint8_t>(round_winner);
         buffer[offset++] = static_cast<uint8_t>(game_winner);
+
+        buffer[offset++] = static_cast<uint8_t>(stage);
+        std::memcpy(buffer + offset, &time_left, sizeof(time_left));
+        offset += sizeof(time_left);
 
         uint16_t num_players = htons(static_cast<uint16_t>(players.size()));
         std::memcpy(buffer + offset, &num_players, sizeof(num_players));
@@ -141,6 +151,11 @@ public:
         Team round_winner = static_cast<Team>(buffer[offset++]);
         Team game_winner = static_cast<Team>(buffer[offset++]);
 
+        RoundStage stage = static_cast<RoundStage>(buffer[offset++]);
+        float time_left;
+        std::memcpy(&time_left, buffer + offset, sizeof(time_left));
+        offset += sizeof(time_left);
+
         uint16_t num_players;
         std::memcpy(&num_players, buffer + offset, sizeof(num_players));
         num_players = ntohs(num_players);
@@ -167,7 +182,8 @@ public:
 
         return GameStateUpdate(game_started, game_ended, round, round_time, round_started,
                                round_ended, bomb_planted, bomb_x, bomb_y, bomb_timer, round_winner,
-                               game_winner, std::move(players), std::move(dropped_weapons));
+                               game_winner, std::move(players), std::move(dropped_weapons), stage,
+                               time_left);
     }
 
     MessageType type() const override { return message_type; }
@@ -180,6 +196,7 @@ public:
         size += 2 + 2;              // bomb_x, bomb_y
         size += sizeof(float);      // bomb_timer
         size += 1 + 1;              // round_winner, game_winner
+        size += 1 + sizeof(float);  // stage, time_left
         size += 2;                  // num_players
         size += std::accumulate(players.begin(), players.end(), 0,
                                 [](const size_t sum, const PlayerInfo& player) {
@@ -220,5 +237,9 @@ public:
     Team get_game_winner() const { return game_winner; }
 
     std::list<DroppedWeapon> get_dropped_weapons() const { return dropped_weapons; }
+
+    RoundStage get_stage() const { return stage; }
+
+    float get_time_left() const { return time_left; }
 };
 #endif

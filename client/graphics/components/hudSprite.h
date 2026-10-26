@@ -56,8 +56,13 @@ private:
 public:
     HudSprite(Renderer* sdlRenderer, Configuration& configuration, std::string& assetsPath);
 
-    void draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlayer, bool& is_bomb_planted);
+    void draw(SDL_Rect& mouse, int& time, int& round, PlayerInfo& myPlayer, bool& is_bomb_planted,
+              bool isBuyStage);
 
     void drawWeaponDroped(Weapon weapon, int weaponX, int weaponY);
+
+    void drawHelp();
+
+    void drawTaskProgress(int progress, bool planting);
 };
 #endif

@@ -100,7 +100,10 @@ QTableWidget::item:selected {
    </column>
    <column>
     <property name="text">
-     <string>+/-</string>
+     <string>K-D</string>
+    </property>
+    <property name="toolTip">
+     <string>Kills menos muertes</string>
     </property>
    </column>
    <column>
@@ -173,7 +176,10 @@ QTableWidget::item:selected {
    </column>
    <column>
     <property name="text">
-     <string>+/-</string>
+     <string>K-D</string>
+    </property>
+    <property name="toolTip">
+     <string>Kills menos muertes</string>
     </property>
    </column>
    <column>

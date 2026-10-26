@@ -1,5 +1,6 @@
 #include "waitroom.h"
 
+#include <QMessageBox>
 #include <memory>
 
 #include "ui_waitroom.h"
@@ -68,14 +69,25 @@ void waitRoom::createSkinSelectionWindow(team& teamPlayer) {
 }
 
 void waitRoom::on_startButton_clicked() {
+    const auto answer = QMessageBox::question(
+            this, "Arrancar partida",
+            "¿Arrancar la partida ahora? Una vez iniciada no se puede unir nadie más.");
+    if (answer != QMessageBox::Yes) {
+        return;
+    }
 
     // Empezamos la partida
     GameReadyRequest gameReady;
     protocol.send_message(gameReady);
 
     const std::unique_ptr<Message> responseGameReady = protocol.recv_message();
-    // const auto game = dynamic_cast<GameReadyResponse*>(responseGameReady.get());
-    // bool gameStart = game->get_success();
+    const auto game = dynamic_cast<GameReadyResponse*>(responseGameReady.get());
+    if (!game || !game->get_success()) {
+        QMessageBox::warning(this, "Faltan jugadores",
+                             "Necesitás al menos un jugador en cada equipo para arrancar. "
+                             "Esperá a que se una alguien más.");
+        return;
+    }
 
     this->close();
     QApplication::exit(EXITLOBBY);

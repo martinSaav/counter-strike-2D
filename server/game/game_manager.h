@@ -85,6 +85,10 @@ public:
     void drop_weapon(Player& player, std::unique_ptr<Gun> gun) const;
     void pick_weapon(const std::shared_ptr<Player>& player) const;
     [[nodiscard]] bool has_to_switch_sides() const;
+    // Ronda en la que los equipos cambian de bando (primera de la segunda mitad).
+    [[nodiscard]] int get_halftime_round() const;
+    [[nodiscard]] int get_rounds_to_win() const;
+    [[nodiscard]] RoundStage get_round_stage() const;
     [[nodiscard]] bool has_ended() const;
     [[nodiscard]] Team get_match_winner() const;
     void give_bomb_to_random_player(const std::vector<std::shared_ptr<Player>>& players) const;

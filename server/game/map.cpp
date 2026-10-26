@@ -19,7 +19,9 @@ Map::Map(const GameConfig& config):
             add_structure(structure);
         } catch (...) {}
     }
-    add_bombsite(config.map_config.bombsite);
+    for (const auto& site: config.map_config.bomb_sites) {
+        add_bombsite(site);
+    }
     for (auto [position, weapon]: config.map_config.dropped_weapons) {
         try {
             std::unique_ptr<Gun> gun = GunShop::get_gun(weapon, config);

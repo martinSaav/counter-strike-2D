@@ -19,6 +19,7 @@ class GameClock {
     const int buy_stage_time;
     const int post_bomb_stage_time;
     const int after_round_stage_time;
+    const int round_stage_time;
     double current_time;
     double stage_time;
     double bomb_timer;
@@ -27,6 +28,7 @@ class GameClock {
     bool bomb_defused;
     bool bomb_exploded;
     bool has_round_finished;
+    bool round_time_expired;
     [[nodiscard]] std::map<Stages, double> get_stage_duration_map() const;
 
 public:
@@ -34,6 +36,7 @@ public:
             buy_stage_time(config.buy_time),
             post_bomb_stage_time(config.bomb_time),
             after_round_stage_time(config.after_round_time),
+            round_stage_time(config.round_time),
             current_time(0),
             stage_time(0),
             bomb_timer(0),
@@ -41,7 +44,8 @@ public:
             bomb_planted(false),
             bomb_defused(false),
             bomb_exploded(false),
-            has_round_finished(false) {}
+            has_round_finished(false),
+            round_time_expired(false) {}
 
     [[nodiscard]] Stages getCurrentStage() const { return current_stage; }
     void advance(double dt);
@@ -52,6 +56,10 @@ public:
     void defuse_bomb();
     [[nodiscard]] double get_time() const { return current_time; }
     [[nodiscard]] double get_bomb_timer() const;
+    // Se agoto el tiempo de la ronda sin que se plante la bomba.
+    [[nodiscard]] bool has_round_time_expired() const { return round_time_expired; }
+    // Milisegundos que le quedan a la etapa actual.
+    [[nodiscard]] double get_stage_time_left() const;
 };
 
 

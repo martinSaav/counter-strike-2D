@@ -40,14 +40,14 @@ bool GameManager::can_player_move_or_shoot(const std::shared_ptr<Player>& player
 void GameManager::advance_round(const std::vector<std::shared_ptr<Player>>& players) {
     for (const auto& player: players) {
         if (player->current_team == last_winner) {
-            if (current_round != 6) {
+            if (current_round != get_halftime_round()) {
                 player->money += round_winner_money;
             } else {
                 player->money += round_loser_money;
             }
 
         } else {
-            if (current_round != 6) {
+            if (current_round != get_halftime_round()) {
                 player->money += round_loser_money;
             } else {
                 player->money += round_winner_money;
@@ -98,17 +98,39 @@ void GameManager::check_winning_cond(const std::vector<std::shared_ptr<Player>>&
         last_winner = Team::Terrorists;
         clock.set_after_round_stage();
         round_won = true;
+    } else if (clock.has_round_time_expired() && !bomb_planted) {
+        // Se termino el tiempo sin que los terroristas planten: gana CT.
+        ct_rounds++;
+        last_winner = Team::CounterTerrorists;
+        clock.set_after_round_stage();
+        round_won = true;
+    }
+}
+
+
+RoundStage GameManager::get_round_stage() const {
+    switch (clock.getCurrentStage()) {
+        case Stages::BuyStage:
+            return RoundStage::Buy;
+        case Stages::PrePlantStage:
+            return RoundStage::PrePlant;
+        case Stages::PostPlantStage:
+            return RoundStage::PostPlant;
+        default:
+            return RoundStage::AfterRound;
     }
 }
 
 
 TimeInformation GameManager::get_time_information() const {
+    const auto time_left = static_cast<float>(clock.get_stage_time_left() / 1000);
     if (bomb_planted) {
         return TimeInformation{current_round, static_cast<float>(clock.get_time() / 1000),
                                !round_won,    round_won,
                                bomb_planted,  bomb_x,
                                bomb_y,        static_cast<float>(clock.get_bomb_timer() / 1000),
-                               last_winner};
+                               last_winner,   get_round_stage(),
+                               time_left};
     }
     return TimeInformation{current_round,
                            static_cast<float>(clock.get_time() / 1000),
@@ -118,7 +140,9 @@ TimeInformation GameManager::get_time_information() const {
                            0,
                            0,
                            static_cast<float>(clock.get_bomb_timer() / 1000),
-                           last_winner};
+                           last_winner,
+                           get_round_stage(),
+                           time_left};
 }
 
 
@@ -154,6 +178,10 @@ void GameManager::start_defusing(const std::shared_ptr<Player>& player) const {
         return;
     }
     if (!map.can_defuse(player)) {
+        return;
+    }
+    if (player->is_currently_defusing()) {
+        // Mantener F manda un pedido por frame: el tiempo cuenta desde el primero
         return;
     }
     player->start_defusing();
@@ -202,14 +230,20 @@ void GameManager::pick_weapon(const std::shared_ptr<Player>& player) const {
 }
 
 
-bool GameManager::has_to_switch_sides() const { return current_round == 6; }
+int GameManager::get_halftime_round() const { return number_of_rounds / 2 + 1; }
+
+
+int GameManager::get_rounds_to_win() const { return number_of_rounds / 2 + 1; }
+
+
+bool GameManager::has_to_switch_sides() const { return current_round == get_halftime_round(); }
 
 
 bool GameManager::has_ended() const {
-    if (tt_rounds >= 6) {
+    if (tt_rounds >= get_rounds_to_win()) {
         return true;
     }
-    if (ct_rounds >= 6) {
+    if (ct_rounds >= get_rounds_to_win()) {
         return true;
     }
     if (current_round > number_of_rounds) {

@@ -1,0 +1,51 @@
+# Mapa "desierto". Se puede abrir y editar con el editor de niveles (taller_editor).
+map_name: desierto
+theme: desert
+map_width: 155
+map_height: 280
+structures:
+- {x: 62, y: 125, width: 12, height: 12}
+- {x: 75, y: 150, width: 12, height: 12}
+- {x: 50, y: 175, width: 37, height: 12}
+- {x: 12, y: 137, width: 25, height: 25}
+- {x: 112, y: 112, width: 12, height: 37}
+- {x: 112, y: 187, width: 25, height: 12}
+- {x: 50, y: 87, width: 25, height: 12}
+- {x: 100, y: 75, width: 37, height: 25}
+- {x: 62, y: 25, width: 37, height: 25}
+bomb_sites:
+- {x: 50, y: 112, height: 50, width: 50}
+- {x: 115, y: 150, width: 35, height: 35}
+tt_site:
+  x: 0
+  y: 0
+  width: 50
+  height: 50
+  spawns:
+  - {x: 12, y: 12}
+  - {x: 37, y: 12}
+  - {x: 25, y: 25}
+  - {x: 12, y: 37}
+  - {x: 37, y: 37}
+ct_site:
+  x: 100
+  y: 225
+  width: 50
+  height: 50
+  spawns:
+  - {x: 112, y: 237}
+  - {x: 137, y: 237}
+  - {x: 125, y: 250}
+  - {x: 112, y: 262}
+  - {x: 137, y: 262}
+weapon_drops:
+- {name: ak-47, x: 12, y: 62}
+- {name: awp, x: 112, y: 37}
+- {name: m3, x: 62, y: 62}
+- {name: ak-47, x: 76, y: 125}
+- {name: m3, x: 50, y: 150}
+- {name: awp, x: 12, y: 225}
+- {name: ak-47, x: 75, y: 200}
+- {name: m3, x: 100, y: 212}
+- {name: ak-47, x: 75, y: 225}
+- {name: awp, x: 12, y: 100}

@@ -2,10 +2,6 @@
 #ifdef INPUTHANDLER_H
 
 #include <iostream>
-#include <mutex>
-#include <optional>
-#include <queue>
-#include <string>
 
 #include "../../common/action.h"
 #include "../../common/dto/buy_ammo_request.h"
@@ -16,33 +12,41 @@
 
 #include "configuration.h"
 
-// Lee el teclado y envía los mensajes al servidor
+// Lee el teclado y el mouse y envía los mensajes al servidor. Se llama una vez por frame desde
+// el loop principal (SDL pide que los eventos se procesen en el hilo que creó la ventana).
 class InputHandler {
 private:
-    bool& gameOver;
-    bool& clientClosed;
-    std::queue<std::string> messages;
-    std::mutex mtx;
     Protocol& protocol;
     Configuration& configuration;
+    bool& gameOver;
+    bool& clientClosed;
 
     int mouseX = 0;
     int mouseY = 0;
     int mouse_map_x = 0;
     int mouse_map_y = 0;
+    int lastAimMouseX = -1;
+    int lastAimMouseY = -1;
+    bool shopClicked = false;
+    bool buyStage = false;
     Action currentAction = {};
     Action* action = nullptr;
 
     void sendMessage(Action& currentAction);
-    void handleEvents();
+    void handleEvents(bool isBuyStage);
+    void handleKeyboard();
+    void quit();
+    void buyWeapon(Weapon weapon);
+    void buyAmmo(WeaponType weaponType);
+    void toggleFullscreen(Uint32 windowID);
+    bool clickShop(int x, int y);
+    bool isOverShop(int x, int y) const;
 
 public:
     InputHandler(Protocol& protocol, Configuration& configuration, bool& gameOver,
                  bool& clientClosed);
     ~InputHandler();
 
-    void processEvents();
-
-    std::optional<std::string> getMessage();
+    void processFrame(bool isBuyStage);
 };
 #endif

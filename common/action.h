@@ -20,6 +20,7 @@ enum class Action : uint8_t {
     Idle = 0x0E,
     BuyingWeapon = 0x0F,
     BuyingAmmo = 0x10,
+    DropWeapon = 0x11,
 };
 
 #endif

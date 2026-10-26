@@ -17,6 +17,8 @@ target_sources(taller_server
         commands/defuse_bomb_command.cpp
         commands/equip_weapon_command.cpp
         commands/buy_ammo_command.cpp
+        commands/drop_weapon_command.cpp
+        commands/aim_command.cpp
         request_processor.cpp
         gun_shop.cpp
         message_parser.cpp
@@ -50,6 +52,8 @@ target_sources(taller_server
         commands/defuse_bomb_command.h
         commands/equip_weapon_command.h
         commands/buy_ammo_command.h
+        commands/drop_weapon_command.h
+        commands/aim_command.h
         request_processor.h
         gun_shop.h
         gun_config.h

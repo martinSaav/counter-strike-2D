@@ -64,7 +64,8 @@ PlayerDTO Player::get_player_info() {
                          bomb_info,
                          last_action,
                          current_weapon,
-                         current_weapon_ammo};
+                         current_weapon_ammo,
+                         task_progress};
     }
     return PlayerDTO{username,
                      position_x,
@@ -85,7 +86,8 @@ PlayerDTO Player::get_player_info() {
                      bomb_info,
                      last_action,
                      current_weapon,
-                     current_weapon_ammo};
+                     current_weapon_ammo,
+                     task_progress};
 }
 
 
@@ -125,16 +127,23 @@ void Player::add_kill() {
 }
 
 
-void Player::buy_weapon(std::unique_ptr<Gun> gun) {
+std::unique_ptr<Gun> Player::buy_weapon(std::unique_ptr<Gun> gun) {
+    std::unique_ptr<Gun> replaced_weapon = nullptr;
     if (const int price = gun->get_gun_price(); money >= price) {
         money -= price;
         if (gun->get_gun_type() == GunType::Primary) {
+            replaced_weapon = std::move(primary_weapon);
+            if (replaced_weapon != nullptr) {
+                replaced_weapon->reset_shoots();
+                replaced_weapon->reset_time();
+            }
             primary_weapon = std::move(gun);
         } else {
             secondary_weapon = std::move(gun);
         }
         last_action = Action::BuyingWeapon;
     }
+    return replaced_weapon;
 }
 
 
@@ -211,7 +220,10 @@ void Player::switch_team() {
 
 void Player::shoot(const Position& pos, float time) {
     is_defusing = false;
-    is_planting = false;
+    if (equipped_weapon != GunType::Bomb) {
+        // Con la bomba equipada, seguir "disparando" (click mantenido) continua el plantado
+        is_planting = false;
+    }
     try {
         if (equipped_weapon == GunType::Primary) {
             primary_weapon->shoot_gun(pos, time);
@@ -251,6 +263,7 @@ Gun& Player::get_equipped_gun() const {
 
 
 void Player::update(GameManager& game_manager) {
+    task_progress = 0;
     if (status == Status::Dead) {
         return;
     }
@@ -258,13 +271,18 @@ void Player::update(GameManager& game_manager) {
     Map& map = game_manager.get_map();
     const double time = game_manager.get_time();
     Position pos(this->position_x, this->position_y);
-    if (Gun& gun_to_shoot = get_equipped_gun(); gun_to_shoot.has_to_shoot(time)) {
-        if (gun_to_shoot.get_gun_type() == GunType::Bomb) {
-            if (game_manager.can_plant_bomb(position_x, position_y)) {
-                gun_to_shoot.fire_gun(map, *this, time, pos);
-                last_action = Action::PlantBomb;
-            }
+    Gun& gun_to_shoot = get_equipped_gun();
+    if (gun_to_shoot.get_gun_type() == GunType::Bomb && gun_to_shoot.has_to_shoot(time)) {
+        // Con la bomba, "disparar" es plantar y solo vale dentro de una zona de bomba. Antes se
+        // seguia de largo al disparo comun, que tambien llamaba a fire_gun y plantaba en cualquier
+        // lugar del mapa.
+        if (game_manager.can_plant_bomb(position_x, position_y)) {
+            gun_to_shoot.fire_gun(map, *this, time, pos);
+            last_action = Action::PlantBomb;
+        } else {
+            gun_to_shoot.reset_shoots();
         }
+    } else if (gun_to_shoot.has_to_shoot(time)) {
         const ShootInfo shoots = gun_to_shoot.fire_gun(map, *this, time, pos);
         int x = 0;
         int y = 0;
@@ -289,6 +307,7 @@ void Player::update(GameManager& game_manager) {
         is_planting = false;
         bomb = nullptr;
     }
+    update_task_progress(time);
     if (is_defusing) {
         game_manager.has_finished_defusing(*this);
     }
@@ -345,3 +364,29 @@ WeaponInfo Player::get_secondary_weapon_info() {
 
 
 void Player::set_idle() { last_action = Action::Idle; }
+
+
+void Player::drop_equipped_weapon(const GameManager& manager) {
+    if (equipped_weapon == GunType::Bomb && bomb != nullptr) {
+        is_planting = false;
+        manager.drop_bomb(*this, std::move(bomb));
+        equipped_weapon = GunType::Secondary;
+    } else if (equipped_weapon == GunType::Primary && primary_weapon != nullptr) {
+        primary_weapon->reset_shoots();
+        primary_weapon->reset_time();
+        manager.drop_weapon(*this, std::move(primary_weapon));
+        primary_weapon = nullptr;
+        equipped_weapon = GunType::Secondary;
+    }
+}
+
+
+void Player::update_task_progress(const double time) {
+    if (is_planting && bomb != nullptr) {
+        task_progress =
+                static_cast<int>(bomb->get_planting_progress(static_cast<float>(time)) * 100);
+    } else if (is_defusing && game_config.defuse_time > 0) {
+        const double progress = (time - defuse_time) / game_config.defuse_time;
+        task_progress = static_cast<int>(std::clamp(progress, 0.0, 1.0) * 100);
+    }
+}

@@ -13,10 +13,12 @@ NAME="cs2d"
 NAME_PROJECT="Counter-Strike 2D"
 SERVER_NAME="taller_server"
 CLIENT_NAME="taller_client"
+EDITOR_NAME="taller_editor"
 TEST_NAME="taller_tests"
 
 SERVER_EXECUTABLE="server.sh"
 CLIENT_EXECUTABLE="client.sh"
+EDITOR_EXECUTABLE="editor.sh"
 
 CONFIG_DIR="/etc/$NAME"
 ASSETS_DIR="/var/$NAME"
@@ -81,6 +83,7 @@ echo -e "${BLUE}📁 Installing game files...${NC}"
 sudo mkdir -p "$BIN_DIR" "$ASSETS_DIR" "$CONFIG_DIR"
 sudo cp build/$SERVER_NAME "$BIN_DIR/"
 sudo cp build/$CLIENT_NAME "$BIN_DIR/"
+sudo cp build/$EDITOR_NAME "$BIN_DIR/"
 
 # Assets
 sudo cp -r client/data/* "$ASSETS_DIR/"
@@ -90,6 +93,9 @@ sudo chmod -R 777 "$ASSETS_DIR"
 
 # Configuracion
 sudo cp server/server_config.yaml "$CONFIG_DIR/"
+# Mapas: uno por archivo, los lista la seccion "maps" de server_config.yaml
+sudo mkdir -p "$CONFIG_DIR/maps"
+sudo cp server/maps/*.yaml "$CONFIG_DIR/maps/"
 
 # ------------------------ Scripts del servidor y cliente ------------------------
 echo -e "${BLUE}📄 Creating startup scripts...${NC}"
@@ -113,10 +119,22 @@ export CS2D_ASSETS_DIR="/var/cs2d"
 ./$CLIENT_NAME \$HOST \$PORT
 EOF
 
-chmod +x "$TMP_DIR/$SERVER_EXECUTABLE" "$TMP_DIR/$CLIENT_EXECUTABLE"
-rm -f "$DESKTOP_DIR/$SERVER_EXECUTABLE" "$DESKTOP_DIR/$CLIENT_EXECUTABLE"
+# El editor guarda los mapas nuevos en ~/cs2d-mapas; para jugarlos se copian a
+# $CONFIG_DIR/maps y se agregan a la lista "maps" de server_config.yaml
+cat <<EOF > "$TMP_DIR/$EDITOR_EXECUTABLE"
+#!/bin/bash
+mkdir -p "\$HOME/cs2d-mapas"
+cd "\$HOME/cs2d-mapas"
+export CS2D_ASSETS_DIR="$ASSETS_DIR"
+$BIN_DIR/$EDITOR_NAME "\$@"
+EOF
+
+chmod +x "$TMP_DIR/$SERVER_EXECUTABLE" "$TMP_DIR/$CLIENT_EXECUTABLE" "$TMP_DIR/$EDITOR_EXECUTABLE"
+rm -f "${DESKTOP_DIR:?}/${SERVER_EXECUTABLE:?}" "${DESKTOP_DIR:?}/${CLIENT_EXECUTABLE:?}" \
+      "${DESKTOP_DIR:?}/${EDITOR_EXECUTABLE:?}"
 cp "$TMP_DIR/$SERVER_EXECUTABLE" "$DESKTOP_DIR/"
 cp "$TMP_DIR/$CLIENT_EXECUTABLE" "$DESKTOP_DIR/"
+cp "$TMP_DIR/$EDITOR_EXECUTABLE" "$DESKTOP_DIR/"
 
 # ------------------------ Finalizacion ------------------------
 echo -e "${GREEN}🎉 Installation completed successfully.${NC}"

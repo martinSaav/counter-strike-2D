@@ -5,6 +5,7 @@
 #include "client_handler.h"
 
 #include <list>
+#include <string>
 #include <vector>
 
 #include "catedra/liberror.h"
@@ -53,7 +54,8 @@ void ClientHandler::handle_list_matches_request() {
 GameIdentification ClientHandler::handle_create_game_request(std::unique_ptr<Message>&& message) {
     const auto create_message = dynamic_cast<CreateGameRequest*>(message.get());
     const std::string game_name = create_message->get_game_name();
-    const GameIdentification id = lobby.create_match(game_name, username);
+    const GameIdentification id =
+            lobby.create_match(game_name, username, create_message->get_map_name());
     match_name = game_name;
     const CreateGameResponse response(true);
     protocol.send_message(response);
@@ -93,6 +95,8 @@ std::optional<GameIdentification> ClientHandler::pick_match() {
                         return handle_join_game_request(std::move(message));
                     } catch (const MatchFull&) {
                         protocol.send_message(JoinGameResponse(false));
+                    } catch (const MatchAlreadyStarted&) {
+                        protocol.send_message(JoinGameResponse(false));
                     } catch (const MatchNotFound&) {
                         protocol.send_message(JoinGameResponse(false));
                     }
@@ -102,8 +106,8 @@ std::optional<GameIdentification> ClientHandler::pick_match() {
                     return std::nullopt;
                 }
                 case MessageType::MapNamesRequest: {
-                    std::list<std::string> map_names;
-                    map_names.emplace_back(config.map_config.map_name);
+                    const std::vector<std::string> names = config.get_map_names();
+                    std::list<std::string> map_names(names.begin(), names.end());
                     const MapNamesResponse response(std::move(map_names));
                     protocol.send_message(response);
                     break;
@@ -159,7 +163,7 @@ void ClientHandler::run() {
         return;
     }
     GameIdentification match_id = match_id_o.value();
-    sender = std::make_unique<Sender>(protocol, config, match_id.sender_queue);
+    sender = std::make_unique<Sender>(protocol, match_id.config, match_id.sender_queue);
     sender.value()->start();
     MessageParser parser(match_id.credentials);
     try {

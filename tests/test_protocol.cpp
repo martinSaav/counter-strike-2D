@@ -3,6 +3,7 @@
 #include "common/dto/create_game_response.h"
 #include "common/dto/game_list_request.h"
 #include "common/dto/game_list_response.h"
+#include "common/dto/game_state_update.h"
 #include "common/dto/join_game_request.h"
 #include "common/dto/join_game_response.h"
 #include "common/dto/login_request.h"
@@ -555,4 +556,18 @@ TEST(ProtocolTest, ThrowsConnectionClosedWhenPayloadNotReceived) {
 
     Protocol protocol(mock_socket);
     EXPECT_THROW(protocol.recv_message(), ConnectionClosed);
+}
+
+
+TEST(ProtocolTest, GameStateUpdateKeepsStageAndTimeLeft) {
+    const GameStateUpdate state(true, false, 3, 12.5f, true, false, false, 0, 0, 0.0f,
+                                Team::Terrorists, Team::Terrorists, {}, {}, RoundStage::PrePlant,
+                                97.25f);
+    std::vector<uint8_t> buffer(state.serialized_size());
+    state.serialize(buffer.data());
+
+    const GameStateUpdate decoded = GameStateUpdate::deserialize(buffer.data(), buffer.size());
+    EXPECT_EQ(decoded.get_round(), 3);
+    EXPECT_EQ(decoded.get_stage(), RoundStage::PrePlant);
+    EXPECT_FLOAT_EQ(decoded.get_time_left(), 97.25f);
 }

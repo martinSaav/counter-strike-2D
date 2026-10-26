@@ -98,11 +98,25 @@ ShootInfo M3::fire_gun(Map& map, Player& owner, float current_time, Position& cu
             continue;
         }
         const double cos = (attack_x * direction_x + attack_y * direction_y) / mod;
-        if (double angle = acos(cos); angle < degree && calculate_if_bullet_hit(mod)) {
+        if (double angle = acos(cos); angle < degree && calculate_if_bullet_hit(mod) &&
+                                      has_line_of_sight(map, owner, current_position, *player)) {
             results.emplace_back(calculate_damage(mod), direction, player);
         }
     }
     return ShootInfo{std::move(results)};
+}
+
+
+bool M3::has_line_of_sight(Map& map, const Player& owner, const Position& from,
+                           Player& target) const {
+    // Los perdigones no atraviesan paredes: el primer impacto en la linea hacia el objetivo
+    // tiene que ser el objetivo mismo.
+    auto [from_x, from_y] = from.get_position();
+    auto [target_x, target_y] = target.get_location();
+    const ImpactInfo impact =
+            map.trace_bullet_path(from_x, from_y, Position(target_x, target_y), owner);
+    return impact.impacted_player.has_value() &&
+           impact.impacted_player.value()->get_username() == target.get_username();
 }
 
 

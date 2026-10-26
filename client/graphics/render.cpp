@@ -116,18 +116,41 @@ void Render::renderFrame(std::optional<GameStateUpdate> message) {
         player.drawBlood(stain.x, stain.y);
     }
 
+    Uint32 now = SDL_GetTicks();
     for (auto const& playerInfo: players) {
 
         std::string name = playerInfo.get_user_name();
         int currentHealth = playerInfo.get_health();
+        float dxToMe = playerInfo.get_pos_x() - myPlayer->get_pos_x();
+        float dyToMe = playerInfo.get_pos_y() - myPlayer->get_pos_y();
+        float distanceToMe = std::sqrt(dxToMe * dxToMe + dyToMe * dyToMe);
 
         lastHealths.try_emplace(name, currentHealth);
 
         if (currentHealth < lastHealths[name]) {
             bloodStains.push_back({playerInfo.get_pos_x(), playerInfo.get_pos_y()});
+            if (currentHealth == 0) {
+                player.playSound(DEATH, 110, distanceToMe);
+            } else {
+                player.playSound(HIT, 90, distanceToMe);
+            }
         }
 
         lastHealths[name] = currentHealth;
+
+        // Pasos: un sonido cada tanto mientras el jugador se mueve
+        std::pair<int, int> position(playerInfo.get_pos_x(), playerInfo.get_pos_y());
+        auto lastPosition = lastPositions.find(name);
+        if (lastPosition != lastPositions.end() && lastPosition->second != position &&
+            currentHealth > 0 && now - lastStepTicks[name] > 350) {
+            player.playSound(STEP, 110, distanceToMe);
+            lastStepTicks[name] = now;
+        }
+        lastPositions[name] = position;
+
+        if (currentHealth > 0) {
+            player.playShotSound(playerInfo, distanceToMe);
+        }
 
         if (playerInfo.get_health() == 0) {
             player.drawPlayerDeath(playerInfo.get_pos_x(), playerInfo.get_pos_y());
@@ -151,18 +174,14 @@ void Render::renderFrame(std::optional<GameStateUpdate> message) {
         }
     }
 
-    int time;
-    int matchTime = message->get_round_time();
+    // El servidor manda cuanto le queda a la etapa actual (compra, ronda o bomba), asi el
+    // reloj siempre cuenta hacia atras.
+    int time = static_cast<int>(std::ceil(message->get_time_left()));
     int round = message->get_round();
-
-    if (is_bomb_planted) {
-        time = message->get_bomb_timer();
-    } else {
-        time = matchTime;
-    }
+    bool isBuyStage = message->get_stage() == RoundStage::Buy;
 
     SDL_Rect mouse = {mouseX, mouseY, 40, 40};
-    hud.draw(mouse, time, round, *myPlayer, is_bomb_planted);
+    hud.draw(mouse, time, round, *myPlayer, is_bomb_planted, isBuyStage);
 
     if (message->is_round_ended()) {
         Team team = message->get_round_winner();
@@ -171,9 +190,9 @@ void Render::renderFrame(std::optional<GameStateUpdate> message) {
         bloodStains.clear();
         lastHealths.clear();
     }
-    if (matchTime >= configuration.buyTime && myPlayer->get_status() == Status::Alive) {
+    if (!isBuyStage && myPlayer->get_status() == Status::Alive) {
         map.drawCampField(myAngle, myPlayer->get_pos_x(), myPlayer->get_pos_y());
-    } else if (matchTime < configuration.buyTime) {
+    } else if (isBuyStage) {
         map.drawShop();
     }
 
@@ -192,6 +211,26 @@ void Render::renderFrame(std::optional<GameStateUpdate> message) {
         damageFlashTimer = 10;
     }
     lastHealth = currentHealth;
+
+    int taskProgress = myPlayer->get_task_progress();
+    if (taskProgress > 0 && myPlayer->get_status() == Status::Alive) {
+        bool planting = myPlayer->get_skin()[0] != 'C';
+        hud.drawTaskProgress(taskProgress, planting);
+        if (!planting && lastTaskProgress == 0) {
+            player.playSound(DEFUSING, 100, 0);
+        }
+    }
+    lastTaskProgress = taskProgress;
+
+    playStateSounds(*message, *myPlayer, isBuyStage);
+
+    // La ayuda aparece sola en la primera compra; despues solo si la abren con H
+    if (!isBuyStage && !configuration.helpToggled) {
+        configuration.helpVisible = false;
+    }
+    if (configuration.helpVisible) {
+        hud.drawHelp();
+    }
 
     if (damageFlashTimer > 0) {
         SDL_Rect screen = {0, 0, configuration.widthWindow, configuration.heightWindow};
@@ -218,10 +257,15 @@ double Render::getAnglePlayer(int playerX, int playerY, int mousex, int mousey) 
 
 bool Render::pointInVision(int playerX, int playerY, float visionAngleDeg, int puntoX, int puntoY) {
     float fovDeg = configuration.visionCone;
-    float radius = 60.0f;
+    float radius = configuration.visionRadius();
+    // Lo que esta pegado al jugador se ve siempre, aunque quede fuera del cono
+    const float nearRadius = 6.0f;
     float dx = puntoX - playerX;
     float dy = puntoY - playerY;
     float distancia = std::sqrt(dx * dx + dy * dy);
+
+    if (distancia <= nearRadius)
+        return true;
 
     // Esta dentro del radio
     if (distancia > radius)
@@ -258,4 +302,54 @@ float Render::normalizeAngle(float angle) {
 void Render::clearScreen() {
     sdlRenderer->SetDrawColor(0, 0, 0, 255);
     sdlRenderer->Clear();
+}
+
+void Render::playStateSounds(const GameStateUpdate& message, const PlayerInfo& me,
+                             bool isBuyStage) {
+    const Uint32 now = SDL_GetTicks();
+
+    // Bomba plantada: un pitido que se acelera en los ultimos 10 segundos, mas fuerte cuanto
+    // mas cerca este la bomba
+    if (message.is_bomb_planted() && !message.is_round_ended()) {
+        const float timeLeft = message.get_time_left();
+        const Uint32 interval = static_cast<Uint32>(std::clamp(timeLeft * 100.0f, 150.0f, 1000.0f));
+        if (now - lastBombBeep >= interval) {
+            const float dx = message.get_bomb_x() - me.get_pos_x();
+            const float dy = message.get_bomb_y() - me.get_pos_y();
+            player.playSound(C4_BEEP, 100, std::sqrt(dx * dx + dy * dy));
+            lastBombBeep = now;
+        }
+    }
+
+    const bool alive = me.get_status() == Status::Alive;
+
+    // Gatillo sin balas: el servidor no dispara, asi que el aviso lo da el cliente
+    const Weapon active = me.get_active_weapon();
+    const bool isGun = active == Weapon::Glock || active == Weapon::AK47 || active == Weapon::M3 ||
+                       active == Weapon::AWP;
+    const bool clicking = SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON(SDL_BUTTON_LEFT);
+    if (alive && !isBuyStage && clicking && isGun && me.get_active_weapon_ammo() == 0 &&
+        now - lastEmptyClick > 350) {
+        player.playSound(EMPTY_CLICK, 80, 0);
+        lastEmptyClick = now;
+    }
+
+    // Levantar (E) o tirar (G) la principal o la bomba. Comprar tiene su propio sonido, y al
+    // morir o plantar tambien se pierden armas sin que sea "tirarlas".
+    const Weapon primary = me.get_primary_weapon();
+    const bool hasBomb = me.get_bomb() == Weapon::Bomb;
+    if (alive && wasAlive && me.get_action() != Action::BuyingWeapon) {
+        const bool gotWeapon =
+                (primary != lastPrimary && primary != Weapon::None) || (hasBomb && !lastHadBomb);
+        const bool lostWeapon = (primary == Weapon::None && lastPrimary != Weapon::None) ||
+                                (!hasBomb && lastHadBomb && !message.is_bomb_planted());
+        if (gotWeapon) {
+            player.playSound(PICKUP, 90, 0);
+        } else if (lostWeapon) {
+            player.playSound(DROP, 90, 0);
+        }
+    }
+    lastPrimary = primary;
+    lastHadBomb = hasBomb;
+    wasAlive = alive;
 }

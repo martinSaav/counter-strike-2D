@@ -11,6 +11,7 @@
 - [Compilación](#compilación)
 - [Ejecución](#ejecución)
 - [Testing](#testing)
+- [Documentación](#documentación)
 - [Manual del Usuario](#manual-del-usuario-counter-strike-2d)
   - [Introducción](#introducción)
   - [Requisitos del Sistema](#requisitos-del-sistema)
@@ -34,6 +35,12 @@
 Juego multijugador 2D por rondas inspirado en el clásico Counter-Strike 1.6. Este juego fue desarrollado en C++ como parte del trabajo práctico final de la materia Taller de Programación I (FIUBA).
 
 
+## Documentación
+
+- [Manual de usuario](docs/manual_usuario.md): cómo instalar, jugar, controles, armas y escenarios.
+- [Manual del proyecto](docs/manual_proyecto.md): organización, cronología, problemas encontrados y aprendizajes.
+- [Documentación técnica](docs/documentacion_tecnica.md): arquitectura del servidor y del cliente, clases principales y protocolo.
+
 ## Compilación
 Para compilar el proyecto, se debe ejecutar el siguiente comando en la terminal:
 
@@ -50,13 +57,19 @@ Entrar a la carpeta build
 
 ### Server
 ```bash
-   ./server <port> <server_config_file>
+   ./taller_server <port> ../server/server_config.yaml
 ```
 
 ### Cliente
 ```bash
-   ./client <hostname> <port>
+   ./taller_client <hostname> <port>
 ```
+
+### Editor de niveles
+```bash
+   ./taller_editor [mapa.yaml]
+```
+Los mapas del juego están en `server/maps/` (uno por archivo) y `server/server_config.yaml` lista cuáles se cargan. Ver la sección del editor en el [manual de usuario](docs/manual_usuario.md#editor-de-niveles-creá-tus-propios-mapas).
 
 ## Testing
 Para ejecutar los tests, se debe ejecutar el siguiente comando en la terminal:
@@ -144,10 +157,11 @@ Podés modificar:
 
 ### Ejecución del juego
 
-Una vez instalado, encontrás dos archivos en tu escritorio:
+Una vez instalado, encontrás tres archivos en tu escritorio:
 
 - `client.sh` para lanzar el cliente
 - `server.sh` para lanzar el servidor
+- `editor.sh` para abrir el editor de niveles
 
 #### Desde una terminal:
 
@@ -207,9 +221,14 @@ Estar en el escritorio o en la carpeta del proyecto
 - `3`: Arma secundaria
 - `4`: Bomba (terroristas)
 - `E`: Agarrar arma del suelo
+- `G`: Tirar el arma principal o la bomba
 - `R`: Recargar
 - `Click izquierdo sobre zona de bomba`: Plantar la bomba (terroristas)
-- `F`: Desactivar bomba (antiterroristas)
+- `F` (mantener): Desactivar bomba (antiterroristas)
+- `I` / `O` / `P`: Comprar AK-47 / M3 / AWP (también con click en la tienda)
+- `K` / `L`: Comprar balas para el arma principal / la glock
+- `H`: Mostrar u ocultar la ayuda de controles
+- `F11`: Alternar pantalla completa y ventana
 - `Q`: Salir del juego
 
 ---

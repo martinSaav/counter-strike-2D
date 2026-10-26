@@ -23,7 +23,9 @@ GameIdentification Match::join_match(const std::string& username) {
     players.insert(std::pair{credentials, player});
     auto sender_queue =
             std::make_shared<Queue<std::variant<MatchStatusDTO, GameReadyNotification>>>();
-    GameIdentification game_identification(commands_queue, sender_queue, credentials);
+    GameIdentification game_identification(commands_queue, sender_queue, credentials,
+                                           game_config_ptr);
+    senders_by_player[credentials] = sender_queue;
     senders_queues.push_back(std::move(sender_queue));
     map.add_player(player);
     game_manager.add_player_to_team(player);
@@ -200,6 +202,31 @@ void Match::process_pick_weapon_request(const PlayerCredentials credentials) {
 }
 
 
+void Match::process_drop_weapon_request(const PlayerCredentials credentials) {
+    std::lock_guard<std::mutex> lck(mtx);
+    const auto player_p = players.find(credentials);
+    if (player_p == players.end()) {
+        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
+    }
+    const std::shared_ptr<Player>& player = player_p->second;
+    if (player->is_dead()) {
+        return;
+    }
+    player->drop_equipped_weapon(game_manager);
+}
+
+
+void Match::process_aim_request(const PlayerCredentials credentials, const Position aim_pos) {
+    std::lock_guard<std::mutex> lck(mtx);
+    const auto player_p = players.find(credentials);
+    if (player_p == players.end()) {
+        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
+    }
+    auto [x, y] = aim_pos.get_position();
+    player_p->second->set_aim_pos(x, y);
+}
+
+
 void Match::process_leave_match(const std::shared_ptr<Player>& player) {
     map.remove_player(player);
     game_manager.remove_player_from_team(player);
@@ -254,7 +281,9 @@ MatchStatusDTO Match::get_match_status() {
                           info.bomb_timer,
                           info.round_winner,
                           game_manager.get_match_winner(),
-                          map.get_dropped_weapons()};
+                          map.get_dropped_weapons(),
+                          info.stage,
+                          info.time_left};
 }
 
 
@@ -309,15 +338,35 @@ void Match::process_change_skin_request(const PlayerCredentials credentials,
 }
 
 
-void Match::process_game_ready() {
-    if (!match_started) {
-        match_started = true;
-        broadcast_match_start();
+void Match::process_game_ready(const PlayerCredentials credentials) {
+    if (match_started) {
+        return;
     }
+    const bool has_terrorists =
+            std::ranges::any_of(players | std::views::values,
+                                [](const auto& p) { return p->get_team() == Team::Terrorists; });
+    const bool has_counter_terrorists = std::ranges::any_of(
+            players | std::views::values,
+            [](const auto& p) { return p->get_team() == Team::CounterTerrorists; });
+    if (!has_terrorists || !has_counter_terrorists) {
+        // Falta al menos un jugador por equipo: solo le avisamos al que pidio arrancar.
+        if (const auto sender = senders_by_player.find(credentials);
+            sender != senders_by_player.end()) {
+            try {
+                sender->second->push(GameReadyNotification{false});
+            } catch (const ClosedQueue&) {}
+        }
+        return;
+    }
+    match_started = true;
+    broadcast_match_start();
 }
 
 
-void Match::process_game_ready_request() { process_game_ready(); }
+void Match::process_game_ready_request(const PlayerCredentials credentials) {
+    std::lock_guard<std::mutex> lck(mtx);
+    process_game_ready(credentials);
+}
 
 
 void Match::wait_for_match_to_start() {
@@ -333,7 +382,10 @@ void Match::process_buy_weapon(const std::shared_ptr<Player>& player, const Weap
     }
     try {
         std::unique_ptr<Gun> gun = GunShop::get_gun(weapon, game_config);
-        player->buy_weapon(std::move(gun));
+        if (std::unique_ptr<Gun> replaced = player->buy_weapon(std::move(gun));
+            replaced != nullptr) {
+            game_manager.drop_weapon(*player, std::move(replaced));
+        }
     } catch (const CantBuyWeapon&) {}
 }
 
@@ -514,3 +566,6 @@ void Match::stop() {
 
 
 bool Match::has_match_finished() const { return has_finished && player_count == 0; }
+
+
+bool Match::has_match_started() const { return match_started; }
