@@ -16,6 +16,8 @@
 #include <QStatusBar>
 #include <QToolBar>
 #include <QVBoxLayout>
+#include <numeric>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -297,10 +299,12 @@ bool EditorWindow::checkCanSave() {
     if (result.ok()) {
         return true;
     }
-    QString message = "No se puede guardar el mapa todavía:\n";
-    for (const auto& error: result.errors) {
-        message += "\n• " + QString::fromStdString(error);
-    }
+    const QString message =
+            std::accumulate(result.errors.begin(), result.errors.end(),
+                            QString("No se puede guardar el mapa todavía:\n"),
+                            [](const QString& text, const std::string& error) {
+                                return text + "\n• " + QString::fromStdString(error);
+                            });
     QMessageBox::warning(this, "Mapa incompleto", message);
     return false;
 }

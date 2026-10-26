@@ -12,7 +12,7 @@
 
 namespace {
 
-const std::string SOURCE_DIR = TALLER_SOURCE_DIR;
+const char SOURCE_DIR[] = TALLER_SOURCE_DIR;
 
 // Mapa chico y valido para partir en cada test
 MapDocument valid_map() {
@@ -108,7 +108,8 @@ TEST(MapDocumentTest, WeaponUnderAStructureIsAnError) {
 
 TEST(MapDocumentTest, ServerMapsAreValid) {
     for (const std::string name: {"desierto", "pueblo-azteca", "entrenamiento"}) {
-        const MapDocument map = MapDocument::load(SOURCE_DIR + "/server/maps/" + name + ".yaml");
+        const MapDocument map =
+                MapDocument::load(std::string(SOURCE_DIR) + "/server/maps/" + name + ".yaml");
         const MapValidation result = map.validate();
         EXPECT_TRUE(result.ok()) << name << ": " << (result.errors.empty() ? "" : result.errors[0]);
         EXPECT_EQ(map.name, name);
@@ -121,7 +122,7 @@ TEST(MapDocumentTest, ServerLoadsAMapSavedByTheEditor) {
     const auto map_path = temp_file("editor_map.yaml");
     const auto config_path = temp_file("server_config.yaml");
     valid_map().save(map_path.string());
-    std::ifstream original(SOURCE_DIR + "/server/server_config.yaml");
+    std::ifstream original(std::string(SOURCE_DIR) + "/server/server_config.yaml");
     std::ofstream config(config_path);
     std::string line;
     while (std::getline(original, line) && line.rfind("maps:", 0) != 0) {

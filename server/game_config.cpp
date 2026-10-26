@@ -4,7 +4,11 @@
 
 #include "game_config.h"
 
+#include <algorithm>
+#include <iterator>
+#include <string>
 #include <utility>
+#include <vector>
 
 GameConfig::GameConfig(int player_health, int number_of_rounds, int starting_money, int ct_amount,
                        int tt_amount, int ammo_price, GunConfig&& knife_config,
@@ -73,10 +77,10 @@ GameConfig::GameConfig(const GameConfig& base, const MapConfig& selected_map):
 
 
 const MapConfig& GameConfig::find_map(const std::string& name) const {
-    for (const auto& map: maps) {
-        if (map.map_name == name) {
-            return map;
-        }
+    const auto found = std::ranges::find_if(
+            maps, [&name](const MapConfig& map) { return map.map_name == name; });
+    if (found != maps.end()) {
+        return *found;
     }
     return maps.empty() ? map_config : maps.front();
 }
@@ -84,9 +88,8 @@ const MapConfig& GameConfig::find_map(const std::string& name) const {
 
 std::vector<std::string> GameConfig::get_map_names() const {
     std::vector<std::string> names;
-    for (const auto& map: maps) {
-        names.push_back(map.map_name);
-    }
+    std::ranges::transform(maps, std::back_inserter(names),
+                           [](const MapConfig& map) { return map.map_name; });
     if (names.empty()) {
         names.push_back(map_config.map_name);
     }

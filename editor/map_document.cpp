@@ -227,11 +227,8 @@ MapValidation MapDocument::validate() const {
                                       "donde no se va a poder plantar.");
         }
     }
-    for (const auto& structure: structures) {
-        if (!inside(structure)) {
-            result.errors.push_back("Hay una estructura que se sale del mapa.");
-            break;
-        }
+    if (!std::ranges::all_of(structures, inside)) {
+        result.errors.push_back("Hay una estructura que se sale del mapa.");
     }
     for (const auto& drop: weapon_drops) {
         const MapRect footprint{drop.position.x, drop.position.y, WEAPON_SIZE, WEAPON_SIZE};

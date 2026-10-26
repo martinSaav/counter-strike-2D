@@ -10,6 +10,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <utility>
+#include <vector>
 
 namespace {
 
@@ -251,7 +252,7 @@ void MapView::mousePressEvent(QMouseEvent* event) {
 
 void MapView::mouseMoveEvent(QMouseEvent* event) {
     const QPoint tile = tileAt(event->pos());
-    emit cursorMoved(tile.x(), tile.y());
+    emit this->cursorMoved(tile.x(), tile.y());
     if (dragMode == DragMode::Move && selected && tile != dragLastTile) {
         moveSelected(tile - dragLastTile);
         dragLastTile = tile;

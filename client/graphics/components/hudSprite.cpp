@@ -380,9 +380,8 @@ void HudSprite::drawSounds(PlayerInfo& myPlayer) {
 }
 
 void HudSprite::drawHelp() {
-    SDL_Rect destRect = configuration.helpRect();
     textureName = "help";
-    drawHud2(destRect, textureName);
+    drawHud2(configuration.helpRect(), textureName);
 }
 
 void HudSprite::drawTaskProgress(int progress, bool planting) {

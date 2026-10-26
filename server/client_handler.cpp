@@ -5,6 +5,7 @@
 #include "client_handler.h"
 
 #include <list>
+#include <string>
 #include <vector>
 
 #include "catedra/liberror.h"
@@ -105,10 +106,8 @@ std::optional<GameIdentification> ClientHandler::pick_match() {
                     return std::nullopt;
                 }
                 case MessageType::MapNamesRequest: {
-                    std::list<std::string> map_names;
-                    for (const auto& name: config.get_map_names()) {
-                        map_names.push_back(name);
-                    }
+                    const std::vector<std::string> names = config.get_map_names();
+                    std::list<std::string> map_names(names.begin(), names.end());
                     const MapNamesResponse response(std::move(map_names));
                     protocol.send_message(response);
                     break;

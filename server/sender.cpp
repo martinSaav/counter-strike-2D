@@ -1,5 +1,7 @@
 #include "sender.h"
 
+#include <algorithm>
+#include <iterator>
 #include <list>
 #include <vector>
 
@@ -40,9 +42,10 @@ void Sender::send_game_config() const {
     std::vector<StructureInfo> structures_info;
     const MapConfig& map_cfg = config.map_config;
     std::vector<BombSiteInfo> bomb_sites_info;
-    for (const auto& site: map_cfg.bomb_sites) {
-        bomb_sites_info.emplace_back(site.bomb_site_height, site.bomb_site_width, site.x, site.y);
-    }
+    std::ranges::transform(
+            map_cfg.bomb_sites, std::back_inserter(bomb_sites_info), [](const BombSite& site) {
+                return BombSiteInfo{site.bomb_site_height, site.bomb_site_width, site.x, site.y};
+            });
     const Site& ct_site = map_cfg.ct_site;
     const Site& tt_site = map_cfg.tt_site;
     for (auto& structure: map_cfg.structures) {
