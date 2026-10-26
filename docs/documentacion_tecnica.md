@@ -184,7 +184,7 @@ weapon_drops:                    # armas en el piso al comenzar: ak-47, m3 o awp
 
 ## 6. Configuración y assets
 
-- `server/server_config.yaml` (instalado en `/etc/cs2d/`) contiene todos los valores numéricos y la sección `maps` con las rutas de los mapas, relativas a la carpeta del archivo (`maps/desierto.yaml`, etc.; también acepta un mapa escrito directamente en la lista). Para agregar un mapa alcanza con crearlo en el editor, copiarlo a `maps/` y sumarlo a la lista. Un **tema visual** nuevo necesita además las texturas `client/data/maps/<theme>/floor.png` (un píxel por tile, del tamaño del mapa) y `wall.png` (baldosa de 32×32).
+- `server/server_config.yaml` (instalado en `/etc/cs2d/`) contiene todos los valores numéricos y la sección `maps` con las rutas de los mapas, relativas a la carpeta del archivo (`maps/desierto.yaml`, etc.; también acepta un mapa escrito directamente en la lista). Para agregar un mapa alcanza con crearlo en el editor, copiarlo a `maps/` y sumarlo a la lista. Un **tema visual** nuevo necesita además las texturas `client/data/maps/<theme>/floor.png` (mosaico de tiles de 32 px que se repite por todo el mapa) y `wall.png` (tile de 32×32 que se repite sobre cada estructura).
 - Assets generados por scripts, que se pueden regenerar:
   - `tools/generate_map_textures.py`: piso y pared de los temas `desert`, `aztec_village` y `training`, armados con tiles de los tilesets originales del CS2D (`client/data/maps/tilesets/`: dust, aztec y cs2dnorm). El cliente y el editor los dibujan en mosaico a 8 px de textura por tile, así un tile de 32 px ocupa lo mismo que un jugador;
   - `tools/generate_hud_images.py`: ayuda de controles y carteles de plantar y desactivar;
