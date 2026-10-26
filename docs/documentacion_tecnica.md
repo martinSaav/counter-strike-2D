@@ -8,6 +8,7 @@ Integrantes: Martín Alejandro Estrada Saavedra (110530), Carlos Matías Sagastu
 - **C++20** y POSIX 2008, compilado con CMake.
 - **Servidor**: hilos de la STL, sockets de la cátedra (`common/catedra`) y yaml-cpp para la configuración.
 - **Cliente**: Qt6 para el lobby y SDL2 con libSDL2pp, SDL_image y SDL_mixer para el juego.
+- **Editor de niveles**: Qt6 (`QGraphicsView`) y yaml-cpp para los archivos de mapa.
 - **Tests**: GoogleTest (`tests/`).
 
 Organización del repositorio:
@@ -19,8 +20,10 @@ Organización del repositorio:
 | `client/lobby/` | Pantallas Qt (login, lobby, crear partida, sala de espera, skins, estadísticas). |
 | `client/graphics/` | Loop del juego, render, entrada, sonido y sprites. |
 | `client/data/` | Imágenes y sonidos. |
+| `editor/` | Editor de niveles: modelo del mapa (`MapDocument`, sin Qt) y la interfaz Qt. |
+| `server/maps/` | Un archivo YAML por mapa (los que lista `server_config.yaml`). |
 | `tools/` | Scripts que generan assets (textos del HUD, texturas de mapas, sonidos). |
-| `tests/` | Tests del protocolo y de las reglas de ronda. |
+| `tests/` | Tests del protocolo, de las reglas de ronda y del modelo del editor. |
 
 ## 2. Arquitectura del servidor
 
@@ -134,20 +137,64 @@ Ambos lados usan `Protocol`, que envía y recibe `Message` (clase abstracta con 
 
 **`PlayerInfo`**: nombre, posición, vida, estado, plata, kills, muertes, última acción, posición de la mira, skin, armas con su munición, arma activa y **`task_progress`** (0 a 100, avance del plantado o desactivado).
 
-**`GameConfigInfo`** se manda una vez al arrancar: vida, rondas, plata, cantidades por equipo, precio de balas, la configuración de cada arma (`GunConfigInfo`: daño, precio, cadencia, alcance, ángulo, munición), tiempos de la partida, cono de visión y el **`MapConfigInfo`** (nombre, tamaño, estructuras, zonas, zona de la bomba y tema visual).
+**`GameConfigInfo`** se manda una vez al arrancar: vida, rondas, plata, cantidades por equipo, precio de balas, la configuración de cada arma (`GunConfigInfo`: daño, precio, cadencia, alcance, ángulo, munición), tiempos de la partida, cono de visión y el **`MapConfigInfo`** (nombre, tamaño, estructuras, zonas de inicio, la **lista de zonas de bomba** y tema visual).
 
-## 5. Configuración y assets
+## 5. Editor de niveles
 
-- `server/server_config.yaml` (instalado en `/etc/cs2d/`) contiene todos los valores numéricos y la sección `maps` con los escenarios. Para agregar un mapa alcanza con sumar una entrada con su `theme` y, si es un tema nuevo, las texturas `client/data/maps/<theme>/floor.png` (un píxel por tile, del tamaño del mapa) y `wall.png` (baldosa de 32×32).
+Tercera aplicación (`taller_editor`). No se conecta al servidor: produce archivos de mapa que después se copian a la carpeta de mapas del servidor.
+
+```mermaid
+flowchart LR
+    W["EditorWindow<br/>menús, herramientas, panel"] -->|"herramienta, arma"| V["MapView<br/>(QGraphicsView)"]
+    V -->|"edita"| D["MapDocument"]
+    W -->|"nombre, terreno, tamaño"| D
+    D -->|"validate()"| W
+    D <-->|"load / save (yaml-cpp)"| F[("mapa.yaml")]
+    F -->|"se copia a server/maps"| S["ConfigurationLoader<br/>del servidor"]
+```
+
+| Clase | Responsabilidad |
+|---|---|
+| `MapDocument` (`editor/map_document.*`) | Modelo del mapa, **sin Qt** (biblioteca `editor_model`, para poder testearlo): nombre, terreno, tamaño, estructuras, zonas de bomba, zonas de inicio con spawns y armas, todo en tiles. `load`/`save` usan el mismo esquema que el servidor. `validate()` devuelve errores (impiden guardar: falta una zona de inicio, zona sin spawns o con spawns afuera, spawn tapado, sin zona de bomba, elementos fuera del mapa, arma debajo de una estructura) y avisos (menos de 5 spawns, zona de bomba con estructuras encima). |
+| `MapView` (`editor/map_view.*`) | Dibuja el documento con las texturas del juego y lo edita según la herramienta: arrastrar para dibujar rectángulos, click para spawns y armas, drag and drop para mover, tirador para redimensionar. La escena solo define el tamaño del mapa; el dibujo se hace en `drawBackground`/`drawForeground` a partir del documento, así no hay que sincronizar objetos gráficos con el modelo. `QGraphicsView` aporta el scroll y el zoom (Ctrl + rueda). |
+| `EditorWindow` (`editor/editor_window.*`) | Menú de archivo (abrir y guardar con `QFileDialog`), barra de herramientas, propiedades del mapa y lista de validación, que se actualiza con cada cambio. Antes de guardar exige que `validate()` no tenga errores. |
+
+### Formato del archivo de mapa
+
+```yaml
+map_name: entrenamiento          # nombre que se ve al crear la partida
+theme: training                  # desert | aztec_village | training (texturas en client/data/maps/<theme>/)
+map_width: 110                   # tamaño en tiles
+map_height: 110
+structures:                      # estructuras sólidas
+  - {x: 51, y: 51, width: 8, height: 8}
+bomb_sites:                      # una o más zonas para plantar
+  - {x: 42, y: 4, width: 26, height: 22}
+tt_site:                         # zona de inicio terrorista y sus spawns
+  x: 4
+  y: 40
+  width: 24
+  height: 30
+  spawns:
+    - {x: 6, y: 44}
+ct_site: {...}                   # igual para los antiterroristas
+weapon_drops:                    # armas en el piso al comenzar: ak-47, m3 o awp
+  - {name: m3, x: 55, y: 95}
+```
+
+## 6. Configuración y assets
+
+- `server/server_config.yaml` (instalado en `/etc/cs2d/`) contiene todos los valores numéricos y la sección `maps` con las rutas de los mapas, relativas a la carpeta del archivo (`maps/desierto.yaml`, etc.; también acepta un mapa escrito directamente en la lista). Para agregar un mapa alcanza con crearlo en el editor, copiarlo a `maps/` y sumarlo a la lista. Un **tema visual** nuevo necesita además las texturas `client/data/maps/<theme>/floor.png` (un píxel por tile, del tamaño del mapa) y `wall.png` (baldosa de 32×32).
 - Assets generados por scripts, que se pueden regenerar:
   - `tools/generate_map_textures.py`: texturas de los temas `desert`, `aztec_village` y `training`;
   - `tools/generate_hud_images.py`: ayuda de controles y carteles de plantar y desactivar;
   - `tools/generate_sounds.py`: sonido de muerte y paso corto.
 
-## 6. Tests
+## 7. Tests
 
 - `tests/test_protocol.cpp`: serialización y deserialización de los mensajes, usando un socket simulado (`MockSocket`).
-- `tests/test_game_rules.cpp`: reglas de ronda sobre la lógica real del servidor (cuenta regresiva por etapa, vencimiento del tiempo de ronda, victoria CT por tiempo, cambio de bando a la mitad, fin de partida).
+- `tests/test_game_rules.cpp`: reglas sobre la lógica real del servidor: cuenta regresiva por etapa, vencimiento del tiempo de ronda, victoria CT por tiempo, cambio de bando a la mitad, fin de partida, duración de la bomba, plantar y desactivar manteniendo la tecla, no plantar fuera de una zona, y tirar y levantar la bomba.
+- `tests/test_map_document.cpp`: el modelo del editor: guardar y abrir da el mismo mapa, cada regla de validación, los mapas de `server/maps/` son válidos y el `ConfigurationLoader` del servidor carga un mapa guardado por el editor.
 
 ```bash
 make run-tests

@@ -132,6 +132,70 @@ En todos verás tu **cono de visión**: lo que queda fuera del cono se ve oscuro
 
 Al terminar la partida se muestra una tabla con las bajas, las muertes, la diferencia **K-D** (bajas menos muertes) y la plata de cada jugador.
 
+Cada escenario tiene **dos zonas de bomba** (A y B): los terroristas pueden plantar en cualquiera de las dos.
+
+---
+
+## Editor de niveles: creá tus propios mapas
+
+El juego trae un editor para diseñar escenarios nuevos: el terreno, las estructuras, las armas tiradas, dónde arranca cada equipo y las zonas de bomba.
+
+```bash
+./editor.sh
+```
+
+(Desde el código: `./taller_editor` dentro de la carpeta `build`. Le podés pasar un mapa para abrirlo directamente: `./taller_editor ../server/maps/entrenamiento.yaml`.)
+
+![Editor con el mapa de entrenamiento](imgs/editor_entrenamiento.jpg)
+
+### Herramientas
+
+Se eligen en la barra de arriba o con las teclas **1 a 9**:
+
+| Tecla | Herramienta | Cómo se usa |
+|---|---|---|
+| **1** | Seleccionar | Arrastrá cualquier elemento para moverlo. Arrastrá el cuadradito blanco de la esquina para cambiarle el tamaño. **Supr** borra lo seleccionado. |
+| **2** | Estructura | Arrastrá para dibujar una pared o caja (los jugadores y las balas no la atraviesan). |
+| **3** | Zona de bomba | Arrastrá para dibujar una zona donde se puede plantar. Podés poner varias (A, B...). |
+| **4** / **5** | Inicio TT / Inicio CT | Arrastrá para dibujar la zona de inicio de cada equipo. Hay una sola por equipo: dibujar otra la reemplaza. |
+| **6** / **7** | Spawn TT / Spawn CT | Click donde aparece un jugador (dentro de su zona). Conviene poner 5 por equipo. |
+| **8** | Arma | Click donde querés dejar un arma tirada. El tipo (AK-47, M3 o AWP) se elige en el panel derecho. |
+| **9** | Borrar | Click sobre lo que quieras sacar. |
+
+Si el mapa es más grande que la ventana, movete con la **rueda del mouse** (o las barras) y hacé zoom con **Ctrl + rueda**. En el panel derecho cambiás el **nombre**, el **terreno** (desierto, pueblo azteca o entrenamiento) y el **tamaño** del mapa.
+
+### Validación
+
+La lista de la derecha te avisa en todo momento qué le falta al mapa. Para poder guardarlo necesita:
+
+- la zona de inicio de cada equipo, con al menos un spawn adentro;
+- al menos una zona de bomba;
+- que nada se salga del mapa, que ninguna estructura tape un spawn y que ningún arma quede debajo de una estructura.
+
+Si intentás guardar un mapa incompleto, el editor te dice qué falta:
+
+![Mapa incompleto](imgs/editor_validacion.png)
+
+Los avisos en amarillo (por ejemplo, menos de 5 spawns en un equipo) no impiden guardar.
+
+![Mapa nuevo armado desde cero](imgs/editor_mapa_nuevo.jpg)
+
+### Jugar tu mapa
+
+Los mapas se guardan como archivos `.yaml` (con `./editor.sh` quedan en la carpeta `~/cs2d-mapas`). Para jugarlo:
+
+1. Copiá el archivo a la carpeta de mapas del servidor:
+   ```bash
+   sudo cp ~/cs2d-mapas/mi-mapa.yaml /etc/cs2d/maps/
+   ```
+2. Agregalo a la lista `maps` de `/etc/cs2d/server_config.yaml`:
+   ```yaml
+   maps:
+     - maps/desierto.yaml
+     - maps/mi-mapa.yaml
+   ```
+3. Reiniciá el servidor. Tu mapa aparece en la lista al crear una partida.
+
 ---
 
 ## Instalación
@@ -147,10 +211,10 @@ sudo ./install.sh
 
 El instalador compila el proyecto, corre los tests y deja:
 
-- los ejecutables en `/usr/bin` (`taller_client`, `taller_server`);
+- los ejecutables en `/usr/bin` (`taller_client`, `taller_server`, `taller_editor`);
 - las imágenes y sonidos en `/var/cs2d`;
-- la configuración en `/etc/cs2d/server_config.yaml`;
-- los accesos directos `client.sh` y `server.sh` en el escritorio.
+- la configuración en `/etc/cs2d/server_config.yaml` y los mapas en `/etc/cs2d/maps/`;
+- los accesos directos `client.sh`, `server.sh` y `editor.sh` en el escritorio.
 
 ### Jugar en red
 
@@ -164,4 +228,4 @@ Todo lo numérico está en `/etc/cs2d/server_config.yaml`:
 - tiempos de compra, de ronda y de la bomba;
 - daño, precisión, cadencia, precio y balas de cada arma;
 - ángulo y opacidad del cono de visión;
-- los mapas (sección `maps`): tamaño, estructuras, zonas de inicio, zona de la bomba y armas tiradas al comenzar.
+- qué mapas se pueden elegir (sección `maps`, una ruta por mapa). Cada mapa es un archivo propio en `/etc/cs2d/maps/` que se arma con el editor de niveles.

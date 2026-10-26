@@ -57,13 +57,19 @@ Entrar a la carpeta build
 
 ### Server
 ```bash
-   ./server <port> <server_config_file>
+   ./taller_server <port> ../server/server_config.yaml
 ```
 
 ### Cliente
 ```bash
-   ./client <hostname> <port>
+   ./taller_client <hostname> <port>
 ```
+
+### Editor de niveles
+```bash
+   ./taller_editor [mapa.yaml]
+```
+Los mapas del juego están en `server/maps/` (uno por archivo) y `server/server_config.yaml` lista cuáles se cargan. Ver la sección del editor en el [manual de usuario](docs/manual_usuario.md#editor-de-niveles-creá-tus-propios-mapas).
 
 ## Testing
 Para ejecutar los tests, se debe ejecutar el siguiente comando en la terminal:
@@ -151,10 +157,11 @@ Podés modificar:
 
 ### Ejecución del juego
 
-Una vez instalado, encontrás dos archivos en tu escritorio:
+Una vez instalado, encontrás tres archivos en tu escritorio:
 
 - `client.sh` para lanzar el cliente
 - `server.sh` para lanzar el servidor
+- `editor.sh` para abrir el editor de niveles
 
 #### Desde una terminal:
 
