@@ -2,21 +2,15 @@
 #define GAME_CONFIG_INFO_H
 
 #include <cstdint>
-#include <cstring>
 #include <utility>
 
-#include <arpa/inet.h>
-
 #include "../message.h"
-#include "../message_type.h"
-#include "../weapon.h"
 
 #include "gun_config_info.h"
 #include "map_config_info.h"
 
-class GameConfigInfo: public Message {
+class GameConfigInfo: public MessageOf<MessageType::GameConfig> {
 private:
-    MessageType message_type = MessageType::GameConfig;
     int32_t player_health;
     int32_t number_of_rounds;
     int32_t starting_money;
@@ -59,10 +53,10 @@ public:
             ct_amount(ct_amount),
             tt_amount(tt_amount),
             ammo_price(ammo_price),
-            knife_config(std::move(knife_config)),
-            glock_config(std::move(glock_config)),
-            ak_config(std::move(ak_config)),
-            awp_config(std::move(awp_config)),
+            knife_config(knife_config),
+            glock_config(glock_config),
+            ak_config(ak_config),
+            awp_config(awp_config),
             m3_config(m3_config),
             defuse_time(defuse_time),
             time_to_plant(time_to_plant),
@@ -79,262 +73,68 @@ public:
             cone_angle(cone_angle),
             opacity(opacity) {}
 
-    void serialize(uint8_t* buffer) const override {
-        buffer[0] = static_cast<uint8_t>(message_type);
-        size_t offset = HEADER_SIZE;
-
-        int32_t net_player_health = htonl(player_health);
-        std::memcpy(buffer + offset, &net_player_health, sizeof(net_player_health));
-        offset += sizeof(net_player_health);
-
-        int32_t net_number_of_rounds = htonl(number_of_rounds);
-        std::memcpy(buffer + offset, &net_number_of_rounds, sizeof(net_number_of_rounds));
-        offset += sizeof(net_number_of_rounds);
-
-        int32_t net_starting_money = htonl(starting_money);
-        std::memcpy(buffer + offset, &net_starting_money, sizeof(net_starting_money));
-        offset += sizeof(net_starting_money);
-
-        int32_t net_ct_amount = htonl(ct_amount);
-        std::memcpy(buffer + offset, &net_ct_amount, sizeof(net_ct_amount));
-        offset += sizeof(net_ct_amount);
-
-        int32_t net_tt_amount = htonl(tt_amount);
-        std::memcpy(buffer + offset, &net_tt_amount, sizeof(net_tt_amount));
-        offset += sizeof(net_tt_amount);
-
-        int32_t net_ammo_price = htonl(ammo_price);
-        std::memcpy(buffer + offset, &net_ammo_price, sizeof(net_ammo_price));
-        offset += sizeof(net_ammo_price);
-
-        knife_config.serialize(buffer + offset);
-        offset += knife_config.serialized_size();
-
-        glock_config.serialize(buffer + offset);
-        offset += glock_config.serialized_size();
-
-        ak_config.serialize(buffer + offset);
-        offset += ak_config.serialized_size();
-
-        awp_config.serialize(buffer + offset);
-        offset += awp_config.serialized_size();
-
-        m3_config.serialize(buffer + offset);
-        offset += m3_config.serialized_size();
-
-        int32_t net_defuse_time = htonl(defuse_time);
-        std::memcpy(buffer + offset, &net_defuse_time, sizeof(net_defuse_time));
-        offset += sizeof(net_defuse_time);
-
-        int32_t net_time_to_plant = htonl(time_to_plant);
-        std::memcpy(buffer + offset, &net_time_to_plant, sizeof(net_time_to_plant));
-        offset += sizeof(net_time_to_plant);
-
-        int32_t net_bomb_dmg = htonl(bomb_dmg);
-        std::memcpy(buffer + offset, &net_bomb_dmg, sizeof(net_bomb_dmg));
-        offset += sizeof(net_bomb_dmg);
-
-        int32_t net_round_winner_money = htonl(round_winner_money);
-        std::memcpy(buffer + offset, &net_round_winner_money, sizeof(net_round_winner_money));
-        offset += sizeof(net_round_winner_money);
-
-        int32_t net_round_loser_money = htonl(round_loser_money);
-        std::memcpy(buffer + offset, &net_round_loser_money, sizeof(net_round_loser_money));
-        offset += sizeof(net_round_loser_money);
-
-        int32_t net_buy_time = htonl(buy_time);
-        std::memcpy(buffer + offset, &net_buy_time, sizeof(net_buy_time));
-        offset += sizeof(net_buy_time);
-
-        int32_t net_bomb_time = htonl(bomb_time);
-        std::memcpy(buffer + offset, &net_bomb_time, sizeof(net_bomb_time));
-        offset += sizeof(net_bomb_time);
-
-        int32_t net_after_round_time = htonl(after_round_time);
-        std::memcpy(buffer + offset, &net_after_round_time, sizeof(net_after_round_time));
-        offset += sizeof(net_after_round_time);
-
-        int32_t net_money_per_kill = htonl(money_per_kill);
-        std::memcpy(buffer + offset, &net_money_per_kill, sizeof(net_money_per_kill));
-        offset += sizeof(net_money_per_kill);
-
-        int32_t net_tiles_per_movement = htonl(tiles_per_movement);
-        std::memcpy(buffer + offset, &net_tiles_per_movement, sizeof(net_tiles_per_movement));
-        offset += sizeof(net_tiles_per_movement);
-
-        int32_t net_game_rate = htonl(game_rate);
-        std::memcpy(buffer + offset, &net_game_rate, sizeof(net_game_rate));
-        offset += sizeof(net_game_rate);
-
-        map_config.serialize(buffer + offset);
-        offset += map_config.serialized_size();
-
-        int32_t cone_angle_net = htonl(cone_angle);
-        memcpy(buffer + offset, &cone_angle_net, sizeof(cone_angle_net));
-        offset += sizeof(cone_angle_net);
-
-        int32_t opacity_net = htonl(opacity);
-        memcpy(buffer + offset, &opacity_net, sizeof(opacity_net));
-        offset += sizeof(opacity_net);
-
-        uint16_t payload_length = htons(static_cast<uint16_t>(offset - 3));
-        std::memcpy(buffer + 1, &payload_length, sizeof(payload_length));
+    void write_payload(ByteWriter& writer) const override {
+        writer.i32(player_health);
+        writer.i32(number_of_rounds);
+        writer.i32(starting_money);
+        writer.i32(ct_amount);
+        writer.i32(tt_amount);
+        writer.i32(ammo_price);
+        knife_config.write(writer);
+        glock_config.write(writer);
+        ak_config.write(writer);
+        awp_config.write(writer);
+        m3_config.write(writer);
+        writer.i32(defuse_time);
+        writer.i32(time_to_plant);
+        writer.i32(bomb_dmg);
+        writer.i32(round_winner_money);
+        writer.i32(round_loser_money);
+        writer.i32(buy_time);
+        writer.i32(bomb_time);
+        writer.i32(after_round_time);
+        writer.i32(money_per_kill);
+        writer.i32(tiles_per_movement);
+        writer.i32(game_rate);
+        map_config.write(writer);
+        writer.i32(cone_angle);
+        writer.i32(opacity);
     }
 
-    static GameConfigInfo deserialize(const uint8_t* buffer, size_t size) {
-        size_t offset = HEADER_SIZE;
-
-        int32_t player_health;
-        std::memcpy(&player_health, buffer + offset, sizeof(player_health));
-        player_health = ntohl(player_health);
-        offset += sizeof(player_health);
-
-        int32_t number_of_rounds;
-        std::memcpy(&number_of_rounds, buffer + offset, sizeof(number_of_rounds));
-        number_of_rounds = ntohl(number_of_rounds);
-        offset += sizeof(number_of_rounds);
-
-        int32_t starting_money;
-        std::memcpy(&starting_money, buffer + offset, sizeof(starting_money));
-        starting_money = ntohl(starting_money);
-        offset += sizeof(starting_money);
-
-        int32_t ct_amount;
-        std::memcpy(&ct_amount, buffer + offset, sizeof(ct_amount));
-        ct_amount = ntohl(ct_amount);
-        offset += sizeof(ct_amount);
-
-        int32_t tt_amount;
-        std::memcpy(&tt_amount, buffer + offset, sizeof(tt_amount));
-        tt_amount = ntohl(tt_amount);
-        offset += sizeof(tt_amount);
-
-        int32_t ammo_price;
-        std::memcpy(&ammo_price, buffer + offset, sizeof(ammo_price));
-        ammo_price = ntohl(ammo_price);
-        offset += sizeof(ammo_price);
-
-        GunConfigInfo knife_config = GunConfigInfo::deserialize(buffer + offset, size - offset);
-        offset += knife_config.serialized_size();
-
-        GunConfigInfo glock_config = GunConfigInfo::deserialize(buffer + offset, size - offset);
-        offset += glock_config.serialized_size();
-
-        GunConfigInfo ak_config = GunConfigInfo::deserialize(buffer + offset, size - offset);
-        offset += ak_config.serialized_size();
-
-        GunConfigInfo awp_config = GunConfigInfo::deserialize(buffer + offset, size - offset);
-        offset += awp_config.serialized_size();
-
-        GunConfigInfo m3_config = GunConfigInfo::deserialize(buffer + offset, size - offset);
-        offset += m3_config.serialized_size();
-
-        int32_t defuse_time;
-        std::memcpy(&defuse_time, buffer + offset, sizeof(defuse_time));
-        defuse_time = ntohl(defuse_time);
-        offset += sizeof(defuse_time);
-
-        int32_t time_to_plant;
-        std::memcpy(&time_to_plant, buffer + offset, sizeof(time_to_plant));
-        time_to_plant = ntohl(time_to_plant);
-        offset += sizeof(time_to_plant);
-
-        int32_t bomb_dmg;
-        std::memcpy(&bomb_dmg, buffer + offset, sizeof(bomb_dmg));
-        bomb_dmg = ntohl(bomb_dmg);
-        offset += sizeof(bomb_dmg);
-
-        int32_t round_winner_money;
-        std::memcpy(&round_winner_money, buffer + offset, sizeof(round_winner_money));
-        round_winner_money = ntohl(round_winner_money);
-        offset += sizeof(round_winner_money);
-
-        int32_t round_loser_money;
-        std::memcpy(&round_loser_money, buffer + offset, sizeof(round_loser_money));
-        round_loser_money = ntohl(round_loser_money);
-        offset += sizeof(round_loser_money);
-
-        int32_t buy_time;
-        std::memcpy(&buy_time, buffer + offset, sizeof(buy_time));
-        buy_time = ntohl(buy_time);
-        offset += sizeof(buy_time);
-
-        int32_t bomb_time;
-        std::memcpy(&bomb_time, buffer + offset, sizeof(bomb_time));
-        bomb_time = ntohl(bomb_time);
-        offset += sizeof(bomb_time);
-
-        int32_t after_round_time;
-        std::memcpy(&after_round_time, buffer + offset, sizeof(after_round_time));
-        after_round_time = ntohl(after_round_time);
-        offset += sizeof(after_round_time);
-
-        int32_t money_per_kill;
-        std::memcpy(&money_per_kill, buffer + offset, sizeof(money_per_kill));
-        money_per_kill = ntohl(money_per_kill);
-        offset += sizeof(money_per_kill);
-
-        int32_t tiles_per_movement;
-        std::memcpy(&tiles_per_movement, buffer + offset, sizeof(tiles_per_movement));
-        tiles_per_movement = ntohl(tiles_per_movement);
-        offset += sizeof(tiles_per_movement);
-
-        int32_t game_rate;
-        std::memcpy(&game_rate, buffer + offset, sizeof(game_rate));
-        game_rate = ntohl(game_rate);
-        offset += sizeof(game_rate);
-
-        MapConfigInfo map_config = MapConfigInfo::deserialize(buffer + offset, size - offset);
-        offset += map_config.serialized_size();
-
-        int32_t cone_angle;
-        memcpy(&cone_angle, buffer + offset, sizeof(cone_angle));
-        cone_angle = ntohl(cone_angle);
-        offset += sizeof(cone_angle);
-
-        int32_t opacity;
-        memcpy(&opacity, buffer + offset, sizeof(opacity));
-        opacity = ntohl(opacity);
-
+    static GameConfigInfo read_payload(ByteReader& reader) {
+        // Los argumentos de una funcion se evaluan en cualquier orden, asi que cada campo se lee
+        // en su propia linea para respetar el orden del mensaje
+        const int32_t player_health = reader.i32();
+        const int32_t number_of_rounds = reader.i32();
+        const int32_t starting_money = reader.i32();
+        const int32_t ct_amount = reader.i32();
+        const int32_t tt_amount = reader.i32();
+        const int32_t ammo_price = reader.i32();
+        GunConfigInfo knife_config = GunConfigInfo::read(reader);
+        GunConfigInfo glock_config = GunConfigInfo::read(reader);
+        GunConfigInfo ak_config = GunConfigInfo::read(reader);
+        GunConfigInfo awp_config = GunConfigInfo::read(reader);
+        GunConfigInfo m3_config = GunConfigInfo::read(reader);
+        const int32_t defuse_time = reader.i32();
+        const int32_t time_to_plant = reader.i32();
+        const int32_t bomb_dmg = reader.i32();
+        const int32_t round_winner_money = reader.i32();
+        const int32_t round_loser_money = reader.i32();
+        const int32_t buy_time = reader.i32();
+        const int32_t bomb_time = reader.i32();
+        const int32_t after_round_time = reader.i32();
+        const int32_t money_per_kill = reader.i32();
+        const int32_t tiles_per_movement = reader.i32();
+        const int32_t game_rate = reader.i32();
+        MapConfigInfo map_config = MapConfigInfo::read(reader);
+        const int32_t cone_angle = reader.i32();
+        const int32_t opacity = reader.i32();
         return GameConfigInfo(player_health, number_of_rounds, starting_money, ct_amount, tt_amount,
-                              ammo_price, std::move(knife_config), std::move(glock_config),
-                              std::move(ak_config), std::move(awp_config), std::move(m3_config),
-                              defuse_time, time_to_plant, bomb_dmg, round_winner_money,
+                              ammo_price, knife_config, glock_config, ak_config, awp_config,
+                              m3_config, defuse_time, time_to_plant, bomb_dmg, round_winner_money,
                               round_loser_money, buy_time, bomb_time, after_round_time,
                               money_per_kill, tiles_per_movement, game_rate, std::move(map_config),
                               cone_angle, opacity);
-    }
-
-    MessageType type() const override { return message_type; }
-
-    size_t serialized_size() const override {
-        size_t size = HEADER_SIZE;
-        size += sizeof(player_health);
-        size += sizeof(number_of_rounds);
-        size += sizeof(starting_money);
-        size += sizeof(ct_amount);
-        size += sizeof(tt_amount);
-        size += sizeof(ammo_price);
-        size += knife_config.serialized_size();
-        size += glock_config.serialized_size();
-        size += ak_config.serialized_size();
-        size += awp_config.serialized_size();
-        size += m3_config.serialized_size();
-        size += sizeof(defuse_time);
-        size += sizeof(time_to_plant);
-        size += sizeof(bomb_dmg);
-        size += sizeof(round_winner_money);
-        size += sizeof(round_loser_money);
-        size += sizeof(buy_time);
-        size += sizeof(bomb_time);
-        size += sizeof(after_round_time);
-        size += sizeof(money_per_kill);
-        size += sizeof(tiles_per_movement);
-        size += sizeof(game_rate);
-        size += map_config.serialized_size();
-        size += sizeof(cone_angle);
-        size += sizeof(opacity);
-        return size;
     }
 
     int32_t get_player_health() const { return player_health; }

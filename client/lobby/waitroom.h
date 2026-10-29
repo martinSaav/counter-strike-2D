@@ -5,9 +5,8 @@
 #include <string>
 #include <thread>
 
-#include "common/dto/game_ready_request.h"
-#include "common/dto/game_ready_response.h"
 #include "common/dto/select_skin_request.h"
+#include "common/dto/simple_messages.h"
 #include "common/protocol.h"
 
 #include "selectskin.h"

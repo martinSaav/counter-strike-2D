@@ -6,6 +6,7 @@
 #define SENDER_H
 #include <memory>
 #include <utility>
+#include <variant>
 
 #include "common/catedra/queue.h"
 #include "common/catedra/thread.h"

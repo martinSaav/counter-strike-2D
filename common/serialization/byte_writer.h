@@ -36,6 +36,11 @@ public:
 
     void f32(float value);
 
+    // Bytes tal cual, sin largo (para pegar un payload ya armado)
+    void raw(const std::vector<uint8_t>& data) {
+        bytes.insert(bytes.end(), data.begin(), data.end());
+    }
+
     // Largo (uint16) y los bytes del texto
     void string(const std::string& value);
 

@@ -8,8 +8,8 @@
 #include "../../common/action.h"
 #include "../../common/dto/buy_ammo_request.h"
 #include "../../common/dto/buy_weapon_request.h"
-#include "../../common/dto/disconnect_request.h"
 #include "../../common/dto/player_action.h"
+#include "../../common/dto/simple_messages.h"
 #include "../../common/protocol.h"
 
 #include "configuration.h"

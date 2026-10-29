@@ -6,11 +6,11 @@
 #include <vector>
 
 #include "catedra/liberror.h"
-#include "common/dto/game_ready_response.h"
 #include "common/dto/game_state_update.h"
+#include "common/dto/simple_messages.h"
 #include "dto/game_config_info.h"
 #include "dto/map_config_info.h"
-#include "dto/structure_info.h"
+#include "dto/rect_info.h"
 
 #include "skin_translator.h"
 

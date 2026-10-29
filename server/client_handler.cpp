@@ -11,12 +11,11 @@
 #include "catedra/liberror.h"
 #include "commands/leave_match_command.h"
 #include "common/dto/create_game_request.h"
-#include "common/dto/create_game_response.h"
 #include "common/dto/game_list_response.h"
 #include "common/dto/join_game_request.h"
-#include "common/dto/join_game_response.h"
 #include "common/dto/login_request.h"
 #include "common/dto/map_names_response.h"
+#include "common/dto/simple_messages.h"
 #include "common/game_info.h"
 #include "common/message.h"
 

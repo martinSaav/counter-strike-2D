@@ -1,13 +1,25 @@
+#include <cstring>
+#include <list>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "common/action.h"
+#include "common/dto/buy_ammo_request.h"
+#include "common/dto/buy_weapon_request.h"
 #include "common/dto/create_game_request.h"
-#include "common/dto/create_game_response.h"
-#include "common/dto/game_list_request.h"
+#include "common/dto/game_config_info.h"
 #include "common/dto/game_list_response.h"
 #include "common/dto/game_state_update.h"
 #include "common/dto/join_game_request.h"
-#include "common/dto/join_game_response.h"
+#include "common/dto/join_team_request.h"
 #include "common/dto/login_request.h"
+#include "common/dto/map_names_response.h"
 #include "common/dto/player_action.h"
+#include "common/dto/select_skin_request.h"
+#include "common/dto/simple_messages.h"
 #include "common/game_info.h"
 #include "common/protocol.h"
 #include "gmock/gmock.h"
@@ -17,557 +29,332 @@
 
 using ::testing::_;
 using ::testing::Invoke;
+using ::testing::NiceMock;
 using ::testing::Return;
 
-// LoginRequest Test Cases
-
-TEST(ProtocolTest, SendsLoginRequestCorrectly) {
-    MockSocket mock_socket;
-
-    const std::string username = "martin";
-    const LoginRequest req(username);
-    const size_t serialized_size = req.serialized_size();
-    std::vector<uint8_t> serialized(serialized_size);
-    serialized[0] = static_cast<uint8_t>(MessageType::LoginRequest);
-    const uint16_t len = htons(username.size());
-    memcpy(&serialized[1], &len, sizeof(len));
-    memcpy(&serialized[3], username.c_str(), username.size());
-
-    EXPECT_CALL(mock_socket, sendall(_, serialized_size))
-            .WillOnce(Invoke([&](const void* data, unsigned int) {
-                EXPECT_EQ(memcmp(data, serialized.data(), serialized_size), 0);
-                return serialized_size;
-            }));
-
-    Protocol protocol(mock_socket);
-    protocol.send_message(req);
-}
-
-TEST(ProtocolTest, ReceivesLoginRequestCorrectly) {
-    MockSocket mock_socket;
-
-    const std::string username = "martin";
-    LoginRequest req(username);
-    std::vector<uint8_t> serialized(req.serialized_size());
-    serialized[0] = static_cast<uint8_t>(MessageType::LoginRequest);
-    const uint16_t len = htons(username.size());
-    memcpy(&serialized[1], &len, sizeof(len));
-    memcpy(&serialized[3], username.c_str(), username.size());
-
-    EXPECT_CALL(mock_socket, recvall(_, 3)).WillOnce(Invoke([&](void* dst, unsigned int) {
-        memcpy(dst, serialized.data(), 3);
-        return 3;
-    }));
-
-    EXPECT_CALL(mock_socket, recvall(_, username.size()))
-            .WillOnce(Invoke([&](void* dst, unsigned int) {
-                memcpy(dst, serialized.data() + 3, username.size());
-                return username.size();
-            }));
-
-    Protocol protocol(mock_socket);
-    const std::unique_ptr<Message> msg = protocol.recv_message();
-
-    auto* login = dynamic_cast<LoginRequest*>(msg.get());
-    ASSERT_NE(login, nullptr);
-    EXPECT_EQ(login->get_username(), username);
-}
-
-// CreateGameRequest Test Cases
-
-
-TEST(ProtocolTest, SendsCreateGameCorrectly) {
-    MockSocket mock_socket;
-
-    const std::string game_name = "a game";
-    const std::string map_name = "a map";
-    const CreateGameRequest req(game_name, map_name);
-    const size_t serialized_size = req.serialized_size();
-    std::vector<uint8_t> serialized(serialized_size);
-    size_t offset = 3;
-    serialized[0] = static_cast<uint8_t>(MessageType::CreateGameRequest);
-    uint16_t game_name_length = htons(static_cast<uint16_t>(game_name.size()));
-    memcpy(&serialized[offset], &game_name_length, sizeof(game_name_length));
-    offset += sizeof(game_name_length);
-    memcpy(&serialized[offset], game_name.c_str(), game_name.size());
-    offset += game_name.size();
-    uint16_t map_name_length = htons(static_cast<uint16_t>(map_name.size()));
-    memcpy(&serialized[offset], &map_name_length, sizeof(map_name_length));
-    offset += sizeof(map_name_length);
-    memcpy(&serialized[offset], map_name.c_str(), map_name.size());
-    offset += map_name.size();
-    const uint16_t payload_length = htons(static_cast<uint16_t>(offset - 3));
-    memcpy(&serialized[1], &payload_length, sizeof(payload_length));
-
-
-    EXPECT_CALL(mock_socket, sendall(_, serialized_size))
-            .WillOnce(Invoke([&](const void* data, unsigned int) {
-                EXPECT_EQ(memcmp(data, serialized.data(), serialized_size), 0);
-                return serialized_size;
-            }));
-
-    Protocol protocol(mock_socket);
-    protocol.send_message(req);
-}
-TEST(ProtocolTest, ReceivesCreateGameCorrectly) {
-    MockSocket mock_socket;
-
-    const std::string game_name = "a game";
-    const std::string map_name = "a map";
-    const CreateGameRequest req(game_name, map_name);
-    const size_t serialized_size = req.serialized_size();
-    std::vector<uint8_t> serialized(serialized_size);
-    size_t offset = 3;
-    serialized[0] = static_cast<uint8_t>(MessageType::CreateGameRequest);
-    uint16_t game_name_length = htons(static_cast<uint16_t>(game_name.size()));
-    memcpy(&serialized[offset], &game_name_length, sizeof(game_name_length));
-    offset += sizeof(game_name_length);
-    memcpy(&serialized[offset], game_name.c_str(), game_name.size());
-    offset += game_name.size();
-    uint16_t map_name_length = htons(static_cast<uint16_t>(map_name.size()));
-    memcpy(&serialized[offset], &map_name_length, sizeof(map_name_length));
-    offset += sizeof(map_name_length);
-    memcpy(&serialized[offset], map_name.c_str(), map_name.size());
-    offset += map_name.size();
-    const uint16_t payload_length = htons(static_cast<uint16_t>(offset - 3));
-    memcpy(&serialized[1], &payload_length, sizeof(payload_length));
-
-    EXPECT_CALL(mock_socket, recvall(_, 3)).WillOnce(Invoke([&](void* dst, unsigned int) {
-        memcpy(dst, serialized.data(), 3);
-        return 3;
-    }));
-
-    size_t payload_size = serialized_size - 3;
-    EXPECT_CALL(mock_socket, recvall(_, payload_size))
-            .WillOnce(Invoke([&](void* dst, unsigned int) {
-                memcpy(dst, serialized.data() + 3, payload_size);
-                return payload_size;
-            }));
-
-    Protocol protocol(mock_socket);
-    const std::unique_ptr<Message> msg = protocol.recv_message();
-
-    auto* create_game = dynamic_cast<CreateGameRequest*>(msg.get());
-    ASSERT_NE(create_game, nullptr);
-    EXPECT_EQ(create_game->get_game_name(), game_name);
-    EXPECT_EQ(create_game->get_map_name(), map_name);
-}
-
-
-// CreateGameResponse Test Cases
-
-TEST(ProtocolTest, SendsCreateGameResponseCorrectly) {
-    MockSocket mock_socket;
-
-    const bool success = true;
-    const CreateGameResponse req(success);
-    const size_t serialized_size = req.serialized_size();
-    std::vector<uint8_t> serialized(serialized_size);
-    serialized[0] = static_cast<uint8_t>(MessageType::CreateGameResponse);
-    const uint16_t len = htons(1);
-    memcpy(&serialized[1], &len, sizeof(len));
-    serialized[3] = static_cast<uint8_t>(success);
-
-    EXPECT_CALL(mock_socket, sendall(_, serialized_size))
-            .WillOnce(Invoke([&](const void* data, unsigned int) {
-                EXPECT_EQ(memcmp(data, serialized.data(), serialized_size), 0);
-                return serialized_size;
-            }));
-
-    Protocol protocol(mock_socket);
-    protocol.send_message(req);
-}
-
-TEST(ProtocolTest, ReceivesCreateGameResponseCorrectly) {
-    MockSocket mock_socket;
-
-    const bool success = true;
-    const CreateGameResponse req(success);
-    std::vector<uint8_t> serialized(req.serialized_size());
-    serialized[0] = static_cast<uint8_t>(MessageType::CreateGameResponse);
-    const uint16_t len = htons(1);
-    memcpy(&serialized[1], &len, sizeof(len));
-    serialized[3] = static_cast<uint8_t>(success);
-
-    EXPECT_CALL(mock_socket, recvall(_, 3)).WillOnce(Invoke([&](void* dst, unsigned int) {
-        memcpy(dst, serialized.data(), 3);
-        return 3;
-    }));
-
-    EXPECT_CALL(mock_socket, recvall(_, 1)).WillOnce(Invoke([&](void* dst, unsigned int) {
-        memcpy(dst, serialized.data() + 3, 1);
-        return 1;
-    }));
-
-    Protocol protocol(mock_socket);
-    const std::unique_ptr<Message> msg = protocol.recv_message();
-
-    auto* create_game_resp = dynamic_cast<CreateGameResponse*>(msg.get());
-    ASSERT_NE(create_game_resp, nullptr);
-    EXPECT_EQ(create_game_resp->get_success(), success);
-}
-
-// JoinGameRequest Test Cases
-
-TEST(ProtocolTest, SendsJoinGameRequestCorrectly) {
-    MockSocket mock_socket;
-
-    const std::string game_name = "a game";
-    const JoinGameRequest req(game_name);
-    const size_t serialized_size = req.serialized_size();
-    std::vector<uint8_t> serialized(serialized_size);
-    serialized[0] = static_cast<uint8_t>(MessageType::JoinGameRequest);
-    const uint16_t len = htons(game_name.size());
-    memcpy(&serialized[1], &len, sizeof(len));
-    memcpy(&serialized[3], game_name.c_str(), game_name.size());
-
-    EXPECT_CALL(mock_socket, sendall(_, serialized_size))
-            .WillOnce(Invoke([&](const void* data, unsigned int) {
-                EXPECT_EQ(memcmp(data, serialized.data(), serialized_size), 0);
-                return serialized_size;
-            }));
-
-    Protocol protocol(mock_socket);
-    protocol.send_message(req);
-}
-
-TEST(ProtocolTest, ReceivesJoinGameRequestCorrectly) {
-    MockSocket mock_socket;
-
-    const std::string game_name = "a game";
-    const JoinGameRequest req(game_name);
-    std::vector<uint8_t> serialized(req.serialized_size());
-    serialized[0] = static_cast<uint8_t>(MessageType::JoinGameRequest);
-    const uint16_t len = htons(game_name.size());
-    memcpy(&serialized[1], &len, sizeof(len));
-    memcpy(&serialized[3], game_name.c_str(), game_name.size());
-
-    EXPECT_CALL(mock_socket, recvall(_, 3)).WillOnce(Invoke([&](void* dst, unsigned int) {
-        memcpy(dst, serialized.data(), 3);
-        return 3;
-    }));
-
-    EXPECT_CALL(mock_socket, recvall(_, game_name.size()))
-            .WillOnce(Invoke([&](void* dst, unsigned int) {
-                memcpy(dst, serialized.data() + 3, game_name.size());
-                return game_name.size();
-            }));
-
-    Protocol protocol(mock_socket);
-    const std::unique_ptr<Message> msg = protocol.recv_message();
-
-    auto* join_game = dynamic_cast<JoinGameRequest*>(msg.get());
-    ASSERT_NE(join_game, nullptr);
-    EXPECT_EQ(join_game->get_game_name(), game_name);
-}
-
-// JoinGameResponse Test Cases
-
-TEST(ProtocolTest, SendsJoinGameResponseCorrectly) {
-    MockSocket mock_socket;
-
-    const bool success = true;
-    const JoinGameResponse req(success);
-    const size_t serialized_size = req.serialized_size();
-    std::vector<uint8_t> serialized(serialized_size);
-    serialized[0] = static_cast<uint8_t>(MessageType::JoinGameResponse);
-    const uint16_t len = htons(1);
-    memcpy(&serialized[1], &len, sizeof(len));
-    serialized[3] = static_cast<uint8_t>(success);
-
-    EXPECT_CALL(mock_socket, sendall(_, serialized_size))
-            .WillOnce(Invoke([&](const void* data, unsigned int) {
-                EXPECT_EQ(memcmp(data, serialized.data(), serialized_size), 0);
-                return serialized_size;
-            }));
-
-    Protocol protocol(mock_socket);
-    protocol.send_message(req);
-}
-
-TEST(ProtocolTest, ReceivesJoinGameResponseCorrectly) {
-    MockSocket mock_socket;
-
-    const bool success = true;
-    const JoinGameResponse req(success);
-    std::vector<uint8_t> serialized(req.serialized_size());
-    serialized[0] = static_cast<uint8_t>(MessageType::JoinGameResponse);
-    const uint16_t len = htons(1);
-    memcpy(&serialized[1], &len, sizeof(len));
-    serialized[3] = static_cast<uint8_t>(success);
-
-    EXPECT_CALL(mock_socket, recvall(_, 3)).WillOnce(Invoke([&](void* dst, unsigned int) {
-        memcpy(dst, serialized.data(), 3);
-        return 3;
-    }));
-
-    EXPECT_CALL(mock_socket, recvall(_, 1)).WillOnce(Invoke([&](void* dst, unsigned int) {
-        memcpy(dst, serialized.data() + 3, 1);
-        return 1;
-    }));
-
-    Protocol protocol(mock_socket);
-    const std::unique_ptr<Message> msg = protocol.recv_message();
-
-    auto* join_game_resp = dynamic_cast<JoinGameResponse*>(msg.get());
-    ASSERT_NE(join_game_resp, nullptr);
-    EXPECT_EQ(join_game_resp->get_success(), success);
-}
-
-// GameListRequest Test Cases
-
-TEST(ProtocolTest, SendsGameListRequestCorrectly) {
-    MockSocket mock_socket;
-
-    const GameListRequest req;
-    const size_t serialized_size = req.serialized_size();
-    std::vector<uint8_t> serialized(serialized_size);
-    serialized[0] = static_cast<uint8_t>(MessageType::GameListRequest);
-    const uint16_t len = htons(0);
-    memcpy(&serialized[1], &len, sizeof(len));
-
-    EXPECT_CALL(mock_socket, sendall(_, serialized_size))
-            .WillOnce(Invoke([&](const void* data, unsigned int) {
-                EXPECT_EQ(memcmp(data, serialized.data(), serialized_size), 0);
-                return serialized_size;
-            }));
-
-    Protocol protocol(mock_socket);
-    protocol.send_message(req);
-}
-
-TEST(ProtocolTest, ReceivesGameListRequestCorrectly) {
-    MockSocket mock_socket;
-
-    const GameListRequest req;
-    std::vector<uint8_t> serialized(req.serialized_size());
-    serialized[0] = static_cast<uint8_t>(MessageType::GameListRequest);
-    const uint16_t len = htons(0);
-    memcpy(&serialized[1], &len, sizeof(len));
-
-    EXPECT_CALL(mock_socket, recvall(_, 3)).WillOnce(Invoke([&](void* dst, unsigned int) {
-        memcpy(dst, serialized.data(), 3);
-        return 3;
-    }));
-
-    Protocol protocol(mock_socket);
-    const std::unique_ptr<Message> msg = protocol.recv_message();
-
-    auto* game_list_req = dynamic_cast<GameListRequest*>(msg.get());
-    ASSERT_NE(game_list_req, nullptr);
-}
-
-// GameListResponse Test Cases
-
-TEST(ProtocolTest, SendsGameListResponseCorrectly) {
-    MockSocket mock_socket;
-
-    const std::string game_name = "a game";
-    const std::string map_name = "a map";
-    uint8_t current_players = 1;
-    uint8_t max_players = 2;
-
-    const GameInfo game_one{game_name, map_name, current_players, max_players};
-    const std::list<GameInfo> games = {game_one};
-    const GameListResponse req(games);
-
-    const size_t serialized_size = req.serialized_size();
-    std::vector<uint8_t> serialized(serialized_size);
-    serialized[0] = static_cast<uint8_t>(MessageType::GameListResponse);
-    size_t offset = 3;
-    for (const auto& game: games) {
-        uint16_t name_length = htons(static_cast<uint16_t>(game.name.size()));
-        std::memcpy(serialized.data() + offset, &name_length, sizeof(name_length));
-        offset += sizeof(name_length);
-        std::memcpy(serialized.data() + offset, game.name.data(), game.name.size());
-        offset += game.name.size();
-
-        uint16_t map_name_length = htons(static_cast<uint16_t>(game.map_name.size()));
-        std::memcpy(serialized.data() + offset, &map_name_length, sizeof(map_name_length));
-        offset += sizeof(map_name_length);
-        std::memcpy(serialized.data() + offset, game.map_name.data(), game.map_name.size());
-        offset += game.map_name.size();
-
-        serialized[offset++] = game.current_players;
-        serialized[offset++] = game.max_players;
+namespace {
+
+using Bytes = std::vector<uint8_t>;
+
+// Conecta un MockSocket a un buffer en memoria: lo que se manda se acumula en `bytes` y lo que
+// se recibe sale de ahi en orden. Si se pide mas de lo que queda, recvall devuelve 0 (como un
+// socket cerrado).
+class Wire {
+public:
+    Bytes bytes;
+    std::size_t read_pos = 0;
+    NiceMock<MockSocket> socket;
+
+    explicit Wire(Bytes initial = {}): bytes(std::move(initial)) {
+        ON_CALL(socket, sendall(_, _))
+                .WillByDefault(Invoke([this](const void* data, unsigned int size) {
+                    const auto* first = static_cast<const uint8_t*>(data);
+                    bytes.insert(bytes.end(), first, first + size);
+                    return static_cast<int>(size);
+                }));
+        ON_CALL(socket, recvall(_, _)).WillByDefault(Invoke([this](void* dst, unsigned int size) {
+            if (read_pos + size > bytes.size()) {
+                return 0;
+            }
+            std::memcpy(dst, bytes.data() + read_pos, size);
+            read_pos += size;
+            return static_cast<int>(size);
+        }));
     }
-    const uint16_t payload_length = htons(static_cast<uint16_t>(offset - 3));
-    std::memcpy(serialized.data() + 1, &payload_length, sizeof(payload_length));
+};
 
-    EXPECT_CALL(mock_socket, sendall(_, serialized_size))
-            .WillOnce(Invoke([&](const void* data, unsigned int) {
-                EXPECT_EQ(memcmp(data, serialized.data(), serialized_size), 0);
-                return serialized_size;
-            }));
-
-    Protocol protocol(mock_socket);
-    protocol.send_message(req);
+// Los bytes exactos que pone Protocol en el socket al mandar `message`
+Bytes bytes_of(const Message& message) {
+    Wire wire;
+    Protocol protocol(wire.socket);
+    protocol.send_message(message);
+    return wire.bytes;
 }
 
-TEST(ProtocolTest, ReceivesGameListResponseCorrectly) {
-    MockSocket mock_socket;
-
-    const std::string game_name = "a game";
-    const std::string map_name = "a map";
-    const uint8_t current_players = 1;
-    const uint8_t max_players = 2;
-
-    GameInfo game_one{game_name, map_name, current_players, max_players};
-    std::list<GameInfo> games = {game_one};
-    GameListResponse req(games);
-
-    std::vector<uint8_t> serialized(req.serialized_size());
-    serialized[0] = static_cast<uint8_t>(MessageType::GameListResponse);
-    size_t offset = 3;
-    for (const auto& game: games) {
-        uint16_t name_length = htons(static_cast<uint16_t>(game.name.size()));
-        std::memcpy(serialized.data() + offset, &name_length, sizeof(name_length));
-        offset += sizeof(name_length);
-        std::memcpy(serialized.data() + offset, game.name.data(), game.name.size());
-        offset += game.name.size();
-
-        uint16_t map_name_length = htons(static_cast<uint16_t>(game.map_name.size()));
-        std::memcpy(serialized.data() + offset, &map_name_length, sizeof(map_name_length));
-        offset += sizeof(map_name_length);
-        std::memcpy(serialized.data() + offset, game.map_name.data(), game.map_name.size());
-        offset += game.map_name.size();
-
-        serialized[offset++] = game.current_players;
-        serialized[offset++] = game.max_players;
+// Manda el mensaje y lo vuelve a leer con el mismo Protocol, como haria el otro extremo
+template <typename M>
+M round_trip(const M& message) {
+    Wire wire;
+    Protocol protocol(wire.socket);
+    protocol.send_message(message);
+    const std::unique_ptr<Message> received = protocol.recv_message();
+    EXPECT_EQ(wire.read_pos, wire.bytes.size()) << "quedaron bytes sin leer";
+    const auto* typed = dynamic_cast<const M*>(received.get());
+    if (typed == nullptr) {
+        throw std::runtime_error("se recibio un mensaje de otro tipo");
     }
-    uint16_t payload_length = htons(static_cast<uint16_t>(offset - 3));
-    std::memcpy(serialized.data() + 1, &payload_length, sizeof(payload_length));
-
-    EXPECT_CALL(mock_socket, recvall(_, 3)).WillOnce(Invoke([&](void* dst, unsigned int) {
-        memcpy(dst, serialized.data(), 3);
-        return 3;
-    }));
-
-    EXPECT_CALL(mock_socket, recvall(_, serialized.size() - 3))
-            .WillOnce(Invoke([&](void* dst, unsigned int) {
-                memcpy(dst, serialized.data() + 3, serialized.size() - 3);
-                return serialized.size() - 3;
-            }));
-
-    Protocol protocol(mock_socket);
-    const std::unique_ptr<Message> msg = protocol.recv_message();
-
-    auto* game_list_resp = dynamic_cast<GameListResponse*>(msg.get());
-    ASSERT_NE(game_list_resp, nullptr);
-    const auto& games_deserialized = game_list_resp->get_games();
-    ASSERT_EQ(games_deserialized.size(), 1);
-    auto it = games_deserialized.begin();
-    EXPECT_EQ(it->name, game_name);
-    EXPECT_EQ(it->map_name, map_name);
-    EXPECT_EQ(it->current_players, current_players);
-    EXPECT_EQ(it->max_players, max_players);
+    return *typed;
 }
 
-// PlayerAction Test Cases
-TEST(ProtocolTest, SendsPlayerActionCorrectly) {
-    MockSocket mock_socket;
-
-    const Action action = Action::MoveDown;
-    int pos_mouse_x = 0;
-    int pos_mouse_y = 0;
-    const PlayerAction req(action, pos_mouse_x, pos_mouse_y);
-    const size_t serialized_size = req.serialized_size();
-    std::vector<uint8_t> serialized(serialized_size);
-    serialized[0] = static_cast<uint8_t>(MessageType::PlayerAction);
-    const uint16_t len = htons(5);
-    memcpy(&serialized[1], &len, sizeof(len));
-    serialized[3] = static_cast<uint8_t>(action);
-    uint16_t pos_mouse_x_be = htons(static_cast<uint16_t>(pos_mouse_x));
-    uint16_t pos_mouse_y_be = htons(static_cast<uint16_t>(pos_mouse_y));
-    memcpy(&serialized[4], &pos_mouse_x_be, sizeof(pos_mouse_x_be));
-    memcpy(&serialized[6], &pos_mouse_y_be, sizeof(pos_mouse_y_be));
-
-    EXPECT_CALL(mock_socket, sendall(_, serialized_size))
-            .WillOnce(Invoke([&](const void* data, unsigned int) {
-                EXPECT_EQ(memcmp(data, serialized.data(), serialized_size), 0);
-                return serialized_size;
-            }));
-
-    Protocol protocol(mock_socket);
-    protocol.send_message(req);
+// Lee un mensaje a partir de bytes armados a mano
+std::unique_ptr<Message> receive(Bytes bytes) {
+    Wire wire(std::move(bytes));
+    Protocol protocol(wire.socket);
+    return protocol.recv_message();
 }
 
-TEST(ProtocolTest, ReceivesPlayerActionCorrectly) {
-    MockSocket mock_socket;
-
-    const Action action = Action::MoveDown;
-    int pos_mouse_x = 110;
-    int pos_mouse_y = 110;
-    const PlayerAction req(action, pos_mouse_x, pos_mouse_y);
-    std::vector<uint8_t> serialized(req.serialized_size());
-    serialized[0] = static_cast<uint8_t>(MessageType::PlayerAction);
-    const uint16_t len = htons(5);
-    memcpy(&serialized[1], &len, sizeof(len));
-    serialized[3] = static_cast<uint8_t>(action);
-    uint16_t pos_mouse_x_be = htons(static_cast<uint16_t>(pos_mouse_x));
-    uint16_t pos_mouse_y_be = htons(static_cast<uint16_t>(pos_mouse_y));
-    memcpy(&serialized[4], &pos_mouse_x_be, sizeof(pos_mouse_x_be));
-    memcpy(&serialized[6], &pos_mouse_y_be, sizeof(pos_mouse_y_be));
-
-    EXPECT_CALL(mock_socket, recvall(_, 3)).WillOnce(Invoke([&](void* dst, unsigned int) {
-        memcpy(dst, serialized.data(), 3);
-        return 3;
-    }));
-
-    EXPECT_CALL(mock_socket, recvall(_, 5)).WillOnce(Invoke([&](void* dst, unsigned int) {
-        memcpy(dst, serialized.data() + 3, 5);
-        return 5;
-    }));
-
-    Protocol protocol(mock_socket);
-    const std::unique_ptr<Message> msg = protocol.recv_message();
-
-    auto* player_action = dynamic_cast<PlayerAction*>(msg.get());
-    ASSERT_NE(player_action, nullptr);
-    EXPECT_EQ(player_action->get_action(), action);
-    EXPECT_EQ(player_action->get_pos_mouse_x(), pos_mouse_x);
-    EXPECT_EQ(player_action->get_pos_mouse_y(), pos_mouse_y);
+PlayerInfo sample_player() {
+    return PlayerInfo("p", 0x0102, 0x0304, 100, Status::Alive, 800, 2, 1, Action::Idle, 10, 11, "s",
+                      Weapon::AK47, 30, Weapon::Glock, 20, Weapon::Knife, Weapon::None,
+                      Weapon::AK47, 30, 50);
 }
 
-// Connection closed Test Cases
+GunConfigInfo sample_gun(int32_t price) {
+    return GunConfigInfo(30, 90, 10, 40, price, 3, 2, 50, 12.5f);
+}
 
-TEST(ProtocolTest, ThrowsConnectionClosedWhenHeaderNotReceived) {
+GameConfigInfo sample_config() {
+    const SiteInfo ct_site(1, 2, 3, 4, {{5, 6}, {7, 8}});
+    const SiteInfo tt_site(9, 10, 11, 12, {{13, 14}});
+    MapConfigInfo map("desierto", 40, 30, {StructureInfo(1, 2, 3, 4), StructureInfo(5, 6, 7, 8)},
+                      {BombSiteInfo(2, 3, 20, 21)}, ct_site, tt_site, "aztec");
+    return GameConfigInfo(100, 10, 800, 5, 5, 40, sample_gun(0), sample_gun(400), sample_gun(2700),
+                          sample_gun(4750), sample_gun(1700), 5, 3, 100, 3000, 1500, 20, 40, 5, 300,
+                          1, 30, std::move(map), 90, 60);
+}
+
+}  // namespace
+
+// ---- Formato exacto en el socket: encabezado (tipo, largo u16) y campos en orden de red ----
+
+TEST(ProtocolWireFormatTest, LoginRequest) {
+    const Bytes expected = {0x01, 0x00, 0x04, 0x00, 0x02, 'a', 'b'};
+    EXPECT_EQ(bytes_of(LoginRequest("ab")), expected);
+}
+
+TEST(ProtocolWireFormatTest, EmptyRequestIsJustTheHeader) {
+    const Bytes expected = {0x03, 0x00, 0x00};
+    EXPECT_EQ(bytes_of(GameListRequest()), expected);
+}
+
+TEST(ProtocolWireFormatTest, SuccessResponseIsOneByte) {
+    const Bytes expected = {0x63, 0x00, 0x01, 0x01};
+    EXPECT_EQ(bytes_of(JoinGameResponse(true)), expected);
+}
+
+TEST(ProtocolWireFormatTest, PlayerAction) {
+    const Bytes expected = {0x0B, 0x00, 0x05, 0x05, 0x01, 0x02, 0x03, 0x04};
+    EXPECT_EQ(bytes_of(PlayerAction(Action::Shoot, 0x0102, 0x0304)), expected);
+}
+
+TEST(ProtocolWireFormatTest, PlayerInfoUsesNetworkOrder) {
+    ByteWriter writer;
+    sample_player().write(writer);
+
+    const Bytes expected = {
+            0x00, 0x01, 'p',   // nombre
+            0x01,              // vivo
+            0x01, 0x02,        // pos_x
+            0x03, 0x04,        // pos_y
+            0x00, 0x64,        // vida 100
+            0x03, 0x20,        // plata 800
+            0x00, 0x02,        // kills
+            0x00, 0x01,        // muertes
+            0x0E,              // accion Idle
+            0x00, 0x0A,        // mira x
+            0x00, 0x0B,        // mira y
+            0x00, 0x01, 's',   // skin
+            0x04, 0x00, 0x1E,  // primaria AK47 con 30 balas
+            0x03, 0x00, 0x14,  // secundaria Glock con 20 balas
+            0x01,              // cuchillo
+            0x00,              // sin bomba
+            0x04, 0x00, 0x1E,  // arma activa AK47 con 30 balas
+            0x32,              // avance de la tarea 50
+    };
+    EXPECT_EQ(writer.data(), expected);
+}
+
+TEST(ProtocolWireFormatTest, GameStateUpdateFloatsUseNetworkOrder) {
+    const GameStateUpdate state(true, false, 1, 1.0f, true, false, false, 0, 0, 0.0f,
+                                Team::Terrorists, Team::Terrorists, {}, {});
+    const Bytes bytes = bytes_of(state);
+
+    // encabezado (3) + game_started, game_ended, round (3) y luego round_time = 1.0f
+    const Bytes round_time(bytes.begin() + 6, bytes.begin() + 10);
+    EXPECT_EQ(round_time, (Bytes{0x3F, 0x80, 0x00, 0x00}));
+}
+
+// ---- Ida y vuelta: lo que se manda es lo que se recibe, para cada mensaje ----
+
+TEST(ProtocolRoundTripTest, LoginRequest) {
+    EXPECT_EQ(round_trip(LoginRequest("martin")).get_username(), "martin");
+}
+
+TEST(ProtocolRoundTripTest, JoinGameRequest) {
+    EXPECT_EQ(round_trip(JoinGameRequest("partida")).get_game_name(), "partida");
+}
+
+TEST(ProtocolRoundTripTest, SelectSkinRequest) {
+    EXPECT_EQ(round_trip(SelectSkinRequest("seal")).get_skin(), "seal");
+}
+
+TEST(ProtocolRoundTripTest, CreateGameRequest) {
+    const CreateGameRequest received = round_trip(CreateGameRequest("partida", "desierto"));
+    EXPECT_EQ(received.get_game_name(), "partida");
+    EXPECT_EQ(received.get_map_name(), "desierto");
+}
+
+TEST(ProtocolRoundTripTest, JoinTeamRequest) {
+    EXPECT_EQ(round_trip(JoinTeamRequest(Team::CounterTerrorists)).get_team(),
+              Team::CounterTerrorists);
+}
+
+TEST(ProtocolRoundTripTest, BuyWeaponRequest) {
+    EXPECT_EQ(round_trip(BuyWeaponRequest(Weapon::AWP)).get_weapon(), Weapon::AWP);
+}
+
+TEST(ProtocolRoundTripTest, BuyAmmoRequest) {
+    EXPECT_EQ(round_trip(BuyAmmoRequest(WeaponType::Secondary)).get_weapon_type(),
+              WeaponType::Secondary);
+}
+
+TEST(ProtocolRoundTripTest, PlayerAction) {
+    const PlayerAction received = round_trip(PlayerAction(Action::PlantBomb, 640, 65535));
+    EXPECT_EQ(received.get_action(), Action::PlantBomb);
+    EXPECT_EQ(received.get_pos_mouse_x(), 640);
+    EXPECT_EQ(received.get_pos_mouse_y(), 65535);
+}
+
+TEST(ProtocolRoundTripTest, EmptyRequests) {
+    EXPECT_EQ(round_trip(MapNamesRequest()).type(), MessageType::MapNamesRequest);
+    EXPECT_EQ(round_trip(GameListRequest()).type(), MessageType::GameListRequest);
+    EXPECT_EQ(round_trip(GameReadyRequest()).type(), MessageType::GameReadyRequest);
+    EXPECT_EQ(round_trip(DisconnectRequest()).type(), MessageType::DisconnectRequest);
+}
+
+TEST(ProtocolRoundTripTest, SuccessResponses) {
+    EXPECT_TRUE(round_trip(LoginResponse(true)).get_success());
+    EXPECT_FALSE(round_trip(CreateGameResponse(false)).get_success());
+    EXPECT_TRUE(round_trip(JoinGameResponse(true)).get_success());
+    EXPECT_FALSE(round_trip(JoinTeamResponse(false)).get_success());
+    EXPECT_TRUE(round_trip(GameReadyResponse(true)).get_success());
+}
+
+TEST(ProtocolRoundTripTest, MapNamesResponse) {
+    const std::list<std::string> names = {"desierto", "pueblo-azteca", ""};
+    EXPECT_EQ(round_trip(MapNamesResponse(names)).get_mapGames(), names);
+}
+
+TEST(ProtocolRoundTripTest, GameListResponse) {
+    const std::list<GameInfo> games = {{"uno", "desierto", 1, 10}, {"dos", "entrenamiento", 4, 4}};
+    const std::list<GameInfo> received = round_trip(GameListResponse(games)).get_games();
+
+    ASSERT_EQ(received.size(), 2u);
+    EXPECT_EQ(received.back().name, "dos");
+    EXPECT_EQ(received.back().map_name, "entrenamiento");
+    EXPECT_EQ(received.back().current_players, 4);
+    EXPECT_EQ(received.back().max_players, 4);
+}
+
+TEST(ProtocolRoundTripTest, EmptyGameListResponse) {
+    EXPECT_TRUE(round_trip(GameListResponse({})).get_games().empty());
+}
+
+TEST(ProtocolRoundTripTest, GameStateUpdate) {
+    const GameStateUpdate state(true, false, 3, 12.5f, true, false, true, 300, 400, 31.75f,
+                                Team::CounterTerrorists, Team::Terrorists, {sample_player()},
+                                {DroppedWeapon(Weapon::M3, 7, 8)}, RoundStage::PostPlant, 97.25f);
+    const GameStateUpdate received = round_trip(state);
+
+    EXPECT_TRUE(received.is_game_started());
+    EXPECT_FALSE(received.is_game_ended());
+    EXPECT_EQ(received.get_round(), 3);
+    EXPECT_FLOAT_EQ(received.get_round_time(), 12.5f);
+    EXPECT_TRUE(received.is_bomb_planted());
+    EXPECT_EQ(received.get_bomb_x(), 300);
+    EXPECT_EQ(received.get_bomb_y(), 400);
+    EXPECT_FLOAT_EQ(received.get_bomb_timer(), 31.75f);
+    EXPECT_EQ(received.get_round_winner(), Team::CounterTerrorists);
+    EXPECT_EQ(received.get_game_winner(), Team::Terrorists);
+    EXPECT_EQ(received.get_stage(), RoundStage::PostPlant);
+    EXPECT_FLOAT_EQ(received.get_time_left(), 97.25f);
+
+    ASSERT_EQ(received.get_players().size(), 1u);
+    const PlayerInfo player = received.get_players().front();
+    EXPECT_EQ(player.get_user_name(), "p");
+    EXPECT_EQ(player.get_pos_x(), 0x0102);
+    EXPECT_EQ(player.get_pos_y(), 0x0304);
+    EXPECT_EQ(player.get_health(), 100);
+    EXPECT_EQ(player.get_money(), 800);
+    EXPECT_EQ(player.get_kills(), 2);
+    EXPECT_EQ(player.get_deaths(), 1);
+    EXPECT_EQ(player.get_pos_shoot_x(), 10);
+    EXPECT_EQ(player.get_skin(), "s");
+    EXPECT_EQ(player.get_secondary_weapon(), Weapon::Glock);
+    EXPECT_EQ(player.get_active_weapon_ammo(), 30);
+    EXPECT_EQ(player.get_task_progress(), 50);
+
+    ASSERT_EQ(received.get_dropped_weapons().size(), 1u);
+    const DroppedWeapon weapon = received.get_dropped_weapons().front();
+    EXPECT_EQ(weapon.get_weapon(), Weapon::M3);
+    EXPECT_EQ(weapon.get_pos_x(), 7);
+    EXPECT_EQ(weapon.get_pos_y(), 8);
+}
+
+TEST(ProtocolRoundTripTest, GameConfigInfo) {
+    const GameConfigInfo received = round_trip(sample_config());
+
+    EXPECT_EQ(received.get_player_health(), 100);
+    EXPECT_EQ(received.get_ammo_price(), 40);
+    EXPECT_EQ(received.get_awp_config().get_gun_price(), 4750);
+    EXPECT_FLOAT_EQ(received.get_m3_config().get_angle(), 12.5f);
+    EXPECT_EQ(received.get_defuse_time(), 5);
+    EXPECT_EQ(received.get_game_rate(), 30);
+    EXPECT_EQ(received.get_cone_angle(), 90);
+    EXPECT_EQ(received.get_opacity(), 60);
+
+    const MapConfigInfo& map = received.get_map_config();
+    EXPECT_EQ(map.get_map_name(), "desierto");
+    EXPECT_EQ(map.get_map_width(), 40);
+    EXPECT_EQ(map.get_theme(), "aztec");
+    ASSERT_EQ(map.get_structures().size(), 2u);
+    EXPECT_EQ(map.get_structures().back().get_x(), 7);
+    ASSERT_EQ(map.get_bombsites().size(), 1u);
+    EXPECT_EQ(map.get_bombsites().front().get_y(), 21);
+    EXPECT_EQ(map.get_ct_site().get_spawns().size(), 2u);
+    EXPECT_EQ(map.get_tt_site().get_spawns().front(), std::make_pair(13, 14));
+}
+
+// ---- Mensajes mal formados: se rechazan con ProtocolError, sin leer fuera del buffer ----
+
+TEST(ProtocolMalformedTest, UnknownTypeThrows) {
+    EXPECT_THROW(receive({0xFF, 0x00, 0x00}), ProtocolError);
+}
+
+TEST(ProtocolMalformedTest, TruncatedPayloadThrows) {
+    // PlayerAction necesita 5 bytes y el encabezado anuncia solo 1
+    EXPECT_THROW(receive({0x0B, 0x00, 0x01, 0x05}), ProtocolError);
+}
+
+TEST(ProtocolMalformedTest, StringLongerThanPayloadThrows) {
+    // El nombre dice tener 10 bytes pero el payload termina despues del primero
+    EXPECT_THROW(receive({0x01, 0x00, 0x03, 0x00, 0x0A, 'a'}), ProtocolError);
+}
+
+TEST(ProtocolMalformedTest, TrailingBytesThrow) {
+    EXPECT_THROW(receive({0x63, 0x00, 0x02, 0x01, 0x00}), ProtocolError);
+}
+
+TEST(ProtocolMalformedTest, PayloadTooLargeToSendThrows) {
+    // Dos nombres de 40000 bytes no entran en el largo u16 del encabezado
+    const std::string big(40000, 'x');
+    Wire wire;
+    Protocol protocol(wire.socket);
+    EXPECT_THROW(protocol.send_message(MapNamesResponse({big, big})), ProtocolError);
+    EXPECT_TRUE(wire.bytes.empty());
+}
+
+// ---- Conexion cerrada ----
+
+TEST(ProtocolConnectionTest, ThrowsConnectionClosedWhenHeaderNotReceived) {
     MockSocket mock_socket;
-
     EXPECT_CALL(mock_socket, recvall(_, 3)).WillOnce(Return(0));
 
     Protocol protocol(mock_socket);
     EXPECT_THROW(protocol.recv_message(), ConnectionClosed);
 }
 
-TEST(ProtocolTest, ThrowsConnectionClosedWhenPayloadNotReceived) {
-    MockSocket mock_socket;
-
-    uint8_t header[3];
-    header[0] = static_cast<uint8_t>(MessageType::LoginRequest);
-    const uint16_t len = htons(6);
-    memcpy(&header[1], &len, sizeof(len));
-
-    EXPECT_CALL(mock_socket, recvall(_, 3)).WillOnce(Invoke([&](void* dst, unsigned int) {
-        memcpy(dst, header, 3);
-        return 3;
-    }));
-    EXPECT_CALL(mock_socket, recvall(_, 6)).WillOnce(Return(0));
-
-    Protocol protocol(mock_socket);
-    EXPECT_THROW(protocol.recv_message(), ConnectionClosed);
-}
-
-
-TEST(ProtocolTest, GameStateUpdateKeepsStageAndTimeLeft) {
-    const GameStateUpdate state(true, false, 3, 12.5f, true, false, false, 0, 0, 0.0f,
-                                Team::Terrorists, Team::Terrorists, {}, {}, RoundStage::PrePlant,
-                                97.25f);
-    std::vector<uint8_t> buffer(state.serialized_size());
-    state.serialize(buffer.data());
-
-    const GameStateUpdate decoded = GameStateUpdate::deserialize(buffer.data(), buffer.size());
-    EXPECT_EQ(decoded.get_round(), 3);
-    EXPECT_EQ(decoded.get_stage(), RoundStage::PrePlant);
-    EXPECT_FLOAT_EQ(decoded.get_time_left(), 97.25f);
+TEST(ProtocolConnectionTest, ThrowsConnectionClosedWhenPayloadNotReceived) {
+    // El encabezado anuncia 6 bytes de payload que nunca llegan
+    EXPECT_THROW(receive({0x01, 0x00, 0x06}), ConnectionClosed);
 }

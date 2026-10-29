@@ -7,7 +7,7 @@
 #include <string>
 
 #include "../../common/dto/join_game_request.h"
-#include "../../common/dto/join_game_response.h"
+#include "../../common/dto/simple_messages.h"
 
 #include "creatematchwindow.h"
 

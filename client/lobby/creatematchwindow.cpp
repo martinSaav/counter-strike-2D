@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "common/dto/create_game_request.h"
-#include "common/dto/create_game_response.h"
+#include "common/dto/simple_messages.h"
 
 #include "ui_creatematchwindow.h"
 
