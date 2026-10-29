@@ -4,8 +4,9 @@
 
 #ifndef BOMB_H
 #define BOMB_H
-#define bomb_hitbox_height 3
-#define bomb_hitbox_width 3
+// Tamano (en tiles) de la bomba en el piso
+constexpr int bomb_hitbox_height = 3;
+constexpr int bomb_hitbox_width = 3;
 #include "game_config.h"
 
 class Bomb {

@@ -1,9 +1,11 @@
 #ifndef MESSAGE_TYPE_H
 #define MESSAGE_TYPE_H
 
+#include <cstddef>
 #include <cstdint>
 
-#define HEADER_SIZE 3
+// Encabezado de cada mensaje: tipo (1 byte) y largo del payload (uint16)
+constexpr std::size_t HEADER_SIZE = 3;
 
 enum class MessageType : uint8_t {
     // Client -> Server

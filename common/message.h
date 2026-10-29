@@ -1,5 +1,5 @@
-#ifndef MESSAGE
-#define MESSAGE
+#ifndef MESSAGE_H
+#define MESSAGE_H
 
 #include <cstddef>
 
@@ -13,4 +13,4 @@ public:
     virtual size_t serialized_size() const = 0;
     virtual MessageType type() const = 0;
 };
-#endif
+#endif  // MESSAGE_H

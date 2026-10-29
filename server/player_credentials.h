@@ -1,6 +1,5 @@
 #ifndef PLAYERCREDENTIALS_H
 #define PLAYERCREDENTIALS_H
-#define invalid_credential (-1)
 class PlayerCredentials {
     int id;
 

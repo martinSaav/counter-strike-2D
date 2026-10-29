@@ -12,8 +12,9 @@
 #include "shoot_info.h"
 #include "weapon_info.h"
 
-#define gun_hitbox_width 3
-#define gun_hitbox_height 3
+// Tamano (en tiles) de un arma tirada en el piso
+constexpr int gun_hitbox_width = 3;
+constexpr int gun_hitbox_height = 3;
 
 struct NoAmmo: public std::runtime_error {
     NoAmmo(): std::runtime_error("There is no ammunition") {}

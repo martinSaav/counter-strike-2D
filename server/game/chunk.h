@@ -1,7 +1,8 @@
 #ifndef CHUNK_H
 #define CHUNK_H
 
-#define CHUNK_SIZE 100
+// Lado (en tiles) de cada chunk en el que se divide el mapa para buscar colisiones solo cerca
+constexpr int CHUNK_SIZE = 100;
 #include <vector>
 
 #include "structure.h"
