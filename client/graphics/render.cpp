@@ -13,9 +13,11 @@ Render::Render(Renderer* renderer, Protocol& protocol, std::string& namePlayer,
         namePlayer(namePlayer),
         configuration(configuration),
         assetsPath(assetsPath),
-        hud(sdlRenderer, configuration, assetsPath),
-        map(sdlRenderer, configuration, assetsPath),
-        player(sdlRenderer, configuration, assetsPath) {}
+        textures(sdlRenderer),
+        sounds(assetsPath),
+        hud(sdlRenderer, configuration, textures, sounds, assetsPath),
+        map(sdlRenderer, configuration, textures, sounds, assetsPath),
+        player(sdlRenderer, configuration, textures, sounds, assetsPath) {}
 
 void Render::renderFrame(std::optional<GameStateUpdate> message) {
 

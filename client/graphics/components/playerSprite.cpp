@@ -3,8 +3,9 @@
 #include <cmath>
 
 PlayerSprite::PlayerSprite(Renderer* sdlRenderer, Configuration& configuration,
-                           std::string& assetsPath):
-        Component(sdlRenderer, configuration, assetsPath) {
+                           TextureStore& textures, MusicManager& sounds,
+                           const std::string& assetsPath):
+        Component(sdlRenderer, configuration, textures, sounds) {
 
     // Skins
     textures.loadTexture("T1", assetsPath + "/players/t1.bmp");

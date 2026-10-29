@@ -4,8 +4,9 @@
 #include <fstream>
 
 
-MapSprite::MapSprite(Renderer* sdlRenderer, Configuration& configuration, std::string& assetsPath):
-        Component(sdlRenderer, configuration, assetsPath),
+MapSprite::MapSprite(Renderer* sdlRenderer, Configuration& configuration, TextureStore& textures,
+                     MusicManager& sounds, const std::string& assetsPath):
+        Component(sdlRenderer, configuration, textures, sounds),
         fieldWidth(0),
         fieldHeight(0),
         mapConfig(configuration.gameConfig->get_map_config()) {

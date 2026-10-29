@@ -32,6 +32,11 @@ private:
 
     Configuration& configuration;
 
+    // Recursos compartidos por los componentes (se declaran antes que ellos para que se
+    // construyan primero)
+    TextureStore textures;
+    MusicManager sounds;
+
     HudSprite hud;
     MapSprite map;
     PlayerSprite player;

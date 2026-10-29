@@ -9,13 +9,16 @@
 #include "musicManager.h"
 #include "textureStore.h"
 
+// Base de las partes que dibujan la pantalla (mapa, jugadores, HUD). Las texturas y los sonidos
+// son de Render y se comparten entre todos los componentes: el audio se abre una sola vez y
+// cada imagen se carga una sola vez.
 class Component {
 
 protected:
-    TextureStore textures;
+    TextureStore& textures;
     Renderer* sdlRenderer;
     Configuration& configuration;
-    MusicManager sounds;
+    MusicManager& sounds;
 
     void drawHud(SDL_Rect srcRect, SDL_Rect destRect, std::string& textureName) {
         Texture& texture = textures.getTexture(textureName);
@@ -28,11 +31,11 @@ protected:
     }
 
 public:
-    // Crea el junto con sus medidas
-    Component(Renderer* sdlRenderer, Configuration& configuration, std::string& assetsPath):
-            textures(sdlRenderer),
+    Component(Renderer* sdlRenderer, Configuration& configuration, TextureStore& textures,
+              MusicManager& sounds):
+            textures(textures),
             sdlRenderer(sdlRenderer),
             configuration(configuration),
-            sounds(assetsPath) {}
+            sounds(sounds) {}
 };
 #endif

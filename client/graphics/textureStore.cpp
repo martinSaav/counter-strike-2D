@@ -7,6 +7,9 @@ using SDL2pp::Surface;
 TextureStore::TextureStore(Renderer* sdlRenderer): sdlRenderer(sdlRenderer) {}
 
 void TextureStore::loadTexture(const std::string& name, const std::string& path, bool setColorKey) {
+    if (textures.contains(name)) {
+        return;  // el store es compartido: otro componente ya cargo esta textura
+    }
 
     auto image = IMG_Load(path.c_str());
     auto imageSurface = Surface(image);
