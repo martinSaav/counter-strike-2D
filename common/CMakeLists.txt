@@ -6,6 +6,7 @@ target_sources(taller_common
         catedra/resolver.cpp
         catedra/socket.cpp
         protocol.cpp
+        serialization/byte_io.cpp
     PUBLIC
     # .h files
         catedra/liberror.h
@@ -44,6 +45,9 @@ target_sources(taller_common
         dto/gun_config_info.h
         dto/map_config_info.h
         dto/game_config_info.h
+        serialization/byte_reader.h
+        serialization/byte_writer.h
+        serialization/protocol_error.h
         action.h
         message_type.h
         message.h
