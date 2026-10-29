@@ -3,8 +3,9 @@
 #include <algorithm>
 #include <cmath>
 
-HudSprite::HudSprite(Renderer* sdlRenderer, Configuration& configuration, std::string& assetsPath):
-        Component(sdlRenderer, configuration, assetsPath) {
+HudSprite::HudSprite(Renderer* sdlRenderer, Configuration& configuration, TextureStore& textures,
+                     MusicManager& sounds, const std::string& assetsPath):
+        Component(sdlRenderer, configuration, textures, sounds) {
 
     // HUD básico
     textures.loadTexture("crosshair", assetsPath + "/crosshair.png");

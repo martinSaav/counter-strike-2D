@@ -428,17 +428,30 @@ void MapView::changed() {
 }
 
 void MapView::drawBackground(QPainter* painter, const QRectF& rect) {
+    // Capas de abajo hacia arriba: terreno, zonas, estructuras, spawns y armas, y el borde
     QGraphicsView::drawBackground(painter, rect);
     const QRectF mapRect(0, 0, document.width * TILE_PX, document.height * TILE_PX);
+    drawFloor(painter, mapRect);
+    drawZones(painter);
+    drawStructures(painter);
+    drawSpawns(painter);
+    drawWeapons(painter);
 
-    // Terreno
+    painter->setPen(QPen(Qt::black, 2));
+    painter->setBrush(Qt::NoBrush);
+    painter->drawRect(mapRect);
+}
+
+void MapView::drawFloor(QPainter* painter, const QRectF& mapRect) const {
     if (!floorTexture.isNull()) {
         painter->fillRect(mapRect, QBrush(floorTexture));
     } else {
         painter->fillRect(mapRect, QColor(110, 110, 100));
     }
+}
 
-    // Zonas de inicio y de bomba (semitransparentes, debajo de lo demas)
+void MapView::drawZones(QPainter* painter) const {
+    // Zonas de inicio y de bomba: semitransparentes, debajo de lo demas
     auto drawZone = [&](const MapRect& area, const QColor& color, const QString& label) {
         const QRectF r = toScene(area);
         painter->fillRect(r, color);
@@ -456,8 +469,9 @@ void MapView::drawBackground(QPainter* painter, const QRectF& rect) {
         drawZone(document.bomb_sites[i], BOMB_COLOR,
                  QString("Bomba %1").arg(QChar('A' + static_cast<int>(i % 26))));
     }
+}
 
-    // Estructuras solidas
+void MapView::drawStructures(QPainter* painter) const {
     for (const auto& structure: document.structures) {
         const QRectF r = toScene(structure);
         if (!wallTexture.isNull()) {
@@ -471,8 +485,9 @@ void MapView::drawBackground(QPainter* painter, const QRectF& rect) {
         painter->setPen(QPen(QColor(40, 30, 20), 1));
         painter->drawRect(r);
     }
+}
 
-    // Spawns y armas
+void MapView::drawSpawns(QPainter* painter) const {
     auto drawSpawn = [&](const MapPoint& spawn, const QColor& color, const QString& label) {
         const QRectF r = toScene(spawn, MapDocument::PLAYER_SIZE);
         painter->setBrush(color);
@@ -487,6 +502,9 @@ void MapView::drawBackground(QPainter* painter, const QRectF& rect) {
     for (const auto& spawn: document.ct_zone.spawns) {
         drawSpawn(spawn, QColor(40, 110, 230), "CT");
     }
+}
+
+void MapView::drawWeapons(QPainter* painter) const {
     for (const auto& drop: document.weapon_drops) {
         // El sprite del juego es chico y oscuro: va sobre una placa clara, algo mas grande que
         // el lugar que ocupa el arma, con el nombre abajo
@@ -509,11 +527,6 @@ void MapView::drawBackground(QPainter* painter, const QRectF& rect) {
         painter->drawText(badge.adjusted(0, badge.height() / 2, 0, 0), Qt::AlignCenter,
                           QString::fromStdString(drop.weapon).toUpper());
     }
-
-    // Borde del mapa
-    painter->setPen(QPen(Qt::black, 2));
-    painter->setBrush(Qt::NoBrush);
-    painter->drawRect(mapRect);
 }
 
 void MapView::drawForeground(QPainter* painter, const QRectF& rect) {

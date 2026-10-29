@@ -69,6 +69,13 @@ protected:
     void drawForeground(QPainter* painter, const QRectF& rect) override;
 
 private:
+    // Capas de drawBackground
+    void drawFloor(QPainter* painter, const QRectF& mapRect) const;
+    void drawZones(QPainter* painter) const;
+    void drawStructures(QPainter* painter) const;
+    void drawSpawns(QPainter* painter) const;
+    void drawWeapons(QPainter* painter) const;
+
     enum class DragMode { None, Move, Resize, Draw };
 
     MapDocument& document;

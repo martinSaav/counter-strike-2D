@@ -15,7 +15,7 @@ Organización del repositorio:
 
 | Carpeta | Contenido |
 |---|---|
-| `common/` | Protocolo, mensajes (`dto/`) y enums compartidos. `catedra/` tiene socket, cola bloqueante y thread. |
+| `common/` | Protocolo, registro de mensajes, mensajes (`dto/`), `ByteWriter`/`ByteReader` (`serialization/`) y enums compartidos. `catedra/` tiene socket, cola bloqueante y thread. |
 | `server/` | Acceptor, lobby, partidas, comandos y envío de estados. `game/` tiene la lógica del juego y `game/gun/` las armas. |
 | `client/lobby/` | Pantallas Qt (login, lobby, crear partida, sala de espera, skins, estadísticas). |
 | `client/graphics/` | Loop del juego, render, entrada, sonido y sprites. |
@@ -52,6 +52,8 @@ flowchart LR
 - **`ClientHandler`** atiende al cliente en dos etapas:
   1. **Lobby** (`pick_match`): login, lista de partidas, nombres de mapas, crear o unirse. Responde directamente por el socket.
   2. **Partida** (`handle_game`): traduce cada mensaje a un **comando** (`MessageParser`) y lo encola en la cola de comandos de la partida. También lanza su `Sender`.
+
+El recorrido completo de una acción del jugador es: `ClientHandler` recibe el `PlayerAction` → `MessageParser` lo convierte en un comando (por ejemplo `ShootCommand`) → el comando entra en la cola → el hilo de `Match` lo saca y llama a `command->process_command(match)` → el comando llama al método de `Match` que le corresponde (`process_shoot_request`).
 - **`Lobby`** guarda las partidas por nombre, protegidas por un mutex. Al crear una partida le pasa el mapa elegido. La lista que devuelve omite las partidas que ya empezaron.
 - **`Match`** es el **único hilo que modifica el estado del juego**. Los clientes no lo tocan: solo encolan comandos (patrón *command*). Así se evitan las condiciones de carrera y los deadlocks entre jugadores.
 - **`Sender`** saca snapshots de su cola y los serializa al socket del cliente. Al arrancar la partida manda primero `GameReadyResponse` y la configuración (`GameConfigInfo`).
@@ -80,13 +82,13 @@ Antes de arrancar, `Match::wait_for_match_to_start` procesa comandos en forma bl
 | Clase | Responsabilidad |
 |---|---|
 | `GameConfig` / `ConfigurationLoader` | Leen `server_config.yaml`: valores numéricos, armas y la lista de mapas (`maps`). Cada `Match` tiene **su propia copia** con el mapa elegido (`GameConfig(base, mapa)`), compartida con los `Sender` por `shared_ptr`. |
-| `Match` | Dueña de jugadores, mapa, reloj y reglas. Procesa los comandos (`process_*_request`, todos bajo su mutex), avanza el juego y arma el `MatchStatusDTO`. |
+| `Match` | Dueña de jugadores, mapa, reloj y reglas. Sus métodos públicos `process_*_request` son la entrada de los comandos: cada uno usa `with_player`, que toma el mutex, busca al jugador por sus credenciales y ejecuta la acción solo si sigue en la partida. Avanza el juego y arma el `MatchStatusDTO`. |
 | `GameClock` | Etapas de la ronda: `BuyStage` → `PrePlantStage` (con límite `round_time`) → `PostPlantStage` (cuenta regresiva de la bomba) → `AfterRoundStage`. Expone el **tiempo restante de la etapa**, que es lo que muestra el reloj del cliente. |
 | `GameManager` | Reglas: victoria de ronda (eliminación, bomba, desactivación o tiempo agotado), dinero, cambio de bando en la ronda `number_of_rounds / 2 + 1`, fin de partida al llegar a la mitad + 1 de victorias, plantado y desactivado, armas tiradas. |
 | `Map` | Estructuras, zonas de inicio, zona de la bomba y armas en el piso. Divide el mapa en *chunks* para buscar colisiones solo cerca. `trace_bullet_path` recorre la trayectoria de una bala hasta la primera pared o jugador. |
-| `Player` | Estado del jugador: posición, vida, plata, armas, bomba, plantado y desactivado (con su avance `task_progress`), estadísticas. |
+| `Player` | Estado del jugador: posición, vida, plata, armas, bomba, plantado y desactivado (con su avance `task_progress`), estadísticas. Sus campos son privados: `GameManager` lo modifica con métodos como `earn_money`, `start_defusing`, `stop_defusing`, `add_kill` y `receive_damage`. |
 | `Gun` y derivadas | `Knife`, `Glock`, `Ak47` (ráfagas), `M3` (cono de perdigones con alcance corto que respeta paredes), `Awp` (daño fijo) y `BombEncapsulator`. Cada arma calcula su daño, precisión y cadencia a partir de su `GunConfig`. |
-| `MessageParser` / comandos | Convierten mensajes en `PlayerCommand` (`MovementCommand`, `ShootCommand`, `BuyWeaponCommand`, `DropWeaponCommand`, `AimCommand`, etc.). Cada comando llama al método correspondiente de `Match` a través de `RequestProcessor`. |
+| `MessageParser` / comandos | Convierten mensajes en `PlayerCommand` (`MovementCommand`, `ShootCommand`, `BuyWeaponCommand`, `DropWeaponCommand`, `AimCommand`, etc.). Cada comando llama directamente al método correspondiente de `Match`. |
 
 ## 3. Arquitectura del cliente
 
@@ -101,7 +103,9 @@ flowchart LR
     R --> MS[MapSprite]
     R --> PS[PlayerSprite]
     R --> HS[HudSprite]
-    PS --> MM[MusicManager]
+    R -. "un TextureStore y un MusicManager compartidos" .-> MS
+    R -.-> PS
+    R -.-> HS
 ```
 
 - El **lobby** es Qt: login, crear partida (eligiendo mapa), buscar partidas, sala de espera (skin y arranque) y, al final, la tabla de estadísticas.
@@ -109,14 +113,16 @@ flowchart LR
   1. `InputHandler::processFrame` procesa los eventos de SDL y el estado del teclado y manda las acciones. Corre en el hilo principal porque SDL lo exige para la ventana que creó.
   2. Vacía la cola de `InputServerHandler` y se queda con el **estado más nuevo**, para no arrastrar atraso si se juntaron varios.
   3. `Render::renderFrame` dibuja ese estado.
+
+  `run` arma la ventana y los hilos; el loop está en `gameLoop` y lo que queda para la pantalla de estadísticas en `collectStatistics`.
 - **`InputServerHandler`** es el único otro hilo: recibe `GameStateUpdate` del socket y los encola. Si la conexión se corta (`ConnectionClosed`), termina el juego ordenadamente.
 
 ### Clases principales del cliente
 
 | Clase | Responsabilidad |
 |---|---|
-| `InputHandler` | Movimiento y acciones por estado del teclado. Compras y atajos (H, F11) por evento de tecla. Click en la tienda durante la compra. Si solo se movió el mouse, manda `Action::Idle` con la mira para que el resto vea hacia dónde apunta. |
-| `Render` | Ubica la cámara sobre el jugador, decide qué es visible (cono de visión + radio cercano, `pointInVision`) y coordina sprites, HUD, sangre, explosión y sonidos por distancia. |
+| `InputHandler` | Movimiento y acciones por estado del teclado: una tabla tecla → acción con prioridad (si hay varias apretadas gana la primera), más las diagonales en `diagonalMovement`. Compras y atajos (H, F11) por evento de tecla. Click en la tienda durante la compra. Si solo se movió el mouse, manda `Action::Idle` con la mira para que el resto vea hacia dónde apunta. |
+| `Render` | Dibuja cada frame por capas, en este orden: `updateCamera`, el mapa, `updateAim`, `drawBomb`, `drawPlayers` (con los sonidos de cada jugador), `drawHudLayer`, `drawWorldOverlays` (campo de visión o tienda, explosión, armas tiradas) y `drawFeedback` (barra de progreso, ayuda, flash de daño). Lo que se calcula una vez por frame viaja en `FrameContext`. Decide qué es visible (cono de visión + radio cercano, `pointInVision`). Es dueña del `TextureStore` y del `MusicManager`, que comparte con los sprites: el audio se abre una sola vez y cada imagen se carga una sola vez. |
 | `MapSprite` | Piso y estructuras del tema del mapa (`maps/<theme>/floor.png` y `wall.png`), zonas, bomba, cono de visión y tienda. |
 | `PlayerSprite` | Jugadores, armas, disparos (incluye el cono del M3) y sonidos de disparo, pasos y muerte. |
 | `HudSprite` | Vida, plata, arma y munición, reloj (en rojo con la bomba), barra de plantar o desactivar, ayuda de controles. |
@@ -125,7 +131,26 @@ flowchart LR
 
 ## 4. Protocolo
 
-Ambos lados usan `Protocol`, que envía y recibe `Message` (clase abstracta con `serialize`, `deserialize` y `serialized_size`). Cada mensaje viaja con un encabezado de 3 bytes: el tipo (`MessageType`, 1 byte) y el largo del payload (uint16 en orden de red). Los enteros multi-byte van en orden de red. Si al leer el encabezado el socket ya está cerrado, `Protocol` lanza `ConnectionClosed`.
+Ambos lados usan `Protocol`, que envía y recibe `Message`. Cada mensaje viaja como
+
+```
+tipo (MessageType, 1 byte) | largo del payload (uint16) | payload
+```
+
+- **Formato de los campos:** todo valor multi-byte va en **orden de red** (big-endian), incluidos los `float`, que viajan como sus 32 bits. Un texto es su largo (`uint16`) seguido de los bytes, y una lista es la cantidad de elementos (`uint16`; `uint32` en la configuración del mapa) seguida de cada elemento. Los enums ocupan 1 byte y los `bool` también.
+- **`ByteWriter` / `ByteReader`** (`common/serialization/`) implementan ese formato en un solo lugar. El lector controla los límites: si a un mensaje le faltan bytes o un largo no entra en lo que queda, lanza **`ProtocolError`** en vez de leer fuera del buffer.
+- **Cada mensaje describe sus campos:** `Message` tiene `type()` y `write_payload(ByteWriter&)`, y cada mensaje concreto expone `static X read_payload(ByteReader&)`. Las estructuras anidadas (`PlayerInfo`, `GunConfigInfo`, `MapConfigInfo`, etc.) tienen `write`/`read`. El encabezado lo pone `Protocol`, que también rechaza un payload de más de 65535 bytes.
+- **Registro de mensajes** (`common/message_registry.cpp`): una tabla de tipo a función de lectura. Al recibir, `Protocol` lee el encabezado y el payload y le pide el mensaje al registro. Si el tipo no existe o sobran bytes, se lanza `ProtocolError`.
+- **Mensajes repetidos como plantillas** (`dto/simple_messages.h`): los pedidos sin datos son `EmptyMessage<Tipo>` y las respuestas de un solo `bool` son `SuccessResponse<Tipo>`, con alias que conservan los nombres (`GameListRequest`, `JoinGameResponse`, ...).
+- Si el socket se cierra antes de que llegue un mensaje completo, `Protocol` lanza `ConnectionClosed`.
+
+**Agregar un mensaje:**
+
+1. Sumar el tipo a `MessageType`.
+2. Crear la clase heredando de `MessageOf<MessageType::X>`, con `write_payload` y `read_payload`, escribiendo y leyendo los campos en el mismo orden.
+3. Agregar `entry<X>()` a la tabla de `message_registry.cpp`.
+
+`Protocol` no cambia.
 
 | Cliente → Servidor | Servidor → Cliente |
 |---|---|
@@ -193,7 +218,8 @@ weapon_drops:                    # armas en el piso al comenzar: ak-47, m3 o awp
 
 ## 7. Tests
 
-- `tests/test_protocol.cpp`: serialización y deserialización de los mensajes, usando un socket simulado (`MockSocket`).
+- `tests/test_byte_io.cpp`: `ByteWriter`/`ByteReader`: bytes exactos en orden de red, ida y vuelta de cada tipo y lecturas truncadas.
+- `tests/test_protocol.cpp`: sobre un socket simulado (`MockSocket`): bytes exactos de algunos mensajes, ida y vuelta de todos los tipos de mensaje y mensajes mal formados (tipo desconocido, truncado, texto más largo que el payload, bytes de más, payload demasiado grande).
 - `tests/test_game_rules.cpp`: reglas sobre la lógica real del servidor: cuenta regresiva por etapa, vencimiento del tiempo de ronda, victoria CT por tiempo, cambio de bando a la mitad, fin de partida, duración de la bomba, plantar y desactivar manteniendo la tecla, no plantar fuera de una zona, y tirar y levantar la bomba.
 - `tests/test_map_document.cpp`: el modelo del editor: guardar y abrir da el mismo mapa, cada regla de validación, los mapas de `server/maps/` son válidos y el `ConfigurationLoader` del servidor carga un mapa guardado por el editor.
 

@@ -13,45 +13,48 @@ Render::Render(Renderer* renderer, Protocol& protocol, std::string& namePlayer,
         namePlayer(namePlayer),
         configuration(configuration),
         assetsPath(assetsPath),
-        hud(sdlRenderer, configuration, assetsPath),
-        map(sdlRenderer, configuration, assetsPath),
-        player(sdlRenderer, configuration, assetsPath) {}
+        textures(sdlRenderer),
+        sounds(assetsPath),
+        hud(sdlRenderer, configuration, textures, sounds, assetsPath),
+        map(sdlRenderer, configuration, textures, sounds, assetsPath),
+        player(sdlRenderer, configuration, textures, sounds, assetsPath) {}
 
 void Render::renderFrame(std::optional<GameStateUpdate> message) {
-
-    std::list<PlayerInfo> players = message->get_players();
-
-    float zoom = configuration.zoom;
-
-    int worldWidth = map.getWidth();
-    int worldHeight = map.getHeight();
-
-    int camWidth = configuration.widthWindow / zoom;
-    int camHeight = configuration.heightWindow / zoom;
-
-    // Calcula la posición del jugador
-    for (auto& playerInfo: players) {
+    // Un frame se dibuja por capas, en este orden (lo que va despues queda encima): mapa, bomba,
+    // jugadores, HUD, overlays del mundo (campo de vision o tienda, explosion, armas tiradas) y
+    // por ultimo el feedback (barra de progreso, ayuda, flash de dano).
+    FrameContext frame{*message, message->get_players()};
+    for (const auto& playerInfo: frame.players) {
         if (playerInfo.get_user_name() == namePlayer) {
-            myPlayer = &playerInfo;
+            frame.me = &playerInfo;
         }
     }
+    if (!frame.me) {
+        return;  // todavia no llego un estado que nos incluya
+    }
+    frame.isBuyStage = frame.state.get_stage() == RoundStage::Buy;
 
-    SDL_Rect& camera = configuration.camera;
-
-    camera.x = myPlayer->get_pos_x() - camWidth / 1.5;
-    camera.y = myPlayer->get_pos_y() - camHeight / 1.5;
-
-    // Limitar bordes
-    if (camera.x < 0)
-        camera.x = 0;
-    if (camera.y < 0)
-        camera.y = 0;
-    if (camera.x > worldWidth - camWidth)
-        camera.x = worldWidth - camWidth;
-    if (camera.y > worldHeight - camHeight)
-        camera.y = worldHeight - camHeight;
-
+    updateCamera(*frame.me);
     sdlRenderer->Clear();
+    map.draw();
+    updateAim(frame);
+    drawBomb(frame);
+    drawPlayers(frame);
+    drawHudLayer(frame);
+    drawWorldOverlays(frame);
+    drawFeedback(frame);
+    sdlRenderer->Present();
+}
+
+void Render::updateCamera(const PlayerInfo& me) {
+    // La camara sigue al jugador sin salirse del mapa; si hubo una explosion, tiembla un rato
+    SDL_Rect& camera = configuration.camera;
+    const int camWidth = configuration.widthWindow / configuration.zoom;
+    const int camHeight = configuration.heightWindow / configuration.zoom;
+    camera.x = me.get_pos_x() - camWidth / 1.5;
+    camera.y = me.get_pos_y() - camHeight / 1.5;
+    camera.x = std::min(std::max(camera.x, 0), map.getWidth() - camWidth);
+    camera.y = std::min(std::max(camera.y, 0), map.getHeight() - camHeight);
 
     if (map.isShaking()) {
         int elapsed = SDL_GetTicks() - map.getShakeStartTime();
@@ -64,157 +67,136 @@ void Render::renderFrame(std::optional<GameStateUpdate> message) {
             map.stopShake();
         }
     }
+}
 
-    map.draw();  // Dibujo el mapa
-
-    // Obtengo mi angulo
+void Render::updateAim(FrameContext& frame) {
+    // Angulo real hacia el mouse (sin correcciones de sprite): define el campo de vision
     SDL_GetMouseState(&mouseX, &mouseY);
-    int mouse_map_x = int(mouseX / zoom + camera.x);
-    int mouse_map_y = int(mouseY / zoom + camera.y);
+    const int mouse_map_x = int(mouseX / configuration.zoom + configuration.camera.x);
+    const int mouse_map_y = int(mouseY / configuration.zoom + configuration.camera.y);
+    frame.myAngle =
+            getAnglePlayer(frame.me->get_pos_x(), frame.me->get_pos_y(), mouse_map_x, mouse_map_y);
+    frame.visionAngle = frame.myAngle < 0 ? frame.myAngle + 360.0 : frame.myAngle;
+}
 
-    // Dibuja jugadores con zoom
-    int posPlayerX = 0;
-    int posPlayerY = 0;
-    int mousePlayerX = 0;
-    int mousePlayerY = 0;
+bool Render::isVisible(const FrameContext& frame, int x, int y) {
+    return pointInVision(frame.me->get_pos_x(), frame.me->get_pos_y(), frame.visionAngle, x, y);
+}
 
-    // visionAngle: debe ser el ángulo real hacia donde está mirando el jugador (sin correcciones de
-    // sprite ni nada).
-    myAngle =
-            getAnglePlayer(myPlayer->get_pos_x(), myPlayer->get_pos_y(), mouse_map_x, mouse_map_y);
-    float visionAngle = myAngle;
-    if (visionAngle < 0)
-        visionAngle += 360.0;
-
-    // Reset bomb
-    if (message->get_round_time() == 0) {
-        map.desactivateBomb();
+void Render::drawBomb(const FrameContext& frame) {
+    const GameStateUpdate& state = frame.state;
+    if (state.get_round_time() == 0) {
+        map.desactivateBomb();  // empezo una ronda nueva
     }
-
-    bool is_bomb_planted = message->is_bomb_planted();
-    // Draw bomb
-    if (is_bomb_planted && !message->is_round_ended()) {
-        int bomb_x = message->get_bomb_x();
-        int bomb_y = message->get_bomb_y();
-
-        if (pointInVision(myPlayer->get_pos_x(), myPlayer->get_pos_y(), visionAngle, bomb_x,
-                          bomb_y)) {
-            map.drawBomb(bomb_x, bomb_y);
+    const bool planted = state.is_bomb_planted();
+    if (planted && !state.is_round_ended()) {
+        if (isVisible(frame, state.get_bomb_x(), state.get_bomb_y())) {
+            map.drawBomb(state.get_bomb_x(), state.get_bomb_y());
         }
-
         map.activateBomb();
     }
-
-    if (is_bomb_planted && message->is_round_ended() && message->get_bomb_timer() == 0 &&
-        message->get_round_winner() == Team::Terrorists) {
-        if (map.isBombActivated()) {
-            map.exploitBomb();
-        }
+    if (planted && state.is_round_ended() && state.get_bomb_timer() == 0 &&
+        state.get_round_winner() == Team::Terrorists && map.isBombActivated()) {
+        map.exploitBomb();
     }
+}
 
+void Render::drawPlayers(const FrameContext& frame) {
     for (const auto& stain: bloodStains) {
         player.drawBlood(stain.x, stain.y);
     }
-
-    Uint32 now = SDL_GetTicks();
-    for (auto const& playerInfo: players) {
-
-        std::string name = playerInfo.get_user_name();
-        int currentHealth = playerInfo.get_health();
-        float dxToMe = playerInfo.get_pos_x() - myPlayer->get_pos_x();
-        float dyToMe = playerInfo.get_pos_y() - myPlayer->get_pos_y();
-        float distanceToMe = std::sqrt(dxToMe * dxToMe + dyToMe * dyToMe);
-
-        lastHealths.try_emplace(name, currentHealth);
-
-        if (currentHealth < lastHealths[name]) {
-            bloodStains.push_back({playerInfo.get_pos_x(), playerInfo.get_pos_y()});
-            if (currentHealth == 0) {
-                player.playSound(DEATH, 110, distanceToMe);
-            } else {
-                player.playSound(HIT, 90, distanceToMe);
-            }
-        }
-
-        lastHealths[name] = currentHealth;
-
-        // Pasos: un sonido cada tanto mientras el jugador se mueve
-        std::pair<int, int> position(playerInfo.get_pos_x(), playerInfo.get_pos_y());
-        auto lastPosition = lastPositions.find(name);
-        if (lastPosition != lastPositions.end() && lastPosition->second != position &&
-            currentHealth > 0 && now - lastStepTicks[name] > 350) {
-            player.playSound(STEP, 110, distanceToMe);
-            lastStepTicks[name] = now;
-        }
-        lastPositions[name] = position;
-
-        if (currentHealth > 0) {
-            player.playShotSound(playerInfo, distanceToMe);
-        }
+    const Uint32 now = SDL_GetTicks();
+    for (const auto& playerInfo: frame.players) {
+        playPlayerSounds(frame, playerInfo, now);
 
         if (playerInfo.get_health() == 0) {
             player.drawPlayerDeath(playerInfo.get_pos_x(), playerInfo.get_pos_y());
-            continue;
-        }
-
-        if (playerInfo.get_user_name() == namePlayer) {
-            player.drawPlayer(playerInfo, myAngle);
-            continue;
-        }
-
-        posPlayerX = playerInfo.get_pos_x();
-        posPlayerY = playerInfo.get_pos_y();
-        mousePlayerX = playerInfo.get_pos_shoot_x();
-        mousePlayerY = playerInfo.get_pos_shoot_y();
-        anglePlayer = getAnglePlayer(posPlayerX, posPlayerY, mousePlayerX, mousePlayerY);
-
-        if (pointInVision(myPlayer->get_pos_x(), myPlayer->get_pos_y(), visionAngle,
-                          playerInfo.get_pos_x(), playerInfo.get_pos_y())) {
-            player.drawPlayer(playerInfo, anglePlayer);
+        } else if (&playerInfo == frame.me) {
+            player.drawPlayer(playerInfo, frame.myAngle);
+        } else if (isVisible(frame, playerInfo.get_pos_x(), playerInfo.get_pos_y())) {
+            // Los demas miran hacia su mira, que manda el servidor
+            const double angle =
+                    getAnglePlayer(playerInfo.get_pos_x(), playerInfo.get_pos_y(),
+                                   playerInfo.get_pos_shoot_x(), playerInfo.get_pos_shoot_y());
+            player.drawPlayer(playerInfo, angle);
         }
     }
+}
 
-    // El servidor manda cuanto le queda a la etapa actual (compra, ronda o bomba), asi el
-    // reloj siempre cuenta hacia atras.
-    int time = static_cast<int>(std::ceil(message->get_time_left()));
-    int round = message->get_round();
-    bool isBuyStage = message->get_stage() == RoundStage::Buy;
+void Render::playPlayerSounds(const FrameContext& frame, const PlayerInfo& playerInfo, Uint32 now) {
+    // Dano, muerte, pasos y disparos de cada jugador, mas fuertes cuanto mas cerca de mi
+    const std::string& name = playerInfo.get_user_name();
+    const int currentHealth = playerInfo.get_health();
+    const float dx = playerInfo.get_pos_x() - frame.me->get_pos_x();
+    const float dy = playerInfo.get_pos_y() - frame.me->get_pos_y();
+    const float distanceToMe = std::sqrt(dx * dx + dy * dy);
 
+    lastHealths.try_emplace(name, currentHealth);
+    if (currentHealth < lastHealths[name]) {
+        bloodStains.push_back({playerInfo.get_pos_x(), playerInfo.get_pos_y()});
+        player.playSound(currentHealth == 0 ? DEATH : HIT, currentHealth == 0 ? 110 : 90,
+                         distanceToMe);
+    }
+    lastHealths[name] = currentHealth;
+
+    // Pasos: un sonido cada tanto mientras el jugador se mueve
+    const std::pair<int, int> position(playerInfo.get_pos_x(), playerInfo.get_pos_y());
+    const auto lastPosition = lastPositions.find(name);
+    if (lastPosition != lastPositions.end() && lastPosition->second != position &&
+        currentHealth > 0 && now - lastStepTicks[name] > 350) {
+        player.playSound(STEP, 110, distanceToMe);
+        lastStepTicks[name] = now;
+    }
+    lastPositions[name] = position;
+
+    if (currentHealth > 0) {
+        player.playShotSound(playerInfo, distanceToMe);
+    }
+}
+
+void Render::drawHudLayer(const FrameContext& frame) {
+    // El servidor manda cuanto le queda a la etapa actual (compra, ronda o bomba), asi el reloj
+    // siempre cuenta hacia atras.
+    int time = static_cast<int>(std::ceil(frame.state.get_time_left()));
+    int round = frame.state.get_round();
+    bool planted = frame.state.is_bomb_planted();
     SDL_Rect mouse = {mouseX, mouseY, 40, 40};
-    hud.draw(mouse, time, round, *myPlayer, is_bomb_planted, isBuyStage);
+    PlayerInfo me = *frame.me;
+    hud.draw(mouse, time, round, me, planted, frame.isBuyStage);
 
-    if (message->is_round_ended()) {
-        Team team = message->get_round_winner();
-        map.drawEndRound(team, message->is_bomb_planted());
-
+    if (frame.state.is_round_ended()) {
+        map.drawEndRound(frame.state.get_round_winner(), planted);
         bloodStains.clear();
         lastHealths.clear();
     }
-    if (!isBuyStage && myPlayer->get_status() == Status::Alive) {
-        map.drawCampField(myAngle, myPlayer->get_pos_x(), myPlayer->get_pos_y());
-    } else if (isBuyStage) {
+}
+
+void Render::drawWorldOverlays(const FrameContext& frame) {
+    if (!frame.isBuyStage && frame.me->get_status() == Status::Alive) {
+        // drawCampField espera el angulo del sprite (90 grados mas que el de la mira)
+        map.drawCampField(frame.myAngle + 90, frame.me->get_pos_x(), frame.me->get_pos_y());
+    } else if (frame.isBuyStage) {
         map.drawShop();
     }
-
     map.drawExplosion();
-
-    std::list<DroppedWeapon> dropped_weapons = message->get_dropped_weapons();
-    for (auto weapon: dropped_weapons) {
-        if (pointInVision(myPlayer->get_pos_x(), myPlayer->get_pos_y(), visionAngle,
-                          weapon.get_pos_x(), weapon.get_pos_y())) {
+    for (const auto& weapon: frame.state.get_dropped_weapons()) {
+        if (isVisible(frame, weapon.get_pos_x(), weapon.get_pos_y())) {
             hud.drawWeaponDroped(weapon.get_weapon(), weapon.get_pos_x(), weapon.get_pos_y());
         }
     }
+}
 
-    int currentHealth = myPlayer->get_health();
+void Render::drawFeedback(const FrameContext& frame) {
+    const PlayerInfo& me = *frame.me;
+    const int currentHealth = me.get_health();
     if (lastHealth != -1 && currentHealth < lastHealth) {
         damageFlashTimer = 10;
     }
     lastHealth = currentHealth;
 
-    int taskProgress = myPlayer->get_task_progress();
-    if (taskProgress > 0 && myPlayer->get_status() == Status::Alive) {
-        bool planting = myPlayer->get_skin()[0] != 'C';
+    const int taskProgress = me.get_task_progress();
+    if (taskProgress > 0 && me.get_status() == Status::Alive) {
+        const bool planting = me.get_skin()[0] != 'C';
         hud.drawTaskProgress(taskProgress, planting);
         if (!planting && lastTaskProgress == 0) {
             player.playSound(DEFUSING, 100, 0);
@@ -222,10 +204,10 @@ void Render::renderFrame(std::optional<GameStateUpdate> message) {
     }
     lastTaskProgress = taskProgress;
 
-    playStateSounds(*message, *myPlayer, isBuyStage);
+    playStateSounds(frame.state, me, frame.isBuyStage);
 
     // La ayuda aparece sola en la primera compra; despues solo si la abren con H
-    if (!isBuyStage && !configuration.helpToggled) {
+    if (!frame.isBuyStage && !configuration.helpToggled) {
         configuration.helpVisible = false;
     }
     if (configuration.helpVisible) {
@@ -235,12 +217,10 @@ void Render::renderFrame(std::optional<GameStateUpdate> message) {
     if (damageFlashTimer > 0) {
         SDL_Rect screen = {0, 0, configuration.widthWindow, configuration.heightWindow};
         sdlRenderer->SetDrawBlendMode(SDL_BLENDMODE_BLEND);
-        sdlRenderer->SetDrawColor(255, 0, 0, 120);  // Rojo semi-transparente
+        sdlRenderer->SetDrawColor(255, 0, 0, 120);  // rojo semitransparente
         sdlRenderer->FillRect(screen);
         damageFlashTimer--;
     }
-
-    sdlRenderer->Present();
 }
 
 double Render::getAnglePlayer(int playerX, int playerY, int mousex, int mousey) {

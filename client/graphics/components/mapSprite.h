@@ -50,7 +50,8 @@ private:
     void drawTiled(Texture& texture, float areaX, float areaY, float areaWidth, float areaHeight);
 
 public:
-    MapSprite(Renderer* sdlRenderer, Configuration& configuration, std::string& assetsPath);
+    MapSprite(Renderer* sdlRenderer, Configuration& configuration, TextureStore& textures,
+              MusicManager& sounds, const std::string& assetsPath);
 
     void draw();
 

@@ -3,8 +3,9 @@
 #include <cmath>
 
 PlayerSprite::PlayerSprite(Renderer* sdlRenderer, Configuration& configuration,
-                           std::string& assetsPath):
-        Component(sdlRenderer, configuration, assetsPath) {
+                           TextureStore& textures, MusicManager& sounds,
+                           const std::string& assetsPath):
+        Component(sdlRenderer, configuration, textures, sounds) {
 
     // Skins
     textures.loadTexture("T1", assetsPath + "/players/t1.bmp");
@@ -35,7 +36,7 @@ PlayerSprite::PlayerSprite(Renderer* sdlRenderer, Configuration& configuration,
     textures.loadTexture("blood", assetsPath + "/maps/blood.png");
 }
 
-void PlayerSprite::drawPlayer(const PlayerInfo& player, double& angle) {
+void PlayerSprite::drawPlayer(const PlayerInfo& player, double angle) {
 
     angle += 90;
     int playerX = player.get_pos_x();

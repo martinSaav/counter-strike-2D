@@ -12,7 +12,7 @@
 
 void GameManager::attack_player(const std::shared_ptr<Player>& attacked, Player& attacker,
                                 const int damage) const {
-    if (attacked->current_team == attacker.current_team || attacked->is_dead()) {
+    if (attacked->get_team() == attacker.get_team() || attacked->is_dead()) {
         return;
     }
     attacked->receive_damage(*this, damage);
@@ -38,21 +38,11 @@ bool GameManager::can_player_move_or_shoot(const std::shared_ptr<Player>& player
 
 
 void GameManager::advance_round(const std::vector<std::shared_ptr<Player>>& players) {
+    // En la ronda del cambio de bando los premios se invierten: los equipos ya cambiaron de lado
+    const bool sides_switched = current_round == get_halftime_round();
     for (const auto& player: players) {
-        if (player->current_team == last_winner) {
-            if (current_round != get_halftime_round()) {
-                player->money += round_winner_money;
-            } else {
-                player->money += round_loser_money;
-            }
-
-        } else {
-            if (current_round != get_halftime_round()) {
-                player->money += round_loser_money;
-            } else {
-                player->money += round_winner_money;
-            }
-        }
+        const bool won = (player->get_team() == last_winner) != sides_switched;
+        player->earn_money(won ? round_winner_money : round_loser_money);
     }
     current_round++;
     round_won = false;
@@ -174,7 +164,7 @@ bool GameManager::can_plant_bomb(const int x, const int y) const {
 
 
 void GameManager::start_defusing(const std::shared_ptr<Player>& player) const {
-    if (player->current_team != Team::CounterTerrorists) {
+    if (player->get_team() != Team::CounterTerrorists) {
         return;
     }
     if (!map.can_defuse(player)) {
@@ -184,17 +174,16 @@ void GameManager::start_defusing(const std::shared_ptr<Player>& player) const {
         // Mantener F manda un pedido por frame: el tiempo cuenta desde el primero
         return;
     }
-    player->start_defusing();
-    player->defuse_time = clock.get_time();
+    player->start_defusing(static_cast<float>(clock.get_time()));
 }
 
 
 void GameManager::has_finished_defusing(Player& player) {
-    if (!player.is_defusing || player.is_dead()) {
+    if (!player.is_currently_defusing() || player.is_dead()) {
         return;
     }
-    if (clock.get_time() - player.defuse_time - time_to_defuse >= 0) {
-        player.is_defusing = false;
+    if (clock.get_time() - player.defusing_since() - time_to_defuse >= 0) {
+        player.stop_defusing();
         bomb_defused = true;
         clock.defuse_bomb();
     }
@@ -218,7 +207,7 @@ void GameManager::pick_weapon(const std::shared_ptr<Player>& player) const {
         return;
     }
     auto [x, y] = player->get_location();
-    if (player->current_team != Team::CounterTerrorists) {
+    if (player->get_team() != Team::CounterTerrorists) {
         if (std::unique_ptr<BombEncapsulator> bomb = map.pick_bomb(x, y); bomb != nullptr) {
             player->equip_bomb(std::move(bomb));
             return;
@@ -261,7 +250,7 @@ void GameManager::give_bomb_to_random_player(
     const int bomb_player = std::rand() % (tt_count);
     int current_tt = 0;
     for (auto& player: players) {
-        if (player->current_team == Team::Terrorists) {
+        if (player->get_team() == Team::Terrorists) {
             if (current_tt == bomb_player) {
                 player->equip_bomb(std::make_unique<BombEncapsulator>(config));
                 return;
@@ -300,7 +289,7 @@ void GameManager::set_players_spawn(const std::vector<std::shared_ptr<Player>>& 
     std::vector<std::shared_ptr<Player>> terrorists;
     std::vector<std::shared_ptr<Player>> counter_terrorists;
     for (auto& player: players) {
-        if (player->current_team == Team::Terrorists) {
+        if (player->get_team() == Team::Terrorists) {
             terrorists.push_back(player);
         } else {
             counter_terrorists.push_back(player);
@@ -328,7 +317,7 @@ Team GameManager::get_next_player_team() const {
 
 
 void GameManager::add_player_to_team(const std::shared_ptr<Player>& player) {
-    if (player->current_team == Team::Terrorists) {
+    if (player->get_team() == Team::Terrorists) {
         tt_count++;
     } else {
         ct_count++;
@@ -337,7 +326,7 @@ void GameManager::add_player_to_team(const std::shared_ptr<Player>& player) {
 
 
 void GameManager::remove_player_from_team(const std::shared_ptr<Player>& player) {
-    if (player->current_team == Team::Terrorists) {
+    if (player->get_team() == Team::Terrorists) {
         tt_count--;
     } else {
         ct_count--;

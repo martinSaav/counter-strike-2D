@@ -2,6 +2,8 @@
 
 #include <utility>
 
+#include <sys/socket.h>
+
 #include "catedra/liberror.h"
 #include "server/client_handler.h"
 

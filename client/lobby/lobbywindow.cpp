@@ -4,11 +4,10 @@
 #include <memory>
 
 #include "./ui_lobbywindow.h"
-#include "common/dto/game_list_request.h"
 #include "common/dto/game_list_response.h"
 #include "common/dto/login_request.h"
-#include "common/dto/map_names_request.h"
 #include "common/dto/map_names_response.h"
+#include "common/dto/simple_messages.h"
 
 #include "loginwindow.h"
 

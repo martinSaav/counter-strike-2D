@@ -109,7 +109,6 @@ int MusicManager::volumeForDistance(int baseVolume, float distance, float maxDis
 void MusicManager::stopMusic() {
 
     if (currentMusic) {
-        // Mix_HaltMusic();  // Detiene la reproducción, no libera memoria
         Mix_FreeMusic(currentMusic);
         currentMusic = nullptr;
     }

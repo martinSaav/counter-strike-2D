@@ -1,5 +1,5 @@
+#ifndef INPUTSERVERHANDLER_H
 #define INPUTSERVERHANDLER_H
-#ifdef INPUTSERVERHANDLER_H
 #include <mutex>
 #include <optional>
 #include <queue>

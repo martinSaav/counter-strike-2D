@@ -12,5 +12,5 @@ ChangeSkinCommand::ChangeSkinCommand(const PlayerCredentials credentials,
 
 
 void ChangeSkinCommand::process_command(Match* match) {
-    RequestProcessor::process_change_skin_request(credentials, new_skin, match);
+    match->process_change_skin_request(credentials, new_skin);
 }

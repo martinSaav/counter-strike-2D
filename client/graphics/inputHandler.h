@@ -1,13 +1,15 @@
+#ifndef INPUTHANDLER_H
 #define INPUTHANDLER_H
-#ifdef INPUTHANDLER_H
 
 #include <iostream>
+#include <optional>
+#include <utility>
 
 #include "../../common/action.h"
 #include "../../common/dto/buy_ammo_request.h"
 #include "../../common/dto/buy_weapon_request.h"
-#include "../../common/dto/disconnect_request.h"
 #include "../../common/dto/player_action.h"
+#include "../../common/dto/simple_messages.h"
 #include "../../common/protocol.h"
 
 #include "configuration.h"
@@ -35,6 +37,8 @@ private:
     void sendMessage(Action& currentAction);
     void handleEvents(bool isBuyStage);
     void handleKeyboard();
+    // Si hay una diagonal apretada: el movimiento vertical y el horizontal, en ese orden
+    static std::optional<std::pair<Action, Action>> diagonalMovement(const Uint8* state);
     void quit();
     void buyWeapon(Weapon weapon);
     void buyAmmo(WeaponType weaponType);

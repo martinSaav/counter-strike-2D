@@ -17,16 +17,13 @@
 #include "player_skin.h"
 #include "position.h"
 #include "weapon_info.h"
-#define player_hitbox_height 2
-#define player_hitbox_width 2
+// Tamano (en tiles) del cuerpo del jugador para las colisiones
+constexpr int player_hitbox_height = 2;
+constexpr int player_hitbox_width = 2;
 
 class GameManager;
 
-class Bomb;
-
 class Player {
-    friend class GameManager;
-    friend class Bomb;
     const int max_health;
     const int money_per_kill;
     const int ammo_price;
@@ -58,8 +55,6 @@ class Player {
     std::vector<std::pair<int, int>>
             chunks_idxs;  // indices de los chunks en los que se encuentra el jugador
     Action last_action;
-    void add_kill();
-    void receive_damage(const GameManager& manager, int damage);
     [[nodiscard]] Gun& get_equipped_gun() const;
 
 public:
@@ -137,10 +132,16 @@ public:
     void update_task_progress(double time);
     [[nodiscard]] bool is_currently_defusing() const { return is_defusing; }
     [[nodiscard]] bool is_currently_planting() const { return is_planting; }
-    void start_defusing() {
+    void start_defusing(float time) {
         is_defusing = true;
+        defuse_time = time;
         last_action = Action::DefuseBomb;
     }
+    [[nodiscard]] float defusing_since() const { return defuse_time; }
+    void stop_defusing() { is_defusing = false; }
+    void earn_money(int amount) { money += amount; }
+    void add_kill();
+    void receive_damage(const GameManager& manager, int damage);
     void reload();
     bool operator==(const Player& player) const = delete;
     WeaponInfo get_primary_weapon_info();

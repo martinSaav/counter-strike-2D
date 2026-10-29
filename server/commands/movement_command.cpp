@@ -5,7 +5,6 @@
 #include "movement_command.h"
 
 #include "match.h"
-#include "request_processor.h"
 
 
 MovementCommand::MovementCommand(const PlayerCredentials credentials, const MovementType command,
@@ -13,5 +12,5 @@ MovementCommand::MovementCommand(const PlayerCredentials credentials, const Move
         credentials(credentials), command(command), aim_pos(aim_pos) {}
 
 void MovementCommand::process_command(Match* match) {
-    RequestProcessor::process_movement_request(credentials, command, aim_pos, match);
+    match->process_movement_request(credentials, command, aim_pos);
 }

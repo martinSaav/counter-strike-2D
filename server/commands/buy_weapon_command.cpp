@@ -4,7 +4,7 @@
 
 #include "buy_weapon_command.h"
 
-#include "request_processor.h"
+#include "match.h"
 
 
 BuyWeaponCommand::BuyWeaponCommand(const PlayerCredentials credentials, const Weapon weapon):
@@ -12,5 +12,5 @@ BuyWeaponCommand::BuyWeaponCommand(const PlayerCredentials credentials, const We
 
 
 void BuyWeaponCommand::process_command(Match* match) {
-    RequestProcessor::process_buy_weapon_request(credentials, weapon, match);
+    match->process_buy_weapon_request(credentials, weapon);
 }

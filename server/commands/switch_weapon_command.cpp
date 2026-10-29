@@ -11,5 +11,5 @@ SwitchWeaponCommand::SwitchWeaponCommand(PlayerCredentials credentials, GunType 
 
 
 void SwitchWeaponCommand::process_command(Match* match) {
-    RequestProcessor::process_switch_weapon_request(credentials, weapon_type, match);
+    match->process_switch_weapon_request(credentials, weapon_type);
 }

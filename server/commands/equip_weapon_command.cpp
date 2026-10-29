@@ -11,5 +11,5 @@ EquipWeaponCommand::EquipWeaponCommand(const PlayerCredentials credentials):
 
 
 void EquipWeaponCommand::process_command(Match* match) {
-    RequestProcessor::process_pick_weapon_request(credentials, match);
+    match->process_pick_weapon_request(credentials);
 }

@@ -11,5 +11,5 @@ LeaveMatchCommand::LeaveMatchCommand(const PlayerCredentials credentials):
 
 
 void LeaveMatchCommand::process_command(Match* match) {
-    RequestProcessor::process_leave_match_request(credentials, match);
+    match->process_leave_match_request(credentials);
 }

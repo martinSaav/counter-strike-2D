@@ -2,14 +2,12 @@
 #define PLAYER_INFO_H
 
 #include <cstdint>
-#include <cstring>
-#include <stdexcept>
 #include <string>
 #include <utility>
 
-#include <netinet/in.h>
-
 #include "../action.h"
+#include "../serialization/byte_reader.h"
+#include "../serialization/byte_writer.h"
 #include "../weapon.h"
 
 enum class Status : uint8_t {
@@ -71,149 +69,56 @@ public:
             active_weapon_ammo(active_weapon_ammo),
             task_progress(task_progress) {}
 
-    void serialize(uint8_t* buffer) const {
-        size_t offset = 0;
-        uint16_t name_length = htons(static_cast<uint16_t>(user_name.size()));
-        std::memcpy(buffer + offset, &name_length, sizeof(name_length));
-        offset += sizeof(name_length);
-        std::memcpy(buffer + offset, user_name.data(), user_name.size());
-        offset += user_name.size();
-
-        buffer[offset++] = static_cast<uint8_t>(status);
-        std::memcpy(buffer + offset, &pos_x, sizeof(pos_x));
-        offset += sizeof(pos_x);
-        std::memcpy(buffer + offset, &pos_y, sizeof(pos_y));
-        offset += sizeof(pos_y);
-        std::memcpy(buffer + offset, &health, sizeof(health));
-        offset += sizeof(health);
-        std::memcpy(buffer + offset, &money, sizeof(money));
-        offset += sizeof(money);
-        std::memcpy(buffer + offset, &kills, sizeof(kills));
-        offset += sizeof(kills);
-        std::memcpy(buffer + offset, &deaths, sizeof(deaths));
-        offset += sizeof(deaths);
-
-        buffer[offset++] = static_cast<uint8_t>(action);
-        std::memcpy(buffer + offset, &pos_shoot_x, sizeof(pos_shoot_x));
-        offset += sizeof(pos_shoot_x);
-        std::memcpy(buffer + offset, &pos_shoot_y, sizeof(pos_shoot_y));
-        offset += sizeof(pos_shoot_y);
-        uint16_t skin_length = htons(static_cast<uint16_t>(skin.size()));
-        std::memcpy(buffer + offset, &skin_length, sizeof(skin_length));
-        offset += sizeof(skin_length);
-        std::memcpy(buffer + offset, skin.data(), skin.size());
-        offset += skin.size();
-
-        buffer[offset++] = static_cast<uint8_t>(primary_weapon);
-        uint16_t primary_weapon_ammo_net = htons(primary_weapon_ammo);
-        std::memcpy(buffer + offset, &primary_weapon_ammo_net, sizeof(primary_weapon_ammo_net));
-        offset += sizeof(primary_weapon_ammo_net);
-        buffer[offset++] = static_cast<uint8_t>(secondary_weapon);
-        uint16_t secondary_weapon_ammo_net = htons(secondary_weapon_ammo);
-        std::memcpy(buffer + offset, &secondary_weapon_ammo_net, sizeof(secondary_weapon_ammo_net));
-        offset += sizeof(secondary_weapon_ammo_net);
-        buffer[offset++] = static_cast<uint8_t>(knife);
-        buffer[offset++] = static_cast<uint8_t>(bomb);
-
-        buffer[offset++] = static_cast<uint8_t>(active_weapon);
-        uint16_t active_weapon_ammo_net = htons(active_weapon_ammo);
-        std::memcpy(buffer + offset, &active_weapon_ammo_net, sizeof(active_weapon_ammo_net));
-        offset += sizeof(active_weapon_ammo_net);
-        buffer[offset] = task_progress;
+    void write(ByteWriter& writer) const {
+        writer.string(user_name);
+        writer.enum_u8(status);
+        writer.u16(pos_x);
+        writer.u16(pos_y);
+        writer.u16(health);
+        writer.u16(money);
+        writer.u16(kills);
+        writer.u16(deaths);
+        writer.enum_u8(action);
+        writer.u16(pos_shoot_x);
+        writer.u16(pos_shoot_y);
+        writer.string(skin);
+        writer.enum_u8(primary_weapon);
+        writer.u16(primary_weapon_ammo);
+        writer.enum_u8(secondary_weapon);
+        writer.u16(secondary_weapon_ammo);
+        writer.enum_u8(knife);
+        writer.enum_u8(bomb);
+        writer.enum_u8(active_weapon);
+        writer.u16(active_weapon_ammo);
+        writer.u8(task_progress);
     }
 
-    static PlayerInfo deserialize(const uint8_t* buffer, size_t size) {
-        if (size < 2) {
-            throw std::runtime_error("");
-        }
-        size_t offset = 0;
-        uint16_t name_length;
-        std::memcpy(&name_length, buffer + offset, sizeof(name_length));
-        name_length = ntohs(name_length);
-        offset += sizeof(name_length);
-
-        std::string user_name(reinterpret_cast<const char*>(buffer + offset), name_length);
-        offset += name_length;
-
-        Status status = static_cast<Status>(buffer[offset++]);
-        uint16_t pos_x, pos_y, health, kills, deaths;
-        std::memcpy(&pos_x, buffer + offset, sizeof(pos_x));
-        offset += sizeof(pos_x);
-        std::memcpy(&pos_y, buffer + offset, sizeof(pos_y));
-        offset += sizeof(pos_y);
-        std::memcpy(&health, buffer + offset, sizeof(health));
-        offset += sizeof(health);
-
-        uint16_t money;
-        std::memcpy(&money, buffer + offset, sizeof(money));
-        offset += sizeof(money);
-
-        std::memcpy(&kills, buffer + offset, sizeof(kills));
-        offset += sizeof(kills);
-        std::memcpy(&deaths, buffer + offset, sizeof(deaths));
-        offset += sizeof(deaths);
-
-        Action action = static_cast<Action>(buffer[offset++]);
-
-        uint16_t pos_shoot_x, pos_shoot_y;
-        std::memcpy(&pos_shoot_x, buffer + offset, sizeof(pos_shoot_x));
-        offset += sizeof(pos_shoot_x);
-        std::memcpy(&pos_shoot_y, buffer + offset, sizeof(pos_shoot_y));
-        offset += sizeof(pos_shoot_y);
-
-        uint16_t skin_length;
-        std::memcpy(&skin_length, buffer + offset, sizeof(skin_length));
-        skin_length = ntohs(skin_length);
-        offset += sizeof(skin_length);
-
-        std::string skin(reinterpret_cast<const char*>(buffer + offset), skin_length);
-        offset += skin_length;
-
-        Weapon primary_weapon = static_cast<Weapon>(buffer[offset++]);
-        uint16_t primary_weapon_ammo;
-        std::memcpy(&primary_weapon_ammo, buffer + offset, sizeof(primary_weapon_ammo));
-        primary_weapon_ammo = ntohs(primary_weapon_ammo);
-        offset += sizeof(primary_weapon_ammo);
-        Weapon secondary_weapon = static_cast<Weapon>(buffer[offset++]);
-        uint16_t secondary_weapon_ammo;
-        std::memcpy(&secondary_weapon_ammo, buffer + offset, sizeof(secondary_weapon_ammo));
-        secondary_weapon_ammo = ntohs(secondary_weapon_ammo);
-        offset += sizeof(secondary_weapon_ammo);
-        Weapon knife = static_cast<Weapon>(buffer[offset++]);
-        Weapon bomb = static_cast<Weapon>(buffer[offset++]);
-
-        Weapon active_weapon = static_cast<Weapon>(buffer[offset++]);
-        uint16_t active_weapon_ammo;
-        std::memcpy(&active_weapon_ammo, buffer + offset, sizeof(active_weapon_ammo));
-        active_weapon_ammo = ntohs(active_weapon_ammo);
-        offset += sizeof(active_weapon_ammo);
-        uint8_t task_progress = buffer[offset];
-
-        return PlayerInfo(user_name, pos_x, pos_y, health, status, money, kills, deaths, action,
-                          pos_shoot_x, pos_shoot_y, skin, primary_weapon, primary_weapon_ammo,
-                          secondary_weapon, secondary_weapon_ammo, knife, bomb, active_weapon,
-                          active_weapon_ammo, task_progress);
-    }
-
-    size_t serialized_size() const {
-        return sizeof(uint16_t) + user_name.size() +  // user_name
-               sizeof(status) +                       // status
-               2 * sizeof(uint16_t) +                 // pos_x, pos_y
-               sizeof(uint16_t) +                     // health
-               sizeof(money) +                        // money
-               2 * sizeof(uint16_t) +                 // kills, deaths
-               sizeof(action) +                       // action
-               2 * sizeof(uint16_t) +                 // pos_shoot_x, pos_shoot_y
-               sizeof(uint16_t) + skin.size() +       // skin
-               sizeof(Weapon) +                       // primary_weapon
-               sizeof(uint16_t) +                     // primary_weapon_ammo
-               sizeof(Weapon) +                       // secondary_weapon
-               sizeof(uint16_t) +                     // secondary_weapon_ammo
-               sizeof(Weapon) +                       // knife
-               sizeof(Weapon) +                       // bomb
-               sizeof(Weapon) +                       // active_weapon
-               sizeof(uint16_t) +                     // active_weapon_ammo
-               sizeof(task_progress);                 // task_progress
+    static PlayerInfo read(ByteReader& reader) {
+        std::string user_name = reader.string();
+        const auto status = reader.enum_u8<Status>();
+        const uint16_t pos_x = reader.u16();
+        const uint16_t pos_y = reader.u16();
+        const uint16_t health = reader.u16();
+        const uint16_t money = reader.u16();
+        const uint16_t kills = reader.u16();
+        const uint16_t deaths = reader.u16();
+        const auto action = reader.enum_u8<Action>();
+        const uint16_t pos_shoot_x = reader.u16();
+        const uint16_t pos_shoot_y = reader.u16();
+        std::string skin = reader.string();
+        const auto primary_weapon = reader.enum_u8<Weapon>();
+        const uint16_t primary_weapon_ammo = reader.u16();
+        const auto secondary_weapon = reader.enum_u8<Weapon>();
+        const uint16_t secondary_weapon_ammo = reader.u16();
+        const auto knife = reader.enum_u8<Weapon>();
+        const auto bomb = reader.enum_u8<Weapon>();
+        const auto active_weapon = reader.enum_u8<Weapon>();
+        const uint16_t active_weapon_ammo = reader.u16();
+        const uint8_t task_progress = reader.u8();
+        return PlayerInfo(std::move(user_name), pos_x, pos_y, health, status, money, kills, deaths,
+                          action, pos_shoot_x, pos_shoot_y, std::move(skin), primary_weapon,
+                          primary_weapon_ammo, secondary_weapon, secondary_weapon_ammo, knife, bomb,
+                          active_weapon, active_weapon_ammo, task_progress);
     }
 
     const std::string& get_user_name() const { return user_name; }

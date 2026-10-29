@@ -44,35 +44,13 @@ PlayerDTO Player::get_player_info() {
         current_weapon = Weapon::Bomb;
         current_weapon_ammo = 0;
     }
-    if (current_team == Team::Terrorists) {
-        return PlayerDTO{username,
-                         position_x,
-                         position_y,
-                         aim_x,
-                         aim_y,
-                         terrorist_skin,
-                         health,
-                         status,
-                         money,
-                         kills,
-                         deaths,
-                         primary_info.weapon_type,
-                         primary_info.ammo,
-                         secondary_info.weapon_type,
-                         secondary_info.ammo,
-                         Weapon::Knife,
-                         bomb_info,
-                         last_action,
-                         current_weapon,
-                         current_weapon_ammo,
-                         task_progress};
-    }
+    const PlayerSkin skin = current_team == Team::Terrorists ? terrorist_skin : ct_skin;
     return PlayerDTO{username,
                      position_x,
                      position_y,
                      aim_x,
                      aim_y,
-                     ct_skin,
+                     skin,
                      health,
                      status,
                      money,

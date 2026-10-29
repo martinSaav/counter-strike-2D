@@ -1,6 +1,7 @@
 target_sources(taller_tests
     PRIVATE
     # .cpp files
+        test_byte_io.cpp
         test_protocol.cpp
     PUBLIC
     # .h files

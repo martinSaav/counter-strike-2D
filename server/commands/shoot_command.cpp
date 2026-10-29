@@ -10,5 +10,5 @@ ShootCommand::ShootCommand(const PlayerCredentials credentials, const Position a
         credentials(credentials), aim_pos(aim_pos) {}
 
 void ShootCommand::process_command(Match* match) {
-    RequestProcessor::process_shoot_request(credentials, aim_pos, match);
+    match->process_shoot_request(credentials, aim_pos);
 }

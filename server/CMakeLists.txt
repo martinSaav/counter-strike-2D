@@ -19,7 +19,6 @@ target_sources(taller_server
         commands/buy_ammo_command.cpp
         commands/drop_weapon_command.cpp
         commands/aim_command.cpp
-        request_processor.cpp
         gun_shop.cpp
         message_parser.cpp
         game_config.cpp
@@ -54,7 +53,6 @@ target_sources(taller_server
         commands/buy_ammo_command.h
         commands/drop_weapon_command.h
         commands/aim_command.h
-        request_processor.h
         gun_shop.h
         gun_config.h
         game_config.h

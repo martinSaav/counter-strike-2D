@@ -11,5 +11,5 @@ DefuseBombCommand::DefuseBombCommand(const PlayerCredentials credentials):
 
 
 void DefuseBombCommand::process_command(Match* match) {
-    RequestProcessor::process_defuse_request(credentials, match);
+    match->process_defuse_request(credentials);
 }
