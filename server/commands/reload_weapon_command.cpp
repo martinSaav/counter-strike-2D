@@ -11,5 +11,5 @@ ReloadWeaponCommand::ReloadWeaponCommand(const PlayerCredentials credentials):
 
 
 void ReloadWeaponCommand::process_command(Match* match) {
-    RequestProcessor::process_reload_request(credentials, match);
+    match->process_reload_request(credentials);
 }

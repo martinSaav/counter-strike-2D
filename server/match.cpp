@@ -1,6 +1,7 @@
 #include "match.h"
 
 #include <algorithm>
+#include <functional>
 #include <ranges>
 #include <utility>
 
@@ -32,6 +33,18 @@ GameIdentification Match::join_match(const std::string& username) {
     return game_identification;
 }
 
+
+void Match::with_player(const PlayerCredentials credentials,
+                        const std::function<void(const std::shared_ptr<Player>&)>& action) {
+    std::lock_guard<std::mutex> lck(mtx);
+    const auto found = players.find(credentials);
+    if (found == players.end()) {
+        return;  // El jugador ya no esta en la partida: se descarta la accion
+    }
+    // Copia del puntero: la accion puede sacar al jugador del mapa (por ejemplo, al irse)
+    const std::shared_ptr<Player> player = found->second;
+    action(player);
+}
 
 void Match::try_half_movement(const std::shared_ptr<Player>& player, int x_mov, int y_mov) {
     auto [old_x, old_y] = player->get_location();
@@ -89,34 +102,26 @@ void Match::process_move_player(const std::shared_ptr<Player>& player, const int
 }
 
 
-void Match::process_movement_request(PlayerCredentials credentials, MovementType command,
-                                     Position aim_pos) {
-    std::lock_guard<std::mutex> lck(mtx);
-    const PlayerCredentials player_credentials = credentials;
-    const auto player_p = players.find(player_credentials);
-    if (player_p == players.end()) {
-        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
-    }
-    const std::shared_ptr<Player>& player = player_p->second;
-    auto [x, y] = aim_pos.get_position();
-    player->set_aim_pos(x, y);
-    switch (command) {
-        case MovementType::MoveLeft: {
-            return process_move_player(player, -tiles_per_movement, 0);
-        }
+void Match::process_movement_request(const PlayerCredentials credentials,
+                                     const MovementType command, const Position aim_pos) {
+    with_player(credentials, [&](const std::shared_ptr<Player>& player) {
+        auto [x, y] = aim_pos.get_position();
+        player->set_aim_pos(x, y);
+        process_movement(player, command);
+    });
+}
 
-        case MovementType::MoveRight: {
+
+void Match::process_movement(const std::shared_ptr<Player>& player, const MovementType command) {
+    switch (command) {
+        case MovementType::MoveLeft:
+            return process_move_player(player, -tiles_per_movement, 0);
+        case MovementType::MoveRight:
             return process_move_player(player, tiles_per_movement, 0);
-        }
-        case MovementType::MoveUp: {
+        case MovementType::MoveUp:
             return process_move_player(player, 0, -tiles_per_movement);
-        }
-        case MovementType::MoveDown: {
-            return process_move_player(player, 0, +tiles_per_movement);
-        }
-        default: {
-            break;
-        }
+        case MovementType::MoveDown:
+            return process_move_player(player, 0, tiles_per_movement);
     }
 }
 
@@ -130,15 +135,9 @@ void Match::process_shoot(const std::shared_ptr<Player>& player, const Position&
     }
 }
 
-void Match::process_shoot_request(PlayerCredentials credentials, Position aim_pos) {
-    std::lock_guard<std::mutex> lck(mtx);
-    const PlayerCredentials player_credentials = credentials;
-    const auto player_p = players.find(player_credentials);
-    if (player_p == players.end()) {
-        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
-    }
-    const std::shared_ptr<Player>& player = player_p->second;
-    process_shoot(player, aim_pos);
+void Match::process_shoot_request(const PlayerCredentials credentials, Position aim_pos) {
+    with_player(credentials,
+                [&](const std::shared_ptr<Player>& player) { process_shoot(player, aim_pos); });
 }
 
 
@@ -151,14 +150,8 @@ void Match::process_defuse(const std::shared_ptr<Player>& player) {
 
 
 void Match::process_defuse_request(const PlayerCredentials credentials) {
-    std::lock_guard<std::mutex> lck(mtx);
-    const PlayerCredentials player_credentials = credentials;
-    const auto player_p = players.find(player_credentials);
-    if (player_p == players.end()) {
-        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
-    }
-    const std::shared_ptr<Player>& player = player_p->second;
-    process_defuse(player);
+    with_player(credentials,
+                [this](const std::shared_ptr<Player>& player) { process_defuse(player); });
 }
 
 
@@ -170,15 +163,9 @@ void Match::process_reload(const std::shared_ptr<Player>& player) {
 }
 
 
-void Match::process_reload_request(PlayerCredentials credentials) {
-    std::lock_guard<std::mutex> lck(mtx);
-    const PlayerCredentials player_credentials = credentials;
-    const auto player_p = players.find(player_credentials);
-    if (player_p == players.end()) {
-        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
-    }
-    const std::shared_ptr<Player>& player = player_p->second;
-    process_reload(player);
+void Match::process_reload_request(const PlayerCredentials credentials) {
+    with_player(credentials,
+                [this](const std::shared_ptr<Player>& player) { process_reload(player); });
 }
 
 
@@ -191,39 +178,25 @@ void Match::process_pick_weapon(const std::shared_ptr<Player>& player) {
 
 
 void Match::process_pick_weapon_request(const PlayerCredentials credentials) {
-    std::lock_guard<std::mutex> lck(mtx);
-    const PlayerCredentials player_credentials = credentials;
-    const auto player_p = players.find(player_credentials);
-    if (player_p == players.end()) {
-        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
-    }
-    const std::shared_ptr<Player>& player = player_p->second;
-    process_pick_weapon(player);
+    with_player(credentials,
+                [this](const std::shared_ptr<Player>& player) { process_pick_weapon(player); });
 }
 
 
 void Match::process_drop_weapon_request(const PlayerCredentials credentials) {
-    std::lock_guard<std::mutex> lck(mtx);
-    const auto player_p = players.find(credentials);
-    if (player_p == players.end()) {
-        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
-    }
-    const std::shared_ptr<Player>& player = player_p->second;
-    if (player->is_dead()) {
-        return;
-    }
-    player->drop_equipped_weapon(game_manager);
+    with_player(credentials, [this](const std::shared_ptr<Player>& player) {
+        if (!player->is_dead()) {
+            player->drop_equipped_weapon(game_manager);
+        }
+    });
 }
 
 
 void Match::process_aim_request(const PlayerCredentials credentials, const Position aim_pos) {
-    std::lock_guard<std::mutex> lck(mtx);
-    const auto player_p = players.find(credentials);
-    if (player_p == players.end()) {
-        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
-    }
-    auto [x, y] = aim_pos.get_position();
-    player_p->second->set_aim_pos(x, y);
+    with_player(credentials, [&aim_pos](const std::shared_ptr<Player>& player) {
+        auto [x, y] = aim_pos.get_position();
+        player->set_aim_pos(x, y);
+    });
 }
 
 
@@ -251,14 +224,8 @@ void Match::process_leave_match(const std::shared_ptr<Player>& player) {
 
 
 void Match::process_leave_match_request(const PlayerCredentials credentials) {
-    std::lock_guard<std::mutex> lck(mtx);
-    const PlayerCredentials player_credentials = credentials;
-    const auto player_p = players.find(player_credentials);
-    if (player_p == players.end()) {
-        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
-    }
-    const std::shared_ptr<Player>& player = player_p->second;
-    process_leave_match(player);
+    with_player(credentials,
+                [this](const std::shared_ptr<Player>& player) { process_leave_match(player); });
 }
 
 MatchStatusDTO Match::get_match_status() {
@@ -327,14 +294,9 @@ void Match::process_change_skin(const std::shared_ptr<Player>& player,
 
 void Match::process_change_skin_request(const PlayerCredentials credentials,
                                         const PlayerSkin new_skin) {
-    std::lock_guard<std::mutex> lck(mtx);
-    const PlayerCredentials player_credentials = credentials;
-    const auto player_p = players.find(player_credentials);
-    if (player_p == players.end()) {
-        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
-    }
-    const std::shared_ptr<Player>& player = player_p->second;
-    process_change_skin(player, new_skin);
+    with_player(credentials, [&](const std::shared_ptr<Player>& player) {
+        process_change_skin(player, new_skin);
+    });
 }
 
 
@@ -391,14 +353,8 @@ void Match::process_buy_weapon(const std::shared_ptr<Player>& player, const Weap
 
 
 void Match::process_buy_weapon_request(const PlayerCredentials credentials, const Weapon weapon) {
-    std::lock_guard<std::mutex> lck(mtx);
-    const PlayerCredentials player_credentials = credentials;
-    const auto player_p = players.find(player_credentials);
-    if (player_p == players.end()) {
-        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
-    }
-    const std::shared_ptr<Player>& player = player_p->second;
-    process_buy_weapon(player, weapon);
+    with_player(credentials,
+                [&](const std::shared_ptr<Player>& player) { process_buy_weapon(player, weapon); });
 }
 
 
@@ -410,15 +366,11 @@ void Match::process_switch_weapon(const std::shared_ptr<Player>& player, GunType
 }
 
 
-void Match::process_switch_weapon_request(PlayerCredentials credentials, GunType gun_type) {
-    std::lock_guard<std::mutex> lck(mtx);
-    const PlayerCredentials player_credentials = credentials;
-    const auto player_p = players.find(player_credentials);
-    if (player_p == players.end()) {
-        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
-    }
-    const std::shared_ptr<Player>& player = player_p->second;
-    process_switch_weapon(player, gun_type);
+void Match::process_switch_weapon_request(const PlayerCredentials credentials,
+                                          const GunType gun_type) {
+    with_player(credentials, [&](const std::shared_ptr<Player>& player) {
+        process_switch_weapon(player, gun_type);
+    });
 }
 
 
@@ -431,14 +383,8 @@ void Match::process_buy_ammo(const std::shared_ptr<Player>& player, GunType gun_
 
 
 void Match::process_buy_ammo_request(const PlayerCredentials credentials, const GunType gun_type) {
-    std::lock_guard<std::mutex> lck(mtx);
-    const PlayerCredentials player_credentials = credentials;
-    const auto player_p = players.find(player_credentials);
-    if (player_p == players.end()) {
-        return;  // El player ya no se encuentra en la partida por lo tanto descarto la accion.
-    }
-    const std::shared_ptr<Player>& player = player_p->second;
-    process_buy_ammo(player, gun_type);
+    with_player(credentials,
+                [&](const std::shared_ptr<Player>& player) { process_buy_ammo(player, gun_type); });
 }
 
 

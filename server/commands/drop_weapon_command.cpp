@@ -7,5 +7,5 @@ DropWeaponCommand::DropWeaponCommand(const PlayerCredentials credentials):
 
 
 void DropWeaponCommand::process_command(Match* match) {
-    RequestProcessor::process_drop_weapon_request(credentials, match);
+    match->process_drop_weapon_request(credentials);
 }
