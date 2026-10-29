@@ -15,7 +15,7 @@ Organización del repositorio:
 
 | Carpeta | Contenido |
 |---|---|
-| `common/` | Protocolo, mensajes (`dto/`) y enums compartidos. `catedra/` tiene socket, cola bloqueante y thread. |
+| `common/` | Protocolo, registro de mensajes, mensajes (`dto/`), `ByteWriter`/`ByteReader` (`serialization/`) y enums compartidos. `catedra/` tiene socket, cola bloqueante y thread. |
 | `server/` | Acceptor, lobby, partidas, comandos y envío de estados. `game/` tiene la lógica del juego y `game/gun/` las armas. |
 | `client/lobby/` | Pantallas Qt (login, lobby, crear partida, sala de espera, skins, estadísticas). |
 | `client/graphics/` | Loop del juego, render, entrada, sonido y sprites. |
@@ -131,7 +131,26 @@ flowchart LR
 
 ## 4. Protocolo
 
-Ambos lados usan `Protocol`, que envía y recibe `Message` (clase abstracta con `serialize`, `deserialize` y `serialized_size`). Cada mensaje viaja con un encabezado de 3 bytes: el tipo (`MessageType`, 1 byte) y el largo del payload (uint16 en orden de red). Los enteros multi-byte van en orden de red. Si al leer el encabezado el socket ya está cerrado, `Protocol` lanza `ConnectionClosed`.
+Ambos lados usan `Protocol`, que envía y recibe `Message`. Cada mensaje viaja como
+
+```
+tipo (MessageType, 1 byte) | largo del payload (uint16) | payload
+```
+
+- **Formato de los campos:** todo valor multi-byte va en **orden de red** (big-endian), incluidos los `float`, que viajan como sus 32 bits. Un texto es su largo (`uint16`) seguido de los bytes, y una lista es la cantidad de elementos (`uint16`; `uint32` en la configuración del mapa) seguida de cada elemento. Los enums ocupan 1 byte y los `bool` también.
+- **`ByteWriter` / `ByteReader`** (`common/serialization/`) implementan ese formato en un solo lugar. El lector controla los límites: si a un mensaje le faltan bytes o un largo no entra en lo que queda, lanza **`ProtocolError`** en vez de leer fuera del buffer.
+- **Cada mensaje describe sus campos:** `Message` tiene `type()` y `write_payload(ByteWriter&)`, y cada mensaje concreto expone `static X read_payload(ByteReader&)`. Las estructuras anidadas (`PlayerInfo`, `GunConfigInfo`, `MapConfigInfo`, etc.) tienen `write`/`read`. El encabezado lo pone `Protocol`, que también rechaza un payload de más de 65535 bytes.
+- **Registro de mensajes** (`common/message_registry.cpp`): una tabla de tipo a función de lectura. Al recibir, `Protocol` lee el encabezado y el payload y le pide el mensaje al registro. Si el tipo no existe o sobran bytes, se lanza `ProtocolError`.
+- **Mensajes repetidos como plantillas** (`dto/simple_messages.h`): los pedidos sin datos son `EmptyMessage<Tipo>` y las respuestas de un solo `bool` son `SuccessResponse<Tipo>`, con alias que conservan los nombres (`GameListRequest`, `JoinGameResponse`, ...).
+- Si el socket se cierra antes de que llegue un mensaje completo, `Protocol` lanza `ConnectionClosed`.
+
+**Agregar un mensaje:**
+
+1. Sumar el tipo a `MessageType`.
+2. Crear la clase heredando de `MessageOf<MessageType::X>`, con `write_payload` y `read_payload`, escribiendo y leyendo los campos en el mismo orden.
+3. Agregar `entry<X>()` a la tabla de `message_registry.cpp`.
+
+`Protocol` no cambia.
 
 | Cliente → Servidor | Servidor → Cliente |
 |---|---|
@@ -199,7 +218,8 @@ weapon_drops:                    # armas en el piso al comenzar: ak-47, m3 o awp
 
 ## 7. Tests
 
-- `tests/test_protocol.cpp`: serialización y deserialización de los mensajes, usando un socket simulado (`MockSocket`).
+- `tests/test_byte_io.cpp`: `ByteWriter`/`ByteReader`: bytes exactos en orden de red, ida y vuelta de cada tipo y lecturas truncadas.
+- `tests/test_protocol.cpp`: sobre un socket simulado (`MockSocket`): bytes exactos de algunos mensajes, ida y vuelta de todos los tipos de mensaje y mensajes mal formados (tipo desconocido, truncado, texto más largo que el payload, bytes de más, payload demasiado grande).
 - `tests/test_game_rules.cpp`: reglas sobre la lógica real del servidor: cuenta regresiva por etapa, vencimiento del tiempo de ronda, victoria CT por tiempo, cambio de bando a la mitad, fin de partida, duración de la bomba, plantar y desactivar manteniendo la tecla, no plantar fuera de una zona, y tirar y levantar la bomba.
 - `tests/test_map_document.cpp`: el modelo del editor: guardar y abrir da el mismo mapa, cada regla de validación, los mapas de `server/maps/` son válidos y el `ConfigurationLoader` del servidor carga un mapa guardado por el editor.
 
