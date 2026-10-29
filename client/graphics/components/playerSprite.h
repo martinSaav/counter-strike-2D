@@ -26,7 +26,7 @@ public:
     PlayerSprite(Renderer* sdlRenderer, Configuration& configuration, TextureStore& textures,
                  MusicManager& sounds, const std::string& assetsPath);
 
-    void drawPlayer(const PlayerInfo& player, double& angle);
+    void drawPlayer(const PlayerInfo& player, double angle);
 
     void drawPlayerDeath(int playerX, int playerY);
 

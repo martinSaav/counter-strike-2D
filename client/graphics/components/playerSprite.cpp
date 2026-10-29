@@ -36,7 +36,7 @@ PlayerSprite::PlayerSprite(Renderer* sdlRenderer, Configuration& configuration,
     textures.loadTexture("blood", assetsPath + "/maps/blood.png");
 }
 
-void PlayerSprite::drawPlayer(const PlayerInfo& player, double& angle) {
+void PlayerSprite::drawPlayer(const PlayerInfo& player, double angle) {
 
     angle += 90;
     int playerX = player.get_pos_x();

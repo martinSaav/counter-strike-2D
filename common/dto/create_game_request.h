@@ -59,7 +59,6 @@ public:
         offset += sizeof(map_name_length);
 
         std::string map_name(reinterpret_cast<const char*>(buffer + offset), map_name_length);
-        // offset += map_name_length;
 
         return CreateGameRequest(std::move(game_name), std::move(map_name));
     }

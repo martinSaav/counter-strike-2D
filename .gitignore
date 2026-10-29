@@ -3,3 +3,5 @@ tags.*
 .vscode/
 server.sh
 client.sh
+# Archivos de usuario de Qt Creator
+*.user

@@ -1,6 +1,7 @@
 #ifndef RENDER_H
 #define RENDER_H
 #include <iostream>
+#include <list>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -23,6 +24,16 @@ struct BloodStain {
     int y;
 };
 
+// Lo que se calcula una vez por frame y usan todas las capas de dibujo
+struct FrameContext {
+    const GameStateUpdate& state;
+    std::list<PlayerInfo> players;
+    const PlayerInfo* me = nullptr;  // mi jugador, dentro de players
+    double myAngle = 0.0;            // angulo hacia el mouse, en grados
+    float visionAngle = 0.0f;        // el mismo angulo en [0, 360)
+    bool isBuyStage = false;
+};
+
 class Render {
 private:
     Renderer* sdlRenderer;
@@ -41,18 +52,8 @@ private:
     MapSprite map;
     PlayerSprite player;
 
-    // Coordenadas de mi jugador
-    PlayerInfo* myPlayer = nullptr;
-
-    // Angulo de mi jugador
-    double myAngle = 0.0;
-
-    // Angulo default
-    double anglePlayer = 0.0;
-
-    // Pos mouse
+    // Posicion del mouse en la ventana
     int mouseX = 0, mouseY = 0;
-    unsigned int prev_ticks = SDL_GetTicks();
 
     int damageFlashTimer = 0;
     int lastHealth = -1;
@@ -67,6 +68,17 @@ private:
     Weapon lastPrimary = Weapon::None;
     bool lastHadBomb = false;
     bool wasAlive = false;
+
+    // Capas del frame, en el orden en que se dibujan (ver renderFrame)
+    void updateCamera(const PlayerInfo& me);
+    void updateAim(FrameContext& frame);
+    void drawBomb(const FrameContext& frame);
+    void drawPlayers(const FrameContext& frame);
+    void playPlayerSounds(const FrameContext& frame, const PlayerInfo& playerInfo, Uint32 now);
+    void drawHudLayer(const FrameContext& frame);
+    void drawWorldOverlays(const FrameContext& frame);
+    void drawFeedback(const FrameContext& frame);
+    bool isVisible(const FrameContext& frame, int x, int y);
 
     // Sonidos que dependen del estado y no de un jugador en particular: pitido de la bomba,
     // gatillo sin balas y levantar/tirar armas

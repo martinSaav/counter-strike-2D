@@ -1,5 +1,9 @@
 #include "inputHandler.h"
 
+#include <algorithm>
+#include <iterator>
+#include <utility>
+
 InputHandler::InputHandler(Protocol& protocol, Configuration& configuration, bool& gameOver,
                            bool& clientClosed):
         protocol(protocol),
@@ -145,81 +149,33 @@ void InputHandler::handleKeyboard() {
         return;
     }
 
-    if (state[SDL_SCANCODE_W] && state[SDL_SCANCODE_D]) {
-        currentAction = Action::MoveUp;
+    if (const auto diagonal = diagonalMovement(state)) {
+        // En diagonal se mandan dos movimientos: primero el vertical y despues el horizontal
+        currentAction = diagonal->first;
         sendMessage(currentAction);
-
-        currentAction = Action::MoveRight;
+        currentAction = diagonal->second;
         action = &currentAction;
-
-    } else if (state[SDL_SCANCODE_W] && state[SDL_SCANCODE_A]) {
-        currentAction = Action::MoveUp;
-        sendMessage(currentAction);
-
-        currentAction = Action::MoveLeft;
-        action = &currentAction;
-
-    } else if (state[SDL_SCANCODE_S] && state[SDL_SCANCODE_A]) {
-        currentAction = Action::MoveDown;
-        sendMessage(currentAction);
-
-        currentAction = Action::MoveLeft;
-        action = &currentAction;
-
-    } else if (state[SDL_SCANCODE_S] && state[SDL_SCANCODE_D]) {
-        currentAction = Action::MoveDown;
-        sendMessage(currentAction);
-
-        currentAction = Action::MoveRight;
-        action = &currentAction;
-
-    } else if (state[SDL_SCANCODE_W]) {
-        currentAction = Action::MoveUp;
-        action = &currentAction;
-
-    } else if (state[SDL_SCANCODE_A]) {
-        currentAction = Action::MoveLeft;
-        action = &currentAction;
-
-    } else if (state[SDL_SCANCODE_S]) {
-        currentAction = Action::MoveDown;
-        action = &currentAction;
-
-    } else if (state[SDL_SCANCODE_D]) {
-        currentAction = Action::MoveRight;
-        action = &currentAction;
-
-    } else if (state[SDL_SCANCODE_1]) {
-        currentAction = Action::SetKnife;
-        action = &currentAction;
-
-    } else if (state[SDL_SCANCODE_2]) {
-        currentAction = Action::SetPrimaryWeapon;
-        action = &currentAction;
-
-    } else if (state[SDL_SCANCODE_3]) {
-        currentAction = Action::SetSecondaryWeapon;
-        action = &currentAction;
-
-    } else if (state[SDL_SCANCODE_4]) {
-        currentAction = Action::SetBomb;
-        action = &currentAction;
-
-    } else if (state[SDL_SCANCODE_R]) {
-        currentAction = Action::Reload;
-        action = &currentAction;
-
-    } else if (state[SDL_SCANCODE_E]) {
-        currentAction = Action::EquipWeapon;
-        action = &currentAction;
-
-    } else if (state[SDL_SCANCODE_F]) {
-        currentAction = Action::DefuseBomb;
-        action = &currentAction;
-
-    } else if (state[SDL_SCANCODE_G]) {
-        currentAction = Action::DropWeapon;
-        action = &currentAction;
+    } else {
+        // Teclas que se mantienen apretadas: si hay varias, gana la primera de la lista
+        static const std::pair<SDL_Scancode, Action> heldKeys[] = {
+                {SDL_SCANCODE_W, Action::MoveUp},
+                {SDL_SCANCODE_A, Action::MoveLeft},
+                {SDL_SCANCODE_S, Action::MoveDown},
+                {SDL_SCANCODE_D, Action::MoveRight},
+                {SDL_SCANCODE_1, Action::SetKnife},
+                {SDL_SCANCODE_2, Action::SetPrimaryWeapon},
+                {SDL_SCANCODE_3, Action::SetSecondaryWeapon},
+                {SDL_SCANCODE_4, Action::SetBomb},
+                {SDL_SCANCODE_R, Action::Reload},
+                {SDL_SCANCODE_E, Action::EquipWeapon},
+                {SDL_SCANCODE_F, Action::DefuseBomb},
+                {SDL_SCANCODE_G, Action::DropWeapon}};
+        const auto key = std::ranges::find_if(
+                heldKeys, [state](const auto& entry) { return state[entry.first] != 0; });
+        if (key != std::end(heldKeys)) {
+            currentAction = key->second;
+            action = &currentAction;
+        }
     }
 
     if (action) {
@@ -250,4 +206,17 @@ void InputHandler::sendMessage(Action& currentAction) {
     lastAimMouseY = mouseY;
     PlayerAction playerAction(currentAction, mouse_map_x, mouse_map_y);
     protocol.send_message(playerAction);
+}
+
+std::optional<std::pair<Action, Action>> InputHandler::diagonalMovement(const Uint8* state) {
+    // Mismas prioridades que tenia la cadena de if: con W gana D sobre A; con S gana A sobre D
+    if (state[SDL_SCANCODE_W] && (state[SDL_SCANCODE_D] || state[SDL_SCANCODE_A])) {
+        return std::pair{Action::MoveUp,
+                         state[SDL_SCANCODE_D] ? Action::MoveRight : Action::MoveLeft};
+    }
+    if (state[SDL_SCANCODE_S] && (state[SDL_SCANCODE_A] || state[SDL_SCANCODE_D])) {
+        return std::pair{Action::MoveDown,
+                         state[SDL_SCANCODE_A] ? Action::MoveLeft : Action::MoveRight};
+    }
+    return std::nullopt;
 }
