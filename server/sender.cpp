@@ -100,6 +100,8 @@ void Sender::run() {
             return;
         } catch (const LibError&) {
             break;
+        } catch (const ConnectionClosed&) {
+            break;  // el cliente se desconecto
         } catch (const std::exception& e) {
             std::cerr << "Unexpected exception: " << e.what() << std::endl;
             break;

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <iostream>
 #include <utility>
 #include <vector>
 
@@ -10,6 +11,8 @@ MusicManager::MusicManager(const std::string& assetsPath) {
     // Abrimos un dispositivo
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2,
                   2048);  //(frecuencia, formato, número de canales, tam de buffer)
+    // Con los 8 canales por defecto se llenaban enseguida (pasos y disparos de 10 jugadores)
+    Mix_AllocateChannels(32);
 
     // Musica de fondo
     const std::string ambienceGameLocation = assetsPath + "/sounds/ambienceGame.mp3";
@@ -46,6 +49,8 @@ MusicManager::MusicManager(const std::string& assetsPath) {
         for (const auto& file: files) {
             if (Mix_Chunk* chunk = Mix_LoadWAV((assetsPath + "/sounds/" + file).c_str())) {
                 chunkFiles[type].push_back(chunk);
+            } else {
+                std::cerr << "Could not load sound " << file << ": " << Mix_GetError() << "\n";
             }
         }
     }
@@ -69,16 +74,14 @@ MusicManager::~MusicManager() {
 
 void MusicManager::loadMusic(MusicType music, int times) {
 
+    // Sin la musica (falta el archivo o no hay dispositivo de audio) se juega en silencio: lanzar
+    // aca cortaba el cliente entero
     auto it = musicFiles.find(music);
-    if (it == musicFiles.end()) {
-        throw std::runtime_error("Music not found");
+    if (it == musicFiles.end() || it->second == nullptr) {
+        return;
     }
 
     Mix_Music* musicTrack = it->second;
-
-    if (!musicTrack) {
-        throw std::runtime_error("Error loading music: " + std::string(Mix_GetError()));
-    }
 
     Mix_VolumeMusic(MIX_MAX_VOLUME / 8);
     Mix_PlayMusic(musicTrack, times);
@@ -87,13 +90,19 @@ void MusicManager::loadMusic(MusicType music, int times) {
 
 int MusicManager::loadSong(MusicType music, int loops, int volume) {
 
+    // Un sonido que no cargo se saltea. Antes se lanzaba una excepcion que nadie atrapaba en el
+    // render y el cliente terminaba con std::terminate.
     auto it = chunkFiles.find(music);
     if (it == chunkFiles.end() || it->second.empty()) {
-        throw std::runtime_error("Sound not found");
+        return -1;
     }
 
     Mix_Chunk* chunk = it->second[std::rand() % it->second.size()];
     int channel = Mix_PlayChannel(-1, chunk, loops);
+    if (channel == -1) {
+        // No habia canal libre. Mix_Volume(-1, ...) cambiaria el volumen de todos los canales.
+        return -1;
+    }
     Mix_Volume(channel, volume);
     return channel;
 }

@@ -4,7 +4,9 @@
 
 #include "client_handler.h"
 
+#include <cstddef>
 #include <list>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -19,13 +21,24 @@
 #include "common/game_info.h"
 #include "common/message.h"
 
+namespace {
+// Los nombres viajan en cada GameListResponse y GameStateUpdate, cuyo payload tiene un largo u16:
+// sin un limite, un solo nombre enorme hacia fallar el envio para todos los clientes.
+constexpr std::size_t max_name_length = 32;
+
+struct InvalidMatchName: public std::runtime_error {
+    InvalidMatchName(): std::runtime_error("Invalid match name") {}
+};
+}  // namespace
+
 std::string ClientHandler::handle_login() {
     while (true) {
         const auto message = protocol.recv_message();
         switch (message->type()) {
             case MessageType::LoginRequest: {
                 const auto login_message = dynamic_cast<LoginRequest*>(message.get());
-                return login_message->get_username();
+                // El login no tiene respuesta, asi que un nombre demasiado largo se recorta
+                return login_message->get_username().substr(0, max_name_length);
             }
             default:  // Mientras no reciba el mensaje de login continuo recibiendo mensajes hasta
                       // recibirlo.
@@ -53,6 +66,9 @@ void ClientHandler::handle_list_matches_request() {
 GameIdentification ClientHandler::handle_create_game_request(std::unique_ptr<Message>&& message) {
     const auto create_message = dynamic_cast<CreateGameRequest*>(message.get());
     const std::string game_name = create_message->get_game_name();
+    if (game_name.empty() || game_name.size() > max_name_length) {
+        throw InvalidMatchName();
+    }
     const GameIdentification id =
             lobby.create_match(game_name, username, create_message->get_map_name());
     match_name = game_name;
@@ -85,6 +101,8 @@ std::optional<GameIdentification> ClientHandler::pick_match() {
                     try {
                         return handle_create_game_request(std::move(message));
                     } catch (const MatchAlreadyExists&) {
+                        protocol.send_message(CreateGameResponse(false));
+                    } catch (const InvalidMatchName&) {
                         protocol.send_message(CreateGameResponse(false));
                     }
                     break;

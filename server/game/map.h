@@ -37,26 +37,19 @@ class Map {
 
     [[nodiscard]] std::pair<int, int> get_chunk_index(int x, int y) const;
 
-    static std::pair<double, double> calculate_bullet_velocity(
-            const std::pair<int, int>& starting_pos, const std::pair<int, int>& ending_pos);
-
-    [[nodiscard]] std::pair<std::pair<int, int>, std::pair<double, double>>
-            calculate_new_bullet_position(const std::pair<double, double>& starting_pos,
-                                          const std::pair<double, double>& velocity) const;
-    [[nodiscard]] std::vector<std::shared_ptr<Player>> get_players_near_point(int x, int y) const;
+    [[nodiscard]] std::vector<std::shared_ptr<Player>> get_players_in_chunk(
+            const std::pair<int, int>& chunk_index) const;
 
     std::optional<ImpactInfo> get_impacted_element(const std::pair<int, int>& chunk_idx, int ini_x,
-                                                   int ini_y, double current_x, double current_y,
-                                                   const Position& final_pos,
-                                                   const std::pair<double, double>& velocity,
+                                                   int ini_y, const Position& final_pos,
                                                    const Player& gun_owner);
 
     static ImpactInfo get_nearest_colliding_structure(const Chunk& chunk, int ini_x, int ini_y,
-                                                      const Position& final_pos,
-                                                      const std::pair<double, double>& velocity);
-    [[nodiscard]] ImpactInfo get_nearest_colliding_player(
-            int ini_x, int ini_y, double current_x, double current_y, const Player& gun_owner,
-            const Position& final_pos, const std::pair<double, double>& velocity) const;
+                                                      const Position& final_pos);
+    [[nodiscard]] ImpactInfo get_nearest_colliding_player(const std::pair<int, int>& chunk_idx,
+                                                          int ini_x, int ini_y,
+                                                          const Player& gun_owner,
+                                                          const Position& final_pos) const;
 
 
 public:
@@ -79,7 +72,8 @@ public:
     void clear_bomb();
     void drop_weapon(std::unique_ptr<Gun> gun, int x, int y);
     void drop_bomb(std::unique_ptr<BombEncapsulator> bomb, int x, int y);
-    std::unique_ptr<Gun> pick_weapon(int x, int y);
+    // Levanta el primer arma tirada en (x, y); con can_pick_primary en false saltea las primarias
+    std::unique_ptr<Gun> pick_weapon(int x, int y, bool can_pick_primary = true);
     std::unique_ptr<BombEncapsulator> pick_bomb(int x, int y);
     void remove_player(const std::shared_ptr<Player>& player);
     std::list<DroppedWeapon> get_dropped_weapons();
