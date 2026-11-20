@@ -11,6 +11,15 @@
 #include "map.h"
 #include "player.h"
 
+namespace {
+// Marca de "nunca disparo": cualquier tiempo de la ronda ya supera los cooldowns
+constexpr float never = -1e6f;
+// El reloj avanza de a 1000/30 ms: tres pasos suman 99,99 ms y sin esta tolerancia un cooldown de
+// 100 ms se iria al cuarto paso
+constexpr float tick_tolerance = 1.0f;
+}  // namespace
+
+
 Ak47::Ak47(const GunConfig& ak_config):
         max_ammo(ak_config.max_ammo),
         bullets_per_burst(ak_config.bullets_per_burst),
@@ -18,16 +27,21 @@ Ak47::Ak47(const GunConfig& ak_config):
         min_dmg(ak_config.min_dmg),
         gun_price(ak_config.gun_price),
         miliseconds_per_shoot(ak_config.shoot_cooldown),
+        miliseconds_between_bursts(ak_config.burst_cooldown),
+        base_precision(ak_config.base_precision),
+        distance_precision_modifier(ak_config.distance_precision_modifier),
         current_ammo(ak_config.max_ammo),
         reserve_ammo(ak_config.starting_reserve_ammo),
-        time_since_last_shot(0),
-        base_precision(ak_config.base_precision),
-        distance_precision_modifier(ak_config.distance_precision_modifier) {}
+        time_since_last_shot(never),
+        time_since_burst_ended(never),
+        bullets_left_in_burst(0),
+        target(0, 0) {}
 
 
 bool Ak47::has_to_shoot(const float current_time) {
-    return !shoots.empty() &&
-           (current_time - time_since_last_shot > static_cast<float>(miliseconds_per_shoot));
+    const float since_last_shot = current_time - time_since_last_shot + tick_tolerance;
+    return bullets_left_in_burst > 0 &&
+           since_last_shot >= static_cast<float>(miliseconds_per_shoot);
 }
 
 bool Ak47::can_reload() { return reserve_ammo != 0 && current_ammo < max_ammo; }
@@ -45,26 +59,22 @@ void Ak47::reload_gun() {
 }
 
 
-void Ak47::reset_shoots() {
-    std::queue<std::pair<int, int>> empty;
-    shoots.swap(empty);
-}
+void Ak47::reset_shoots() { bullets_left_in_burst = 0; }
 
 
-void Ak47::shoot_gun(const Position final_position, float current_time) {
-    if (current_ammo == 0 || shoots.size() == current_ammo) {
+// El cliente manda un disparo por frame mientras se mantiene el click: cada llamada actualiza la
+// mira de la rafaga en curso, y si no hay ninguna y ya paso la pausa, empieza otra.
+void Ak47::shoot_gun(const Position final_position, const float current_time) {
+    if (current_ammo == 0) {
         throw NoAmmo();
     }
-    const auto pos = final_position.get_position();
-    if (shoots.empty()) {
-        const int bullets_to_shoot = std::min(bullets_per_burst, current_ammo);
-        for (int i = 0; i < bullets_to_shoot; i++) {
-            shoots.push(pos);
-        }
-    } else {
-        if (shoots.size() == 1) {
-            shoots.push(pos);
-        }
+    target = final_position.get_position();
+    if (bullets_left_in_burst > 0) {
+        return;
+    }
+    if (current_time - time_since_burst_ended + tick_tolerance >=
+        static_cast<float>(miliseconds_between_bursts)) {
+        bullets_left_in_burst = std::min(bullets_per_burst, current_ammo);
     }
 }
 
@@ -86,10 +96,13 @@ ShootInfo Ak47::fire_gun(Map& map, Player& owner, const float current_time,
         throw DontHaveToShoot();
     }
     auto [x, y] = current_position.get_position();
-    auto [final_x, final_y] = shoots.front();
-    shoots.pop();
+    auto [final_x, final_y] = target;
     current_ammo--;
+    bullets_left_in_burst--;
     time_since_last_shot = current_time;
+    if (bullets_left_in_burst == 0) {
+        time_since_burst_ended = current_time;
+    }
     const ImpactInfo impact = map.trace_bullet_path(x, y, Position(final_x, final_y), owner);
     std::vector<ShootResult> result;
     if (impact.impacted_player.has_value()) {
@@ -114,4 +127,7 @@ ShootInfo Ak47::fire_gun(Map& map, Player& owner, const float current_time,
 void Ak47::add_magazine() { reserve_ammo += max_ammo; }
 
 
-void Ak47::reset_time() { time_since_last_shot = 0; }
+void Ak47::reset_time() {
+    time_since_last_shot = never;
+    time_since_burst_ended = never;
+}

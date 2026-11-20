@@ -87,7 +87,7 @@ Antes de arrancar, `Match::wait_for_match_to_start` procesa comandos en forma bl
 | `GameManager` | Reglas: victoria de ronda (eliminación, bomba, desactivación o tiempo agotado), dinero, cambio de bando en la ronda `number_of_rounds / 2 + 1`, fin de partida al llegar a la mitad + 1 de victorias, plantado y desactivado, armas tiradas. |
 | `Map` | Estructuras, zonas de inicio, zona de la bomba y armas en el piso. Divide el mapa en *chunks* para buscar colisiones solo cerca. `trace_bullet_path` recorre la trayectoria de una bala hasta la primera pared o jugador. |
 | `Player` | Estado del jugador: posición, vida, plata, armas, bomba, plantado y desactivado (con su avance `task_progress`), estadísticas. Sus campos son privados: `GameManager` lo modifica con métodos como `earn_money`, `start_defusing`, `stop_defusing`, `add_kill` y `receive_damage`. |
-| `Gun` y derivadas | `Knife`, `Glock`, `Ak47` (ráfagas), `M3` (cono de perdigones con alcance corto que respeta paredes), `Awp` (daño fijo) y `BombEncapsulator`. Cada arma calcula su daño, precisión y cadencia a partir de su `GunConfig`. |
+| `Gun` y derivadas | `Knife`, `Glock`, `Ak47` (ráfagas de `bullets_per_burst` balas separadas por `shoot_cooldown`, con `burst_cooldown` de pausa entre ráfagas), `M3` (cono de perdigones con alcance corto que respeta paredes), `Awp` (daño fijo) y `BombEncapsulator`. Cada arma calcula su daño, precisión y cadencia a partir de su `GunConfig`. |
 | `MessageParser` / comandos | Convierten mensajes en `PlayerCommand` (`MovementCommand`, `ShootCommand`, `BuyWeaponCommand`, `DropWeaponCommand`, `AimCommand`, etc.). Cada comando llama directamente al método correspondiente de `Match`. |
 
 ## 3. Arquitectura del cliente

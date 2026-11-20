@@ -52,6 +52,7 @@ GunConfig ConfigurationLoader::get_ak_config(YAML::Node& ak_config) {
     const int gun_price = ak_config["gun_price"].as<int>();
     const int bullets_per_burst = ak_config["bullets_per_burst"].as<int>();
     const int shoot_cooldown = ak_config["shoot_cooldown"].as<int>();
+    const int burst_cooldown = ak_config["burst_cooldown"].as<int>();
     const auto base_precision = ak_config["base_precision"].as<double>();
     const auto distance_precision_modifier = ak_config["distance_precision_modifier"].as<double>();
     return GunConfig{max_ammo,
@@ -64,7 +65,8 @@ GunConfig ConfigurationLoader::get_ak_config(YAML::Node& ak_config) {
                      shoot_cooldown,
                      bullets_per_burst,
                      base_precision,
-                     distance_precision_modifier};
+                     distance_precision_modifier,
+                     burst_cooldown};
 }
 
 
