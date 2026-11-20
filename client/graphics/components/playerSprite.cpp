@@ -2,6 +2,16 @@
 
 #include <cmath>
 
+namespace {
+// Cuanto se ve el trazo de una bala (el del AWP un poco mas, es un solo tiro fuerte)
+constexpr Uint32 TRACER_MS = 90;
+constexpr Uint32 AWP_TRACER_MS = 160;
+// Cuanto se ve el fogonazo en la boca del arma
+constexpr Uint32 MUZZLE_FLASH_MS = 50;
+// Distancia (en unidades del mapa) del centro del jugador a la boca del arma
+constexpr float MUZZLE_DISTANCE = 3.0f;
+}  // namespace
+
 PlayerSprite::PlayerSprite(Renderer* sdlRenderer, Configuration& configuration,
                            TextureStore& textures, MusicManager& sounds,
                            const std::string& assetsPath):
@@ -65,14 +75,24 @@ void PlayerSprite::drawPlayer(const PlayerInfo& player, double angle) {
             // El disparo llega en un solo estado: lo dejamos visible un instante
             recentSpreads[player.get_user_name()] = {SDL_Point{shootX, shootY},
                                                      SDL_GetTicks() + 150};
-        } else {
+        } else if (weaponPlayer == Weapon::Knife) {
             drawBullet(shootX, shootY, angle);
+        } else {
+            const Uint32 duration = weaponPlayer == Weapon::AWP ? AWP_TRACER_MS : TRACER_MS;
+            recentShots[player.get_user_name()] = {SDL_Point{shootX, shootY}, SDL_GetTicks(),
+                                                   duration};
         }
     }
 
     auto spread = recentSpreads.find(player.get_user_name());
     if (spread != recentSpreads.end() && SDL_GetTicks() < spread->second.second) {
         drawShotgunSpread(playerX, playerY, spread->second.first.x, spread->second.first.y);
+    }
+
+    auto shot = recentShots.find(player.get_user_name());
+    if (shot != recentShots.end() &&
+        SDL_GetTicks() - shot->second.firedAt < shot->second.duration) {
+        drawTracer(playerX, playerY, shot->second, angle);
     }
 }
 
@@ -128,6 +148,46 @@ void PlayerSprite::drawBullet(const int& shootX, const int& shootY, double& angl
                          int(2 * configuration.zoom), int(2 * configuration.zoom)};
     std::string textureName = "shot";
     drawHud2(destRect, textureName);
+}
+
+void PlayerSprite::drawTracer(int playerX, int playerY, const RecentShot& shot, double angle) {
+    // Trazo desde la boca del arma hasta el impacto, que se desvanece en `duration` ms, mas un
+    // fogonazo corto en la boca. Antes la bala era un punto en el impacto durante un solo frame.
+    const float playerSize = 32.0f / 8.0f;
+    const float centerX = playerX + playerSize / 2;
+    const float centerY = playerY + playerSize / 2;
+    const float dx = shot.impact.x - centerX;
+    const float dy = shot.impact.y - centerY;
+    const float length = std::hypot(dx, dy);
+    if (length < MUZZLE_DISTANCE) {
+        return;
+    }
+    const float muzzleX = centerX + dx / length * MUZZLE_DISTANCE;
+    const float muzzleY = centerY + dy / length * MUZZLE_DISTANCE;
+
+    const Uint32 elapsed = SDL_GetTicks() - shot.firedAt;
+    const float life = 1.0f - static_cast<float>(elapsed) / static_cast<float>(shot.duration);
+    const int fromX = int((muzzleX - configuration.camera.x) * configuration.zoom);
+    const int fromY = int((muzzleY - configuration.camera.y) * configuration.zoom);
+    const int toX = int((shot.impact.x - configuration.camera.x) * configuration.zoom);
+    const int toY = int((shot.impact.y - configuration.camera.y) * configuration.zoom);
+    sdlRenderer->SetDrawBlendMode(SDL_BLENDMODE_BLEND);
+    sdlRenderer->SetDrawColor(255, 230, 150, Uint8(220 * life));
+    // Dos lineas pegadas para que el trazo tenga 2 px de ancho
+    const bool mostlyHorizontal = std::abs(dx) > std::abs(dy);
+    sdlRenderer->DrawLine(fromX, fromY, toX, toY);
+    sdlRenderer->DrawLine(fromX + (mostlyHorizontal ? 0 : 1), fromY + (mostlyHorizontal ? 1 : 0),
+                          toX + (mostlyHorizontal ? 0 : 1), toY + (mostlyHorizontal ? 1 : 0));
+
+    if (elapsed < MUZZLE_FLASH_MS) {
+        const int flashSize = int(1.5f * configuration.zoom);
+        SDL_Rect flashRect = {fromX - flashSize / 2, fromY - flashSize / 2, flashSize, flashSize};
+        std::string textureName = "shot";
+        drawHud2(flashRect, textureName);
+    }
+    int impactX = shot.impact.x;
+    int impactY = shot.impact.y;
+    drawBullet(impactX, impactY, angle);
 }
 
 void PlayerSprite::drawShotgunSpread(int playerX, int playerY, int shootX, int shootY) {
