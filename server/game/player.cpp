@@ -78,20 +78,9 @@ bool Player::is_dead() const { return status == Status::Dead; }
 void Player::receive_damage(const GameManager& manager, const int damage) {
     health = std::max(0, health - damage);
     if (health == 0) {
+        drop_all_weapons(manager);
         status = Status::Dead;
         deaths += 1;
-        if (bomb != nullptr) {
-            manager.drop_bomb(*this, std::move(bomb));
-        } else if (equipped_weapon == GunType::Primary) {
-            primary_weapon->reset_shoots();
-            primary_weapon->reset_time();
-            manager.drop_weapon(*this, std::move(primary_weapon));
-        } else if (equipped_weapon == GunType::Secondary) {
-            secondary_weapon->reset_shoots();
-            secondary_weapon->reset_time();
-            manager.drop_weapon(*this, std::move(secondary_weapon));
-        }
-        primary_weapon = nullptr;
         is_defusing = false;
         is_planting = false;
         secondary_weapon = std::make_unique<Glock>(game_config.glock_config);
@@ -280,10 +269,14 @@ void Player::update(GameManager& game_manager) {
         is_shooting = true;
     }
     if (is_planting && bomb->has_finished_planting(time)) {
-        game_manager.plant_bomb(position_x, position_y);
-        equipped_weapon = GunType::Secondary;
+        if (game_manager.can_plant_bomb(position_x, position_y)) {
+            game_manager.plant_bomb(position_x, position_y);
+            equipped_weapon = GunType::Secondary;
+            bomb = nullptr;
+        } else {
+            bomb->reset_shoots();  // la ronda termino mientras plantaba: no se planta
+        }
         is_planting = false;
-        bomb = nullptr;
     }
     update_task_progress(time);
     if (is_defusing) {
@@ -309,6 +302,33 @@ void Player::set_skin(const PlayerSkin skin) {
 
 
 void Player::start_planting() { is_planting = true; }
+
+
+void Player::drop_all_weapons(const GameManager& manager) {
+    if (is_dead()) {
+        return;  // ya tiro sus armas al morir
+    }
+    const bool holding_secondary = equipped_weapon == GunType::Secondary;
+    if (bomb != nullptr) {
+        bomb->reset_shoots();
+        manager.drop_bomb(*this, std::move(bomb));
+        if (equipped_weapon == GunType::Bomb) {
+            equipped_weapon = GunType::Secondary;
+        }
+    }
+    // Antes solo se tiraba el arma equipada y la primaria se perdia si se moria con el cuchillo,
+    // la bomba o la secundaria en la mano
+    if (primary_weapon != nullptr) {
+        primary_weapon->reset_shoots();
+        primary_weapon->reset_time();
+        manager.drop_weapon(*this, std::move(primary_weapon));
+    } else if (holding_secondary && secondary_weapon != nullptr) {
+        secondary_weapon->reset_shoots();
+        secondary_weapon->reset_time();
+        manager.drop_weapon(*this, std::move(secondary_weapon));
+    }
+    primary_weapon = nullptr;
+}
 
 
 void Player::equip_weapon(std::unique_ptr<Gun> gun) {

@@ -78,6 +78,8 @@ public:
     void plant_bomb(int x, int y);
     [[nodiscard]] bool is_bomb_planted() const { return bomb_planted; }
     [[nodiscard]] bool can_plant_bomb(int x, int y) const;
+    // La bomba esta plantada y todavia se puede desactivar (no exploto ni se desactivo)
+    [[nodiscard]] bool is_bomb_defusable() const;
     void explode_bomb(const std::vector<std::shared_ptr<Player>>& players);
     void start_defusing(const std::shared_ptr<Player>& player) const;
     void has_finished_defusing(Player& player);
