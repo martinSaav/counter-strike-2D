@@ -44,6 +44,7 @@ target_sources(taller_common
         message_type.h
         message.h
         message_registry.h
+        name_limits.h
         protocol.h
         game_info.h
         team.h

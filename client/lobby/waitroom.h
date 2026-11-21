@@ -1,6 +1,7 @@
 #ifndef WAITROOM_H
 #define WAITROOM_H
 
+#include <QCloseEvent>
 #include <QWidget>
 #include <atomic>
 #include <string>
@@ -36,14 +37,28 @@ private slots:
 signals:
     void gameReady();
 
+    void connectionLost();
+
+protected:
+    void closeEvent(QCloseEvent* event) override;
+
 private:
     void createSkinSelectionWindow(team& teamPlayer);
 
     void ask_game_started();
 
+    void leaveMatch();
+
+    void showConnectionLost(const QString& detail);
+
     std::thread socketThread;
     // true mientras socketThread esta bloqueado esperando el aviso de que arranco la partida
     std::atomic<bool> waitingGameStart{false};
+    // true si la ventana se cierra porque arranca la partida: no hay que irse de ella
+    bool matchStarting = false;
+    // true cuando ya cerramos la conexion: socketThread no tiene que avisar un error ni hay que
+    // volver a cerrarla en el destructor
+    std::atomic<bool> connectionClosed{false};
 
     Ui::waitRoom* ui;
     Protocol& protocol;
