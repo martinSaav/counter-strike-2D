@@ -43,6 +43,68 @@ flowchart TB
 - **Entre los dos** viajan mensajes binarios con un encabezado de tipo y largo ([sección 4](#4-protocolo)).
 - **El editor** arma mapas que el servidor carga al iniciar si figuran en `server_config.yaml` ([sección 5](#5-editor-de-niveles)).
 
+### Hilos y colas
+
+El mismo sistema, un nivel más abajo: qué hilos hay de cada lado y por qué colas se pasan los datos. En azul los hilos, en naranja las colas.
+
+```mermaid
+flowchart TB
+    subgraph CLIENTE["Cliente (uno por jugador)"]
+        direction TB
+        subgraph FASE_LOBBY["Fase lobby (Qt)"]
+            GUI["Hilo de Qt<br/>login, crear / unirse, sala de espera<br/>pedido y respuesta sincrónicos"]
+            WAIT["Hilo de la sala de espera<br/>solo el que se unió:<br/>espera que arranque la partida"]
+        end
+        subgraph FASE_JUEGO["Fase en juego (ChatClient)"]
+            CMAIN["Hilo principal, 30 FPS<br/>InputHandler: teclado y mouse<br/>Render: dibuja el último estado"]
+            CRECV["Hilo InputServerHandler<br/>recibe GameStateUpdate"]
+            CQ[["cola de estados<br/>std::queue + mutex"]]
+        end
+    end
+
+    NET(("socket TCP<br/>uno por cliente"))
+
+    subgraph SERVIDOR["Servidor"]
+        direction TB
+        SMAIN["Hilo main<br/>carga la configuración<br/>y espera 'q'"]
+        SACC["Hilo Acceptor<br/>acepta conexiones y limpia<br/>clientes y partidas terminados"]
+        subgraph POR_CLIENTE["Por cliente"]
+            SCH["Hilo ClientHandler<br/>lobby: login, listar, crear / unirse<br/>en partida: recv → MessageParser → comando"]
+            SSND["Hilo Sender<br/>saca de su cola y manda"]
+        end
+        subgraph POR_PARTIDA["Por partida"]
+            SCQ[["commands_queue<br/>N productores → 1 consumidor"]]
+            SMATCH["Hilo Match<br/>antes de arrancar: pop bloqueante<br/>en juego, a game_rate Hz:<br/>1. comandos → Match::process_*<br/>2. update_game()<br/>3. broadcast del estado"]
+            SSQ[["una cola por jugador<br/>MatchStatusDTO o<br/>GameReadyNotification"]]
+        end
+    end
+
+    GUI <-->|"lobby"| NET
+    NET -->|"GameReadyResponse"| WAIT
+    CMAIN -->|"PlayerAction, compras"| NET
+    NET -->|"GameStateUpdate"| CRECV
+    CRECV -->|"push"| CQ
+    CQ -->|"vacía la cola: dibuja el último<br/>y junta las bajas de todos"| CMAIN
+
+    SMAIN -->|"start"| SACC
+    SACC -.->|"crea uno por conexión"| SCH
+    SCH -.->|"crea al entrar a una partida"| SSND
+    NET <-->|"pedidos del lobby, acciones"| SCH
+    SCH -->|"push comando"| SCQ
+    SCQ -->|"pop"| SMATCH
+    SMATCH -->|"push del estado (1 → N)"| SSQ
+    SSQ -->|"pop"| SSND
+    SSND -->|"GameReadyResponse, GameConfig,<br/>GameStateUpdate"| NET
+
+    classDef hilo fill:#BBDEFB,stroke:#1565C0,color:#000
+    classDef cola fill:#FFE0B2,stroke:#E65100,color:#000
+    class GUI,WAIT,CMAIN,CRECV,SMAIN,SACC,SCH,SSND,SMATCH hilo
+    class CQ,SCQ,SSQ cola
+```
+
+- **Cliente:** el hilo principal hace entrada y render (SDL exige manejar la ventana desde el hilo que la creó); el único otro hilo del juego es el que recibe del socket. En el lobby, Qt espera cada respuesta del servidor salvo en la sala de espera del que se unió, que espera el arranque en un hilo aparte para no congelar la ventana.
+- **Servidor:** por cada cliente hay un `ClientHandler` (lo que llega del socket) y, desde que entra a una partida, un `Sender` (lo que sale). Cada partida es un hilo `Match`, el único que toca el estado del juego: recibe comandos por una cola compartida y reparte cada estado en una cola por jugador.
+
 ## 1. Tecnologías
 
 - **C++20** y POSIX 2008, compilado con CMake.
