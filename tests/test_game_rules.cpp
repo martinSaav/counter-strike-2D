@@ -6,6 +6,7 @@
 #include "gtest/gtest.h"
 #include "server/game/game_clock.h"
 #include "server/game/game_manager.h"
+#include "server/game/gun/ak47.h"
 #include "server/game/gun/bomb_encapsulator.h"
 #include "server/game/impact_info.h"
 #include "server/game/map.h"
@@ -61,6 +62,9 @@ GameConfig make_game_config(const int after_round_time = AFTER_ROUND_TIME,
                       ROUND_TIME};
 }
 
+// AK de prueba: rafagas de 3 balas cada 100 ms y 400 ms de pausa entre rafagas, siempre acierta
+GunConfig make_ak_config() { return GunConfig{30, 60, 10, 20, 2700, 0, 0, 100, 3, 1.0, 0.0, 400}; }
+
 class GameRulesTest: public ::testing::Test {
 protected:
     GameConfig config = make_game_config();
@@ -72,6 +76,27 @@ protected:
     void SetUp() override {
         players.push_back(std::make_shared<Player>("tt", config, 2, 2, Team::Terrorists));
         players.push_back(std::make_shared<Player>("ct", config, 82, 82, Team::CounterTerrorists));
+    }
+
+    // Simula `ticks` pasos del servidor en el mismo orden que Match: el pedido de disparo del
+    // cliente (si `holding`, uno por paso, como con el click apretado) se procesa con la hora
+    // anterior, despues avanza el reloj y corre update. Devuelve en que momento salio cada bala.
+    std::vector<double> run_shooter(Player& shooter, const int ticks, const bool holding,
+                                    const Position& aim) {
+        const double tick = 1000.0 / 30;
+        std::vector<double> shots;
+        for (int i = 0; i < ticks; i++) {
+            if (holding) {
+                shooter.shoot(aim, static_cast<float>(clock.get_time()));
+            }
+            clock.advance(tick);
+            shooter.update(manager);
+            if (shooter.get_player_info().last_action == Action::Shoot) {
+                shots.push_back(clock.get_time());
+            }
+            shooter.set_idle();
+        }
+        return shots;
     }
 };
 
@@ -219,6 +244,58 @@ TEST_F(GameRulesTest, CannotPlantOutsideABombSite) {
     }
     EXPECT_FALSE(manager.get_time_information().bomb_planted);
     EXPECT_EQ(terrorist->get_player_info().bomb, Weapon::Bomb);
+}
+
+TEST_F(GameRulesTest, AkSingleClickFiresOneBurstOfThree) {
+    Player& shooter = *players[0];
+    shooter.equip_weapon(std::make_unique<Ak47>(make_ak_config()));
+    clock.advance(BUY_TIME);
+
+    shooter.shoot(Position(50, 2), static_cast<float>(clock.get_time()));
+    const std::vector<double> shots = run_shooter(shooter, 60, false, Position(50, 2));
+
+    ASSERT_EQ(shots.size(), 3u);
+    EXPECT_NEAR(shots[1] - shots[0], 100, 1);
+    EXPECT_NEAR(shots[2] - shots[1], 100, 1);
+    EXPECT_EQ(shooter.get_player_info().current_weapon_ammo, 27);
+}
+
+TEST_F(GameRulesTest, HoldingTheAkFiresBurstsWithAPauseBetweenThem) {
+    Player& shooter = *players[0];
+    shooter.equip_weapon(std::make_unique<Ak47>(make_ak_config()));
+    clock.advance(BUY_TIME);
+
+    // 2 segundos con el click apretado
+    const std::vector<double> shots = run_shooter(shooter, 60, true, Position(50, 2));
+
+    // Rafagas de 3 balas cada 100 ms y 400 ms de pausa. La pausa se redondea al paso siguiente
+    // del servidor (el pedido de disparo usa la hora del paso anterior): una rafaga cada 633 ms,
+    // asi que en 2 s entran al menos 3 rafagas completas.
+    ASSERT_GE(shots.size(), 9u);
+    for (std::size_t i = 1; i < shots.size(); i++) {
+        const double gap = shots[i] - shots[i - 1];
+        if (i % 3 == 0) {
+            EXPECT_NEAR(gap, 400, 34) << "pausa antes de la rafaga que empieza en la bala " << i;
+        } else {
+            EXPECT_NEAR(gap, 100, 1) << "dentro de la rafaga, bala " << i;
+        }
+    }
+}
+
+TEST_F(GameRulesTest, EachAkBulletGoesWhereThePlayerAimsNow) {
+    // Antes la rafaga entera iba al punto del primer click aunque el jugador moviera la mira
+    Player& shooter = *players[0];
+    shooter.equip_weapon(std::make_unique<Ak47>(make_ak_config()));
+    clock.advance(BUY_TIME);
+
+    run_shooter(shooter, 1, true, Position(50, 2));
+    EXPECT_EQ(shooter.get_player_info().aim_x, 50);
+
+    // Sin pared ni jugadores en el medio, la bala llega a la mira: aim queda en el impacto
+    const std::vector<double> shots = run_shooter(shooter, 3, true, Position(2, 50));
+    ASSERT_EQ(shots.size(), 1u);
+    EXPECT_EQ(shooter.get_player_info().aim_x, 2);
+    EXPECT_EQ(shooter.get_player_info().aim_y, 50);
 }
 
 namespace {
