@@ -41,7 +41,8 @@ ak:
   max_dmg: 25
   gun_price: 2700
   bullets_per_burst: 3
-  shoot_cooldown: 200
+  shoot_cooldown: 100 # entre las balas de una rafaga
+  burst_cooldown: 400 # pausa entre rafagas si se mantiene el click
   base_precision: 0.98
   distance_precision_modifier: 0.02
 awp:

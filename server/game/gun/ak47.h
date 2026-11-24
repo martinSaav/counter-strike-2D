@@ -4,7 +4,6 @@
 
 #ifndef AK47_H
 #define AK47_H
-#include <queue>
 #include <utility>
 
 #include "game_config.h"
@@ -13,6 +12,9 @@
 
 class GameConfig;
 
+// Dispara rafagas de bullets_per_burst balas separadas por shoot_cooldown. Si se mantiene el
+// click, la rafaga siguiente arranca burst_cooldown despues de la ultima bala. Cada bala sale hacia
+// donde apunta el jugador en ese momento, no hacia donde apuntaba al empezar la rafaga.
 class Ak47: public Gun {
     const int max_ammo;
     const int bullets_per_burst;
@@ -20,12 +22,15 @@ class Ak47: public Gun {
     const int min_dmg;
     const int gun_price;
     const int miliseconds_per_shoot;
+    const int miliseconds_between_bursts;
     const double base_precision;
     const double distance_precision_modifier;
     int current_ammo;
     int reserve_ammo;
     float time_since_last_shot;
-    std::queue<std::pair<int, int>> shoots;
+    float time_since_burst_ended;
+    int bullets_left_in_burst;
+    std::pair<int, int> target;
     GunType type = GunType::Primary;
 
     [[nodiscard]] bool has_to_shoot(float current_time) override;

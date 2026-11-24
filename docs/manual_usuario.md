@@ -111,7 +111,7 @@ Si ya tenías un arma principal y comprás otra, la vieja queda tirada en el pis
 |---|---|
 | **Cuchillo** | Siempre lo tenés. Solo pega si estás pegado al rival. |
 | **Glock** | Pistola inicial: un tiro por click, más daño que el cuchillo. |
-| **AK-47** | Ráfagas de 3 balas. El daño baja con la distancia. |
+| **AK-47** | Ráfagas de 3 balas (una cada 0,1 s). Manteniendo el click sale otra ráfaga después de una pausa de 0,4 s. Cada bala va hacia donde apuntás en ese momento. El daño baja con la distancia. |
 | **M3** | Escopeta: dispara un **cono de perdigones** de alcance corto (se ven los trazos al disparar). Devastadora de cerca y no atraviesa paredes. |
 | **AWP** | Francotirador: el arma más cara, con el mayor alcance y daño, que no depende de la distancia. |
 
