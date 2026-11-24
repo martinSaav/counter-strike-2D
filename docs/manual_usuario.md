@@ -20,7 +20,7 @@ Los **terroristas** quieren plantar una bomba en la zona marcada y defenderla ha
 
    ![Login](imgs/manual_login.png)
 
-4. **Creá una partida.** Ponele un nombre y elegí uno de los tres escenarios: *desierto*, *pueblo-azteca* o *entrenamiento*.
+4. **Creá una partida.** Ponele un nombre (hasta 32 caracteres, que no use otra partida) y elegí uno de los tres escenarios: *desierto*, *pueblo-azteca* o *entrenamiento*. Si falta algo o el nombre ya está en uso, el juego te avisa.
 
    ![Crear partida](imgs/manual_crear_partida.png)
 
@@ -28,7 +28,7 @@ Los **terroristas** quieren plantar una bomba en la zona marcada y defenderla ha
 
    ![Lista de partidas](imgs/manual_lobby.png)
 
-6. **Elegí tu skin** en la sala de espera. El equipo lo arma el servidor automáticamente, para que queden parejos.
+6. **Elegí tu skin** en la sala de espera. El equipo lo arma el servidor automáticamente, para que queden parejos. Si cerrás la sala antes de que arranque la partida, salís de ella y el juego se cierra.
 
    ![Sala de espera](imgs/manual_sala_espera.png)
 

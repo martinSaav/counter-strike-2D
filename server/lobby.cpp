@@ -3,8 +3,14 @@ GameIdentification Lobby::create_match(const std::string& match_name,
                                        const std::string& player_name,
                                        const std::string& map_name) {
     std::lock_guard<std::mutex> guard(mutex);
-    if (matches.contains(match_name)) {
-        throw MatchAlreadyExists();
+    if (const auto existing = matches.find(match_name); existing != matches.end()) {
+        // Una partida que ya termino solo espera que el acceptor la limpie: su nombre se puede
+        // volver a usar
+        if (!existing->second->has_match_finished()) {
+            throw MatchAlreadyExists();
+        }
+        existing->second->join();
+        matches.erase(existing);
     }
 
     matches[match_name] = std::make_unique<Match>(game_config, map_name);
@@ -28,8 +34,10 @@ std::vector<MatchDTO> Lobby::list_matches() {
     std::lock_guard<std::mutex> guard(mutex);
     std::vector<MatchDTO> match_dtos;
     for (auto& [name, match]: matches) {
-        if (match->has_match_started()) {
-            continue;  // no tiene sentido ofrecer partidas a las que ya no se puede entrar
+        if (match->has_match_started() || match->has_match_finished()) {
+            // No tiene sentido ofrecer partidas a las que ya no se puede entrar. Las terminadas
+            // siguen en el mapa hasta que el acceptor las limpia al aceptar otra conexion.
+            continue;
         }
         MatchDTO match_dto(name, match->get_map_name(), match->get_player_count(),
                            match->get_max_player_count());
