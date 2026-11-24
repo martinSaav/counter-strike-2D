@@ -54,11 +54,11 @@ Una ronda termina cuando:
 - la bomba es desactivada (ganan los antiterroristas);
 - se acaba el tiempo sin que se plante la bomba (ganan los antiterroristas).
 
-**A mitad de partida los equipos cambian de bando**: después de la ronda 5, los terroristas pasan a ser antiterroristas y viceversa. Con 10 rondas, gana el primero en llegar a 6.
+**A mitad de partida los equipos cambian de bando**: después de la ronda 5, los terroristas pasan a ser antiterroristas y viceversa. Con 10 rondas, gana el primero en llegar a 6; si terminan 5 a 5, es empate.
 
 ### Plata
 
-Arrancás con $2000. Ganás $600 por cada baja y al terminar cada ronda ($600 si tu equipo ganó, $200 si perdió). Las armas y las balas que compraste se mantienen entre rondas mientras sigas vivo. Si morís, tu arma queda tirada en el piso para quien la quiera levantar, y volvés con cuchillo y glock.
+Arrancás con $2000. Ganás $600 por cada baja y al terminar cada ronda ($600 si tu equipo ganó, $200 si perdió). Las armas y las balas que compraste se mantienen entre rondas mientras sigas vivo. Si morís (o te vas de la partida), tu arma principal y la bomba quedan tiradas en el piso para quien las quiera levantar, y volvés con cuchillo y glock.
 
 ---
 
@@ -76,7 +76,7 @@ Al empezar la partida aparece esta ayuda en pantalla. Se cierra sola al terminar
 | **1 / 2 / 3** | Cuchillo / arma principal / glock |
 | **4** | Bomba (solo terroristas) |
 | **R** | Recargar |
-| **E** | Levantar el arma que está en el piso |
+| **E** | Levantar el arma que está en el piso (si ya tenés una principal, primero tirala con **G**) |
 | **G** | Tirar el arma principal o la bomba |
 | **F** (mantener) | Desactivar la bomba (antiterroristas) |
 | **H** | Mostrar / ocultar la ayuda |
@@ -135,7 +135,7 @@ Arriba a la derecha aparecen las últimas bajas durante unos segundos ("matador 
 
 Al terminar la partida se muestra una tabla con las bajas, las muertes, la diferencia **K-D** (bajas menos muertes) y la plata de cada jugador.
 
-Cada escenario tiene **dos zonas de bomba** (A y B): los terroristas pueden plantar en cualquiera de las dos.
+**Desierto** y **pueblo azteca** tienen dos zonas de bomba (A y B) y los terroristas pueden plantar en cualquiera; **entrenamiento** tiene una sola.
 
 ---
 

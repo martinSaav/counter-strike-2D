@@ -39,7 +39,7 @@ Juego multijugador 2D por rondas inspirado en el clásico Counter-Strike 1.6. Es
 
 - [Manual de usuario](docs/manual_usuario.md): cómo instalar, jugar, controles, armas y escenarios.
 - [Manual del proyecto](docs/manual_proyecto.md): organización, cronología, problemas encontrados y aprendizajes.
-- [Documentación técnica](docs/documentacion_tecnica.md): arquitectura del servidor y del cliente, clases principales y protocolo.
+- [Documentación técnica](docs/documentacion_tecnica.md): visión general del sistema, arquitectura del servidor y del cliente, clases principales, protocolo y editor de niveles.
 
 ## Compilación
 Para compilar el proyecto, se debe ejecutar el siguiente comando en la terminal:
@@ -82,7 +82,7 @@ Para ejecutar los tests, se debe ejecutar el siguiente comando en la terminal:
 
 ### Introducción
 
-El juego consiste en una batalla armada entre dos bandos, donde los terroristas querrán plantar una bomba para ganar la partida, mientras que los anti-terroristas harán lo posible para impedirlo. La partida terminará luego de jugadas diez ronda (configurable). Cada ronda finaliza cuando todos los integrantes de un bando hayan sido eliminados, cuando los terroristas planten la bomba y ésta explote luego de un tiempo, o luego de que los anti-terroristas desactiven dicha bomba.
+El juego consiste en una batalla armada entre dos bandos, donde los terroristas querrán plantar una bomba para ganar la partida, mientras que los anti-terroristas harán lo posible para impedirlo. La partida se juega a diez rondas (configurable) con cambio de bando a la mitad, y la gana el primer equipo que se lleve más de la mitad. Cada ronda finaliza cuando todos los integrantes de un bando hayan sido eliminados, cuando los terroristas planten la bomba y ésta explote luego de un tiempo, cuando los anti-terroristas desactiven dicha bomba, o cuando se acabe el tiempo sin que se plante.
 
 ---
 
@@ -190,8 +190,8 @@ Estar en el escritorio o en la carpeta del proyecto
 
 - Ingresá tu nombre de usuario
 - Elegí o creá una partida
-- Elegí equipo y skin
-- Esperá a que todos estén listos y comience la partida o esperá a que el creador inicie la partida.
+- Elegí tu skin (el equipo lo asigna el servidor para que queden parejos)
+- Esperá a que el creador inicie la partida. Hace falta al menos un jugador en cada equipo.
 
 #### 2. Objetivos del juego
 
@@ -206,6 +206,7 @@ Estar en el escritorio o en la carpeta del proyecto
 
 - Eliminación del equipo contrario
 - La bomba explota o es desactivada
+- Se acaba el tiempo sin que se plante la bomba (ganan los antiterroristas)
 
 ---
 
@@ -223,11 +224,12 @@ Estar en el escritorio o en la carpeta del proyecto
 - `E`: Agarrar arma del suelo
 - `G`: Tirar el arma principal o la bomba
 - `R`: Recargar
-- `Click izquierdo sobre zona de bomba`: Plantar la bomba (terroristas)
+- `4` y `Click izquierdo` dentro de una zona de bomba: Plantar la bomba (terroristas, quieto hasta que se complete)
 - `F` (mantener): Desactivar bomba (antiterroristas)
 - `I` / `O` / `P`: Comprar AK-47 / M3 / AWP (también con click en la tienda)
 - `K` / `L`: Comprar balas para el arma principal / la glock
 - `H`: Mostrar u ocultar la ayuda de controles
+- `Tab` (mantener): Tabla de puntajes
 - `F11`: Alternar pantalla completa y ventana
 - `Q`: Salir del juego
 
@@ -261,7 +263,7 @@ En el menu principal, podemos crear o unirse a una partida
 Creamos una partida, eligiendo el nombre de la partida y el mapa
 ![Imagen de ejemplo](docs/imgs/example6.png)
 
-Una vez creada la partida, podemos elegir el equipo, la skin y esperamos a que todos los jugadores estén listos
+Una vez creada la partida, elegimos la skin (el equipo lo asigna el servidor) y esperamos a que se unan los demás jugadores
 ![Imagen de ejemplo](docs/imgs/example7.png)
 
 Tu amigo busca partidas y se une a la partida que creaste
@@ -295,6 +297,16 @@ Pero el equipo antiterrorista no logra desactivarla a tiempo y explota
 - Autor: eldipa
 - Licencia: GPL v2s
 - Código fuente: https://github.com/eldipa/hands-on-threads
+
+3. **Otras bibliotecas**
+- [SDL2](https://www.libsdl.org/), SDL2_image y SDL2_mixer (zlib) con [libSDL2pp](https://github.com/libSDL2pp/libSDL2pp) (zlib): ventana, render, entrada y sonido del juego.
+- [Qt 6](https://www.qt.io/) (LGPL v3): lobby, pantallas del cliente y editor de niveles.
+- [yaml-cpp](https://github.com/jbeder/yaml-cpp) (MIT): configuración del servidor y archivos de mapa.
+- [GoogleTest](https://github.com/google/googletest) (BSD-3): tests.
+
+4. **Recursos**
+- Texturas y sonidos del [CS2D](https://www.cs2d.com/) original.
+- Fuente [DejaVu Sans](https://dejavu-fonts.github.io/) (licencia libre de DejaVu/Bitstream Vera) para los textos del HUD.
 
 ## Licencia
 Este proyecto está bajo la Licencia MIT. Para más detalles, consulta el archivo [LICENSE](LICENSE).

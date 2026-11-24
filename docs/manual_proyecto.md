@@ -29,6 +29,7 @@ Desarrollar en C++ un juego multijugador estilo Counter-Strike 2D con arquitectu
 | Semanas 4 y 5 | Armas, disparos, colisiones, bomba, compra, rondas, sonidos y pantallas de Qt. Configuración por YAML. |
 | Semana 6 (fines de junio de 2025) | Integración, corrección de bugs (rondas, bomba, deadlocks), instalador y documentación. Entrega. |
 | Post entrega | Arreglo de la desincronización inicial, código unificado en inglés, correcciones de la devolución (sección 6) y editor de niveles. |
+| Después de las correcciones | Refactor de legibilidad (cliente y servidor) y del protocolo (`ByteWriter`/`ByteReader`, registro de mensajes, todo en orden de red), arreglos de una revisión de código, ráfagas reales de la AK con trazo de las balas, avisos en el lobby, registro de bajas y tabla de puntajes con Tab. |
 
 ## 5. Problemas que encontramos y cómo los resolvimos
 
@@ -70,14 +71,14 @@ A partir de la devolución de la cátedra corregimos:
 - **Armas**: al comprar, la principal vieja queda en el piso. La tecla G tira el arma o la bomba. El M3 muestra su cono de perdigones y no atraviesa paredes.
 - **Jugabilidad**: los otros jugadores giran según hacia dónde apuntan. El campo de visión coincide con lo que se dibuja (antes había jugadores que desaparecían dentro del cono). Hay barra de progreso al plantar y desactivar, tienda usable con el mouse, ayuda de controles con H, F11 para alternar ventana y pantalla completa, y más zoom.
 - **Sonido**: sonidos de muerte, pasos y desactivación, y volumen según la distancia.
-- **Escenarios**: además del desierto, pueblo azteca y zona de entrenamiento, elegibles al crear la partida, cada uno con dos zonas de bomba.
+- **Escenarios**: además del desierto, pueblo azteca y zona de entrenamiento, elegibles al crear la partida. Desierto y pueblo azteca tienen dos zonas de bomba.
 - **Pantallas Qt**: textos que ya no se cortan, un input de usuario legible y la columna K-D explicada.
 - **Editor de niveles**: la tercera aplicación que pedía el enunciado. Cada mapa pasó a ser un archivo YAML propio que el editor abre, valida y guarda.
 
 ## 7. Qué aprendimos
 
 - **Diseñar la concurrencia antes de escribir código.** El esquema "hilo dueño del estado + colas de comandos y de snapshots" nos sacó de los deadlocks. Cuanto antes lo hubiéramos fijado, menos código habríamos rehecho.
-- **Un protocolo binario necesita tests.** Cada campo nuevo implica tocar serialización, deserialización y tamaño en dos lados. Los tests de ida y vuelta nos ahorraron muchos errores de offsets.
+- **Un protocolo binario necesita tests y un solo lugar que sepa del formato.** Al principio cada campo nuevo implicaba tocar serialización, deserialización y tamaño en dos lados, y los tests de ida y vuelta nos ahorraron muchos errores de offsets. Después pasamos el formato a `ByteWriter`/`ByteReader` y cada mensaje describe sus campos una sola vez.
 - **Probar con el juego corriendo, no solo con tests.** Bugs como el lag inicial, los jugadores invisibles o el cambio de bando que nunca ocurría solo aparecían jugando varias rondas con más de un cliente.
 - **Los valores fijos en el código traicionan.** Toda regla que dependa de un número tiene que salir de la configuración.
 - **La experiencia de juego también es parte del trabajo.** Un menú que no se entiende o un reloj confuso arruinan una lógica que funciona bien.
@@ -108,6 +109,8 @@ A partir de la devolución de la cátedra corregimos:
 
 - Deshacer y rehacer en el editor de niveles, y temas visuales nuevos sin tener que generar texturas.
 - Que el servidor tome los mapas nuevos sin reiniciarse.
+- Volver al lobby al salir de una sala de espera o al terminar una partida, sin reconectarse (hoy el cliente se cierra).
+- Acentos y caracteres no ASCII en el texto del juego (la fuente del registro de bajas es solo ASCII).
 - Chat de texto o voz durante la partida.
 - Cuentas de usuario con estadísticas persistentes.
 - Interpolación de movimiento en el cliente para jugar con más latencia.
