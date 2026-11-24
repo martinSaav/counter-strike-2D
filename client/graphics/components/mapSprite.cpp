@@ -165,6 +165,8 @@ void MapSprite::drawEndRound(const Team& team_winer, bool is_bomb_planted) {
             textureName = "counterterroristWins";
             music = COUNTERTERRORISTWIN;
             break;
+        case Team::None:
+            return;  // una ronda siempre tiene ganador; None solo se usa para el empate final
     }
     drawHud2(destRect, textureName);
 

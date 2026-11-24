@@ -124,7 +124,16 @@ public:
         knife->reset_shoots();
     }
     void start_planting();
-    void equip_bomb(std::unique_ptr<BombEncapsulator> bomb) { this->bomb = std::move(bomb); }
+    void equip_bomb(std::unique_ptr<BombEncapsulator> bomb) {
+        // Una bomba tirada puede traer un "disparo" pendiente de su dueno anterior: sin esto el
+        // nuevo portador empezaria a plantar sin hacer click
+        bomb->reset_shoots();
+        this->bomb = std::move(bomb);
+    }
+    [[nodiscard]] bool has_primary_weapon() const { return primary_weapon != nullptr; }
+    // Tira al piso la bomba y la primaria (o la secundaria si no tiene primaria y la tiene en la
+    // mano). Se usa al morir y al irse de la partida.
+    void drop_all_weapons(const GameManager& manager);
     void equip_weapon(std::unique_ptr<Gun> gun);
     // Tira al piso el arma equipada si es la primaria o la bomba (el cuchillo y la glock no se
     // pueden tirar) y equipa la secundaria.

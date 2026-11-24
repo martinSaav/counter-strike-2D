@@ -2,6 +2,7 @@
 #define WAITROOM_H
 
 #include <QWidget>
+#include <atomic>
 #include <string>
 #include <thread>
 
@@ -41,6 +42,8 @@ private:
     void ask_game_started();
 
     std::thread socketThread;
+    // true mientras socketThread esta bloqueado esperando el aviso de que arranco la partida
+    std::atomic<bool> waitingGameStart{false};
 
     Ui::waitRoom* ui;
     Protocol& protocol;

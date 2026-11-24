@@ -36,7 +36,11 @@ void Protocol::send_message(const Message& message) {
     frame.enum_u8(message.type());
     frame.u16(ByteWriter::checked_u16(payload.data().size(), "payload"));
     frame.raw(payload.data());
-    peer.sendall(frame.data().data(), frame.data().size());
+    // Con MSG_NOSIGNAL un peer cerrado (EPIPE) hace que sendall devuelva 0 en vez de lanzar: sin
+    // este chequeo el Sender seguia mandando estados a un socket muerto sin enterarse.
+    if (peer.sendall(frame.data().data(), frame.data().size()) == 0) {
+        throw ConnectionClosed();
+    }
 }
 
 void Protocol::kill() {

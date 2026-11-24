@@ -14,13 +14,13 @@ GameIdentification Match::join_match(const std::string& username) {
     if (player_count == max_player_count) {
         throw MatchFull();
     }
-    if (match_started) {
+    if (match_started || has_finished) {
         throw MatchAlreadyStarted();
     }
     player_count++;
     Team player_team = game_manager.get_next_player_team();
     auto player = std::make_shared<Player>(username, game_config, 0, 0, player_team);
-    PlayerCredentials credentials(player_count);
+    PlayerCredentials credentials(++next_player_id);
     players.insert(std::pair{credentials, player});
     auto sender_queue =
             std::make_shared<Queue<std::variant<MatchStatusDTO, GameReadyNotification>>>();
@@ -201,6 +201,8 @@ void Match::process_aim_request(const PlayerCredentials credentials, const Posit
 
 
 void Match::process_leave_match(const std::shared_ptr<Player>& player) {
+    // La bomba y la primaria quedan en el piso; si no, se destruyen con el Player
+    player->drop_all_weapons(game_manager);
     map.remove_player(player);
     game_manager.remove_player_from_team(player);
     auto it = players.begin();
@@ -217,7 +219,9 @@ void Match::process_leave_match(const std::shared_ptr<Player>& player) {
         }
         ++it;
     }
-    if (player_count <= 1) {
+    // Antes de arrancar la partida sigue viva mientras quede alguien en la sala de espera; si se
+    // cortara con uno solo, el hilo terminaria y ese jugador quedaria esperando para siempre.
+    if (player_count == 0 || (match_started && player_count <= 1)) {
         has_finished = true;
     }
 }

@@ -44,7 +44,10 @@ class Match: public Thread {
             senders_by_player;
     std::mutex mtx;
     std::atomic<bool> match_started;
-    int player_count;
+    // Se lee sin el mutex desde el lobby y el acceptor, por eso es atomico
+    std::atomic<int> player_count;
+    // Los IDs nunca se reutilizan: player_count baja cuando alguien se va y no sirve como ID
+    int next_player_id;
     const int max_player_count;
     Map map;
     GameClock game_clock;
@@ -139,6 +142,7 @@ public:
             commands_queue(Queue<std::shared_ptr<PlayerCommand>>()),
             match_started(false),
             player_count(0),
+            next_player_id(0),
             max_player_count(game_config.ct_amount + game_config.tt_amount),
             map(game_config),
             game_clock(game_config),

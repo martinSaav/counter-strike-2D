@@ -30,7 +30,9 @@ Statistics::Statistics(const std::unique_ptr<GameStateUpdate>& gameState, QWidge
     ui->labelWinner->setStyleSheet("color: white;");
     Team teamWinner = gameState->get_game_winner();
     std::string winner;
-    if (teamWinner == Team::Terrorists) {
+    if (teamWinner == Team::None) {
+        winner = "Draw";
+    } else if (teamWinner == Team::Terrorists) {
         winner = "Orange team wins";
     } else {
         winner = "Blue team wins";
