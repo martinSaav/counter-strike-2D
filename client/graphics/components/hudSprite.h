@@ -1,9 +1,19 @@
 #ifndef HUDSPRITE_H
 #define HUDSPRITE_H
 
+#include <deque>
+#include <list>
 #include <string>
 
+#include "../../common/dto/kill_info.h"
+
 #include "component.h"
+
+// Una linea del registro de bajas y hasta cuando se muestra (en ticks de SDL)
+struct KillFeedEntry {
+    KillInfo kill;
+    Uint32 shownUntil;
+};
 
 enum HudType { HEALTH = 0, TIME = 2, SHOP = 4, BOMB = 6, MONEY = 7, COLON = 10 };
 
@@ -53,6 +63,12 @@ private:
 
     void drawSounds(PlayerInfo& myPlayer);
 
+    // Texto con la fuente de mapa de bits (hud/font.png). height es el alto de cada letra en
+    // pixeles; devuelve el ancho dibujado.
+    int drawText(const std::string& text, int x, int y, int height, SDL_Color color);
+
+    int textWidth(const std::string& text, int height);
+
 public:
     HudSprite(Renderer* sdlRenderer, Configuration& configuration, TextureStore& textures,
               MusicManager& sounds, const std::string& assetsPath);
@@ -65,5 +81,12 @@ public:
     void drawHelp();
 
     void drawTaskProgress(int progress, bool planting);
+
+    // Ultimas muertes, arriba a la derecha: "matador [arma] victima" con el color de cada equipo
+    void drawKillFeed(const std::deque<KillFeedEntry>& feed, const std::list<PlayerInfo>& players);
+
+    // Tabla de puntajes (mientras se mantiene Tab): bajas, muertes y plata por equipo. La plata
+    // de los rivales no se muestra.
+    void drawScoreboard(const std::list<PlayerInfo>& players, const std::string& myName);
 };
 #endif

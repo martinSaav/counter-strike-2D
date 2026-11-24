@@ -143,6 +143,7 @@ void InputHandler::handleKeyboard() {
     // Leer estado del teclado
     const Uint8* state = SDL_GetKeyboardState(NULL);
     Uint32 mouseState = SDL_GetMouseState(&mouseX, &mouseY);
+    configuration.scoreboardVisible = state[SDL_SCANCODE_TAB] != 0;
 
     if (state[SDL_SCANCODE_Q]) {
         quit();

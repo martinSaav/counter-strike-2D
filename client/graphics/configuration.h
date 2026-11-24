@@ -20,6 +20,8 @@ struct Configuration {
     // cierra con H.
     bool helpVisible = true;
     bool helpToggled = false;
+    // Tabla de puntajes: se ve mientras se mantiene Tab
+    bool scoreboardVisible = false;
 
     Configuration(int width, int height, GameConfigInfo* gameConfig):
             gameConfig(gameConfig),

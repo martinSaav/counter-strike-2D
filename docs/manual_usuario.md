@@ -80,6 +80,7 @@ Al empezar la partida aparece esta ayuda en pantalla. Se cierra sola al terminar
 | **G** | Tirar el arma principal o la bomba |
 | **F** (mantener) | Desactivar la bomba (antiterroristas) |
 | **H** | Mostrar / ocultar la ayuda |
+| **Tab** (mantener) | Tabla de puntajes: bajas, muertes y plata de cada jugador (la plata de los rivales no se ve) |
 | **F11** | Alternar pantalla completa y ventana |
 | **Q** | Salir |
 
@@ -129,6 +130,8 @@ Si ya tenías un arma principal y comprás otra, la vieja queda tirada en el pis
   ![Entrenamiento](imgs/manual_entrenamiento.png)
 
 En todos verás tu **cono de visión**: lo que queda fuera del cono se ve oscuro y los rivales que están ahí no se muestran, salvo que estén pegados a vos. Los sonidos (disparos, pasos, muertes) se escuchan más fuerte cuanto más cerca ocurren, así que **prestá atención al ruido**.
+
+Arriba a la derecha aparecen las últimas bajas durante unos segundos ("matador [arma] víctima", con el color de cada equipo; las de la bomba se ven como "[Bomba] víctima").
 
 Al terminar la partida se muestra una tabla con las bajas, las muertes, la diferencia **K-D** (bajas menos muertes) y la plata de cada jugador.
 

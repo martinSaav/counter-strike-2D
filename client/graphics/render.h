@@ -1,5 +1,6 @@
 #ifndef RENDER_H
 #define RENDER_H
+#include <deque>
 #include <iostream>
 #include <list>
 #include <memory>
@@ -68,6 +69,8 @@ private:
     Weapon lastPrimary = Weapon::None;
     bool lastHadBomb = false;
     bool wasAlive = false;
+    // Muertes recientes que se muestran arriba a la derecha (ver addKills)
+    std::deque<KillFeedEntry> killFeed;
 
     // Capas del frame, en el orden en que se dibujan (ver renderFrame)
     void updateCamera(const PlayerInfo& me);
@@ -94,6 +97,9 @@ public:
     Render(Renderer* renderer, Protocol& protocol, std::string& namePlayer,
            Configuration& configuration, std::string& assetsPath);
     void renderFrame(std::optional<GameStateUpdate> message);
+    // Cada muerte llega en un solo estado: hay que pasarle las de todos los estados que llegan,
+    // no solo las del ultimo que se dibuja
+    void addKills(const std::list<KillInfo>& kills);
     bool pointInVision(int playerX, int playerY, float visionAngleDeg, int puntoX, int puntoY);
     void clearScreen();
 };

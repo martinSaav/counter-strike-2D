@@ -6,6 +6,12 @@
 
 using SDL2pp::Rect;
 
+namespace {
+// Registro de bajas: cuanto se ve cada muerte y cuantas lineas entran a la vez
+constexpr Uint32 KILL_FEED_MS = 6000;
+constexpr std::size_t KILL_FEED_LINES = 5;
+}  // namespace
+
 Render::Render(Renderer* renderer, Protocol& protocol, std::string& namePlayer,
                Configuration& configuration, std::string& assetsPath):
         sdlRenderer(renderer),
@@ -214,6 +220,14 @@ void Render::drawFeedback(const FrameContext& frame) {
         hud.drawHelp();
     }
 
+    while (!killFeed.empty() && SDL_GetTicks() >= killFeed.front().shownUntil) {
+        killFeed.pop_front();
+    }
+    hud.drawKillFeed(killFeed, frame.players);
+    if (configuration.scoreboardVisible) {
+        hud.drawScoreboard(frame.players, namePlayer);
+    }
+
     if (damageFlashTimer > 0) {
         SDL_Rect screen = {0, 0, configuration.widthWindow, configuration.heightWindow};
         sdlRenderer->SetDrawBlendMode(SDL_BLENDMODE_BLEND);
@@ -332,4 +346,14 @@ void Render::playStateSounds(const GameStateUpdate& message, const PlayerInfo& m
     lastPrimary = primary;
     lastHadBomb = hasBomb;
     wasAlive = alive;
+}
+
+void Render::addKills(const std::list<KillInfo>& kills) {
+    const Uint32 shownUntil = SDL_GetTicks() + KILL_FEED_MS;
+    for (const auto& kill: kills) {
+        killFeed.push_back({kill, shownUntil});
+        if (killFeed.size() > KILL_FEED_LINES) {
+            killFeed.pop_front();
+        }
+    }
 }

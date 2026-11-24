@@ -2,6 +2,69 @@
 
 #include <algorithm>
 #include <cmath>
+#include <optional>
+#include <vector>
+
+namespace {
+
+// Grilla de hud/font.png: los caracteres ASCII 32 a 126, 16 por fila (tools/generate_hud_images.py)
+constexpr int FONT_COLUMNS = 16;
+constexpr int FONT_ROWS = 6;
+constexpr int FIRST_CHAR = 32;
+constexpr int LAST_CHAR = 126;
+
+constexpr SDL_Color WHITE = {235, 235, 235, 255};
+constexpr SDL_Color GRAY = {140, 140, 140, 255};
+constexpr SDL_Color ORANGE = {255, 165, 0, 255};
+constexpr SDL_Color BLUE = {110, 170, 255, 255};
+constexpr SDL_Color HIGHLIGHT = {255, 230, 120, 255};
+
+// La fuente solo tiene ASCII: los bytes de continuacion de UTF-8 se saltean y el resto de lo que
+// no entra se muestra como '?' (asi "Martín" queda "Mart?n" y no "Mart??n").
+std::string printable(const std::string& text) {
+    std::string result;
+    for (const char c: text) {
+        const auto byte = static_cast<unsigned char>(c);
+        if ((byte & 0xC0) == 0x80) {
+            continue;
+        }
+        result += (byte >= FIRST_CHAR && byte <= LAST_CHAR) ? c : '?';
+    }
+    return result;
+}
+
+bool isCounterTerrorist(const PlayerInfo& player) { return player.get_skin()[0] == 'C'; }
+
+// Color del equipo de un jugador (por su skin). Si ya se fue de la partida, blanco.
+SDL_Color teamColor(const std::string& name, const std::list<PlayerInfo>& players) {
+    const auto player = std::ranges::find_if(
+            players, [&name](const PlayerInfo& p) { return p.get_user_name() == name; });
+    if (player == players.end()) {
+        return WHITE;
+    }
+    return isCounterTerrorist(*player) ? BLUE : ORANGE;
+}
+
+std::string weaponName(Weapon weapon) {
+    switch (weapon) {
+        case Weapon::Knife:
+            return "Cuchillo";
+        case Weapon::Glock:
+            return "Glock";
+        case Weapon::AK47:
+            return "AK-47";
+        case Weapon::M3:
+            return "M3";
+        case Weapon::AWP:
+            return "AWP";
+        case Weapon::Bomb:
+            return "Bomba";
+        default:
+            return "?";
+    }
+}
+
+}  // namespace
 
 HudSprite::HudSprite(Renderer* sdlRenderer, Configuration& configuration, TextureStore& textures,
                      MusicManager& sounds, const std::string& assetsPath):
@@ -35,6 +98,7 @@ HudSprite::HudSprite(Renderer* sdlRenderer, Configuration& configuration, Textur
     textures.loadTexture("help", assetsPath + "/hud/help.png", false);
     textures.loadTexture("planting", assetsPath + "/hud/planting.png", false);
     textures.loadTexture("defusing", assetsPath + "/hud/defusing.png", false);
+    textures.loadTexture("font", assetsPath + "/hud/font.png", false);
 
     // Color mod
     Texture& counterPost = textures.getTexture("counterTerroristPost");
@@ -402,4 +466,132 @@ void HudSprite::drawTaskProgress(int progress, bool planting) {
     sdlRenderer->SetDrawColor(255, 165, 0, 230);
     sdlRenderer->FillRect(
             SDL_Rect{barX + 2, barY + 2, (barWidth - 4) * progress / 100, barHeight - 4});
+}
+
+
+int HudSprite::textWidth(const std::string& text, int height) {
+    Texture& font = textures.getTexture("font");
+    const int cellWidth = font.GetWidth() / FONT_COLUMNS;
+    const int cellHeight = font.GetHeight() / FONT_ROWS;
+    return static_cast<int>(printable(text).size()) * (cellWidth * height / cellHeight);
+}
+
+int HudSprite::drawText(const std::string& text, int x, int y, int height, SDL_Color color) {
+    Texture& font = textures.getTexture("font");
+    const int cellWidth = font.GetWidth() / FONT_COLUMNS;
+    const int cellHeight = font.GetHeight() / FONT_ROWS;
+    const int glyphWidth = cellWidth * height / cellHeight;
+    // Las letras son blancas: el color se lo da el modulado de la textura
+    font.SetColorMod(color.r, color.g, color.b);
+    int cursor = x;
+    for (const char c: printable(text)) {
+        const int index = static_cast<unsigned char>(c) - FIRST_CHAR;
+        SDL_Rect src = {(index % FONT_COLUMNS) * cellWidth, (index / FONT_COLUMNS) * cellHeight,
+                        cellWidth, cellHeight};
+        SDL_Rect dst = {cursor, y, glyphWidth, height};
+        sdlRenderer->Copy(font, src, dst);
+        cursor += glyphWidth;
+    }
+    return cursor - x;
+}
+
+void HudSprite::drawKillFeed(const std::deque<KillFeedEntry>& feed,
+                             const std::list<PlayerInfo>& players) {
+    const int height = 20;
+    const int padding = 6;
+    const int margin = 12;
+    int y = int(configuration.heightWindow * 0.07);
+    for (const auto& entry: feed) {
+        const KillInfo& kill = entry.kill;
+        // Si la mato la bomba no hay matador: queda "[Bomba] victima"
+        const std::string weapon = "[" + weaponName(kill.get_weapon()) + "]";
+        const std::string killer = kill.get_killer().empty() ? "" : kill.get_killer() + " ";
+        const std::string victim = " " + kill.get_victim();
+        const int width = textWidth(killer + weapon + victim, height);
+        int x = configuration.widthWindow - margin - width;
+
+        SDL_Rect background = {x - padding, y - padding / 2, width + 2 * padding, height + padding};
+        sdlRenderer->SetDrawBlendMode(SDL_BLENDMODE_BLEND);
+        sdlRenderer->SetDrawColor(0, 0, 0, 150);
+        sdlRenderer->FillRect(background);
+
+        x += drawText(killer, x, y, height, teamColor(kill.get_killer(), players));
+        x += drawText(weapon, x, y, height, WHITE);
+        drawText(victim, x, y, height, teamColor(kill.get_victim(), players));
+        y += height + padding + 2;
+    }
+}
+
+void HudSprite::drawScoreboard(const std::list<PlayerInfo>& players, const std::string& myName) {
+    std::vector<const PlayerInfo*> terrorists;
+    std::vector<const PlayerInfo*> counterTerrorists;
+    bool iAmCounterTerrorist = false;
+    for (const auto& player: players) {
+        (isCounterTerrorist(player) ? counterTerrorists : terrorists).push_back(&player);
+        if (player.get_user_name() == myName) {
+            iAmCounterTerrorist = isCounterTerrorist(player);
+        }
+    }
+    // Mas bajas arriba; a igualdad, menos muertes
+    const auto byScore = [](const PlayerInfo* a, const PlayerInfo* b) {
+        if (a->get_kills() != b->get_kills()) {
+            return a->get_kills() > b->get_kills();
+        }
+        return a->get_deaths() < b->get_deaths();
+    };
+    std::ranges::sort(terrorists, byScore);
+    std::ranges::sort(counterTerrorists, byScore);
+
+    const int textHeight = 20;
+    const int rowHeight = 28;
+    const int width = std::min(720, int(configuration.widthWindow * 0.9));
+    // Titulo, y por equipo: nombre del equipo, encabezados de columna y una fila por jugador
+    const int rows = 2 + 2 * 2 + static_cast<int>(players.size()) + 1;
+    const int height = rows * rowHeight;
+    const int left = (configuration.widthWindow - width) / 2;
+    int y = (configuration.heightWindow - height) / 2;
+
+    SDL_Rect panel = {left, y, width, height};
+    sdlRenderer->SetDrawBlendMode(SDL_BLENDMODE_BLEND);
+    sdlRenderer->SetDrawColor(15, 25, 15, 240);  // casi opaco: puede quedar encima de la ayuda
+    sdlRenderer->FillRect(panel);
+    sdlRenderer->SetDrawColor(ORANGE.r, ORANGE.g, ORANGE.b, 255);
+    sdlRenderer->DrawRect(panel);
+
+    const std::string title = "PUNTAJES";
+    drawText(title, left + (width - textWidth(title, 26)) / 2, y + 10, 26, ORANGE);
+    y += 2 * rowHeight;
+
+    const int nameX = left + 20;
+    const int killsX = left + int(width * 0.55);
+    const int deathsX = left + int(width * 0.69);
+    const int moneyX = left + int(width * 0.84);
+    const auto drawTeam = [&](const std::string& teamName, SDL_Color color,
+                              const std::vector<const PlayerInfo*>& team, bool showMoney) {
+        drawText(teamName, nameX, y, textHeight, color);
+        y += rowHeight;
+        drawText("Bajas", killsX, y, textHeight - 4, GRAY);
+        drawText("Muertes", deathsX, y, textHeight - 4, GRAY);
+        drawText("Plata", moneyX, y, textHeight - 4, GRAY);
+        y += rowHeight;
+        for (const PlayerInfo* player: team) {
+            SDL_Color rowColor = WHITE;
+            if (player->get_status() == Status::Dead) {
+                rowColor = GRAY;
+            }
+            if (player->get_user_name() == myName) {
+                rowColor = HIGHLIGHT;
+            }
+            drawText(player->get_user_name(), nameX + 12, y, textHeight, rowColor);
+            drawText(std::to_string(player->get_kills()), killsX, y, textHeight, rowColor);
+            drawText(std::to_string(player->get_deaths()), deathsX, y, textHeight, rowColor);
+            const std::string money =
+                    showMoney ? "$" + std::to_string(player->get_money()) : std::string("-");
+            drawText(money, moneyX, y, textHeight, rowColor);
+            y += rowHeight;
+        }
+    };
+    drawTeam("TERRORISTAS", ORANGE, terrorists, !iAmCounterTerrorist);
+    y += rowHeight / 2;
+    drawTeam("ANTITERRORISTAS", BLUE, counterTerrorists, iAmCounterTerrorist);
 }

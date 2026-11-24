@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Genera las imagenes de texto del HUD (ayuda de controles y carteles de plantar/desactivar).
+"""Genera las imagenes de texto del HUD (ayuda de controles, carteles de plantar/desactivar y la
+fuente de mapa de bits que usa el cliente para escribir texto).
 
 Uso: python3 tools/generate_hud_images.py
 Escribe en client/data/hud/. Requiere Pillow y la fuente DejaVu Sans (fonts-dejavu).
 """
+import math
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
@@ -31,8 +33,8 @@ def help_image():
                                            ("K / L", "balas principal / glock")]),
         ("Bomba", [("4 + click en zona", "plantar (quieto)"),
                    ("F (mantener)", "desactivar (CT, quieto)")]),
-        ("Otros", [("H", "mostrar / ocultar esta ayuda"), ("F11", "pantalla completa / ventana"),
-                   ("Q", "salir")]),
+        ("Otros", [("H", "mostrar / ocultar esta ayuda"), ("Tab (mantener)", "tabla de puntajes"),
+                   ("F11", "pantalla completa / ventana"), ("Q", "salir")]),
     ]
     width, height = 620, 720
     img = Image.new("RGBA", (width, height), (15, 25, 15, 215))
@@ -62,8 +64,29 @@ def label_image(text, name):
     img.save(OUT / name)
 
 
+def font_atlas():
+    """Fuente para el registro de bajas y la tabla de puntajes: los caracteres ASCII imprimibles
+    (32 a 126) en una grilla de 16x6 celdas iguales. Las letras son blancas con borde negro, asi el
+    cliente las pinta del color que quiera con SetColorMod y se leen sobre cualquier fondo."""
+    f = ImageFont.truetype(str(FONT_DIR / "DejaVuSansMono-Bold.ttf"), 32)
+    ascent, descent = f.getmetrics()
+    border = 2
+    cell_w = math.ceil(f.getlength("M")) + 2 * border
+    cell_h = ascent + descent + 2 * border
+    img = Image.new("RGBA", (16 * cell_w, 6 * cell_h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    for code in range(32, 127):
+        index = code - 32
+        x = (index % 16) * cell_w + border
+        y = (index // 16) * cell_h + border
+        draw.text((x, y), chr(code), font=f, fill=(255, 255, 255, 255), stroke_width=border,
+                  stroke_fill=(0, 0, 0, 255))
+    img.save(OUT / "font.png")
+
+
 if __name__ == "__main__":
     help_image()
     label_image("PLANTANDO BOMBA", "planting.png")
     label_image("DESACTIVANDO BOMBA", "defusing.png")
+    font_atlas()
     print("Imagenes generadas en", OUT)

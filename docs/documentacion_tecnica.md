@@ -125,7 +125,7 @@ flowchart LR
 | `Render` | Dibuja cada frame por capas, en este orden: `updateCamera`, el mapa, `updateAim`, `drawBomb`, `drawPlayers` (con los sonidos de cada jugador), `drawHudLayer`, `drawWorldOverlays` (campo de visión o tienda, explosión, armas tiradas) y `drawFeedback` (barra de progreso, ayuda, flash de daño). Lo que se calcula una vez por frame viaja en `FrameContext`. Decide qué es visible (cono de visión + radio cercano, `pointInVision`). Es dueña del `TextureStore` y del `MusicManager`, que comparte con los sprites: el audio se abre una sola vez y cada imagen se carga una sola vez. |
 | `MapSprite` | Piso y estructuras del tema del mapa (`maps/<theme>/floor.png` y `wall.png`), zonas, bomba, cono de visión y tienda. |
 | `PlayerSprite` | Jugadores, armas, disparos (incluye el cono del M3) y sonidos de disparo, pasos y muerte. |
-| `HudSprite` | Vida, plata, arma y munición, reloj (en rojo con la bomba), barra de plantar o desactivar, ayuda de controles. |
+| `HudSprite` | Vida, plata, arma y munición, reloj (en rojo con la bomba), barra de plantar o desactivar, ayuda de controles, registro de bajas y tabla de puntajes (Tab). El texto se dibuja con una fuente de mapa de bits (`hud/font.png`, generada por `tools/generate_hud_images.py`). |
 | `Configuration` | Tamaño de ventana, zoom, cámara, rectángulos de la tienda y la ayuda, y el radio del campo de visión. |
 | `MusicManager` | Carga y reproduce sonidos. `volumeForDistance` atenúa linealmente según la distancia al jugador. |
 

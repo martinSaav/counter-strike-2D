@@ -127,6 +127,7 @@ std::optional<GameStateUpdate> ChatClient::gameLoop(Render& render, InputHandler
         std::optional<GameStateUpdate> latest;
         std::optional<GameStateUpdate> next;
         while ((next = inputServerHandler.getMessage())) {
+            render.addKills(next->get_kills());
             latest = std::move(next);
             stats.addState();
         }
