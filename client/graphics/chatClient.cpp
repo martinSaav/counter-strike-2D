@@ -89,7 +89,16 @@ int ChatClient::run(std::unique_ptr<GameStateUpdate>& statistics) {
     InputServerHandler inputServerHandler(protocol, gameOver);
     std::thread inputServer(&InputServerHandler::processEvents, &inputServerHandler);
 
-    std::optional<GameStateUpdate> lastState = gameLoop(render, inputHandler, inputServerHandler);
+    std::optional<GameStateUpdate> lastState;
+    try {
+        lastState = gameLoop(render, inputHandler, inputServerHandler);
+    } catch (...) {
+        // Destruir un std::thread que sigue joinable llama a std::terminate: antes de propagar el
+        // error se cierra la conexion (eso destraba al hilo receptor) y se lo espera.
+        protocol.kill();
+        inputServer.join();
+        throw;
+    }
 
     protocol.kill();
     inputServer.join();

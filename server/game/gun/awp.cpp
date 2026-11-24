@@ -78,7 +78,9 @@ ShootInfo Awp::fire_gun(Map& map, Player& owner, const float current_time,
     }
     auto [x, y] = current_position.get_position();
     auto [final_x, final_y] = shoots.front();
-    shoots.pop();
+    // Un solo tiro por cooldown. Si llegaban dos pedidos en el mismo tick los dos pasaban el
+    // chequeo de shoot_gun y el segundo salia en el tick siguiente, salteando los 4 s de espera.
+    reset_shoots();
     current_ammo--;
     time_since_last_shot = current_time;
     const ImpactInfo impact = map.trace_bullet_path(x, y, Position(final_x, final_y), owner);

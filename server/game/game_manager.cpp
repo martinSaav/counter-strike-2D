@@ -6,7 +6,11 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
+#include <iterator>
+#include <random>
 #include <utility>
+#include <vector>
 
 #include "map.h"
 
@@ -38,10 +42,10 @@ bool GameManager::can_player_move_or_shoot(const std::shared_ptr<Player>& player
 
 
 void GameManager::advance_round(const std::vector<std::shared_ptr<Player>>& players) {
-    // En la ronda del cambio de bando los premios se invierten: los equipos ya cambiaron de lado
-    const bool sides_switched = current_round == get_halftime_round();
+    // El cambio de bando ocurre al empezar la ronda (setup_round_start), asi que last_winner ya
+    // esta en las etiquetas actuales de los jugadores: no hay que invertir nada.
     for (const auto& player: players) {
-        const bool won = (player->get_team() == last_winner) != sides_switched;
+        const bool won = player->get_team() == last_winner;
         player->earn_money(won ? round_winner_money : round_loser_money);
     }
     current_round++;
@@ -159,12 +163,26 @@ void GameManager::explode_bomb(const std::vector<std::shared_ptr<Player>>& playe
 
 
 bool GameManager::can_plant_bomb(const int x, const int y) const {
+    // Solo durante la ronda: plantar con la ronda terminada la volveria a abrir en PostPlant
+    if (round_won || bomb_planted || clock.getCurrentStage() != Stages::PrePlantStage) {
+        return false;
+    }
     return map.can_plant_bomb(x, y);
+}
+
+
+bool GameManager::is_bomb_defusable() const {
+    return bomb_planted && !bomb_defused && !has_exploded_bomb &&
+           clock.getCurrentStage() == Stages::PostPlantStage;
 }
 
 
 void GameManager::start_defusing(const std::shared_ptr<Player>& player) const {
     if (player->get_team() != Team::CounterTerrorists) {
+        return;
+    }
+    if (!is_bomb_defusable()) {
+        // Ya desactivada o explotada: si no, mantener F reiniciaria el fin de ronda sin parar
         return;
     }
     if (!map.can_defuse(player)) {
@@ -180,6 +198,10 @@ void GameManager::start_defusing(const std::shared_ptr<Player>& player) const {
 
 void GameManager::has_finished_defusing(Player& player) {
     if (!player.is_currently_defusing() || player.is_dead()) {
+        return;
+    }
+    if (!is_bomb_defusable()) {
+        player.stop_defusing();
         return;
     }
     if (clock.get_time() - player.defusing_since() - time_to_defuse >= 0) {
@@ -213,7 +235,11 @@ void GameManager::pick_weapon(const std::shared_ptr<Player>& player) const {
             return;
         }
     }
-    if (std::unique_ptr<Gun> gun = map.pick_weapon(x, y); gun != nullptr) {
+    // Con la primaria ocupada no se levanta otra: antes se pisaba y el arma anterior desaparecia.
+    // Hay que tirarla con G primero. No se intercambia automaticamente porque E se manda en cada
+    // frame mientras se mantiene, y el intercambio iria y vendria sin parar.
+    if (std::unique_ptr<Gun> gun = map.pick_weapon(x, y, !player->has_primary_weapon());
+        gun != nullptr) {
         player->equip_weapon(std::move(gun));
     }
 }
@@ -244,20 +270,17 @@ bool GameManager::has_ended() const {
 
 void GameManager::give_bomb_to_random_player(
         const std::vector<std::shared_ptr<Player>>& players) const {
-    if (tt_count == 0) {
+    std::vector<std::shared_ptr<Player>> terrorists;
+    std::ranges::copy_if(players, std::back_inserter(terrorists),
+                         [](const auto& player) { return player->get_team() == Team::Terrorists; });
+    if (terrorists.empty()) {
         return;
     }
-    const int bomb_player = std::rand() % (tt_count);
-    int current_tt = 0;
-    for (auto& player: players) {
-        if (player->get_team() == Team::Terrorists) {
-            if (current_tt == bomb_player) {
-                player->equip_bomb(std::make_unique<BombEncapsulator>(config));
-                return;
-            }
-            current_tt++;
-        }
-    }
+    // Cada Match corre en su propio hilo: std::rand no es seguro entre hilos y ademas nunca se le
+    // daba semilla, asi que el portador salia siempre en el mismo orden.
+    static thread_local std::mt19937 rng{std::random_device{}()};
+    std::uniform_int_distribution<std::size_t> pick(0, terrorists.size() - 1);
+    terrorists[pick(rng)]->equip_bomb(std::make_unique<BombEncapsulator>(config));
 }
 
 
@@ -268,7 +291,7 @@ Team GameManager::get_match_winner() const {
     if (ct_rounds > tt_rounds) {
         return Team::CounterTerrorists;
     }
-    return Team::Terrorists;
+    return Team::None;  // empate (por ejemplo 5-5 con 10 rondas)
 }
 
 
