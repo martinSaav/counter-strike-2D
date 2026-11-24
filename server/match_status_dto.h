@@ -29,12 +29,13 @@ public:
     const std::list<DroppedWeapon> dropped_weapons;
     const RoundStage stage;
     const float time_left;
+    const std::list<KillInfo> kills;
     explicit MatchStatusDTO(std::vector<PlayerDTO>&& players, bool game_started, bool game_ended,
                             int round, float round_time, bool round_started, bool round_ended,
                             bool bomb_planted, int bomb_x, int bomb_y, float bomb_timer,
                             Team round_winner, Team game_winner,
                             std::list<DroppedWeapon> dropped_weapons, RoundStage stage,
-                            float time_left):
+                            float time_left, std::list<KillInfo> kills):
             players(std::move(players)),
             game_started(game_started),
             game_ended(game_ended),
@@ -50,7 +51,8 @@ public:
             game_winner(game_winner),
             dropped_weapons(std::move(dropped_weapons)),
             stage(stage),
-            time_left(time_left) {}
+            time_left(time_left),
+            kills(std::move(kills)) {}
 };
 
 #endif  // MATCHSTATUSDTO_H

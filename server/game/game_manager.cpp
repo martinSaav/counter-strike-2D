@@ -15,14 +15,24 @@
 #include "map.h"
 
 void GameManager::attack_player(const std::shared_ptr<Player>& attacked, Player& attacker,
-                                const int damage) const {
+                                const int damage) {
     if (attacked->get_team() == attacker.get_team() || attacked->is_dead()) {
         return;
     }
+    // El arma que mato es la que el atacante tiene en la mano: es la que acaba de disparar
+    const Weapon weapon = attacker.get_player_info().current_weapon;
     attacked->receive_damage(*this, damage);
     if (attacked->is_dead()) {
         attacker.add_kill();
+        kills.emplace_back(attacker.get_username(), attacked->get_username(), weapon);
     }
+}
+
+
+std::list<KillInfo> GameManager::take_kills() {
+    std::list<KillInfo> taken;
+    taken.swap(kills);
+    return taken;
 }
 
 
@@ -157,6 +167,9 @@ void GameManager::explode_bomb(const std::vector<std::shared_ptr<Player>>& playe
             const double distance_to_bomb = sqrt(pow(p_x - bomb_x, 2) + pow(p_y - bomb_y, 2));
             const double damage = bomb_dmg / (1 + distance_to_bomb / 10);
             player->receive_damage(*this, static_cast<int>(damage));
+            if (player->is_dead()) {
+                kills.emplace_back("", player->get_username(), Weapon::Bomb);
+            }
         }
     }
 }

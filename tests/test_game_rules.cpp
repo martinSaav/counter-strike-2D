@@ -1,3 +1,4 @@
+#include <list>
 #include <memory>
 #include <string>
 #include <utility>
@@ -410,6 +411,35 @@ TEST_F(GameRulesTest, CannotFinishPlantingAfterTheRoundEnded) {
     EXPECT_FALSE(info.bomb_planted);
     EXPECT_EQ(info.round_winner, Team::CounterTerrorists);
     EXPECT_EQ(info.stage, RoundStage::AfterRound);
+}
+
+TEST_F(GameRulesTest, AKillIsReportedOnceWithTheKillersWeapon) {
+    auto& terrorist = players[0];
+    auto& counter_terrorist = players[1];
+    manager.attack_player(counter_terrorist, *terrorist, config.player_health / 2);
+    EXPECT_TRUE(manager.take_kills().empty());  // herido, no muerto
+
+    manager.attack_player(counter_terrorist, *terrorist, config.player_health);
+    const std::list<KillInfo> kills = manager.take_kills();
+    ASSERT_EQ(kills.size(), 1u);
+    EXPECT_EQ(kills.front().get_killer(), "tt");
+    EXPECT_EQ(kills.front().get_victim(), "ct");
+    EXPECT_EQ(kills.front().get_weapon(), Weapon::Glock);  // el arma que tenia en la mano
+    EXPECT_TRUE(manager.take_kills().empty());             // ya salio en un estado
+}
+
+TEST_F(GameRulesTest, BombKillsAreReportedWithoutKiller) {
+    clock.advance(BUY_TIME);
+    manager.plant_bomb(2, 2);  // al lado del terrorista: la explosion lo mata
+    manager.explode_bomb(players);
+    bool terrorist_killed_by_bomb = false;
+    for (const auto& kill: manager.take_kills()) {
+        if (kill.get_victim() == "tt") {
+            terrorist_killed_by_bomb =
+                    kill.get_killer().empty() && kill.get_weapon() == Weapon::Bomb;
+        }
+    }
+    EXPECT_TRUE(terrorist_killed_by_bomb);
 }
 
 TEST_F(GameRulesTest, DyingWithTheKnifeDropsThePrimary) {

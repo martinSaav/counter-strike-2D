@@ -4,9 +4,12 @@
 
 #ifndef GAME_MANAGER_H
 #define GAME_MANAGER_H
+#include <list>
 #include <memory>
 #include <stdexcept>
 #include <vector>
+
+#include "dto/kill_info.h"
 
 #include "game_clock.h"
 #include "player.h"
@@ -41,6 +44,8 @@ class GameManager {
     int ct_rounds;
     int tt_rounds;
     bool has_exploded_bomb;
+    // Muertes que todavia no salieron en un estado (ver take_kills)
+    std::list<KillInfo> kills;
 
 public:
     explicit GameManager(Map& map, GameClock& clock, GameConfig& config):
@@ -67,7 +72,9 @@ public:
             tt_rounds(0),
             has_exploded_bomb(false) {}
 
-    void attack_player(const std::shared_ptr<Player>& attacked, Player& attacker, int damage) const;
+    void attack_player(const std::shared_ptr<Player>& attacked, Player& attacker, int damage);
+    // Devuelve las muertes desde la ultima llamada y las olvida: cada una sale en un solo estado
+    std::list<KillInfo> take_kills();
     [[nodiscard]] bool can_player_buy() const;
     [[nodiscard]] bool can_player_move_or_shoot(const std::shared_ptr<Player>& player) const;
     void advance_round(const std::vector<std::shared_ptr<Player>>& players);

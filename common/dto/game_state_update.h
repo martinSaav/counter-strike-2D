@@ -10,6 +10,7 @@
 #include "../team.h"
 
 #include "dropped_weapon.h"
+#include "kill_info.h"
 #include "player_info.h"
 
 
@@ -31,6 +32,8 @@ private:
     std::list<DroppedWeapon> dropped_weapons;
     RoundStage stage;
     float time_left;
+    // Muertes desde el estado anterior: cada una viaja en un solo estado
+    std::list<KillInfo> kills;
 
 public:
     explicit GameStateUpdate(bool game_started, bool game_ended, uint8_t round, float round_time,
@@ -38,7 +41,8 @@ public:
                              uint16_t bomb_x, uint16_t bomb_y, float bomb_timer, Team round_winner,
                              Team game_winner, std::list<PlayerInfo> players,
                              std::list<DroppedWeapon> dropped_weapons,
-                             RoundStage stage = RoundStage::Buy, float time_left = 0):
+                             RoundStage stage = RoundStage::Buy, float time_left = 0,
+                             std::list<KillInfo> kills = {}):
             game_started(game_started),
             game_ended(game_ended),
             round(round),
@@ -54,7 +58,8 @@ public:
             players(std::move(players)),
             dropped_weapons(std::move(dropped_weapons)),
             stage(stage),
-            time_left(time_left) {}
+            time_left(time_left),
+            kills(std::move(kills)) {}
 
 
     void write_payload(ByteWriter& writer) const override {
@@ -75,6 +80,7 @@ public:
         writer.list(players, [](ByteWriter& w, const PlayerInfo& player) { player.write(w); });
         writer.list(dropped_weapons,
                     [](ByteWriter& w, const DroppedWeapon& weapon) { weapon.write(w); });
+        writer.list(kills, [](ByteWriter& w, const KillInfo& kill) { kill.write(w); });
     }
 
     static GameStateUpdate read_payload(ByteReader& reader) {
@@ -94,10 +100,11 @@ public:
         const float time_left = reader.f32();
         auto players = reader.list<std::list<PlayerInfo>>(PlayerInfo::read);
         auto dropped_weapons = reader.list<std::list<DroppedWeapon>>(DroppedWeapon::read);
+        auto kills = reader.list<std::list<KillInfo>>(KillInfo::read);
         return GameStateUpdate(game_started, game_ended, round, round_time, round_started,
                                round_ended, bomb_planted, bomb_x, bomb_y, bomb_timer, round_winner,
                                game_winner, std::move(players), std::move(dropped_weapons), stage,
-                               time_left);
+                               time_left, std::move(kills));
     }
 
     std::list<PlayerInfo> get_players() const { return players; }
@@ -131,5 +138,7 @@ public:
     RoundStage get_stage() const { return stage; }
 
     float get_time_left() const { return time_left; }
+
+    const std::list<KillInfo>& get_kills() const { return kills; }
 };
 #endif

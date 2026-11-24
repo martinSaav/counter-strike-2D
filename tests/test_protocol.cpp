@@ -291,6 +291,21 @@ TEST(ProtocolRoundTripTest, GameStateUpdate) {
     EXPECT_EQ(weapon.get_pos_y(), 8);
 }
 
+TEST(ProtocolRoundTripTest, GameStateUpdateCarriesKills) {
+    const GameStateUpdate state(
+            true, false, 1, 10.0f, true, false, false, 0, 0, 0.0f, Team::Terrorists, Team::None, {},
+            {}, RoundStage::PrePlant, 50.0f,
+            {KillInfo("alice", "bob", Weapon::AK47), KillInfo("", "carla", Weapon::Bomb)});
+    const std::list<KillInfo> kills = round_trip(state).get_kills();
+
+    ASSERT_EQ(kills.size(), 2u);
+    EXPECT_EQ(kills.front().get_killer(), "alice");
+    EXPECT_EQ(kills.front().get_victim(), "bob");
+    EXPECT_EQ(kills.front().get_weapon(), Weapon::AK47);
+    EXPECT_EQ(kills.back().get_killer(), "");
+    EXPECT_EQ(kills.back().get_weapon(), Weapon::Bomb);
+}
+
 TEST(ProtocolRoundTripTest, GameConfigInfo) {
     const GameConfigInfo received = round_trip(sample_config());
 

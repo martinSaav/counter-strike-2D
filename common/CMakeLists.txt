@@ -31,6 +31,7 @@ target_sources(taller_common
         dto/buy_ammo_request.h
         dto/player_info.h
         dto/dropped_weapon.h
+        dto/kill_info.h
         dto/site_info.h
         dto/gun_config_info.h
         dto/map_config_info.h

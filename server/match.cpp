@@ -254,7 +254,8 @@ MatchStatusDTO Match::get_match_status() {
                           game_manager.get_match_winner(),
                           map.get_dropped_weapons(),
                           info.stage,
-                          info.time_left};
+                          info.time_left,
+                          game_manager.take_kills()};
 }
 
 
