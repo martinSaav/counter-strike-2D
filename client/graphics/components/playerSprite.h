@@ -12,11 +12,21 @@ class PlayerSprite: public Component {
 private:
     // Ultimo disparo de M3 de cada jugador y hasta cuando se dibuja
     std::unordered_map<std::string, std::pair<SDL_Point, Uint32>> recentSpreads;
+    // Ultima bala (glock, AK o AWP) de cada jugador. Cada bala llega en un solo estado del servidor
+    // (un frame): la guardamos para que el trazo se vea un instante y se desvanezca.
+    struct RecentShot {
+        SDL_Point impact;
+        Uint32 firedAt;
+        Uint32 duration;
+    };
+    std::unordered_map<std::string, RecentShot> recentShots;
     SDL_Rect srcRect = {0, 0, 32, 32};
 
     void drawWeapon(int& playerX, int& playerY, double& angle, Weapon& weaponPlayer);
 
     void drawBullet(const int& shootX, const int& shootY, double& angle);
+
+    void drawTracer(int playerX, int playerY, const RecentShot& shot, double angle);
 
     std::string castWeapon(const Weapon& weapon);
 
